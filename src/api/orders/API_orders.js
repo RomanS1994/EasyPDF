@@ -1,12 +1,13 @@
 import { fetchApi } from '../settings.js';
 import { readJsonResponse } from '../utils.js';
+import { t } from '../../js/i18n/app.js';
 
 export async function API_getOrders() {
   const response = await fetchApi('/orders', {
     method: 'GET',
   });
 
-  return readJsonResponse(response, 'Не вдалося завантажити замовлення');
+  return readJsonResponse(response, t('api_orders_failed'));
 }
 
 export async function API_getOrder(orderId) {
@@ -14,7 +15,7 @@ export async function API_getOrder(orderId) {
     method: 'GET',
   });
 
-  return readJsonResponse(response, 'Не вдалося завантажити замовлення');
+  return readJsonResponse(response, t('api_order_failed'));
 }
 
 export async function API_createOrder(payload) {
@@ -23,7 +24,7 @@ export async function API_createOrder(payload) {
     body: payload,
   });
 
-  return readJsonResponse(response, 'Не вдалося створити замовлення');
+  return readJsonResponse(response, t('api_create_order_failed'));
 }
 
 export async function API_updateOrder(orderId, payload) {
@@ -32,5 +33,5 @@ export async function API_updateOrder(orderId, payload) {
     body: payload,
   });
 
-  return readJsonResponse(response, 'Не вдалося оновити замовлення');
+  return readJsonResponse(response, t('api_update_order_failed'));
 }

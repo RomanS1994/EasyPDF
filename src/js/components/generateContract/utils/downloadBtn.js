@@ -2,6 +2,7 @@ import { API_getContractPdf } from '../../../../api/contract/API_getContractPdf.
 import { API_createOrder, API_updateOrder } from '../../../../api/orders/API_orders.js';
 import { hasAuthenticatedSession } from '../../auth/authPanel.js';
 import { contractData } from '../generateContract';
+import { t } from '../../../i18n/app.js';
 import { notifyText } from '../../../toastify.js';
 
 const loader = document.getElementById('loaderOverlay');
@@ -13,10 +14,7 @@ const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 
 downloadPdfBtn?.addEventListener('click', async () => {
   if (!hasAuthenticatedSession()) {
-    notifyText(
-      'Увійдіть або створіть акаунт перед генерацією збереженого замовлення.',
-      'error'
-    );
+    notifyText(t('auth_required_before_pdf'), 'error');
     document.getElementById('accountHub')?.scrollIntoView({
       behavior: 'smooth',
       block: 'start',
@@ -40,13 +38,13 @@ downloadPdfBtn?.addEventListener('click', async () => {
 
     const response = await API_getContractPdf(contractData);
     if (!response?.blob) {
-      throw new Error('Не вдалося згенерувати PDF-файл.');
+      throw new Error(t('pdf_generation_failed'));
     }
 
     const blobUrl = URL.createObjectURL(response.blob);
     const link = document.createElement('a');
     link.href = blobUrl;
-    link.download = response.fileName || 'dogovir-transferu.pdf';
+    link.download = response.fileName || t('pdf_fallback_name');
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -59,7 +57,7 @@ downloadPdfBtn?.addEventListener('click', async () => {
       });
     }
 
-    notifyText('Замовлення збережено, PDF завантажено.', 'success');
+    notifyText(t('order_saved_pdf_downloaded'), 'success');
     window.dispatchEvent(new CustomEvent('pdf-app:order-created'));
   } catch (error) {
     console.error('Download PDF failed', error);
@@ -77,7 +75,7 @@ downloadPdfBtn?.addEventListener('click', async () => {
       }
     }
 
-    notifyText(error.message || 'Не вдалося завантажити PDF.', 'error');
+    notifyText(error.message || t('pdf_download_failed'), 'error');
   } finally {
     hideLoader();
   }

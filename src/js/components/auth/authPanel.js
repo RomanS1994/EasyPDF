@@ -30,6 +30,13 @@ import {
   API_updateOrder,
 } from '../../../api/orders/API_orders.js';
 import { API_getPlans } from '../../../api/plans/API_getPlans.js';
+import {
+  applyLanguage,
+  getCurrentLanguage,
+  getCurrentLocale,
+  initLanguage,
+  t,
+} from '../../i18n/app.js';
 import { notifyText } from '../../toastify.js';
 
 const refs = {
@@ -62,6 +69,7 @@ const refs = {
   accountProviderName: document.getElementById('accountProviderName'),
   accountProviderAddress: document.getElementById('accountProviderAddress'),
   accountProviderIco: document.getElementById('accountProviderIco'),
+  accountLanguageSelect: document.getElementById('accountLanguageSelect'),
   updateProfileBtn: document.getElementById('updateProfileBtn'),
   managerEntrySection: document.getElementById('managerEntrySection'),
   workspaceGreeting: document.getElementById('workspaceGreeting'),
@@ -137,6 +145,7 @@ const refs = {
   managerPlanActive: document.getElementById('managerPlanActive'),
   managerPlanSubmitBtn: document.getElementById('managerPlanSubmitBtn'),
   managerPlanResetBtn: document.getElementById('managerPlanResetBtn'),
+  adminLanguageSelect: document.getElementById('adminLanguageSelect'),
   managerAuditList: document.getElementById('managerAuditList'),
   managerAuditEmpty: document.getElementById('managerAuditEmpty'),
   managerSubscriptionEmpty: document.getElementById('managerSubscriptionEmpty'),
@@ -191,42 +200,6 @@ const CONTRACT_STORAGE_KEY = 'contract-data';
 const MANAGER_SELECTED_USER_KEY = 'pdf-app-admin-selected-user';
 const MANAGER_SELECTED_ORDER_KEY = 'pdf-app-admin-selected-order';
 const MANAGER_ORDERS_SELECTED_ONLY_KEY = 'pdf-app-admin-orders-selected-only';
-const UI_LOCALE = 'uk-UA';
-const ROLE_LABELS = {
-  user: 'Користувач',
-  manager: 'Менеджер',
-  admin: 'Адміністратор',
-};
-const SUBSCRIPTION_STATUS_LABELS = {
-  active: 'Активна',
-  trial: 'Пробна',
-  paused: 'Призупинена',
-  canceled: 'Скасована',
-  expired: 'Завершена',
-  inactive: 'Неактивна',
-};
-const ORDER_STATUS_LABELS = {
-  created: 'Створено',
-  pending_pdf: 'Очікує PDF',
-  pdf_generated: 'PDF згенеровано',
-  pdf_failed: 'Помилка PDF',
-};
-const AUDIT_ACTION_LABELS = {
-  'user.registered': 'Користувача зареєстровано',
-  'user.deleted_self': 'Користувач видалив акаунт',
-  'user.profile.updated': 'Профіль оновлено',
-  'order.created': 'Замовлення створено',
-  'order.updated': 'Замовлення оновлено',
-  'subscription.updated': 'Підписку оновлено',
-  'subscription.extended': 'Підписку продовжено',
-  'subscription.canceled': 'Підписку скасовано',
-  'user.role.updated': 'Роль оновлено',
-  'plan.created': 'План створено',
-  'plan.updated': 'План оновлено',
-};
-const GUEST_HEADLINE = 'Оберіть план і створіть акаунт';
-const GUEST_SUBLINE =
-  'Після входу ви потрапляєте в застосунок. Кожен згенерований PDF зберігається в межах активного циклу підписки.';
 
 const state = {
   plans: [],
@@ -334,15 +307,21 @@ function titleCase(value) {
 }
 
 function localizeRole(value) {
-  return ROLE_LABELS[value] || titleCase(value || 'user');
+  const key = `role_${value || 'user'}`;
+  const translated = t(key);
+  return translated !== key ? translated : titleCase(value || 'user');
 }
 
 function localizeSubscriptionStatus(value) {
-  return SUBSCRIPTION_STATUS_LABELS[value] || titleCase(value || '-');
+  const key = `subscription_${value || 'inactive'}`;
+  const translated = t(key);
+  return translated !== key ? translated : titleCase(value || '-');
 }
 
 function localizeAuditAction(value) {
-  return AUDIT_ACTION_LABELS[value] || titleCase(value || 'system.event');
+  const key = `audit_${String(value || 'system.event').replaceAll('.', '_')}`;
+  const translated = t(key);
+  return translated !== key ? translated : titleCase(value || 'system.event');
 }
 
 function formatDateLabel(value) {
@@ -351,7 +330,7 @@ function formatDateLabel(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '-';
 
-  return date.toLocaleDateString(UI_LOCALE, {
+  return date.toLocaleDateString(getCurrentLocale(), {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -364,7 +343,7 @@ function formatDateTimeLabel(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return String(value);
 
-  return date.toLocaleString(UI_LOCALE);
+  return date.toLocaleString(getCurrentLocale());
 }
 
 function formatCycleLabel(usage) {
@@ -409,6 +388,23 @@ function setGuestVisible(isVisible) {
   refs.accountPanel?.classList.toggle('is-hidden', isVisible);
 }
 
+function syncLanguageSelects() {
+  const language = getCurrentLanguage();
+
+  if (refs.accountLanguageSelect) {
+    refs.accountLanguageSelect.value = language;
+  }
+
+  if (refs.adminLanguageSelect) {
+    refs.adminLanguageSelect.value = language;
+  }
+}
+
+function handleLanguageSelectChange(event) {
+  const nextLanguage = event.target.value;
+  applyLanguage(nextLanguage);
+}
+
 function activateTab(tabName = 'home') {
   const nextTab = TAB_NAMES.includes(tabName) ? tabName : 'home';
   state.activeTab = nextTab;
@@ -450,6 +446,11 @@ function syncSelectedPlan(planId, { scrollToForm = false } = {}) {
     refs.planSelect.value = planId;
   }
 
+  refs.planCards?.querySelectorAll('.planCard').forEach(card => {
+    const button = card.querySelector('[data-plan-select]');
+    card.classList.toggle('is-active', button?.dataset.planSelect === planId);
+  });
+
   refs.planCards?.querySelectorAll('[data-plan-select]').forEach(button => {
     button.classList.toggle('is-active', button.dataset.planSelect === planId);
   });
@@ -459,13 +460,50 @@ function syncSelectedPlan(planId, { scrollToForm = false } = {}) {
   }
 }
 
+function getPlanVisual(plan) {
+  const haystack = `${plan?.id || ''} ${plan?.name || ''}`.toLowerCase();
+  const limit = Number(plan?.monthlyGenerationLimit) || 0;
+
+  if (haystack.includes('trial') || limit <= 10) {
+    return {
+      tone: 'trial',
+      tierLabel: t('plan_tier_trial'),
+      note: t('plan_note_trial'),
+    };
+  }
+
+  if (haystack.includes('scale') || haystack.includes('gold') || limit >= 100) {
+    return {
+      tone: 'gold',
+      tierLabel: t('plan_tier_gold'),
+      note: t('plan_note_gold'),
+    };
+  }
+
+  if (haystack.includes('growth') || haystack.includes('silver') || limit >= 50) {
+    return {
+      tone: 'silver',
+      tierLabel: t('plan_tier_silver'),
+      note: t('plan_note_silver'),
+    };
+  }
+
+  return {
+    tone: 'bronze',
+    tierLabel: t('plan_tier_bronze'),
+    note: t('plan_note_bronze'),
+  };
+}
+
 function renderPlans() {
   if (!state.plans.length) return;
 
   if (refs.planSelect) {
     refs.planSelect.innerHTML = state.plans
       .map(plan => {
-        return `<option value="${plan.id}">${escapeHtml(plan.name)} - ${plan.monthlyGenerationLimit}/місяць</option>`;
+        return `<option value="${plan.id}">${escapeHtml(plan.name)} - ${escapeHtml(
+          t('plan_option_suffix', { limit: plan.monthlyGenerationLimit })
+        )}</option>`;
       })
       .join('');
   }
@@ -473,17 +511,26 @@ function renderPlans() {
   if (refs.planCards) {
     refs.planCards.innerHTML = state.plans
       .map(plan => {
+        const visual = getPlanVisual(plan);
         return `
-          <article class="planCard ${plan.id === state.selectedPlanId ? 'is-active' : ''}">
+          <article class="planCard planCard--${visual.tone} ${plan.id === state.selectedPlanId ? 'is-active' : ''}">
+            <div class="planCard-tierRow">
+              <span class="planCard-tier">${escapeHtml(visual.tierLabel)}</span>
+              <span class="planCard-limit">${escapeHtml(
+                t('plan_option_suffix', { limit: plan.monthlyGenerationLimit })
+              )}</span>
+            </div>
             <div class="planCard-head">
               <p>${escapeHtml(plan.name)}</p>
               <strong>${plan.monthlyGenerationLimit}</strong>
             </div>
-            <span class="planCard-caption">документів / місяць</span>
-            <p class="planCard-copy">${escapeHtml(plan.description || '')}</p>
-            <button class="planCard-action" type="button" data-plan-select="${plan.id}">
-              Обрати ${escapeHtml(plan.name)}
-            </button>
+            <span class="planCard-caption">${escapeHtml(t('plan_card_caption'))}</span>
+            <p class="planCard-copy">${escapeHtml(visual.note)}</p>
+            <div class="planCard-footer">
+              <button class="planCard-action" type="button" data-plan-select="${plan.id}">
+                ${escapeHtml(t('choose_plan', { plan: plan.name }))}
+              </button>
+            </div>
           </article>
         `;
       })
@@ -562,7 +609,7 @@ function buildActivitySeries(usage) {
     return {
       key,
       count,
-      label: date.toLocaleDateString(UI_LOCALE, { weekday: 'short' }).slice(0, 2),
+      label: date.toLocaleDateString(getCurrentLocale(), { weekday: 'short' }).slice(0, 2),
     };
   });
 }
@@ -588,7 +635,7 @@ function buildPlanForecast(usage) {
   if (!start || !end || Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
     return {
       projectedVolume: 0,
-      forecastLabel: 'Немає даних',
+      forecastLabel: t('no_data'),
       projectedPercent: 0,
     };
   }
@@ -609,18 +656,20 @@ function buildPlanForecast(usage) {
     ? Math.min(100, Math.round((projectedVolume / usage.limit) * 100))
     : 0;
 
-  let forecastLabel = 'У межах ліміту';
+  let forecastLabel = t('on_track');
   if (perDay <= 0) {
-    forecastLabel = 'Активності ще не було';
+    forecastLabel = t('no_activity_yet');
   } else if (projectedVolume > usage.limit && usage.limit > 0) {
     const remaining = Math.max(usage.limit - usage.used, 0);
     const daysToLimit = remaining > 0 ? Math.ceil(remaining / perDay) : 0;
     const forecastDate = new Date(effectiveNow);
     forecastDate.setDate(forecastDate.getDate() + daysToLimit);
-    forecastLabel = `Ліміт орієнтовно ${forecastDate.toLocaleDateString(UI_LOCALE, {
-      day: 'numeric',
-      month: 'short',
-    })}`;
+    forecastLabel = t('limit_around', {
+      date: forecastDate.toLocaleDateString(getCurrentLocale(), {
+        day: 'numeric',
+        month: 'short',
+      }),
+    });
   }
 
   return {
@@ -632,8 +681,10 @@ function buildPlanForecast(usage) {
 
 function formatOrderStatusLabel(status) {
   const value = String(status || '').trim();
-  if (!value) return 'Створено';
-  if (ORDER_STATUS_LABELS[value]) return ORDER_STATUS_LABELS[value];
+  if (!value) return t('order_created');
+
+  const translated = t(`order_${value}`);
+  if (translated !== `order_${value}`) return translated;
 
   return value
     .split(/[_\s-]+/)
@@ -650,7 +701,10 @@ function renderStatsCharts(metrics) {
     refs.statsRingValue.textContent = `${metrics.usagePercent}%`;
   }
   if (refs.statsQuotaLabel) {
-    refs.statsQuotaLabel.textContent = `${metrics.usage.used} з ${metrics.usage.limit}`;
+    refs.statsQuotaLabel.textContent = t('quota_label', {
+      used: metrics.usage.used,
+      limit: metrics.usage.limit,
+    });
   }
 
   const activitySeries = buildActivitySeries(metrics.usage);
@@ -676,7 +730,7 @@ function renderStatsCharts(metrics) {
 
   if (refs.statsActivitySummary) {
     const totalWeekOrders = activitySeries.reduce((sum, item) => sum + item.count, 0);
-    refs.statsActivitySummary.textContent = `${totalWeekOrders} замовлень`;
+    refs.statsActivitySummary.textContent = t('orders_count', { count: totalWeekOrders });
   }
 
   const statusCounts = buildStatusBreakdown();
@@ -702,33 +756,35 @@ function renderStatsCharts(metrics) {
     refs.statsStatusLegend.innerHTML = `
       <div class="statusLegendItem">
         <span class="statusLegendDot statusLegendDot-generated"></span>
-        <span>Згенеровано</span>
+        <span>${escapeHtml(t('generated'))}</span>
         <strong>${statusCounts.generated}</strong>
       </div>
       <div class="statusLegendItem">
         <span class="statusLegendDot statusLegendDot-pending"></span>
-        <span>Очікують</span>
+        <span>${escapeHtml(t('pending'))}</span>
         <strong>${statusCounts.pending}</strong>
       </div>
       <div class="statusLegendItem">
         <span class="statusLegendDot statusLegendDot-failed"></span>
-        <span>Помилка</span>
+        <span>${escapeHtml(t('failed'))}</span>
         <strong>${statusCounts.failed}</strong>
       </div>
     `;
   }
 
   if (refs.statsStatusSummary) {
-    refs.statsStatusSummary.textContent = `${metrics.totalOrders} всього`;
+    refs.statsStatusSummary.textContent = t('total_count', { count: metrics.totalOrders });
   }
 
   const forecast = buildPlanForecast(metrics.usage);
 
   if (refs.statsPlanLimit) {
-    refs.statsPlanLimit.textContent = `${metrics.usage.limit} документів за цикл`;
+    refs.statsPlanLimit.textContent = t('docs_per_cycle', { count: metrics.usage.limit });
   }
   if (refs.statsForecastVolume) {
-    refs.statsForecastVolume.textContent = `${forecast.projectedVolume} прогноз`;
+    refs.statsForecastVolume.textContent = t('projected_volume', {
+      count: forecast.projectedVolume,
+    });
   }
   if (refs.statsForecastDate) {
     refs.statsForecastDate.textContent = forecast.forecastLabel;
@@ -740,16 +796,16 @@ function renderStatsCharts(metrics) {
 
 function buildOrderMarkup(order, { compact = false, showOwner = false } = {}) {
   const createdAt = order.createdAt
-    ? new Date(order.createdAt).toLocaleString(UI_LOCALE)
+    ? new Date(order.createdAt).toLocaleString(getCurrentLocale())
     : '-';
   const route = [order.trip?.from, order.trip?.to]
     .filter(Boolean)
     .join(' → ');
-  const customerName = order.customer?.name || 'Без імені клієнта';
-  const totalPrice = order.totalPrice || 'Без суми';
+  const customerName = order.customer?.name || t('no_customer_name');
+  const totalPrice = order.totalPrice || t('no_total');
   const ownerLabel = order.user
-    ? `${order.user.name || 'Без імені'} · ${order.user.email || '-'}`
-    : 'Без акаунта';
+    ? `${order.user.name || t('no_name')} · ${order.user.email || '-'}`
+    : t('no_account');
   const statusLabel = formatOrderStatusLabel(order.status || 'created');
 
   return `
@@ -758,7 +814,7 @@ function buildOrderMarkup(order, { compact = false, showOwner = false } = {}) {
         <strong>${escapeHtml(order.orderNumber || '-')}</strong>
         ${showOwner ? `<p class="orderItem-owner">${escapeHtml(ownerLabel)}</p>` : ''}
         <p>${escapeHtml(customerName)}</p>
-        <p>${escapeHtml(route || 'Маршрут не вказано')}</p>
+        <p>${escapeHtml(route || t('route_not_set'))}</p>
       </div>
       <div class="orderItem-meta">
         <span>${escapeHtml(totalPrice)}</span>
@@ -790,11 +846,11 @@ function renderOrderList(listElement, emptyElement, orders, options = {}) {
 function buildManagerOrderListMarkup(order) {
   const createdAt = formatDateTimeLabel(order.createdAt);
   const route =
-    [order.trip?.from, order.trip?.to].filter(Boolean).join(' → ') || 'Маршрут не вказано';
+    [order.trip?.from, order.trip?.to].filter(Boolean).join(' → ') || t('route_not_set');
   const ownerLabel = order.user
-    ? `${order.user.name || 'Без імені'} · ${order.user.email || '-'}`
-    : 'Без акаунта';
-  const customerLabel = order.customer?.name || order.customer?.email || 'Без клієнта';
+    ? `${order.user.name || t('no_name')} · ${order.user.email || '-'}`
+    : t('no_account');
+  const customerLabel = order.customer?.name || order.customer?.email || t('no_customer');
   const statusLabel = formatOrderStatusLabel(order.status || 'created');
   const isActive = order.id === state.managerSelectedOrderId;
 
@@ -808,7 +864,7 @@ function buildManagerOrderListMarkup(order) {
           <p>${escapeHtml(route)}</p>
         </div>
         <div class="orderItem-meta">
-          <span>${escapeHtml(order.totalPrice || 'Без суми')}</span>
+          <span>${escapeHtml(order.totalPrice || t('no_total'))}</span>
           <span>${escapeHtml(createdAt)}</span>
           <span class="orderStatus">${escapeHtml(statusLabel)}</span>
         </div>
@@ -843,7 +899,7 @@ function renderManagerOrderDetail() {
     if (refs.managerOrderDetailRoute) refs.managerOrderDetailRoute.textContent = '-';
     if (refs.managerOrderDetailPdf) refs.managerOrderDetailPdf.textContent = '-';
     if (refs.managerOrderDetailHint) {
-      refs.managerOrderDetailHint.textContent = 'Видимо в поточних результатах.';
+      refs.managerOrderDetailHint.textContent = t('visible_in_results');
     }
     return;
   }
@@ -858,7 +914,7 @@ function renderManagerOrderDetail() {
   }
   if (refs.managerOrderDetailAccount) {
     refs.managerOrderDetailAccount.textContent = order.user
-      ? `${order.user.name || order.user.email || 'Без акаунта'}`
+      ? `${order.user.name || order.user.email || t('no_account')}`
       : '-';
   }
   if (refs.managerOrderDetailCustomer) {
@@ -879,18 +935,18 @@ function renderManagerOrderDetail() {
   }
   if (refs.managerOrderDetailRoute) {
     refs.managerOrderDetailRoute.textContent =
-      [order.trip?.from, order.trip?.to].filter(Boolean).join(' → ') || 'Маршрут не вказано';
+      [order.trip?.from, order.trip?.to].filter(Boolean).join(' → ') || t('route_not_set');
   }
   if (refs.managerOrderDetailPdf) {
-    const pdfLabel = order.pdf?.fileName || order.pdf?.url || 'Не прикріплено';
+    const pdfLabel = order.pdf?.fileName || order.pdf?.url || t('not_attached');
     refs.managerOrderDetailPdf.textContent = pdfLabel;
   }
   if (refs.managerOrderDetailHint) {
     refs.managerOrderDetailHint.textContent = isVisibleInCurrentResults
       ? state.managerOrdersSelectedOnly && contextUser
-        ? `Відфільтровано за ${contextUser.name || contextUser.email}.`
-        : 'Видимо в поточних результатах.'
-      : 'Вибране замовлення поза межами поточних фільтрів.';
+        ? t('filtered_to_user', { name: contextUser.name || contextUser.email })
+        : t('visible_in_results')
+      : t('selected_order_outside_filters');
   }
 }
 
@@ -921,13 +977,13 @@ function renderManagerOrders() {
   if (refs.managerOrdersContextNote) {
     refs.managerOrdersContextNote.textContent = contextUser
       ? state.managerOrdersSelectedOnly
-        ? `Відфільтровано за вибраним акаунтом: ${
-            contextUser.name || contextUser.email
-          }.`
-        : `Вибраний акаунт: ${
-            contextUser.name || contextUser.email
-          }. Увімкніть фільтр, щоб звузити результати.`
-      : 'Показано всі акаунти.';
+        ? t('filtered_to_selected_account', {
+            name: contextUser.name || contextUser.email,
+          })
+        : t('selected_account_context', {
+            name: contextUser.name || contextUser.email,
+          })
+      : t('all_accounts_visible');
   }
 
   if (!state.managerOrders.length) {
@@ -949,9 +1005,9 @@ function renderManagerOrders() {
     );
     refs.managerOrdersSelectedUserBtn.textContent = canUseSelected
       ? state.managerOrdersSelectedOnly
-        ? 'Показано вибраний акаунт'
-        : 'Лише вибраний акаунт'
-      : 'Спочатку оберіть акаунт';
+        ? t('showing_selected_account')
+        : t('selected_account_only')
+      : t('select_account_first');
   }
 
   renderManagerOrderDetail();
@@ -963,7 +1019,9 @@ function renderManagerPlanOptions() {
   if (refs.managerSubscriptionPlan) {
     refs.managerSubscriptionPlan.innerHTML = plans
       .map(plan => {
-        return `<option value="${plan.id}">${escapeHtml(plan.name)} - ${plan.monthlyGenerationLimit}</option>`;
+        return `<option value="${plan.id}">${escapeHtml(plan.name)} - ${escapeHtml(
+          t('per_cycle', { count: plan.monthlyGenerationLimit })
+        )}</option>`;
       })
       .join('');
   }
@@ -971,7 +1029,7 @@ function renderManagerPlanOptions() {
   if (refs.managerPlanFilter) {
     const currentValue = refs.managerPlanFilter.value || 'all';
     refs.managerPlanFilter.innerHTML = [
-      '<option value="all">Усі плани</option>',
+      `<option value="all">${escapeHtml(t('all_plans_filter'))}</option>`,
       ...plans.map(plan => `<option value="${plan.id}">${escapeHtml(plan.name)}</option>`),
     ].join('');
     refs.managerPlanFilter.value = plans.some(plan => plan.id === currentValue)
@@ -1016,7 +1074,7 @@ function renderManagerUsers() {
         <li class="managerUserItem ${isActive ? 'is-active' : ''}">
           <button type="button" class="managerUserButton" data-manager-user-id="${user.id}">
             <div class="managerUserCopy">
-              <strong>${escapeHtml(user.name || 'Без імені')}</strong>
+              <strong>${escapeHtml(user.name || t('no_name'))}</strong>
               <p>${escapeHtml(user.email || '-')}</p>
             </div>
             <div class="managerUserMeta">
@@ -1039,7 +1097,7 @@ function renderManagerSelectedUser() {
   refs.managerSubscriptionCard?.classList.toggle('is-hidden', !user);
 
   if (isAdminShell() && refs.workspaceUsage) {
-    refs.workspaceUsage.textContent = user?.email || 'Без акаунта';
+    refs.workspaceUsage.textContent = user?.email || t('no_account');
   }
 
   if (!user) {
@@ -1049,7 +1107,7 @@ function renderManagerSelectedUser() {
       refs.managerSelectedOrdersList,
       refs.managerSelectedOrdersEmpty,
       [],
-      { emptyText: 'Для цього акаунта ще немає недавніх замовлень.' }
+      { emptyText: t('recent_orders_empty') }
     );
     if (refs.managerSubscriptionName) refs.managerSubscriptionName.textContent = '-';
     if (refs.managerSubscriptionEmail) refs.managerSubscriptionEmail.textContent = '-';
@@ -1082,7 +1140,9 @@ function renderManagerSelectedUser() {
     refs.managerSelectedOrdersCount.textContent = String(user.totalOrders || 0);
   }
   if (refs.managerRecentOrdersLabel) {
-    refs.managerRecentOrdersLabel.textContent = `${state.managerSelectedOrders.length} недавніх`;
+    refs.managerRecentOrdersLabel.textContent = t('recent_count', {
+      count: state.managerSelectedOrders.length,
+    });
   }
   if (refs.managerSubscriptionName) {
     refs.managerSubscriptionName.textContent = user.name || '-';
@@ -1131,7 +1191,7 @@ function renderManagerSelectedUser() {
     refs.managerSelectedOrdersList,
     refs.managerSelectedOrdersEmpty,
     state.managerSelectedOrders,
-    { compact: true, emptyText: 'Для цього акаунта ще немає недавніх замовлень.' }
+    { compact: true, emptyText: t('recent_orders_empty') }
   );
   renderManagerOrders();
 }
@@ -1156,11 +1216,13 @@ function renderManagerPlans() {
           <button type="button" class="managerPlanButton" data-manager-plan-id="${plan.id}">
             <div>
               <strong>${escapeHtml(plan.name)}</strong>
-              <p>${escapeHtml(plan.description || 'Без опису')}</p>
+              <p>${escapeHtml(plan.description || t('no_description'))}</p>
             </div>
             <div class="managerPlanMeta">
-              <span>${plan.monthlyGenerationLimit}/цикл</span>
-              <span>${plan.isActive === false ? 'Неактивний' : 'Активний'}</span>
+              <span>${escapeHtml(t('per_cycle', { count: plan.monthlyGenerationLimit }))}</span>
+              <span>${escapeHtml(
+                plan.isActive === false ? t('plan_inactive_status') : t('plan_active_status')
+              )}</span>
             </div>
           </button>
         </li>
@@ -1170,17 +1232,15 @@ function renderManagerPlans() {
 }
 
 function buildAuditMarkup(record) {
-  const actor = record.actor?.name || record.actor?.email || 'Система';
+  const actor = record.actor?.name || record.actor?.email || t('system_actor');
   const target = record.target?.email || record.target?.name || '-';
-  const createdAt = record.createdAt
-    ? new Date(record.createdAt).toLocaleString(UI_LOCALE)
-    : '-';
+  const createdAt = formatDateTimeLabel(record.createdAt);
 
   return `
     <li class="auditItem">
       <div>
         <strong>${escapeHtml(localizeAuditAction(record.action || 'system.event'))}</strong>
-        <p>${escapeHtml(actor)} → ${escapeHtml(target)}</p>
+        <p>${escapeHtml(t('audit_target_arrow', { actor, target }))}</p>
       </div>
       <span>${escapeHtml(createdAt)}</span>
     </li>
@@ -1219,7 +1279,9 @@ function renderDashboard() {
     null;
 
   if (refs.workspaceGreeting) {
-    refs.workspaceGreeting.textContent = state.user.name || 'Водій';
+    refs.workspaceGreeting.textContent = t('hello', {
+      name: state.user.name || t('driver_fallback'),
+    });
   }
   if (refs.workspacePlan) {
     refs.workspacePlan.textContent = isAdminShell()
@@ -1228,7 +1290,7 @@ function renderDashboard() {
   }
   if (refs.workspaceUsage) {
     refs.workspaceUsage.textContent = isAdminShell()
-      ? contextUser?.email || 'Без акаунта'
+      ? contextUser?.email || t('no_account')
       : usageText;
   }
 
@@ -1272,12 +1334,14 @@ function renderDashboard() {
     refs.statsUsageBar.style.width = `${metrics.usagePercent}%`;
   }
   if (refs.statsUsagePercent) {
-    refs.statsUsagePercent.textContent = `${metrics.usagePercent}% використано`;
+    refs.statsUsagePercent.textContent = t('usage_percent_used', {
+      percent: metrics.usagePercent,
+    });
   }
 
   renderStatsCharts(metrics);
   renderOrderList(refs.ordersList, refs.ordersEmpty, state.orders, {
-    emptyText: 'Замовлень ще немає. Згенеруйте PDF на вкладці «Головна», щоб створити перше.',
+    emptyText: t('orders_empty_home'),
   });
   renderManagerAccessState();
   renderManagerUsers();
@@ -1303,11 +1367,11 @@ function renderAuthenticatedState({ resetTab = false } = {}) {
     setGuestVisible(true);
     clearManagerState();
 
-    if (refs.authHeadline) refs.authHeadline.textContent = GUEST_HEADLINE;
-    if (refs.authSubline) refs.authSubline.textContent = GUEST_SUBLINE;
+    if (refs.authHeadline) refs.authHeadline.textContent = t('guest_headline');
+    if (refs.authSubline) refs.authSubline.textContent = t('guest_subline');
 
     renderOrderList(refs.ordersList, refs.ordersEmpty, [], {
-      emptyText: 'Замовлень ще немає. Згенеруйте PDF на вкладці «Головна», щоб створити перше.',
+      emptyText: t('orders_empty_home'),
     });
     renderManagerUsers();
     renderManagerSelectedUser();
@@ -1350,7 +1414,7 @@ async function refreshManagerUserDetail(userId) {
     state.managerSelectedOrders = data.recentOrders || [];
     renderManagerSelectedUser();
   } catch (error) {
-    notifyText(error.message || 'Не вдалося завантажити деталі акаунта.', 'error');
+    notifyText(error.message || t('account_detail_failed'), 'error');
   }
 }
 
@@ -1393,7 +1457,7 @@ async function refreshManagerOrderDetail(orderId, { silent = false } = {}) {
     renderManagerOrderDetail();
   } catch (error) {
     if (!silent) {
-      notifyText(error.message || 'Не вдалося завантажити деталі замовлення.', 'error');
+      notifyText(error.message || t('order_detail_failed'), 'error');
     }
   }
 }
@@ -1433,7 +1497,7 @@ async function loadManagerOrders() {
     syncSelectedManagerOrderFromCollections();
     renderManagerOrders();
   } catch (error) {
-    notifyText(error.message || 'Не вдалося завантажити admin-замовлення.', 'error');
+    notifyText(error.message || t('admin_orders_failed'), 'error');
   }
 }
 
@@ -1507,7 +1571,7 @@ async function loadManagerData({ preserveSelection = true } = {}) {
 
     await refreshManagerUserDetail(nextSelected);
   } catch (error) {
-    notifyText(error.message || 'Не вдалося завантажити admin-робочий простір.', 'error');
+    notifyText(error.message || t('admin_workspace_failed'), 'error');
   }
 }
 
@@ -1548,11 +1612,11 @@ async function refreshAccountData({ resetTab = false } = {}) {
       state.orders = [];
       clearManagerState();
       renderAuthenticatedState({ resetTab: true });
-      notifyText('Сесія закінчилася. Увійдіть знову.', 'error');
+      notifyText(t('session_expired'), 'error');
       return;
     }
 
-    notifyText(error.message || 'Не вдалося завантажити дані робочого простору.', 'error');
+    notifyText(error.message || t('account_load_failed'), 'error');
   }
 }
 
@@ -1563,7 +1627,7 @@ async function handleRegisterSubmit(event) {
   const payload = Object.fromEntries(formData.entries());
 
   if (!payload.name || !payload.email || !payload.password || !payload.planId) {
-    notifyText('Введіть ім’я, email, пароль і оберіть план.', 'error');
+    notifyText(t('register_validation'), 'error');
     return;
   }
 
@@ -1573,12 +1637,12 @@ async function handleRegisterSubmit(event) {
     const data = await API_register(payload);
     setStoredSession({ token: data.token, user: data.user });
     state.user = data.user;
-    notifyText('Акаунт створено. Ви вже увійшли в систему.', 'success');
+    notifyText(t('account_created_signed_in'), 'success');
     await refreshAccountData({ resetTab: true });
     refs.registerForm?.reset();
     syncSelectedPlan(state.selectedPlanId);
   } catch (error) {
-    notifyText(error.message || 'Не вдалося зареєструватися.', 'error');
+    notifyText(error.message || t('register_failed'), 'error');
   } finally {
     setFormDisabled(refs.registerForm, false);
   }
@@ -1591,7 +1655,7 @@ async function handleLoginSubmit(event) {
   const payload = Object.fromEntries(formData.entries());
 
   if (!payload.email || !payload.password) {
-    notifyText('Введіть email і пароль.', 'error');
+    notifyText(t('login_validation'), 'error');
     return;
   }
 
@@ -1601,11 +1665,11 @@ async function handleLoginSubmit(event) {
     const data = await API_login(payload);
     setStoredSession({ token: data.token, user: data.user });
     state.user = data.user;
-    notifyText('Вхід виконано.', 'success');
+    notifyText(t('signed_in_successfully'), 'success');
     await refreshAccountData({ resetTab: true });
     refs.loginForm?.reset();
   } catch (error) {
-    notifyText(error.message || 'Не вдалося увійти.', 'error');
+    notifyText(error.message || t('sign_in_failed'), 'error');
   } finally {
     setFormDisabled(refs.loginForm, false);
   }
@@ -1624,14 +1688,14 @@ async function handleLogoutClick() {
   state.orders = [];
   clearManagerState();
   renderAuthenticatedState({ resetTab: true });
-  notifyText('Ви вийшли з системи.', 'success');
+  notifyText(t('signed_out'), 'success');
 }
 
 async function handleDeleteAccountClick() {
   if (!state.user) return;
 
   const confirmed = window.confirm(
-    'Видалити цей акаунт і всі його замовлення? Цю дію неможливо скасувати.'
+    t('delete_account_confirm')
   );
 
   if (!confirmed) return;
@@ -1645,9 +1709,9 @@ async function handleDeleteAccountClick() {
     clearManagerState();
     renderAuthenticatedState({ resetTab: true });
     refs.hub?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    notifyText('Акаунт видалено.', 'success');
+    notifyText(t('account_deleted'), 'success');
   } catch (error) {
-    notifyText(error.message || 'Не вдалося видалити акаунт.', 'error');
+    notifyText(error.message || t('delete_account_failed'), 'error');
   }
 }
 
@@ -1679,10 +1743,10 @@ async function handleUpdateProfileClick() {
       setStoredSession({ token: session.token, user: state.user });
     }
 
-    notifyText('Бізнес-профіль оновлено.', 'success');
+    notifyText(t('business_profile_updated'), 'success');
     renderAuthenticatedState();
   } catch (error) {
-    notifyText(error.message || 'Не вдалося оновити профіль.', 'error');
+    notifyText(error.message || t('update_profile_failed'), 'error');
   } finally {
     if (refs.updateProfileBtn) refs.updateProfileBtn.disabled = false;
   }
@@ -1705,10 +1769,10 @@ async function handleManagerSubscriptionSave() {
 
   try {
     await API_updateManagerUserSubscription(userId, payload);
-    notifyText('Підписку оновлено.', 'success');
+    notifyText(t('subscription_updated'), 'success');
     await refreshAccountData();
   } catch (error) {
-    notifyText(error.message || 'Не вдалося оновити підписку.', 'error');
+    notifyText(error.message || t('update_subscription_failed'), 'error');
   } finally {
     refs.managerSubscriptionSaveBtn && (refs.managerSubscriptionSaveBtn.disabled = false);
   }
@@ -1723,10 +1787,10 @@ async function handleManagerSubscriptionExtend() {
 
   try {
     await API_extendManagerUserSubscription(userId, { months: 1 });
-    notifyText('Підписку продовжено на 30 днів.', 'success');
+    notifyText(t('subscription_extended_30'), 'success');
     await refreshAccountData();
   } catch (error) {
-    notifyText(error.message || 'Не вдалося продовжити підписку.', 'error');
+    notifyText(error.message || t('extend_subscription_failed'), 'error');
   } finally {
     refs.managerSubscriptionExtendBtn &&
       (refs.managerSubscriptionExtendBtn.disabled = false);
@@ -1737,7 +1801,7 @@ async function handleManagerSubscriptionCancel() {
   const userId = state.managerSelectedUserId;
   if (!userId) return;
 
-  const confirmed = window.confirm('Скасувати цю підписку негайно?');
+  const confirmed = window.confirm(t('cancel_subscription_confirm'));
   if (!confirmed) return;
 
   refs.managerSubscriptionCancelBtn &&
@@ -1745,10 +1809,10 @@ async function handleManagerSubscriptionCancel() {
 
   try {
     await API_cancelManagerUserSubscription(userId);
-    notifyText('Підписку скасовано.', 'success');
+    notifyText(t('subscription_canceled_message'), 'success');
     await refreshAccountData();
   } catch (error) {
-    notifyText(error.message || 'Не вдалося скасувати підписку.', 'error');
+    notifyText(error.message || t('cancel_subscription_failed'), 'error');
   } finally {
     refs.managerSubscriptionCancelBtn &&
       (refs.managerSubscriptionCancelBtn.disabled = false);
@@ -1764,10 +1828,10 @@ async function handleManagerRoleSave() {
 
   try {
     await API_updateManagerUserRole(userId, role);
-    notifyText('Роль оновлено.', 'success');
+    notifyText(t('role_updated'), 'success');
     await refreshAccountData();
   } catch (error) {
-    notifyText(error.message || 'Не вдалося оновити роль.', 'error');
+    notifyText(error.message || t('update_role_failed'), 'error');
   } finally {
     refs.managerRoleSaveBtn && (refs.managerRoleSaveBtn.disabled = false);
   }
@@ -1793,7 +1857,7 @@ async function handleManagerPlanSubmit(event) {
   };
 
   if (!payload.name || !payload.monthlyGenerationLimit) {
-    notifyText('Введіть назву плану та місячний ліміт.', 'error');
+    notifyText(t('plan_validation'), 'error');
     return;
   }
 
@@ -1802,17 +1866,17 @@ async function handleManagerPlanSubmit(event) {
   try {
     if (planId) {
       await API_updateManagerPlan(planId, payload);
-      notifyText('План оновлено.', 'success');
+      notifyText(t('plan_updated'), 'success');
     } else {
       await API_createManagerPlan(payload);
-      notifyText('План створено.', 'success');
+      notifyText(t('plan_created'), 'success');
     }
 
     resetManagerPlanForm();
     await loadPlans();
     await refreshAccountData();
   } catch (error) {
-    notifyText(error.message || 'Не вдалося зберегти план.', 'error');
+    notifyText(error.message || t('save_plan_failed'), 'error');
   } finally {
     refs.managerPlanSubmitBtn && (refs.managerPlanSubmitBtn.disabled = false);
   }
@@ -1841,7 +1905,7 @@ async function loadPlans() {
     }
     renderPlans();
   } catch (error) {
-    notifyText(error.message || 'Не вдалося завантажити плани.', 'error');
+    notifyText(error.message || t('load_plans_failed'), 'error');
   }
 }
 
@@ -1932,9 +1996,9 @@ function setManagerOrderActionButtonsDisabled(disabled) {
 }
 
 function getOrderStatusActionLabel(status) {
-  if (status === 'pending_pdf') return 'очікує PDF';
-  if (status === 'pdf_generated') return 'PDF згенеровано';
-  if (status === 'pdf_failed') return 'помилка PDF';
+  if (status === 'pending_pdf') return t('order_pending_pdf');
+  if (status === 'pdf_generated') return t('order_pdf_generated');
+  if (status === 'pdf_failed') return t('order_pdf_failed');
   return formatOrderStatusLabel(status);
 }
 
@@ -1949,7 +2013,10 @@ async function handleManagerOrderStatusChange(nextStatus) {
     state.managerSelectedOrder = data.order || state.managerSelectedOrder;
     state.managerSelectedOrderId = data.order?.id || state.managerSelectedOrderId;
     setStoredManagerSelectedOrderId(state.managerSelectedOrderId);
-    notifyText(`Замовлення позначено як: ${getOrderStatusActionLabel(nextStatus)}.`, 'success');
+    notifyText(
+      t('order_marked_as', { status: getOrderStatusActionLabel(nextStatus) }),
+      'success'
+    );
 
     const refreshTasks = [loadManagerOrders()];
     if (state.managerSelectedUserId && data.order?.userId === state.managerSelectedUserId) {
@@ -1958,7 +2025,7 @@ async function handleManagerOrderStatusChange(nextStatus) {
 
     await Promise.all(refreshTasks);
   } catch (error) {
-    notifyText(error.message || 'Не вдалося оновити статус замовлення.', 'error');
+    notifyText(error.message || t('update_order_status_failed'), 'error');
   } finally {
     setManagerOrderActionButtonsDisabled(false);
   }
@@ -1970,6 +2037,8 @@ function bindEvents() {
   refs.logoutBtn?.addEventListener('click', handleLogoutClick);
   refs.deleteAccountBtn?.addEventListener('click', handleDeleteAccountClick);
   refs.updateProfileBtn?.addEventListener('click', handleUpdateProfileClick);
+  refs.accountLanguageSelect?.addEventListener('change', handleLanguageSelectChange);
+  refs.adminLanguageSelect?.addEventListener('change', handleLanguageSelectChange);
   refs.planCards?.addEventListener('click', handlePlanCardClick);
   refs.planSelect?.addEventListener('change', event => {
     syncSelectedPlan(event.target.value);
@@ -2036,12 +2105,19 @@ function bindEvents() {
   window.addEventListener('pdf-app:order-created', () => {
     refreshAccountData();
   });
+  window.addEventListener('pdf-app:language-changed', () => {
+    syncLanguageSelects();
+    renderPlans();
+    renderAuthenticatedState();
+  });
 }
 
 async function init() {
   if (!refs.hub) return;
 
+  initLanguage();
   bindEvents();
+  syncLanguageSelects();
   activateTab(state.activeTab);
   activateStatsTab(state.activeStatsTab);
   await loadPlans();

@@ -4,25 +4,29 @@
       <section class="guestStage" id="guestPanel">
         <div class="guestIntro">
           <p class="sectionEyebrow">TransferDocs</p>
-          <h1>PDF-простір</h1>
-          <p id="authSubline">Оберіть план і почніть зберігати згенеровані PDF.</p>
+          <h1 data-i18n="app_brand_workspace">PDF-простір</h1>
+          <p id="authSubline" data-i18n="guest_subline">
+            Оберіть план і почніть зберігати згенеровані PDF.
+          </p>
         </div>
 
         <div class="planCards" id="planCards"></div>
 
         <section class="guestAuth">
           <div class="compactHeader">
-            <p class="sectionEyebrow">Доступ</p>
-            <h2 id="authHeadline">Створити акаунт</h2>
-            <p>Один акаунт. Один план. Усі замовлення зберігаються в одному місці.</p>
+            <p class="sectionEyebrow" data-i18n="access">Доступ</p>
+            <h2 id="authHeadline" data-i18n="guest_headline">Створити акаунт</h2>
+            <p data-i18n="guest_note">
+              Один акаунт. Один план. Усі замовлення зберігаються в одному місці.
+            </p>
           </div>
 
           <div class="authForms">
             <form class="authForm" id="registerForm">
-              <h3>Новий акаунт</h3>
+              <h3 data-i18n="new_account">Новий акаунт</h3>
 
               <label class="authField">
-                <span>Повне ім’я</span>
+                <span data-i18n="full_name">Повне ім’я</span>
                 <input
                   type="text"
                   name="name"
@@ -32,7 +36,7 @@
               </label>
 
               <label class="authField">
-                <span>Email</span>
+                <span data-i18n="email">Email</span>
                 <input
                   type="email"
                   name="email"
@@ -42,28 +46,31 @@
               </label>
 
               <label class="authField">
-                <span>Пароль</span>
+                <span data-i18n="password">Пароль</span>
                 <input
                   type="password"
                   name="password"
                   placeholder="Щонайменше 8 символів"
+                  data-i18n-placeholder="password_min"
                   autocomplete="new-password"
                 />
               </label>
 
               <label class="authField">
-                <span>План</span>
+                <span data-i18n="plan">План</span>
                 <select name="planId" id="registerPlan"></select>
               </label>
 
-              <button class="primary-btn" type="submit">Створити простір</button>
+              <button class="primary-btn" type="submit" data-i18n="create_workspace">
+                Створити простір
+              </button>
             </form>
 
             <form class="authForm authForm-login" id="loginForm">
-              <h3>Увійти</h3>
+              <h3 data-i18n="sign_in">Увійти</h3>
 
               <label class="authField">
-                <span>Email</span>
+                <span data-i18n="email">Email</span>
                 <input
                   type="email"
                   name="email"
@@ -73,16 +80,17 @@
               </label>
 
               <label class="authField">
-                <span>Пароль</span>
+                <span data-i18n="password">Пароль</span>
                 <input
                   type="password"
                   name="password"
                   placeholder="Ваш пароль"
+                  data-i18n-placeholder="your_password"
                   autocomplete="current-password"
                 />
               </label>
 
-              <button class="secondary-btn" type="submit">Увійти</button>
+              <button class="secondary-btn" type="submit" data-i18n="sign_in">Увійти</button>
             </form>
           </div>
         </section>
@@ -92,17 +100,17 @@
         <header class="appTop appTop-admin">
           <div class="appTitleBlock">
             <p class="sectionEyebrow">TransferDocs</p>
-            <h1>Admin-простір</h1>
-            <p>Вітаємо, <span id="workspaceGreeting">-</span></p>
+            <h1 data-i18n="admin_workspace_title">Admin-простір</h1>
+            <p id="workspaceGreeting">Вітаємо, -</p>
           </div>
 
           <div class="topMetrics">
             <article class="topMetric">
-              <span>Роль</span>
+              <span data-i18n="role">Роль</span>
               <strong id="workspacePlan">-</strong>
             </article>
             <article class="topMetric">
-              <span>Вибрано</span>
+              <span data-i18n="selected">Вибрано</span>
               <strong id="workspaceUsage">-</strong>
             </article>
           </div>
@@ -110,17 +118,19 @@
 
         <section class="screenCard screenCard-settings" id="managerGate">
           <div class="compactHeader">
-            <p class="sectionEyebrow">Обмежено</p>
-            <h2>Потрібен admin-доступ</h2>
-            <p>Відкрийте user app, якщо ви увійшли під звичайним акаунтом.</p>
+            <p class="sectionEyebrow" data-i18n="restricted">Обмежено</p>
+            <h2 data-i18n="admin_access_required">Потрібен admin-доступ</h2>
+            <p data-i18n="admin_access_note">
+              Відкрийте user app, якщо ви увійшли під звичайним акаунтом.
+            </p>
           </div>
 
           <section class="screenSection">
             <div class="settingsGroup">
-              <div class="settingsNote">
+              <div class="settingsNote" data-i18n="admin_access_routes_note">
                 Для admin-маршрутів потрібен доступ менеджера або адміністратора.
               </div>
-              <a class="secondary-btn settingsActionLink" href="/cz/pdf/">
+              <a class="secondary-btn settingsActionLink" href="/cz/pdf/" data-i18n="open_user_app">
                 Відкрити user app
               </a>
             </div>
@@ -131,141 +141,142 @@
           <section class="appScreen is-active" data-tab-screen="accounts">
             <div class="screenCard screenCard-settings">
               <div class="compactHeader">
-                <p class="sectionEyebrow">Акаунти</p>
-                <h2>Акаунти</h2>
-                <p>Шукайте акаунти, перевіряйте доступ і змінюйте ролі.</p>
+                <p class="sectionEyebrow" data-i18n="accounts">Акаунти</p>
+                <h2 data-i18n="accounts">Акаунти</h2>
+                <p data-i18n="accounts_subline">Шукайте акаунти, перевіряйте доступ і змінюйте ролі.</p>
               </div>
 
               <section class="screenSection">
-                <p class="screenSectionLabel">Огляд</p>
+                <p class="screenSectionLabel" data-i18n="overview">Огляд</p>
                 <div class="managerOverviewGrid">
                   <article class="managerOverviewCard">
-                    <span>Користувачі</span>
+                    <span data-i18n="users">Користувачі</span>
                     <strong id="managerUsersCount">0</strong>
                   </article>
                   <article class="managerOverviewCard">
-                    <span>Активні</span>
+                    <span data-i18n="active">Активні</span>
                     <strong id="managerActiveCount">0</strong>
                   </article>
                   <article class="managerOverviewCard">
-                    <span>Неактивні</span>
+                    <span data-i18n="inactive">Неактивні</span>
                     <strong id="managerInactiveCount">0</strong>
                   </article>
                   <article class="managerOverviewCard">
-                    <span>Команда</span>
+                    <span data-i18n="staff">Команда</span>
                     <strong id="managerStaffCount">0</strong>
                   </article>
                 </div>
               </section>
 
               <section class="screenSection">
-                <p class="screenSectionLabel">Каталог</p>
+                <p class="screenSectionLabel" data-i18n="directory">Каталог</p>
                 <div class="settingsGroup managerToolbar">
                   <label class="settingsField settingsField-stack">
-                    <span class="settingsRow-label">Пошук</span>
-                    <input id="managerSearchInput" type="text" placeholder="Email або ім’я" />
+                    <span class="settingsRow-label" data-i18n="search">Пошук</span>
+                    <input id="managerSearchInput" type="text" placeholder="Email або ім’я" data-i18n-placeholder="email_or_name" />
                   </label>
                   <label class="settingsField">
-                    <span class="settingsRow-label">Статус</span>
+                    <span class="settingsRow-label" data-i18n="status">Статус</span>
                     <select id="managerStatusFilter">
-                      <option value="all">Усі</option>
-                      <option value="active">Активна</option>
-                      <option value="trial">Пробна</option>
-                      <option value="paused">Призупинена</option>
-                      <option value="canceled">Скасована</option>
-                      <option value="expired">Завершена</option>
+                      <option value="all" data-i18n="all">Усі</option>
+                      <option value="active" data-i18n="active">Активна</option>
+                      <option value="trial" data-i18n="trial">Пробна</option>
+                      <option value="paused" data-i18n="paused">Призупинена</option>
+                      <option value="canceled" data-i18n="canceled">Скасована</option>
+                      <option value="expired" data-i18n="expired">Завершена</option>
                     </select>
                   </label>
                   <label class="settingsField">
-                    <span class="settingsRow-label">Роль</span>
+                    <span class="settingsRow-label" data-i18n="role">Роль</span>
                     <select id="managerRoleFilter">
-                      <option value="all">Усі</option>
-                      <option value="user">Користувач</option>
-                      <option value="manager">Менеджер</option>
-                      <option value="admin">Адміністратор</option>
+                      <option value="all" data-i18n="all">Усі</option>
+                      <option value="user" data-i18n="role_user">Користувач</option>
+                      <option value="manager" data-i18n="role_manager">Менеджер</option>
+                      <option value="admin" data-i18n="role_admin">Адміністратор</option>
                     </select>
                   </label>
                   <label class="settingsField">
-                    <span class="settingsRow-label">План</span>
+                    <span class="settingsRow-label" data-i18n="plan">План</span>
                     <select id="managerPlanFilter">
-                      <option value="all">Усі плани</option>
+                      <option value="all" data-i18n="all_plans">Усі плани</option>
                     </select>
                   </label>
                   <button
                     class="secondary-btn settingsAction"
                     id="managerRefreshBtn"
                     type="button"
+                    data-i18n="refresh"
                   >
                     Оновити
                   </button>
                 </div>
-                <p class="ordersEmpty" id="managerUsersEmpty">
+                <p class="ordersEmpty" id="managerUsersEmpty" data-i18n="accounts_empty">
                   Жоден акаунт не відповідає поточному фільтру.
                 </p>
                 <ul class="managerUsersList" id="managerUsersList"></ul>
               </section>
 
               <section class="screenSection">
-                <p class="screenSectionLabel">Вибраний акаунт</p>
-                <div class="emptyStateCard" id="managerSelectedEmpty">
+                <p class="screenSectionLabel" data-i18n="selected_account">Вибраний акаунт</p>
+                <div class="emptyStateCard" id="managerSelectedEmpty" data-i18n="selected_account_note">
                   Виберіть акаунт, щоб переглянути його доступ.
                 </div>
                 <div class="managerDetailStack is-hidden" id="managerSelectedCard">
                   <div class="settingsGroup">
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Ім’я</span>
+                      <span class="settingsRow-label" data-i18n="name">Ім’я</span>
                       <strong class="settingsValue" id="managerSelectedName">-</strong>
                     </div>
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Email</span>
+                      <span class="settingsRow-label" data-i18n="email">Email</span>
                       <strong class="settingsValue" id="managerSelectedEmail">-</strong>
                     </div>
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Роль</span>
+                      <span class="settingsRow-label" data-i18n="role">Роль</span>
                       <strong class="settingsValue" id="managerSelectedRole">-</strong>
                     </div>
                     <div class="settingsRow">
-                      <span class="settingsRow-label">План</span>
+                      <span class="settingsRow-label" data-i18n="plan">План</span>
                       <strong class="settingsValue" id="managerSelectedPlan">-</strong>
                     </div>
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Статус</span>
+                      <span class="settingsRow-label" data-i18n="status">Статус</span>
                       <strong class="settingsValue" id="managerSelectedStatus">-</strong>
                     </div>
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Цикл</span>
+                      <span class="settingsRow-label" data-i18n="cycle">Цикл</span>
                       <strong class="settingsValue" id="managerSelectedCycle">-</strong>
                     </div>
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Використання</span>
+                      <span class="settingsRow-label" data-i18n="usage">Використання</span>
                       <strong class="settingsValue" id="managerSelectedUsage">-</strong>
                     </div>
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Замовлення</span>
+                      <span class="settingsRow-label" data-i18n="orders">Замовлення</span>
                       <strong class="settingsValue" id="managerSelectedOrdersCount">-</strong>
                     </div>
                   </div>
 
                   <div class="settingsGroup is-hidden" id="managerRoleSection">
                     <label class="settingsField">
-                      <span class="settingsRow-label">Роль</span>
+                      <span class="settingsRow-label" data-i18n="role">Роль</span>
                       <select id="managerRoleSelect">
-                        <option value="user">Користувач</option>
-                        <option value="manager">Менеджер</option>
-                        <option value="admin">Адміністратор</option>
+                        <option value="user" data-i18n="role_user">Користувач</option>
+                        <option value="manager" data-i18n="role_manager">Менеджер</option>
+                        <option value="admin" data-i18n="role_admin">Адміністратор</option>
                       </select>
                     </label>
-                    <button class="primary-btn" id="managerRoleSaveBtn" type="button">
+                    <button class="primary-btn" id="managerRoleSaveBtn" type="button" data-i18n="save_role">
                       Зберегти роль
                     </button>
                   </div>
 
                   <div class="settingsGroup">
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Недавні замовлення</span>
+                      <span class="settingsRow-label" data-i18n="recent_orders">Недавні замовлення</span>
                       <strong class="settingsValue" id="managerRecentOrdersLabel">-</strong>
                     </div>
-                    <p class="ordersEmpty" id="managerSelectedOrdersEmpty">
+                    <p class="ordersEmpty" id="managerSelectedOrdersEmpty" data-i18n="recent_orders_empty">
                       Для цього акаунта ще немає недавніх замовлень.
                     </p>
                     <ul class="ordersList" id="managerSelectedOrdersList"></ul>
@@ -278,74 +289,78 @@
           <section class="appScreen" data-tab-screen="subscriptions">
             <div class="screenCard screenCard-settings">
               <div class="compactHeader">
-                <p class="sectionEyebrow">Підписки</p>
-                <h2>Підписки</h2>
-                <p>Призначайте плани, коригуйте цикли та залишайте внутрішні нотатки.</p>
+                <p class="sectionEyebrow" data-i18n="subscriptions">Підписки</p>
+                <h2 data-i18n="subscriptions">Підписки</h2>
+                <p data-i18n="subscriptions_subline">
+                  Призначайте плани, коригуйте цикли та залишайте внутрішні нотатки.
+                </p>
               </div>
 
               <section class="screenSection">
-                <p class="screenSectionLabel">Вибраний акаунт</p>
-                <div class="emptyStateCard" id="managerSubscriptionEmpty">
+                <p class="screenSectionLabel" data-i18n="selected_account">Вибраний акаунт</p>
+                <div class="emptyStateCard" id="managerSubscriptionEmpty" data-i18n="select_account_for_subscription">
                   Виберіть акаунт у розділі «Акаунти», щоб змінити його підписку.
                 </div>
                 <div class="managerDetailStack is-hidden" id="managerSubscriptionCard">
                   <div class="settingsGroup">
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Ім’я</span>
+                      <span class="settingsRow-label" data-i18n="name">Ім’я</span>
                       <strong class="settingsValue" id="managerSubscriptionName">-</strong>
                     </div>
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Email</span>
+                      <span class="settingsRow-label" data-i18n="email">Email</span>
                       <strong class="settingsValue" id="managerSubscriptionEmail">-</strong>
                     </div>
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Поточний статус</span>
+                      <span class="settingsRow-label" data-i18n="current_status">Поточний статус</span>
                       <strong class="settingsValue" id="managerSubscriptionStatusLabel">-</strong>
                     </div>
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Використання</span>
+                      <span class="settingsRow-label" data-i18n="usage">Використання</span>
                       <strong class="settingsValue" id="managerSubscriptionUsageLabel">-</strong>
                     </div>
                   </div>
 
                   <div class="settingsGroup">
                     <label class="settingsField">
-                      <span class="settingsRow-label">План</span>
+                      <span class="settingsRow-label" data-i18n="plan">План</span>
                       <select id="managerSubscriptionPlan"></select>
                     </label>
                     <label class="settingsField">
-                      <span class="settingsRow-label">Статус</span>
+                      <span class="settingsRow-label" data-i18n="status">Статус</span>
                       <select id="managerSubscriptionStatus">
-                        <option value="active">Активна</option>
-                        <option value="trial">Пробна</option>
-                        <option value="paused">Призупинена</option>
-                        <option value="canceled">Скасована</option>
-                        <option value="expired">Завершена</option>
+                        <option value="active" data-i18n="subscription_active">Активна</option>
+                        <option value="trial" data-i18n="subscription_trial">Пробна</option>
+                        <option value="paused" data-i18n="subscription_paused">Призупинена</option>
+                        <option value="canceled" data-i18n="subscription_canceled">Скасована</option>
+                        <option value="expired" data-i18n="subscription_expired">Завершена</option>
                       </select>
                     </label>
                     <label class="settingsField">
-                      <span class="settingsRow-label">Початок</span>
+                      <span class="settingsRow-label" data-i18n="start">Початок</span>
                       <input id="managerSubscriptionStart" type="date" />
                     </label>
                     <label class="settingsField">
-                      <span class="settingsRow-label">Кінець</span>
+                      <span class="settingsRow-label" data-i18n="end">Кінець</span>
                       <input id="managerSubscriptionEnd" type="date" />
                     </label>
                     <label class="settingsField">
-                      <span class="settingsRow-label">Перевизначення квоти</span>
+                      <span class="settingsRow-label" data-i18n="quota_override">Перевизначення квоти</span>
                       <input
                         id="managerSubscriptionQuota"
                         type="number"
                         min="0"
                         placeholder="Необов’язково"
+                        data-i18n-placeholder="optional"
                       />
                     </label>
                     <label class="settingsField settingsField-stack">
-                      <span class="settingsRow-label">Нотатки</span>
+                      <span class="settingsRow-label" data-i18n="notes">Нотатки</span>
                       <input
                         id="managerSubscriptionNotes"
                         type="text"
                         placeholder="Внутрішня нотатка"
+                        data-i18n-placeholder="internal_note"
                       />
                     </label>
                     <div class="managerSplitActions">
@@ -353,6 +368,7 @@
                         class="primary-btn"
                         id="managerSubscriptionSaveBtn"
                         type="button"
+                        data-i18n="save_subscription"
                       >
                         Зберегти підписку
                       </button>
@@ -360,6 +376,7 @@
                         class="secondary-btn"
                         id="managerSubscriptionExtendBtn"
                         type="button"
+                        data-i18n="extend_30_days"
                       >
                         Продовжити на 30 днів
                       </button>
@@ -367,6 +384,7 @@
                         class="danger-btn"
                         id="managerSubscriptionCancelBtn"
                         type="button"
+                        data-i18n="cancel_now"
                       >
                         Скасувати зараз
                       </button>
@@ -380,35 +398,39 @@
           <section class="appScreen" data-tab-screen="orders">
             <div class="screenCard screenCard-settings">
               <div class="compactHeader">
-                <p class="sectionEyebrow">Замовлення</p>
-                <h2>Системні замовлення</h2>
-                <p>Переглядайте всі згенеровані, очікувані та помилкові PDF-замовлення.</p>
+                <p class="sectionEyebrow" data-i18n="orders">Замовлення</p>
+                <h2 data-i18n="system_orders">Системні замовлення</h2>
+                <p data-i18n="system_orders_subline">
+                  Переглядайте всі згенеровані, очікувані та помилкові PDF-замовлення.
+                </p>
               </div>
 
               <section class="screenSection">
-                <p class="screenSectionLabel">Фільтри</p>
+                <p class="screenSectionLabel" data-i18n="filters">Фільтри</p>
                 <div class="settingsGroup managerToolbar">
                   <label class="settingsField settingsField-stack">
-                    <span class="settingsRow-label">Пошук</span>
+                    <span class="settingsRow-label" data-i18n="search">Пошук</span>
                     <input
                       id="managerOrdersSearchInput"
                       type="text"
                       placeholder="Замовлення, клієнт або акаунт"
+                      data-i18n-placeholder="order_customer_account"
                     />
                   </label>
                   <label class="settingsField">
-                    <span class="settingsRow-label">Статус</span>
+                    <span class="settingsRow-label" data-i18n="status">Статус</span>
                     <select id="managerOrdersStatusFilter">
-                      <option value="all">Усі</option>
-                      <option value="pending">Очікують</option>
-                      <option value="generated">PDF згенеровано</option>
-                      <option value="failed">Помилка</option>
+                      <option value="all" data-i18n="all">Усі</option>
+                      <option value="pending" data-i18n="pending">Очікують</option>
+                      <option value="generated" data-i18n="pdf_generated">PDF згенеровано</option>
+                      <option value="failed" data-i18n="failed">Помилка</option>
                     </select>
                   </label>
                   <button
                     class="secondary-btn settingsAction"
                     id="managerOrdersSelectedUserBtn"
                     type="button"
+                    data-i18n="selected_account_only"
                   >
                     Лише вибраний акаунт
                   </button>
@@ -416,24 +438,25 @@
                     class="secondary-btn settingsAction"
                     id="managerOrdersRefreshBtn"
                     type="button"
+                    data-i18n="refresh"
                   >
                     Оновити
                   </button>
                 </div>
-                <p class="settingsNote managerOrdersContext" id="managerOrdersContextNote">
+                <p class="settingsNote managerOrdersContext" id="managerOrdersContextNote" data-i18n="all_accounts_visible">
                   Показано всі акаунти.
                 </p>
               </section>
 
               <section class="screenSection">
-                <p class="screenSectionLabel">Тріаж</p>
+                <p class="screenSectionLabel" data-i18n="triage">Тріаж</p>
                 <div class="managerOverviewGrid managerOverviewGrid-orders">
                   <button
                     class="managerOverviewCard managerTriageCard is-active"
                     type="button"
                     data-manager-orders-status="all"
                   >
-                    <span>Усі</span>
+                    <span data-i18n="all">Усі</span>
                     <strong id="managerOrdersAllCount">0</strong>
                   </button>
                   <button
@@ -441,7 +464,7 @@
                     type="button"
                     data-manager-orders-status="pending"
                   >
-                    <span>Очікують</span>
+                    <span data-i18n="pending">Очікують</span>
                     <strong id="managerOrdersPendingCount">0</strong>
                   </button>
                   <button
@@ -449,7 +472,7 @@
                     type="button"
                     data-manager-orders-status="failed"
                   >
-                    <span>Помилка</span>
+                    <span data-i18n="failed">Помилка</span>
                     <strong id="managerOrdersFailedCount">0</strong>
                   </button>
                   <button
@@ -457,72 +480,72 @@
                     type="button"
                     data-manager-orders-status="generated"
                   >
-                    <span>Згенеровано</span>
+                    <span data-i18n="generated">Згенеровано</span>
                     <strong id="managerOrdersGeneratedCount">0</strong>
                   </button>
                 </div>
               </section>
 
               <section class="screenSection">
-                <p class="screenSectionLabel">Історія</p>
-                <p class="ordersEmpty" id="managerOrdersEmpty">
+                <p class="screenSectionLabel" data-i18n="history">Історія</p>
+                <p class="ordersEmpty" id="managerOrdersEmpty" data-i18n="orders_empty_admin">
                   Жодне замовлення не відповідає поточному фільтру.
                 </p>
                 <ul class="ordersList" id="managerOrdersList"></ul>
               </section>
 
               <section class="screenSection">
-                <p class="screenSectionLabel">Деталі замовлення</p>
-                <div class="emptyStateCard" id="managerOrderDetailEmpty">
+                <p class="screenSectionLabel" data-i18n="order_detail">Деталі замовлення</p>
+                <div class="emptyStateCard" id="managerOrderDetailEmpty" data-i18n="order_detail_empty">
                   Виберіть замовлення, щоб переглянути статус, акаунт і стан PDF.
                 </div>
                 <div class="managerDetailStack is-hidden" id="managerOrderDetailCard">
                   <div class="settingsGroup">
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Замовлення</span>
+                      <span class="settingsRow-label" data-i18n="order_label">Замовлення</span>
                       <strong class="settingsValue" id="managerOrderDetailNumber">-</strong>
                     </div>
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Статус</span>
+                      <span class="settingsRow-label" data-i18n="status">Статус</span>
                       <strong class="settingsValue" id="managerOrderDetailStatus">-</strong>
                     </div>
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Акаунт</span>
+                      <span class="settingsRow-label" data-i18n="account">Акаунт</span>
                       <strong class="settingsValue" id="managerOrderDetailAccount">-</strong>
                     </div>
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Клієнт</span>
+                      <span class="settingsRow-label" data-i18n="customer">Клієнт</span>
                       <strong class="settingsValue" id="managerOrderDetailCustomer">-</strong>
                     </div>
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Час посадки</span>
+                      <span class="settingsRow-label" data-i18n="pickup_time">Час посадки</span>
                       <strong class="settingsValue" id="managerOrderDetailTime">-</strong>
                     </div>
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Сума</span>
+                      <span class="settingsRow-label" data-i18n="total">Сума</span>
                       <strong class="settingsValue" id="managerOrderDetailTotal">-</strong>
                     </div>
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Створено</span>
+                      <span class="settingsRow-label" data-i18n="created">Створено</span>
                       <strong class="settingsValue" id="managerOrderDetailCreated">-</strong>
                     </div>
                     <div class="settingsRow">
-                      <span class="settingsRow-label">Оновлено</span>
+                      <span class="settingsRow-label" data-i18n="updated">Оновлено</span>
                       <strong class="settingsValue" id="managerOrderDetailUpdated">-</strong>
                     </div>
                   </div>
 
                   <div class="settingsGroup">
                     <div class="settingsNote">
-                      <strong class="managerInfoLabel">Маршрут</strong>
+                      <strong class="managerInfoLabel" data-i18n="route">Маршрут</strong>
                       <span class="managerInfoText" id="managerOrderDetailRoute">-</span>
                     </div>
                     <div class="settingsNote">
-                      <strong class="managerInfoLabel">PDF</strong>
+                      <strong class="managerInfoLabel" data-i18n="pdf_label">PDF</strong>
                       <span class="managerInfoText" id="managerOrderDetailPdf">-</span>
                     </div>
                     <div class="settingsNote">
-                      <strong class="managerInfoLabel">Контекст</strong>
+                      <strong class="managerInfoLabel" data-i18n="context">Контекст</strong>
                       <span class="managerInfoText" id="managerOrderDetailHint">
                         Видимо в поточних результатах.
                       </span>
@@ -535,6 +558,7 @@
                         class="secondary-btn"
                         id="managerOrderMarkPendingBtn"
                         type="button"
+                        data-i18n="mark_pending"
                       >
                         Позначити як очікує
                       </button>
@@ -542,6 +566,7 @@
                         class="primary-btn"
                         id="managerOrderMarkGeneratedBtn"
                         type="button"
+                        data-i18n="mark_generated"
                       >
                         Позначити як згенеровано
                       </button>
@@ -549,6 +574,7 @@
                         class="danger-btn"
                         id="managerOrderMarkFailedBtn"
                         type="button"
+                        data-i18n="mark_failed"
                       >
                         Позначити як помилка
                       </button>
@@ -562,54 +588,74 @@
           <section class="appScreen" data-tab-screen="settings">
             <div class="screenCard screenCard-settings">
               <div class="compactHeader">
-                <p class="sectionEyebrow">Налаштування</p>
-                <h2>Плани та аудит</h2>
-                <p>Керуйте каталогом планів, переглядайте аудит і повертайтеся в user app.</p>
+                <p class="sectionEyebrow" data-i18n="settings">Налаштування</p>
+                <h2 data-i18n="plans_and_audit">Плани та аудит</h2>
+                <p data-i18n="settings_subline">
+                  Керуйте каталогом планів, переглядайте аудит і повертайтеся в user app.
+                </p>
               </div>
 
               <section class="screenSection">
-                <p class="screenSectionLabel">Дії</p>
+                <p class="screenSectionLabel" data-i18n="actions">Дії</p>
                 <div class="settingsGroup">
-                  <a class="secondary-btn settingsActionLink" href="/cz/pdf/">
+                  <a class="secondary-btn settingsActionLink" href="/cz/pdf/" data-i18n="open_user_app">
                     Відкрити user app
                   </a>
-                  <button class="secondary-btn settingsAction" id="logoutBtn" type="button">
+                  <button class="secondary-btn settingsAction" id="logoutBtn" type="button" data-i18n="log_out">
                     Вийти
                   </button>
                 </div>
               </section>
 
               <section class="screenSection">
-                <p class="screenSectionLabel">Плани</p>
-                <p class="ordersEmpty" id="managerPlansEmpty">Планів ще немає.</p>
+                <p class="screenSectionLabel" data-i18n="account_settings">Налаштування</p>
+                <div class="settingsGroup">
+                  <label class="settingsField">
+                    <span class="settingsRow-label" data-i18n="interface_language">Мова інтерфейсу</span>
+                    <select id="adminLanguageSelect">
+                      <option value="uk" data-i18n="language_uk">Українська</option>
+                      <option value="en" data-i18n="language_en">English</option>
+                      <option value="cs" data-i18n="language_cs">Čeština</option>
+                    </select>
+                  </label>
+                  <div class="settingsNote" data-i18n="interface_language_note">
+                    Обрана мова зберігається для user і admin простору на цьому пристрої.
+                  </div>
+                </div>
+              </section>
+
+              <section class="screenSection">
+                <p class="screenSectionLabel" data-i18n="plans">Плани</p>
+                <p class="ordersEmpty" id="managerPlansEmpty" data-i18n="no_plans_yet">Планів ще немає.</p>
                 <ul class="managerPlansList" id="managerPlansList"></ul>
                 <form class="settingsGroup managerPlanForm" id="managerPlanForm">
                   <input id="managerPlanId" type="hidden" />
                   <label class="settingsField settingsField-stack">
-                    <span class="settingsRow-label">Назва плану</span>
-                    <input id="managerPlanName" type="text" placeholder="Starter 25" />
+                    <span class="settingsRow-label" data-i18n="plan_name">Назва плану</span>
+                    <input id="managerPlanName" type="text" placeholder="Starter 25" data-i18n-placeholder="plan_placeholder" />
                   </label>
                   <label class="settingsField">
-                    <span class="settingsRow-label">Ліміт циклу</span>
+                    <span class="settingsRow-label" data-i18n="cycle_limit_setting">Ліміт циклу</span>
                     <input id="managerPlanLimit" type="number" min="1" placeholder="25" />
                   </label>
                   <label class="settingsField settingsField-stack">
-                    <span class="settingsRow-label">Опис</span>
+                    <span class="settingsRow-label" data-i18n="description">Опис</span>
                     <input
                       id="managerPlanDescription"
                       type="text"
                       placeholder="25 генерацій PDF за цикл"
+                      data-i18n-placeholder="plan_description_placeholder"
                     />
                   </label>
                   <label class="settingsCheckbox">
                     <input id="managerPlanActive" type="checkbox" checked />
-                    <span>План активний</span>
+                    <span data-i18n="plan_is_active">План активний</span>
                   </label>
                   <div class="managerSplitActions">
-                    <button class="secondary-btn" id="managerPlanResetBtn" type="button">
+                    <button class="secondary-btn" id="managerPlanResetBtn" type="button" data-i18n="new_plan">
                       Новий план
                     </button>
-                    <button class="primary-btn" id="managerPlanSubmitBtn" type="submit">
+                    <button class="primary-btn" id="managerPlanSubmitBtn" type="submit" data-i18n="save_plan">
                       Зберегти план
                     </button>
                   </div>
@@ -617,15 +663,15 @@
               </section>
 
               <section class="screenSection">
-                <p class="screenSectionLabel">Журнал аудиту</p>
-                <p class="ordersEmpty" id="managerAuditEmpty">Аудит-подій ще немає.</p>
+                <p class="screenSectionLabel" data-i18n="audit_log">Журнал аудиту</p>
+                <p class="ordersEmpty" id="managerAuditEmpty" data-i18n="audit_empty">Аудит-подій ще немає.</p>
                 <ul class="auditList" id="managerAuditList"></ul>
               </section>
             </div>
           </section>
         </main>
 
-        <nav class="bottomTabs" aria-label="Admin-навігація">
+        <nav class="bottomTabs" aria-label="Admin-навігація" data-i18n-aria-label="admin_navigation">
           <a class="bottomTab is-active" href="/cz/pdf/admin/accounts/" data-tab-target="accounts">
             <span class="bottomTab-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false">
@@ -635,7 +681,7 @@
                 <path d="M17 6h2" />
               </svg>
             </span>
-            <span class="bottomTab-label">Акаунти</span>
+            <span class="bottomTab-label" data-i18n="accounts">Акаунти</span>
           </a>
           <a class="bottomTab" href="/cz/pdf/admin/subscriptions/" data-tab-target="subscriptions">
             <span class="bottomTab-icon" aria-hidden="true">
@@ -646,7 +692,7 @@
                 <path d="M7 16.5h10" />
               </svg>
             </span>
-            <span class="bottomTab-label">Підписки</span>
+            <span class="bottomTab-label" data-i18n="subscriptions">Підписки</span>
           </a>
           <a class="bottomTab" href="/cz/pdf/admin/orders/" data-tab-target="orders">
             <span class="bottomTab-icon" aria-hidden="true">
@@ -657,7 +703,7 @@
                 <path d="M11 16h5" />
               </svg>
             </span>
-            <span class="bottomTab-label">Замовлення</span>
+            <span class="bottomTab-label" data-i18n="orders">Замовлення</span>
           </a>
           <a class="bottomTab" href="/cz/pdf/admin/settings/" data-tab-target="settings">
             <span class="bottomTab-icon" aria-hidden="true">
@@ -666,7 +712,7 @@
                 <path d="M19.4 15a1 1 0 0 0 .2 1.1l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1 1 0 0 0-1.1-.2 1 1 0 0 0-.6.9V20a2 2 0 1 1-4 0v-.2a1 1 0 0 0-.6-.9 1 1 0 0 0-1.1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1 1 0 0 0 .2-1.1 1 1 0 0 0-.9-.6H4a2 2 0 1 1 0-4h.2a1 1 0 0 0 .9-.6 1 1 0 0 0-.2-1.1l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1 1 0 0 0 1.1.2 1 1 0 0 0 .6-.9V4a2 2 0 1 1 4 0v.2a1 1 0 0 0 .6.9 1 1 0 0 0 1.1-.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1 1 0 0 0-.2 1.1 1 1 0 0 0 .9.6H20a2 2 0 1 1 0 4h-.2a1 1 0 0 0-.9.6Z" />
               </svg>
             </span>
-            <span class="bottomTab-label">Налаштування</span>
+            <span class="bottomTab-label" data-i18n="settings">Налаштування</span>
           </a>
         </nav>
       </section>

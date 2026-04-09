@@ -1,5 +1,6 @@
 import { fetchApi } from '../settings.js';
 import { readJsonResponse } from '../utils.js';
+import { t } from '../../js/i18n/app.js';
 
 export async function API_register(payload) {
   const response = await fetchApi('/auth/register', {
@@ -7,7 +8,7 @@ export async function API_register(payload) {
     body: payload,
   });
 
-  return readJsonResponse(response, 'Не вдалося зареєструватися');
+  return readJsonResponse(response, t('api_registration_failed'));
 }
 
 export async function API_login(payload) {
@@ -16,7 +17,7 @@ export async function API_login(payload) {
     body: payload,
   });
 
-  return readJsonResponse(response, 'Не вдалося увійти');
+  return readJsonResponse(response, t('api_login_failed'));
 }
 
 export async function API_logout() {
@@ -24,7 +25,7 @@ export async function API_logout() {
     method: 'POST',
   });
 
-  return readJsonResponse(response, 'Не вдалося вийти');
+  return readJsonResponse(response, t('api_logout_failed'));
 }
 
 export async function API_getMe() {
@@ -32,7 +33,7 @@ export async function API_getMe() {
     method: 'GET',
   });
 
-  return readJsonResponse(response, 'Не вдалося завантажити поточного користувача');
+  return readJsonResponse(response, t('api_current_user_failed'));
 }
 
 export async function API_deleteMe() {
@@ -40,7 +41,7 @@ export async function API_deleteMe() {
     method: 'DELETE',
   });
 
-  return readJsonResponse(response, 'Не вдалося видалити акаунт');
+  return readJsonResponse(response, t('api_delete_account_failed'));
 }
 
 export async function API_updateMyProfile(profile) {
@@ -49,5 +50,5 @@ export async function API_updateMyProfile(profile) {
     body: { profile },
   });
 
-  return readJsonResponse(response, 'Не вдалося оновити профіль');
+  return readJsonResponse(response, t('api_update_profile_failed'));
 }

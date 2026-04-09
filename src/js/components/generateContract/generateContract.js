@@ -1,5 +1,6 @@
 // Generate contract data management
 import { loadLs, saveLs } from '../../storage/localStorage.js';
+import { t } from '../../i18n/app.js';
 import { getRandomDate } from './utils/getRandomDate.js';
 import { getRandomOrderNumber } from './utils/getRandomOrderNumber.js';
 
@@ -32,7 +33,7 @@ export let contractData = {
       address: 'Hotel Hilton, Pobřežní 311/1, 186 00 Praha 8-Rohanský ostrov',
     },
     time: '2025-11-13 10:00',
-    paymentMethod: 'hotovost / kartou / invoice',
+    paymentMethod: '',
   },
   totalPrice: '',
 };
@@ -138,6 +139,34 @@ const formatPrice = numericStr => {
     const eur = Math.round((num / EUR_RATE) * 100) / 100;
     return `${num} CZK / ${eur} EUR`;
   }
+};
+
+const getLocalizedPaymentDefaults = () => {
+  return new Set([
+    '',
+    t('payment_method_default', {}, 'uk'),
+    t('payment_method_default', {}, 'en'),
+    t('payment_method_default', {}, 'cs'),
+  ]);
+};
+
+const syncLocalizedContractDefaults = () => {
+  if (!contractRoot) return;
+
+  const paymentInput = contractRoot.querySelector('input[name="trip-payment-method"]');
+  if (!paymentInput) return;
+
+  const defaults = getLocalizedPaymentDefaults();
+  const currentValue = String(paymentInput.value || '').trim();
+  if (!defaults.has(currentValue)) return;
+
+  const nextValue = t('payment_method_default');
+  paymentInput.value = nextValue;
+  contractData.trip = {
+    ...contractData.trip,
+    paymentMethod: nextValue,
+  };
+  saveLs(KEY_LS, contractData);
 };
 
 // =====================================
@@ -302,6 +331,7 @@ export const clearContractData = () => {
 // =====================================
 const initContractData = () => {
   recoveryContractData();
+  syncLocalizedContractDefaults();
 
   const randomDate = contractData.today || getRandomDate();
   inputsAllToday.forEach(input => (input.value = randomDate));
@@ -316,6 +346,9 @@ const initContractData = () => {
 
 if (contractRoot) {
   initContractData();
+  window.addEventListener('pdf-app:language-changed', () => {
+    syncLocalizedContractDefaults();
+  });
 }
 
 // Apply initial scale and keep it in sync on resize

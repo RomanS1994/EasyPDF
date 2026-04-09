@@ -1,4 +1,5 @@
 import { fetchApi } from '../settings';
+import { t } from '../../js/i18n/app.js';
 
 export const API_getContractPdf = async order => {
   const res = await fetchApi('/contracts/get-pdf', {
@@ -9,7 +10,7 @@ export const API_getContractPdf = async order => {
   if (!res) return null;
 
   if (!res.ok) {
-    let errorMessage = 'Не вдалося згенерувати PDF';
+    let errorMessage = t('api_contract_pdf_failed');
 
     try {
       const payload = await res.json();
@@ -26,10 +27,12 @@ export const API_getContractPdf = async order => {
   const contentType = res.headers.get('Content-Type') || '';
   if (contentType.includes('application/pdf')) {
     const blob = await res.blob();
-    const fileName = `dogovir-transferu-${order?.orderNumber}.pdf`;
+    const fileName = t('pdf_file_name', {
+      orderNumber: order?.orderNumber || 'order',
+    });
 
     return { blob, fileName };
   }
 
-  throw new Error('Сервер не повернув PDF-файл');
+  throw new Error(t('api_contract_pdf_missing'));
 };

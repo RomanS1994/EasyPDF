@@ -1,5 +1,6 @@
 import { fetchApi } from '../settings.js';
 import { readJsonResponse } from '../utils.js';
+import { t } from '../../js/i18n/app.js';
 
 function matchesManagerUserQuery(user, query = {}) {
   const search = String(query.search || '').trim().toLowerCase();
@@ -101,7 +102,7 @@ export async function API_getManagerUsers(query = {}) {
       query,
     });
 
-    return await readJsonResponse(response, 'Не вдалося завантажити користувачів');
+    return await readJsonResponse(response, t('api_manager_users_failed'));
   } catch (error) {
     if (error?.status !== 404) {
       throw error;
@@ -112,7 +113,7 @@ export async function API_getManagerUsers(query = {}) {
     });
     const payload = await readJsonResponse(
       legacyResponse,
-      'Не вдалося завантажити користувачів'
+      t('api_manager_users_failed')
     );
 
     return {
@@ -129,7 +130,7 @@ export async function API_getManagerUser(userId) {
       method: 'GET',
     });
 
-    return await readJsonResponse(response, 'Не вдалося завантажити деталі акаунта');
+    return await readJsonResponse(response, t('api_account_details_failed'));
   } catch (error) {
     if (error?.status !== 404) {
       throw error;
@@ -163,7 +164,7 @@ export async function API_updateManagerUserSubscription(userId, payload) {
     body: payload,
   });
 
-  return readJsonResponse(response, 'Не вдалося оновити підписку');
+  return readJsonResponse(response, t('api_subscription_update_failed'));
 }
 
 export async function API_extendManagerUserSubscription(userId, payload = {}) {
@@ -172,7 +173,7 @@ export async function API_extendManagerUserSubscription(userId, payload = {}) {
     body: payload,
   });
 
-  return readJsonResponse(response, 'Не вдалося продовжити підписку');
+  return readJsonResponse(response, t('api_subscription_extend_failed'));
 }
 
 export async function API_cancelManagerUserSubscription(userId) {
@@ -180,7 +181,7 @@ export async function API_cancelManagerUserSubscription(userId) {
     method: 'POST',
   });
 
-  return readJsonResponse(response, 'Не вдалося скасувати підписку');
+  return readJsonResponse(response, t('api_subscription_cancel_failed'));
 }
 
 export async function API_updateManagerUserRole(userId, role) {
@@ -189,7 +190,7 @@ export async function API_updateManagerUserRole(userId, role) {
     body: { role },
   });
 
-  return readJsonResponse(response, 'Не вдалося оновити роль');
+  return readJsonResponse(response, t('api_role_update_failed'));
 }
 
 export async function API_getManagerPlans() {
@@ -198,7 +199,7 @@ export async function API_getManagerPlans() {
       method: 'GET',
     });
 
-    return await readJsonResponse(response, 'Не вдалося завантажити плани');
+    return await readJsonResponse(response, t('api_manager_plans_failed'));
   } catch (error) {
     if (error?.status !== 404) {
       throw error;
@@ -208,7 +209,7 @@ export async function API_getManagerPlans() {
       method: 'GET',
     });
 
-    return readJsonResponse(fallbackResponse, 'Не вдалося завантажити плани');
+    return readJsonResponse(fallbackResponse, t('api_manager_plans_failed'));
   }
 }
 
@@ -219,7 +220,7 @@ export async function API_getManagerOrders(query = {}) {
       query,
     });
 
-    return await readJsonResponse(response, 'Не вдалося завантажити замовлення');
+    return await readJsonResponse(response, t('api_manager_orders_failed'));
   } catch (error) {
     if (error?.status !== 404) {
       throw error;
@@ -231,7 +232,7 @@ export async function API_getManagerOrders(query = {}) {
     });
     const payload = await readJsonResponse(
       legacyResponse,
-      'Не вдалося завантажити замовлення'
+      t('api_manager_orders_failed')
     );
     const allOrders = payload.orders || [];
     const filteredOrders = allOrders.filter(order => matchesManagerOrderQuery(order, query));
@@ -250,7 +251,7 @@ export async function API_createManagerPlan(payload) {
     body: payload,
   });
 
-  return readJsonResponse(response, 'Не вдалося створити план');
+  return readJsonResponse(response, t('api_plan_create_failed'));
 }
 
 export async function API_updateManagerPlan(planId, payload) {
@@ -259,7 +260,7 @@ export async function API_updateManagerPlan(planId, payload) {
     body: payload,
   });
 
-  return readJsonResponse(response, 'Не вдалося оновити план');
+  return readJsonResponse(response, t('api_plan_update_failed'));
 }
 
 export async function API_getManagerAudit(query = {}) {
@@ -269,7 +270,7 @@ export async function API_getManagerAudit(query = {}) {
       query,
     });
 
-    return await readJsonResponse(response, 'Не вдалося завантажити журнал аудиту');
+    return await readJsonResponse(response, t('api_audit_failed'));
   } catch (error) {
     if (error?.status !== 404) {
       throw error;
