@@ -1,0 +1,93 @@
+html {
+  scroll-behavior: smooth;
+}
+.page,
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+.page,
+body {
+  font-family: var(--Poppins, 'Poppins', sans-serif);
+  font-weight: 400;
+  color: var(--black, #090b15);
+  background-color: var(--white, #fff);
+}
+body strong,
+body b {
+  font-weight: 600;
+}
+body h1,
+body h2,
+body h3,
+body h4,
+body h5,
+body h6 {
+  font-family: var(--Raleway, 'Raleway', sans-serif);
+  font-weight: 700;
+  color: var(--black, #090b15);
+}
+.services {
+  overflow-x: hidden;
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  display: block;
+  color: currentColor;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 0;
+  padding: 0;
+
+  white-space: nowrap;
+  clip-path: inset(100%);
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+
+body.no-scroll {
+  overflow: hidden;
+}

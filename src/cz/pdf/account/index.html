@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>TransferDocs — мій акаунт</title>
+    <meta
+      name="description"
+      content="Керуйте акаунтом TransferDocs, оновлюйте бізнес-профіль і видаляйте робочий простір за потреби."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Raleway:wght@500;700;800&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Raleway:wght@500;700;800&display=swap"
+      />
+    </noscript>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/spinkit@2.0.1/spinkit.min.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/spinkit@2.0.1/spinkit.min.css"
+      />
+    </noscript>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+      />
+    </noscript>
+
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+
+  <body class="page-generateContract" data-app-shell="user" data-app-tab="account">
+    <main>
+      <load src="../partials/generateContract.html" />
+    </main>
+
+    <script type="module" src="/js/components/auth/authPanel.js"></script>
+    <script
+      type="module"
+      src="/js/components/generateContract/generateContract.js"
+    ></script>
+    <script
+      type="module"
+      src="/js/components/generateContract/utils/downloadBtn.js"
+    ></script>
+  </body>
+</html>

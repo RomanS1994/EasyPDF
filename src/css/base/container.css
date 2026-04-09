@@ -1,0 +1,60 @@
+/* ========================
+    Mobile (default)
+   ======================== */
+.container {
+  width: 100%;
+  /* Allow wider modern phones while keeping safe gutters */
+  max-width: 428px;
+  margin: 0 auto;
+  padding: 0 12px;
+}
+
+/* ========================
+   Tablets (>= 768px)
+   ======================== */
+@media only screen and (min-width: 768px) {
+  .container {
+    max-width: 740px;
+    padding: 0 10px;
+  }
+}
+
+/* ========================
+     Small Desktop (>= 1280px)
+   ======================== */
+@media only screen and (min-width: 1280px) {
+  .container {
+    max-width: 1200px;
+    padding: 0 20px;
+  }
+}
+
+/* ========================
+    Large Desktop (>= 1440px)
+   ======================== */
+@media only screen and (min-width: 1440px) {
+  .container {
+    max-width: 1360px;
+    padding: 0 24px;
+  }
+}
+
+/* ========================
+    Full HD & WQHD (>= 1920px)
+   ======================== */
+@media only screen and (min-width: 1920px) {
+  .container {
+    max-width: 1600px;
+    padding: 0 30px;
+  }
+}
+
+/* ========================
+    Ultra Wide 4K (>= 2560px)
+   ======================== */
+@media only screen and (min-width: 2560px) {
+  .container {
+    max-width: 2000px;
+    padding: 0 40px;
+  }
+}

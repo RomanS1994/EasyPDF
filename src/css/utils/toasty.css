@@ -1,0 +1,29 @@
+.toastify {
+  display: flex !important;
+  max-width: 380px !important;
+  width: auto !important;
+  gap: 12px !important;
+  border-radius: 12px !important;
+  padding: 16px 18px !important;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25) !important;
+  border-left: 6px solid var(--secondary-accent-color) !important;
+}
+
+.toast-info {
+  background: var(--white) !important;
+  color: #4a3800 !important;
+}
+
+.toast-success {
+  background: #e6ffef !important;
+  color: #055a3b !important;
+}
+
+.toast-error {
+  background: var(--white) !important;
+  color: #7a1b1b !important;
+}

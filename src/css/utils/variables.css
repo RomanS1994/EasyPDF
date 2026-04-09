@@ -1,0 +1,19 @@
+:root {
+  /* COLORS */
+  --dark-brown: #02182a;
+  --white: #fff;
+  --secondary-accent-color: #f5f3e1;
+  --grey: #e4e2e2;
+  --accent-color: #ded47b;
+  --accent-color-shadow: rgba(222, 212, 123, 0.1);
+  --cyan-Blue: #193f47;
+  --logo-Blue: #083459;
+  --black: #090b15;
+  --focus-color: #fcfaf2;
+
+  /* FONT-FAMILY */
+  --Poppins: 'Poppins', sans-serif;
+  --Raleway: 'Raleway', sans-serif;
+
+  /* TIMING */
+}
