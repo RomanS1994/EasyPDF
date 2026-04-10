@@ -28,6 +28,15 @@ export async function API_logout() {
   return readJsonResponse(response, t('api_logout_failed'));
 }
 
+export async function API_refreshSession() {
+  const response = await fetchApi('/auth/refresh', {
+    method: 'POST',
+    skipAuthRefresh: true,
+  });
+
+  return readJsonResponse(response, t('api_current_user_failed'));
+}
+
 export async function API_getMe() {
   const response = await fetchApi('/me', {
     method: 'GET',

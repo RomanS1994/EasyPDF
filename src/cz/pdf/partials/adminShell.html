@@ -1,4 +1,13 @@
 <section class="dataContract">
+  <script>
+    try {
+      const rawSession = window.localStorage.getItem('pdf-app-session');
+      const session = rawSession ? JSON.parse(rawSession) : null;
+      document.body.dataset.authState = session?.token ? 'session' : 'guest';
+    } catch {
+      document.body.dataset.authState = 'guest';
+    }
+  </script>
   <div class="container">
     <div class="appRoot" id="accountHub">
       <section class="guestStage" id="guestPanel">

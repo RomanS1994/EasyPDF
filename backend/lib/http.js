@@ -1,5 +1,31 @@
+const REQUEST_CONTEXT = Symbol('requestContext');
+
+function appendVaryHeader(response, value) {
+  const current = response.getHeader('Vary');
+  const values = new Set(
+    String(current || '')
+      .split(',')
+      .map(item => item.trim())
+      .filter(Boolean)
+  );
+
+  values.add(value);
+  response.setHeader('Vary', Array.from(values).join(', '));
+}
+
+function getBoundRequest(response) {
+  return response[REQUEST_CONTEXT] || null;
+}
+
+export function bindRequestContext(response, request) {
+  response[REQUEST_CONTEXT] = request;
+}
+
 export function setCorsHeaders(response) {
-  const origin = process.env.CLIENT_ORIGIN || '*';
+  const request = getBoundRequest(response);
+  const configuredOrigin = process.env.CLIENT_ORIGIN || '';
+  const requestOrigin = request?.headers.origin || '';
+  const origin = configuredOrigin || requestOrigin || '*';
 
   response.setHeader('Access-Control-Allow-Origin', origin);
   response.setHeader(
@@ -7,6 +33,14 @@ export function setCorsHeaders(response) {
     'Content-Type, Authorization, X-API-KEY'
   );
   response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
+
+  if (origin !== '*') {
+    response.setHeader('Access-Control-Allow-Credentials', 'true');
+    appendVaryHeader(response, 'Origin');
+    return;
+  }
+
+  response.setHeader('Access-Control-Allow-Credentials', 'false');
 }
 
 export function handleCors(request, response) {
@@ -79,4 +113,87 @@ export function getBearerToken(request) {
   }
 
   return token;
+}
+
+export function parseCookies(request) {
+  const header = request.headers.cookie || '';
+  if (!header) return {};
+
+  return header
+    .split(';')
+    .map(item => item.trim())
+    .filter(Boolean)
+    .reduce((cookies, pair) => {
+      const separatorIndex = pair.indexOf('=');
+      if (separatorIndex < 0) return cookies;
+
+      const name = pair.slice(0, separatorIndex).trim();
+      const rawValue = pair.slice(separatorIndex + 1).trim();
+      cookies[name] = decodeURIComponent(rawValue);
+      return cookies;
+    }, {});
+}
+
+export function getCookie(request, name) {
+  return parseCookies(request)[name] || '';
+}
+
+function appendSetCookieHeader(response, value) {
+  const current = response.getHeader('Set-Cookie');
+  if (!current) {
+    response.setHeader('Set-Cookie', value);
+    return;
+  }
+
+  const next = Array.isArray(current) ? [...current, value] : [current, value];
+  response.setHeader('Set-Cookie', next);
+}
+
+export function setCookie(response, name, value, options = {}) {
+  const parts = [`${name}=${encodeURIComponent(value)}`];
+
+  if (options.maxAge !== undefined && options.maxAge !== null) {
+    parts.push(`Max-Age=${Math.max(0, Math.floor(options.maxAge))}`);
+  }
+
+  if (options.expires instanceof Date) {
+    parts.push(`Expires=${options.expires.toUTCString()}`);
+  }
+
+  parts.push(`Path=${options.path || '/'}`);
+
+  if (options.httpOnly !== false) {
+    parts.push('HttpOnly');
+  }
+
+  if (options.secure) {
+    parts.push('Secure');
+  }
+
+  if (options.sameSite) {
+    parts.push(`SameSite=${options.sameSite}`);
+  }
+
+  appendSetCookieHeader(response, parts.join('; '));
+}
+
+export function clearCookie(response, name, options = {}) {
+  setCookie(response, name, '', {
+    ...options,
+    expires: new Date(0),
+    maxAge: 0,
+  });
+}
+
+export function getClientIp(request) {
+  const forwarded = String(request.headers['x-forwarded-for'] || '')
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean);
+
+  if (forwarded.length > 0) {
+    return forwarded[0];
+  }
+
+  return request.socket?.remoteAddress || '';
 }

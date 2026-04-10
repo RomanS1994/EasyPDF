@@ -2,7 +2,7 @@ import 'dotenv/config';
 import http from 'node:http';
 
 import { requireApiKey } from './auth/context.js';
-import { handleCors, sendError } from './lib/http.js';
+import { bindRequestContext, handleCors, sendError } from './lib/http.js';
 import { routeRequest } from './routes/index.js';
 
 const PORT = Number(process.env.BACKEND_PORT || process.env.PORT || 3001);
@@ -37,6 +37,13 @@ function handleUnexpectedError(response, error) {
   }
 
   if (
+    message === 'Too many failed login attempts. Try again later.' ||
+    message === 'Too many failed registration attempts. Try again later.'
+  ) {
+    return sendError(response, 429, message);
+  }
+
+  if (
     message === 'Invalid JSON body' ||
     message === 'Request body is too large' ||
     message === 'Invalid plan' ||
@@ -58,6 +65,7 @@ function handleUnexpectedError(response, error) {
 
 const server = http.createServer(async (request, response) => {
   try {
+    bindRequestContext(response, request);
     if (handleCors(request, response)) return;
     if (!requireApiKey(request, response)) return;
 

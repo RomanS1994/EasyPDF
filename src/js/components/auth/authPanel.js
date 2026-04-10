@@ -3,6 +3,7 @@ import {
   API_getMe,
   API_login,
   API_logout,
+  API_refreshSession,
   API_register,
   API_updateMyProfile,
 } from '../../../api/auth/API_auth.js';
@@ -35,6 +36,7 @@ import {
   getCurrentLanguage,
   getCurrentLocale,
   initLanguage,
+  syncPageMeta,
   t,
 } from '../../i18n/app.js';
 import { notifyText } from '../../toastify.js';
@@ -289,6 +291,45 @@ function getRouteTab() {
   return TAB_NAMES.includes(routeTab) ? routeTab : 'home';
 }
 
+function getShellRouteConfig() {
+  const shell = document.body.dataset.appShell;
+
+  if (shell === 'admin') {
+    return {
+      accounts: '/cz/pdf/admin/accounts/',
+      subscriptions: '/cz/pdf/admin/subscriptions/',
+      orders: '/cz/pdf/admin/orders/',
+      settings: '/cz/pdf/admin/settings/',
+    };
+  }
+
+  return {
+    home: '/cz/pdf/',
+    stats: '/cz/pdf/stats/',
+    orders: '/cz/pdf/orders/',
+    account: '/cz/pdf/account/',
+  };
+}
+
+function getTabForPath(pathname) {
+  const routes = getShellRouteConfig();
+  return (
+    Object.entries(routes).find(([, routePath]) => routePath === pathname)?.[0] || null
+  );
+}
+
+function navigateToTab(tabName, pathname) {
+  if (!TAB_NAMES.includes(tabName)) return;
+
+  document.body.dataset.appTab = tabName;
+  activateTab(tabName);
+  syncPageMeta(getCurrentLanguage());
+
+  if (window.location.pathname !== pathname) {
+    window.history.pushState({ appTab: tabName }, '', pathname);
+  }
+}
+
 function escapeHtml(value) {
   return String(value || '')
     .replaceAll('&', '&amp;')
@@ -384,6 +425,7 @@ function clearManagerState() {
 }
 
 function setGuestVisible(isVisible) {
+  document.body.dataset.authState = isVisible ? 'guest' : 'session';
   refs.guestPanel?.classList.toggle('is-hidden', !isVisible);
   refs.accountPanel?.classList.toggle('is-hidden', isVisible);
 }
@@ -1576,14 +1618,20 @@ async function loadManagerData({ preserveSelection = true } = {}) {
 }
 
 async function refreshAccountData({ resetTab = false } = {}) {
-  const session = getStoredSession();
+  let session = getStoredSession();
 
   if (!session?.token) {
-    state.user = null;
-    state.orders = [];
-    clearManagerState();
-    renderAuthenticatedState({ resetTab });
-    return;
+    try {
+      const refreshed = await API_refreshSession();
+      setStoredSession({ token: refreshed.token, user: refreshed.user });
+      session = getStoredSession();
+    } catch {
+      state.user = null;
+      state.orders = [];
+      clearManagerState();
+      renderAuthenticatedState({ resetTab });
+      return;
+    }
   }
 
   try {
@@ -1893,8 +1941,46 @@ function handleTabClick(event) {
   const button = event.target.closest('[data-tab-target]');
   if (!button) return;
 
-  if (button.getAttribute('href')) return;
-  activateTab(button.dataset.tabTarget);
+  const href = button.getAttribute('href');
+  if (!href) {
+    activateTab(button.dataset.tabTarget);
+    return;
+  }
+
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+  const url = new URL(href, window.location.origin);
+  const nextTab = getTabForPath(url.pathname);
+  if (!nextTab) return;
+
+  event.preventDefault();
+  navigateToTab(nextTab, url.pathname);
+}
+
+function handleTabPopState() {
+  const nextTab = getTabForPath(window.location.pathname);
+  if (!nextTab) return;
+
+  document.body.dataset.appTab = nextTab;
+  activateTab(nextTab);
+  syncPageMeta(getCurrentLanguage());
+}
+
+function bindNavigationEvents() {
+  window.addEventListener('popstate', handleTabPopState);
+}
+
+function unbindNavigationEvents() {
+  window.removeEventListener('popstate', handleTabPopState);
+}
+
+function syncInitialRouteState() {
+  const nextTab = getTabForPath(window.location.pathname);
+  if (!nextTab) return;
+
+  document.body.dataset.appTab = nextTab;
+  activateTab(nextTab);
+  syncPageMeta(getCurrentLanguage());
 }
 
 async function loadPlans() {
@@ -2033,6 +2119,7 @@ async function handleManagerOrderStatusChange(nextStatus) {
 }
 
 function bindEvents() {
+  bindNavigationEvents();
   refs.registerForm?.addEventListener('submit', handleRegisterSubmit);
   refs.loginForm?.addEventListener('submit', handleLoginSubmit);
   refs.logoutBtn?.addEventListener('click', handleLogoutClick);
@@ -2117,16 +2204,18 @@ async function init() {
   if (!refs.hub) return;
 
   initLanguage();
+  syncInitialRouteState();
   bindEvents();
   syncLanguageSelects();
   activateTab(state.activeTab);
   activateStatsTab(state.activeStatsTab);
   await loadPlans();
-  renderAuthenticatedState({ resetTab: true });
   await refreshAccountData();
 }
 
 init();
+
+window.addEventListener('beforeunload', unbindNavigationEvents);
 
 export function hasAuthenticatedSession() {
   return Boolean(getStoredSession()?.token);

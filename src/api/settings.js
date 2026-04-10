@@ -1,4 +1,8 @@
-import { getSessionToken } from './auth/session.js';
+import {
+  clearStoredSession,
+  getSessionToken,
+  setStoredSession,
+} from './auth/session.js';
 
 function resolveApiBase() {
   if (import.meta.env.DEV) {
@@ -12,14 +16,10 @@ function resolveApiBase() {
   return import.meta.env.VITE_API_BASE_URL || '/api';
 }
 
-export const fetchApi = async (
-  endpoint = '',
-  { method = 'GET', query, body, options = {} }
-) => {
-  const base = resolveApiBase();
-  const API_KEY = import.meta.env.VITE_API_KEY;
-  const sessionToken = getSessionToken();
-  const queryString = query
+let refreshSessionPromise = null;
+
+function buildQueryString(query) {
+  return query
     ? Object.entries(query)
         .map(
           ([key, val]) =>
@@ -27,13 +27,34 @@ export const fetchApi = async (
         )
         .join('&')
     : '';
-  const url = `${base}${endpoint}${queryString ? `?${queryString}` : ''}`;
+}
 
-  // build headers and options safely
+function buildApiUrl(base, endpoint, query) {
+  const queryString = buildQueryString(query);
+  return `${base}${endpoint}${queryString ? `?${queryString}` : ''}`;
+}
+
+function shouldAttemptRefresh(endpoint) {
+  return ![
+    '/auth/login',
+    '/auth/register',
+    '/auth/logout',
+    '/auth/refresh',
+  ].some(prefix => endpoint.startsWith(prefix));
+}
+
+async function performRequest({
+  url,
+  method,
+  body,
+  options,
+  apiKey,
+  sessionToken,
+}) {
   const headers = { ...(options.headers || {}) };
 
-  if (API_KEY) {
-    headers['X-API-KEY'] = API_KEY;
+  if (apiKey) {
+    headers['X-API-KEY'] = apiKey;
   }
 
   if (sessionToken && !headers.Authorization) {
@@ -46,14 +67,90 @@ export const fetchApi = async (
 
   const fetchOptions = {
     ...options,
+    credentials: options.credentials || 'include',
     method: method.toUpperCase(),
     headers,
   };
 
-  // do not attach body for GET/HEAD
   if (body && fetchOptions.method !== 'GET' && fetchOptions.method !== 'HEAD') {
     fetchOptions.body = JSON.stringify(body);
   }
 
   return fetch(url, fetchOptions);
+}
+
+async function refreshAccessSession(base, apiKey) {
+  if (refreshSessionPromise) {
+    return refreshSessionPromise;
+  }
+
+  refreshSessionPromise = (async () => {
+    const headers = {};
+
+    if (apiKey) {
+      headers['X-API-KEY'] = apiKey;
+    }
+
+    const response = await fetch(`${base}/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include',
+      headers,
+    });
+    const payload = await response.json().catch(() => null);
+
+    if (!response.ok || !payload?.token || !payload?.user) {
+      clearStoredSession();
+      return null;
+    }
+
+    setStoredSession({
+      token: payload.token,
+      user: payload.user,
+    });
+
+    return payload;
+  })().finally(() => {
+    refreshSessionPromise = null;
+  });
+
+  return refreshSessionPromise;
+}
+
+export const fetchApi = async (
+  endpoint = '',
+  { method = 'GET', query, body, options = {}, skipAuthRefresh = false }
+) => {
+  const base = resolveApiBase();
+  const API_KEY = import.meta.env.VITE_API_KEY;
+  const url = buildApiUrl(base, endpoint, query);
+
+  let response = await performRequest({
+    url,
+    method,
+    body,
+    options,
+    apiKey: API_KEY,
+    sessionToken: getSessionToken(),
+  });
+
+  if (
+    response.status === 401 &&
+    !skipAuthRefresh &&
+    shouldAttemptRefresh(endpoint)
+  ) {
+    const refreshed = await refreshAccessSession(base, API_KEY);
+
+    if (refreshed?.token) {
+      response = await performRequest({
+        url,
+        method,
+        body,
+        options,
+        apiKey: API_KEY,
+        sessionToken: refreshed.token,
+      });
+    }
+  }
+
+  return response;
 };

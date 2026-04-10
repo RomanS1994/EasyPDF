@@ -13,7 +13,8 @@
     "db:migrate-json": "node tools/migrate-json-to-postgres.js",
     "build": "vite build --base=/",
     "preview": "vite preview",
-    "start:server": "node backend/server.js"
+    "start:server": "node backend/server.js",
+    "postinstall": "prisma generate"
   },
   "devDependencies": {
     "glob": "^11.0.0",

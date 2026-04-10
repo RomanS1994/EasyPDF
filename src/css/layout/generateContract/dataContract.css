@@ -60,6 +60,14 @@
   display: none !important;
 }
 
+.page-generateContract[data-auth-state='session'] #guestPanel {
+  display: none !important;
+}
+
+.page-generateContract[data-auth-state='session'] #accountPanel {
+  display: grid !important;
+}
+
 .appRoot,
 .guestStage,
 .appShell,

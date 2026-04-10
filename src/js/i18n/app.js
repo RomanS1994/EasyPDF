@@ -1216,6 +1216,10 @@ function applyPageMeta(language = getCurrentLanguage()) {
   }
 }
 
+export function syncPageMeta(language = getCurrentLanguage()) {
+  applyPageMeta(language);
+}
+
 export function applyLanguage(language = getStoredLanguage(), { persist = true } = {}) {
   const nextLanguage = persist ? setStoredLanguage(language) : resolveLanguage(language);
 

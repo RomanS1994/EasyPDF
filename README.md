@@ -50,6 +50,7 @@ URLs:
 - `GET /api/plans`
 - `POST /api/auth/register`
 - `POST /api/auth/login`
+- `POST /api/auth/refresh`
 - `POST /api/auth/logout`
 - `GET /api/me`
 - `GET /api/me/usage`
@@ -70,4 +71,5 @@ URLs:
 - use `DATABASE_URL` for runtime and optional `DIRECT_DATABASE_URL` for Prisma CLI migrations/introspection
 - migrate legacy JSON data with `npm run db:migrate-json -- --input=/path/to/db.json`
 - passwords are hashed with Node `crypto.scrypt`
-- auth uses `Authorization: Bearer <token>`
+- auth uses a short-lived `Authorization: Bearer <access-token>` plus a rotating refresh token in a secure `HttpOnly` cookie
+- `/api/auth/login` and `/api/auth/register` are protected by brute-force lockouts and failed login auditing
