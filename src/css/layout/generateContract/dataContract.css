@@ -715,6 +715,17 @@
   gap: 12px;
 }
 
+.page-generateContract[data-app-tab='home'] .appScreen[data-tab-screen='home'],
+.page-generateContract[data-app-tab='stats'] .appScreen[data-tab-screen='stats'],
+.page-generateContract[data-app-tab='orders'] .appScreen[data-tab-screen='orders'],
+.page-generateContract[data-app-tab='account'] .appScreen[data-tab-screen='account'],
+.page-generateContract[data-app-tab='accounts'] .appScreen[data-tab-screen='accounts'],
+.page-generateContract[data-app-tab='subscriptions'] .appScreen[data-tab-screen='subscriptions'],
+.page-generateContract[data-app-tab='settings'] .appScreen[data-tab-screen='settings'] {
+  display: grid;
+  gap: 12px;
+}
+
 .page-generateContract[data-app-tab='home'] .appTop {
   display: none;
 }
@@ -1618,6 +1629,25 @@
   color: var(--accent);
 }
 
+.page-generateContract[data-app-tab='home'] .bottomTab[data-tab-target='home'] .bottomTab-icon,
+.page-generateContract[data-app-tab='home'] .bottomTab[data-tab-target='home'] .bottomTab-label,
+.page-generateContract[data-app-tab='stats'] .bottomTab[data-tab-target='stats'] .bottomTab-icon,
+.page-generateContract[data-app-tab='stats'] .bottomTab[data-tab-target='stats'] .bottomTab-label,
+.page-generateContract[data-app-tab='orders'] .bottomTab[data-tab-target='orders'] .bottomTab-icon,
+.page-generateContract[data-app-tab='orders'] .bottomTab[data-tab-target='orders'] .bottomTab-label,
+.page-generateContract[data-app-tab='account'] .bottomTab[data-tab-target='account'] .bottomTab-icon,
+.page-generateContract[data-app-tab='account'] .bottomTab[data-tab-target='account'] .bottomTab-label,
+.page-generateContract[data-app-tab='accounts'] .bottomTab[data-tab-target='accounts'] .bottomTab-icon,
+.page-generateContract[data-app-tab='accounts'] .bottomTab[data-tab-target='accounts'] .bottomTab-label,
+.page-generateContract[data-app-tab='subscriptions'] .bottomTab[data-tab-target='subscriptions'] .bottomTab-icon,
+.page-generateContract[data-app-tab='subscriptions'] .bottomTab[data-tab-target='subscriptions'] .bottomTab-label,
+.page-generateContract[data-app-tab='orders'] .bottomTab[data-tab-target='orders'] .bottomTab-icon,
+.page-generateContract[data-app-tab='orders'] .bottomTab[data-tab-target='orders'] .bottomTab-label,
+.page-generateContract[data-app-tab='settings'] .bottomTab[data-tab-target='settings'] .bottomTab-icon,
+.page-generateContract[data-app-tab='settings'] .bottomTab[data-tab-target='settings'] .bottomTab-label {
+  color: var(--accent);
+}
+
 .bottomTab-label {
   font-size: 10px;
   font-weight: 600;
@@ -1626,6 +1656,16 @@
 }
 
 .bottomTab.is-active .bottomTab-icon svg {
+  stroke-width: 2.15;
+}
+
+.page-generateContract[data-app-tab='home'] .bottomTab[data-tab-target='home'] .bottomTab-icon svg,
+.page-generateContract[data-app-tab='stats'] .bottomTab[data-tab-target='stats'] .bottomTab-icon svg,
+.page-generateContract[data-app-tab='orders'] .bottomTab[data-tab-target='orders'] .bottomTab-icon svg,
+.page-generateContract[data-app-tab='account'] .bottomTab[data-tab-target='account'] .bottomTab-icon svg,
+.page-generateContract[data-app-tab='accounts'] .bottomTab[data-tab-target='accounts'] .bottomTab-icon svg,
+.page-generateContract[data-app-tab='subscriptions'] .bottomTab[data-tab-target='subscriptions'] .bottomTab-icon svg,
+.page-generateContract[data-app-tab='settings'] .bottomTab[data-tab-target='settings'] .bottomTab-icon svg {
   stroke-width: 2.15;
 }
 

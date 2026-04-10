@@ -1893,6 +1893,7 @@ function handleTabClick(event) {
   const button = event.target.closest('[data-tab-target]');
   if (!button) return;
 
+  if (button.getAttribute('href')) return;
   activateTab(button.dataset.tabTarget);
 }
 
