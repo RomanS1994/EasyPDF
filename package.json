@@ -16,7 +16,6 @@
     "start:server": "node backend/server.js"
   },
   "devDependencies": {
-    "dotenv": "^17.4.1",
     "glob": "^11.0.0",
     "postcss": "^8.4.41",
     "postcss-sort-media-queries": "^5.2.0",
@@ -29,6 +28,7 @@
     "@microsoft/clarity": "^1.0.0",
     "@prisma/client": "^6.19.3",
     "basiclightbox": "^5.0.4",
+    "dotenv": "^17.4.1",
     "firebase": "^11.10.0",
     "flatpickr": "^4.6.13",
     "jspdf": "^3.0.1",
