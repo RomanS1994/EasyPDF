@@ -23,6 +23,7 @@ export default defineConfig(({ command }) => {
 
   return {
     base: '/',
+    envDir: '.',
     define: {
       [command === 'serve' ? 'global' : '_global']: {},
     },

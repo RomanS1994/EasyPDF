@@ -1,13 +1,22 @@
 import { getSessionToken } from './auth/session.js';
 
+function resolveApiBase() {
+  if (import.meta.env.DEV) {
+    return (
+      import.meta.env.VITE_API_BASE_URL_TEST ||
+      import.meta.env.VITE_API_BASE_URL ||
+      'http://localhost:3001/api'
+    );
+  }
+
+  return import.meta.env.VITE_API_BASE_URL || '/api';
+}
+
 export const fetchApi = async (
   endpoint = '',
   { method = 'GET', query, body, options = {} }
 ) => {
-  const base =
-    import.meta.env.DEV && import.meta.env.VITE_API_BASE_URL_TEST
-      ? import.meta.env.VITE_API_BASE_URL_TEST
-      : import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+  const base = resolveApiBase();
   const API_KEY = import.meta.env.VITE_API_KEY;
   const sessionToken = getSessionToken();
   const queryString = query
