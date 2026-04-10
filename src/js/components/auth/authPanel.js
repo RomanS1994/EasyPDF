@@ -44,9 +44,14 @@ import { notifyText } from '../../toastify.js';
 const refs = {
   hub: document.getElementById('accountHub'),
   guestPanel: document.getElementById('guestPanel'),
+  guestRouteBadge: document.getElementById('guestRouteBadge'),
   accountPanel: document.getElementById('accountPanel'),
   registerForm: document.getElementById('registerForm'),
   loginForm: document.getElementById('loginForm'),
+  guestAuthNote: document.getElementById('guestAuthNote'),
+  guestLanguageButtons: document.querySelectorAll('[data-language-option]'),
+  authModeButtons: document.querySelectorAll('[data-auth-mode]'),
+  authModePanels: document.querySelectorAll('[data-auth-mode-panel]'),
   logoutBtn: document.getElementById('logoutBtn'),
   deleteAccountBtn: document.getElementById('deleteAccountBtn'),
   authHeadline: document.getElementById('authHeadline'),
@@ -198,6 +203,7 @@ const TAB_NAMES = [
   'settings',
 ];
 const STATS_TAB_NAMES = ['usage', 'activity', 'plan'];
+const AUTH_MODES = ['register', 'login'];
 const CONTRACT_STORAGE_KEY = 'contract-data';
 const MANAGER_SELECTED_USER_KEY = 'pdf-app-admin-selected-user';
 const MANAGER_SELECTED_ORDER_KEY = 'pdf-app-admin-selected-order';
@@ -210,6 +216,7 @@ const state = {
   activeTab: getRouteTab(),
   activeStatsTab: 'usage',
   selectedPlanId: '',
+  authMode: getDefaultAuthMode(),
   managerUsers: [],
   managerPlans: [],
   managerAudit: [],
@@ -230,6 +237,10 @@ const state = {
 
 let managerSearchTimer = 0;
 let managerOrdersSearchTimer = 0;
+
+function getDefaultAuthMode() {
+  return getRouteTab() === 'home' ? 'register' : 'login';
+}
 
 function setFormDisabled(form, disabled) {
   if (!form) return;
@@ -440,11 +451,26 @@ function syncLanguageSelects() {
   if (refs.adminLanguageSelect) {
     refs.adminLanguageSelect.value = language;
   }
+
+  refs.guestLanguageButtons.forEach(button => {
+    button.classList.toggle('is-active', button.dataset.languageOption === language);
+    button.setAttribute(
+      'aria-pressed',
+      button.dataset.languageOption === language ? 'true' : 'false'
+    );
+  });
 }
 
 function handleLanguageSelectChange(event) {
   const nextLanguage = event.target.value;
   applyLanguage(nextLanguage);
+}
+
+function handleGuestLanguageClick(event) {
+  const button = event.target.closest('[data-language-option]');
+  if (!button) return;
+
+  applyLanguage(button.dataset.languageOption || 'uk');
 }
 
 function activateTab(tabName = 'home') {
@@ -458,6 +484,10 @@ function activateTab(tabName = 'home') {
   refs.tabScreens.forEach(screen => {
     screen.classList.toggle('is-active', screen.dataset.tabScreen === nextTab);
   });
+
+  if (!state.user) {
+    renderGuestContext();
+  }
 }
 
 function activateStatsTab(tabName = 'usage') {
@@ -477,6 +507,67 @@ function activateStatsTab(tabName = 'usage') {
       screen.dataset.statsTabScreen === nextTab
     );
   });
+}
+
+function getGuestRouteLabel() {
+  if (state.activeTab === 'home') {
+    return t('guest_start_screen');
+  }
+
+  return t('guest_continue_to', { screen: t(state.activeTab) });
+}
+
+function renderGuestContext() {
+  const routeLabel = getGuestRouteLabel();
+  const authMode = AUTH_MODES.includes(state.authMode) ? state.authMode : getDefaultAuthMode();
+
+  if (refs.guestRouteBadge) {
+    refs.guestRouteBadge.textContent = routeLabel;
+  }
+
+  if (refs.authSubline) {
+    refs.authSubline.textContent =
+      state.activeTab === 'home'
+        ? t('guest_subline')
+        : t('guest_redirect_note', { screen: t(state.activeTab) });
+  }
+
+  if (refs.authHeadline) {
+    refs.authHeadline.textContent =
+      authMode === 'login' ? t('guest_login_headline') : t('guest_headline');
+  }
+
+  if (refs.guestAuthNote) {
+    refs.guestAuthNote.textContent =
+      authMode === 'login' ? t('guest_login_note') : t('guest_note');
+  }
+}
+
+function setAuthMode(mode = getDefaultAuthMode()) {
+  const nextMode = AUTH_MODES.includes(mode) ? mode : getDefaultAuthMode();
+  state.authMode = nextMode;
+  refs.guestPanel?.setAttribute('data-auth-mode', nextMode);
+
+  refs.authModeButtons.forEach(button => {
+    const isActive = button.dataset.authMode === nextMode;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    button.setAttribute('tabindex', isActive ? '0' : '-1');
+  });
+
+  refs.authModePanels.forEach(panel => {
+    const isActive = panel.dataset.authModePanel === nextMode;
+    panel.classList.toggle('is-active', isActive);
+    panel.hidden = !isActive;
+    panel.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+  });
+
+  renderGuestContext();
+}
+
+function focusAuthMode(mode) {
+  const button = Array.from(refs.authModeButtons).find(item => item.dataset.authMode === mode);
+  button?.focus();
 }
 
 function syncSelectedPlan(planId, { scrollToForm = false } = {}) {
@@ -1406,11 +1497,13 @@ function broadcastAuthState() {
 
 function renderAuthenticatedState({ resetTab = false } = {}) {
   if (!state.user) {
+    if (state.activeTab !== 'home') {
+      state.authMode = 'login';
+    }
+
     setGuestVisible(true);
     clearManagerState();
-
-    if (refs.authHeadline) refs.authHeadline.textContent = t('guest_headline');
-    if (refs.authSubline) refs.authSubline.textContent = t('guest_subline');
+    renderGuestContext();
 
     renderOrderList(refs.ordersList, refs.ordersEmpty, [], {
       emptyText: t('orders_empty_home'),
@@ -1934,7 +2027,41 @@ function handlePlanCardClick(event) {
   const button = event.target.closest('[data-plan-select]');
   if (!button) return;
 
+  setAuthMode('register');
   syncSelectedPlan(button.dataset.planSelect, { scrollToForm: true });
+}
+
+function handleAuthModeClick(event) {
+  const button = event.target.closest('[data-auth-mode]');
+  if (!button) return;
+
+  setAuthMode(button.dataset.authMode || getDefaultAuthMode());
+}
+
+function handleAuthModeKeydown(event) {
+  const button = event.target.closest('[data-auth-mode]');
+  if (!button) return;
+
+  const currentIndex = AUTH_MODES.indexOf(button.dataset.authMode || '');
+  if (currentIndex === -1) return;
+
+  let nextMode = null;
+
+  if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+    nextMode = AUTH_MODES[(currentIndex + 1) % AUTH_MODES.length];
+  } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+    nextMode = AUTH_MODES[(currentIndex - 1 + AUTH_MODES.length) % AUTH_MODES.length];
+  } else if (event.key === 'Home') {
+    nextMode = AUTH_MODES[0];
+  } else if (event.key === 'End') {
+    nextMode = AUTH_MODES[AUTH_MODES.length - 1];
+  }
+
+  if (!nextMode) return;
+
+  event.preventDefault();
+  setAuthMode(nextMode);
+  focusAuthMode(nextMode);
 }
 
 function handleTabClick(event) {
@@ -2122,6 +2249,13 @@ function bindEvents() {
   bindNavigationEvents();
   refs.registerForm?.addEventListener('submit', handleRegisterSubmit);
   refs.loginForm?.addEventListener('submit', handleLoginSubmit);
+  refs.guestLanguageButtons.forEach(button => {
+    button.addEventListener('click', handleGuestLanguageClick);
+  });
+  refs.authModeButtons.forEach(button => {
+    button.addEventListener('click', handleAuthModeClick);
+    button.addEventListener('keydown', handleAuthModeKeydown);
+  });
   refs.logoutBtn?.addEventListener('click', handleLogoutClick);
   refs.deleteAccountBtn?.addEventListener('click', handleDeleteAccountClick);
   refs.updateProfileBtn?.addEventListener('click', handleUpdateProfileClick);
@@ -2129,6 +2263,7 @@ function bindEvents() {
   refs.adminLanguageSelect?.addEventListener('change', handleLanguageSelectChange);
   refs.planCards?.addEventListener('click', handlePlanCardClick);
   refs.planSelect?.addEventListener('change', event => {
+    setAuthMode('register');
     syncSelectedPlan(event.target.value);
   });
   refs.statsTabButtons.forEach(button => {
@@ -2207,6 +2342,7 @@ async function init() {
   syncInitialRouteState();
   bindEvents();
   syncLanguageSelects();
+  setAuthMode(state.authMode);
   activateTab(state.activeTab);
   activateStatsTab(state.activeStatsTab);
   await loadPlans();

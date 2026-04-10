@@ -12,6 +12,9 @@
     "db:migrate": "npm --prefix backend run db:migrate",
     "db:migrate:deploy": "npm --prefix backend run db:migrate:deploy",
     "db:migrate-json": "npm --prefix backend run db:migrate-json --",
+    "hooks:install": "node tools/install-git-hooks.js",
+    "prepare": "node tools/install-git-hooks.js",
+    "secrets:check": "node tools/check-secrets.js",
     "build": "vite build --base=/",
     "preview": "vite preview",
     "start:server": "npm --prefix backend run start"

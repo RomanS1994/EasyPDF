@@ -4,5 +4,6 @@ dist
 src/.env
 src/.env.*
 .DS_Store
+backend/data/*.json
 
 /src/generated/prisma

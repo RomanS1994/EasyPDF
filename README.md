@@ -35,6 +35,7 @@ cp .env.example .env
 cp backend/.env.example backend/.env
 npm install
 npm --prefix backend install
+npm run hooks:install
 npm run db:generate
 npm run db:migrate
 npm run dev
@@ -46,6 +47,13 @@ Use:
 - `backend/.env` for backend variables and PostgreSQL connection
 
 Make sure PostgreSQL is running and `DATABASE_URL` in `backend/.env` points to the target database before starting the app.
+
+Security:
+
+- `backend/.env.example` must contain placeholders only, never live credentials
+- `backend/.env` stays local and must not be committed
+- run `npm run secrets:check` to scan tracked files for accidental secrets
+- `npm install` also runs `npm run hooks:install` to enable the local `pre-commit` secret check
 
 URLs:
 

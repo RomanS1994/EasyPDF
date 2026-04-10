@@ -3,15 +3,50 @@
     try {
       const rawSession = window.localStorage.getItem('pdf-app-session');
       const session = rawSession ? JSON.parse(rawSession) : null;
+      const rawLanguage = window.localStorage.getItem('pdf-app-language');
+      const language = ['uk', 'en', 'cs'].includes(rawLanguage) ? rawLanguage : 'uk';
+      const routeTab = document.body?.dataset?.appTab || 'home';
+
+      document.documentElement.lang = language;
       document.body.dataset.authState = session?.token ? 'session' : 'guest';
+      window.__PDF_APP_BOOT__ = {
+        language,
+        routeTab,
+        defaultAuthMode: routeTab === 'home' ? 'register' : 'login',
+      };
     } catch {
       document.body.dataset.authState = 'guest';
+      window.__PDF_APP_BOOT__ = {
+        language: 'uk',
+        routeTab: document.body?.dataset?.appTab || 'home',
+        defaultAuthMode: (document.body?.dataset?.appTab || 'home') === 'home' ? 'register' : 'login',
+      };
     }
   </script>
   <div class="container">
     <div class="appRoot" id="accountHub">
       <section class="guestStage" id="guestPanel">
         <div class="guestIntro">
+          <div class="guestIntroBar">
+            <p class="guestRouteBadge" id="guestRouteBadge">Стартовий екран</p>
+            <div
+              class="languageToggle"
+              role="group"
+              aria-label="Обрати мову"
+              data-i18n-aria-label="choose_language"
+            >
+              <button class="languageToggle-btn is-active" type="button" data-language-option="uk">
+                UA
+              </button>
+              <button class="languageToggle-btn" type="button" data-language-option="en">
+                EN
+              </button>
+              <button class="languageToggle-btn" type="button" data-language-option="cs">
+                CZ
+              </button>
+            </div>
+          </div>
+
           <p class="sectionEyebrow">TransferDocs</p>
           <h1 data-i18n="app_brand_workspace">PDF-простір</h1>
           <p id="authSubline" data-i18n="guest_subline">
@@ -25,13 +60,52 @@
           <div class="compactHeader">
             <p class="sectionEyebrow" data-i18n="access">Доступ</p>
             <h2 id="authHeadline" data-i18n="guest_headline">Створити акаунт</h2>
-            <p data-i18n="guest_note">
+            <p id="guestAuthNote" data-i18n="guest_note">
               Один акаунт. Один план. Усі замовлення зберігаються в одному місці.
             </p>
           </div>
 
+          <div
+            class="authModeSwitch"
+            role="tablist"
+            aria-label="Режим доступу"
+            data-i18n-aria-label="auth_mode_switch"
+          >
+            <button
+              class="authModeSwitch-btn is-active"
+              type="button"
+              id="authModeTabRegister"
+              role="tab"
+              aria-controls="registerForm"
+              aria-selected="true"
+              tabindex="0"
+              data-auth-mode="register"
+            >
+              <span data-i18n="new_account">Новий акаунт</span>
+            </button>
+            <button
+              class="authModeSwitch-btn"
+              type="button"
+              id="authModeTabLogin"
+              role="tab"
+              aria-controls="loginForm"
+              aria-selected="false"
+              tabindex="-1"
+              data-auth-mode="login"
+            >
+              <span data-i18n="sign_in">Увійти</span>
+            </button>
+          </div>
+
           <div class="authForms">
-            <form class="authForm" id="registerForm">
+            <form
+              class="authForm authForm-register is-active"
+              id="registerForm"
+              role="tabpanel"
+              aria-labelledby="authModeTabRegister"
+              aria-hidden="false"
+              data-auth-mode-panel="register"
+            >
               <h3 data-i18n="new_account">Новий акаунт</h3>
 
               <label class="authField">
@@ -75,7 +149,15 @@
               </button>
             </form>
 
-            <form class="authForm authForm-login" id="loginForm">
+            <form
+              class="authForm authForm-login"
+              id="loginForm"
+              role="tabpanel"
+              aria-labelledby="authModeTabLogin"
+              aria-hidden="true"
+              data-auth-mode-panel="login"
+              hidden
+            >
               <h3 data-i18n="sign_in">Увійти</h3>
 
               <label class="authField">
@@ -103,6 +185,158 @@
             </form>
           </div>
         </section>
+
+        <script>
+          try {
+            const boot = window.__PDF_APP_BOOT__ || {};
+            const language = ['uk', 'en', 'cs'].includes(boot.language)
+              ? boot.language
+              : document.documentElement.lang || 'uk';
+            const routeTab = boot.routeTab || document.body?.dataset?.appTab || 'home';
+            const defaultAuthMode = boot.defaultAuthMode || (routeTab === 'home' ? 'register' : 'login');
+            const copy = {
+              uk: {
+                chooseLanguage: 'Обрати мову',
+                authModeSwitch: 'Режим доступу',
+                startScreen: 'Стартовий екран',
+                guestSubline: 'Оберіть план і почніть зберігати згенеровані PDF.',
+                guestHeadline: 'Створити акаунт',
+                guestNote: 'Один акаунт. Один план. Усі замовлення зберігаються в одному місці.',
+                guestLoginHeadline: 'Увійти у свій простір',
+                guestLoginNote: 'Поверніться до замовлень, статистики та збережених PDF без зайвих кроків.',
+                newAccount: 'Новий акаунт',
+                signIn: 'Увійти',
+                screens: {
+                  stats: 'Статистика',
+                  orders: 'Замовлення',
+                  account: 'Акаунт',
+                  accounts: 'Акаунти',
+                  subscriptions: 'Підписки',
+                  settings: 'Налаштування',
+                },
+                continueTo: 'Після входу відкриємо «{screen}»',
+                redirectNote: 'Увійдіть, і ми одразу відкриємо розділ «{screen}».',
+              },
+              en: {
+                chooseLanguage: 'Choose language',
+                authModeSwitch: 'Access mode',
+                startScreen: 'Start screen',
+                guestSubline: 'Choose a plan and start saving generated PDFs.',
+                guestHeadline: 'Create account',
+                guestNote: 'One account. One plan. All orders stay in one place.',
+                guestLoginHeadline: 'Sign in to your workspace',
+                guestLoginNote: 'Get back to orders, stats, and saved PDFs without extra steps.',
+                newAccount: 'New account',
+                signIn: 'Sign in',
+                screens: {
+                  stats: 'Stats',
+                  orders: 'Orders',
+                  account: 'Account',
+                  accounts: 'Accounts',
+                  subscriptions: 'Subscriptions',
+                  settings: 'Settings',
+                },
+                continueTo: 'After sign-in, we will open “{screen}”',
+                redirectNote: 'Sign in and we will open the “{screen}” section right away.',
+              },
+              cs: {
+                chooseLanguage: 'Vybrat jazyk',
+                authModeSwitch: 'Režim přístupu',
+                startScreen: 'Startovní obrazovka',
+                guestSubline: 'Vyberte plán a začněte ukládat vygenerovaná PDF.',
+                guestHeadline: 'Vytvořit účet',
+                guestNote: 'Jeden účet. Jeden plán. Všechny objednávky zůstanou na jednom místě.',
+                guestLoginHeadline: 'Přihlásit se do svého prostoru',
+                guestLoginNote: 'Vraťte se k objednávkám, statistikám a uloženým PDF bez zbytečných kroků.',
+                newAccount: 'Nový účet',
+                signIn: 'Přihlásit se',
+                screens: {
+                  stats: 'Statistiky',
+                  orders: 'Objednávky',
+                  account: 'Účet',
+                  accounts: 'Účty',
+                  subscriptions: 'Předplatné',
+                  settings: 'Nastavení',
+                },
+                continueTo: 'Po přihlášení otevřeme „{screen}“',
+                redirectNote: 'Přihlaste se a hned otevřeme sekci „{screen}“.',
+              },
+            };
+            const messages = copy[language] || copy.uk;
+            const isHome = routeTab === 'home';
+            const screenLabel = messages.screens[routeTab] || messages.screens.account;
+            const routeLabel = isHome
+              ? messages.startScreen
+              : messages.continueTo.replace('{screen}', screenLabel);
+            const subline = isHome
+              ? messages.guestSubline
+              : messages.redirectNote.replace('{screen}', screenLabel);
+            const registerTab = document.getElementById('authModeTabRegister');
+            const loginTab = document.getElementById('authModeTabLogin');
+            const registerForm = document.getElementById('registerForm');
+            const loginForm = document.getElementById('loginForm');
+            const authHeadline = document.getElementById('authHeadline');
+            const guestAuthNote = document.getElementById('guestAuthNote');
+            const authSubline = document.getElementById('authSubline');
+            const guestRouteBadge = document.getElementById('guestRouteBadge');
+            const languageToggle = document.querySelector('.languageToggle');
+            const authModeSwitch = document.querySelector('.authModeSwitch');
+            const registerLabel = registerTab?.querySelector('span');
+            const loginLabel = loginTab?.querySelector('span');
+            const setMode = mode => {
+              const isRegister = mode === 'register';
+
+              registerTab?.classList.toggle('is-active', isRegister);
+              registerTab?.setAttribute('aria-selected', isRegister ? 'true' : 'false');
+              registerTab?.setAttribute('tabindex', isRegister ? '0' : '-1');
+              loginTab?.classList.toggle('is-active', !isRegister);
+              loginTab?.setAttribute('aria-selected', isRegister ? 'false' : 'true');
+              loginTab?.setAttribute('tabindex', isRegister ? '-1' : '0');
+              if (registerForm) {
+                registerForm.hidden = !isRegister;
+                registerForm.classList.toggle('is-active', isRegister);
+                registerForm.setAttribute('aria-hidden', isRegister ? 'false' : 'true');
+              }
+              if (loginForm) {
+                loginForm.hidden = isRegister;
+                loginForm.classList.toggle('is-active', !isRegister);
+                loginForm.setAttribute('aria-hidden', isRegister ? 'true' : 'false');
+              }
+              if (authHeadline) {
+                authHeadline.textContent = isRegister ? messages.guestHeadline : messages.guestLoginHeadline;
+              }
+              if (guestAuthNote) {
+                guestAuthNote.textContent = isRegister ? messages.guestNote : messages.guestLoginNote;
+              }
+            };
+
+            document.documentElement.lang = language;
+            if (languageToggle) {
+              languageToggle.setAttribute('aria-label', messages.chooseLanguage);
+            }
+            if (authModeSwitch) {
+              authModeSwitch.setAttribute('aria-label', messages.authModeSwitch);
+            }
+            document.querySelectorAll('[data-language-option]').forEach(button => {
+              const isActive = button.dataset.languageOption === language;
+              button.classList.toggle('is-active', isActive);
+              button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            });
+            if (registerLabel) {
+              registerLabel.textContent = messages.newAccount;
+            }
+            if (loginLabel) {
+              loginLabel.textContent = messages.signIn;
+            }
+            if (guestRouteBadge) {
+              guestRouteBadge.textContent = routeLabel;
+            }
+            if (authSubline) {
+              authSubline.textContent = subline;
+            }
+            setMode(defaultAuthMode);
+          } catch {}
+        </script>
       </section>
 
       <section class="appShell is-hidden" id="accountPanel">
