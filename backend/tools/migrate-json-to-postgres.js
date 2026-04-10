@@ -2,11 +2,10 @@ import 'dotenv/config';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { DEFAULT_PLAN_ID, PLANS as DEFAULT_PLANS } from '../backend/config/plans.js';
-import { writeDatabase } from '../backend/db/store.js';
-import { disconnectDatabase } from '../backend/db/store.js';
-import { normalizeUserProfile } from '../backend/services/profiles.js';
-import { buildDefaultSubscription } from '../backend/services/subscriptions.js';
+import { DEFAULT_PLAN_ID, PLANS as DEFAULT_PLANS } from '../config/plans.js';
+import { writeDatabase, disconnectDatabase } from '../db/store.js';
+import { normalizeUserProfile } from '../services/profiles.js';
+import { buildDefaultSubscription } from '../services/subscriptions.js';
 
 function parseArgs(argv) {
   const args = {};
@@ -70,7 +69,7 @@ async function main() {
   const inputPath =
     args.input ||
     process.env.LEGACY_DATA_FILE ||
-    path.resolve(process.cwd(), 'backend/data/db.json');
+    path.resolve(process.cwd(), 'data/db.json');
   const resolvedPath = path.resolve(process.cwd(), inputPath);
   const raw = await fs.readFile(resolvedPath, 'utf8');
   const parsed = JSON.parse(raw);
