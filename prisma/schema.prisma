@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  user
+  manager
+  admin
+}
+
+enum SubscriptionStatus {
+  active
+  trial
+  paused
+  canceled
+  expired
+}
+
+model User {
+  id           String        @id
+  name         String
+  email        String        @unique
+  passwordHash String
+  role         UserRole      @default(user)
+  profile      Json
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  sessions     Session[]
+  subscription Subscription?
+  orders       Order[]
+
+  @@map("users")
+}
+
+model Session {
+  id         String   @id
+  userId     String
+  tokenHash  String   @unique
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model Plan {
+  id                     String         @id
+  name                   String
+  monthlyGenerationLimit Int
+  description            String
+  isActive               Boolean        @default(true)
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  subscriptions          Subscription[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id                     String             @id
+  userId                 String             @unique
+  planId                 String
+  status                 SubscriptionStatus @default(active)
+  source                 String
+  currentPeriodStart     DateTime
+  currentPeriodEnd       DateTime
+  monthlyGenerationLimit Int
+  quotaOverride          Int?
+  assignedByUserId       String?
+  assignedAt             DateTime
+  notes                  String
+  canceledAt             DateTime?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan                   Plan               @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  @@index([planId])
+  @@index([status])
+  @@index([currentPeriodEnd])
+  @@map("subscriptions")
+}
+
+model Order {
+  id           String   @id
+  userId       String
+  orderNumber  String
+  status       String
+  source       String
+  customer     Json
+  trip         Json
+  totalPrice   String
+  pdf          Json
+  contractData Json
+  metadata     Json
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([orderNumber])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model AuditLog {
+  id           String   @id
+  action       String
+  actorUserId  String?
+  targetUserId String?
+  entityType   String
+  entityId     String?
+  before       Json?
+  after        Json?
+  meta         Json?
+  createdAt    DateTime @default(now())
+
+  @@index([actorUserId])
+  @@index([targetUserId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

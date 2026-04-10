@@ -6,6 +6,7 @@ Small full-stack app for:
 - plan selection (`25`, `50`, `100` generations per month)
 - order storage
 - PDF generation for saved orders
+- PostgreSQL persistence through Prisma
 
 ## Project structure
 
@@ -31,8 +32,12 @@ The frontend uses only these active areas:
 ```bash
 cp .env.example .env
 npm install
+npm run db:generate
+npm run db:migrate
 npm run dev
 ```
+
+Make sure PostgreSQL is running and `DATABASE_URL` in `.env` points to the target database before starting the app.
 
 URLs:
 
@@ -60,6 +65,9 @@ URLs:
 ## Notes
 
 - the first registered user becomes `admin`
-- data is stored in `backend/data/db.json`
+- backend data is stored in PostgreSQL
+- Prisma schema covers `users`, `sessions`, `plans`, `subscriptions`, `orders`, `audit_logs`
+- use `DATABASE_URL` for runtime and optional `DIRECT_DATABASE_URL` for Prisma CLI migrations/introspection
+- migrate legacy JSON data with `npm run db:migrate-json -- --input=/path/to/db.json`
 - passwords are hashed with Node `crypto.scrypt`
 - auth uses `Authorization: Bearer <token>`
