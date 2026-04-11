@@ -55,10 +55,12 @@ function handleUnexpectedError(response, error) {
     message === 'Invalid JSON body' ||
     message === 'Request body is too large' ||
     message === 'Invalid plan' ||
+    message === 'Invalid PDF document type' ||
     message === 'Invalid role' ||
     message === 'Name is required' ||
     message === 'Email is required' ||
     message === 'Email and password are required' ||
+    message === 'Order id is required for PDF generation' ||
     message === 'Password must be at least 8 characters long' ||
     message === 'Plan name is required' ||
     message === 'Subscription end date must be after start date' ||

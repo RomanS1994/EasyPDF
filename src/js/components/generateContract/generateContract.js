@@ -5,6 +5,8 @@ import { getRandomDate } from './utils/getRandomDate.js';
 import { getRandomOrderNumber } from './utils/getRandomOrderNumber.js';
 
 const KEY_LS = 'contract-data';
+const DEFAULT_DOCUMENT_TYPE = 'confirmation';
+const SUPPORTED_DOCUMENT_TYPES = new Set(['offer', 'confirmation']);
 
 // =====================================
 // Дані про контракт
@@ -12,6 +14,7 @@ const KEY_LS = 'contract-data';
 export let contractData = {
   orderNumber: 'ORD-0013291093548-7FLQ',
   today: '2025-10-14',
+  documentType: DEFAULT_DOCUMENT_TYPE,
   driver: {
     name: 'Roman Stryzhka',
     address: 'Nam. na Balabence 1437/3, 190 00 Praha 9',
@@ -57,6 +60,7 @@ const refs = {
   quickPickButtons: document.querySelectorAll('.dataContract-container .quick-pick-btn'),
   priceConverted: document.getElementById('priceConverted'),
   currencyButtons: document.querySelectorAll('.dataContract-container .currency-btn'),
+  documentTypeButtons: document.querySelectorAll('[data-pdf-document]'),
 };
 const {
   sectionDataContract,
@@ -65,6 +69,14 @@ const {
   inputsAllToday,
   inputOrderNumber,
 } = refs;
+
+const applyDocumentTypeButtons = () => {
+  refs.documentTypeButtons.forEach(button => {
+    const isActive = button.dataset.pdfDocument === contractData.documentType;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+  });
+};
 
 // =====================================
 // Layout sync
@@ -226,6 +238,9 @@ export const recoveryContractData = () => {
     // нормалізуємо можливі старі формати дат
     const normalized = {
       ...data,
+      documentType: SUPPORTED_DOCUMENT_TYPES.has(data.documentType)
+        ? data.documentType
+        : DEFAULT_DOCUMENT_TYPE,
       today: normalizeDateValue(data.today),
       trip: {
         ...contractData.trip,
@@ -322,8 +337,10 @@ export const clearContractData = () => {
   contractData = {
     orderNumber: '',
     today: '',
+    documentType: DEFAULT_DOCUMENT_TYPE,
   };
   saveLs(KEY_LS, contractData);
+  applyDocumentTypeButtons();
 };
 
 // =====================================
@@ -342,6 +359,7 @@ const initContractData = () => {
     inputOrderNumber.value = randomOrderNumber;
   }
   setContractData({ orderNumber: randomOrderNumber });
+  applyDocumentTypeButtons();
 };
 
 if (contractRoot) {
@@ -356,6 +374,19 @@ if (contractRoot) {
   // Run after initial layout
   window.requestAnimationFrame(() => applyContractScale());
   window.addEventListener('resize', handleResize, { passive: true });
+}
+
+if (refs.documentTypeButtons.length) {
+  applyDocumentTypeButtons();
+  refs.documentTypeButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const nextDocumentType = button.dataset.pdfDocument;
+      if (!SUPPORTED_DOCUMENT_TYPES.has(nextDocumentType)) return;
+
+      setContractData({ documentType: nextDocumentType });
+      applyDocumentTypeButtons();
+    });
+  });
 }
 
 // =====================================

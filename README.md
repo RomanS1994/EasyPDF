@@ -67,6 +67,7 @@ URLs:
 
 - `GET /api/health`
 - `GET /api/plans`
+- `POST /api/contracts/get-pdf`
 - `POST /api/auth/register`
 - `POST /api/auth/login`
 - `POST /api/auth/refresh`
@@ -80,7 +81,6 @@ URLs:
 - `GET /api/admin/users`
 - `GET /api/admin/orders`
 - `PATCH /api/admin/users/:id/plan`
-- `POST /api/contracts/get-pdf`
 
 ## Notes
 
@@ -90,9 +90,12 @@ URLs:
 - Prisma exists only in `backend/`
 - backend data is stored in PostgreSQL
 - production runs only through Prisma + PostgreSQL, with no JSON fallback
+- backend PDF generation is HTML-first and rendered through Puppeteer/Chromium
+- every plan exposes two PDF document types: `offer` and `confirmation`
 - Prisma schema covers `users`, `sessions`, `plans`, `subscriptions`, `orders`, `audit_logs`
 - use `DATABASE_URL` for runtime and optional `DIRECT_DATABASE_URL` for Prisma CLI migrations/introspection inside `backend/`
 - `DB_MODE=file`, `DATA_FILE`, and `LEGACY_DATA_FILE` are local/test-only controls
+- `/api/contracts/get-pdf` requires auth, uses the active subscription plan, and expects an existing `orderId`
 - migrate legacy JSON data with `npm run db:migrate-json -- --input=/path/to/db.json`
 - promote an existing account to admin with `npm run admin:create -- --email=user@example.com --promote-existing`
 - passwords are hashed with Node `crypto.scrypt`
@@ -123,6 +126,7 @@ Backend on Render or another Node host:
 - required env: `AUTH_TOKEN_SECRET`, `DATABASE_URL`
 - optional env: `API_KEY`
 - optional env for Prisma CLI: `DIRECT_DATABASE_URL`
+- optional env for custom browser location: `PUPPETEER_EXECUTABLE_PATH`
 - production must not set `DB_MODE=file`, `DATA_FILE`, or `LEGACY_DATA_FILE`
 - production health checks should target `/api/health`, which validates the live PostgreSQL connection
 

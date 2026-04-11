@@ -664,6 +664,37 @@
                     </section>
 
                     <div class="wizard-controls">
+                      <div class="pdfDocumentPicker">
+                        <div class="pdfDocumentPickerHeader">
+                          <span class="screenSectionLabel" data-i18n="pdf_document_variant">
+                            Тип PDF
+                          </span>
+                          <p class="pdfDocumentPickerNote" data-i18n="pdf_document_note">
+                            Стиль документа автоматично залежить від активного плану.
+                          </p>
+                        </div>
+                        <div class="pdfDocumentPickerActions" role="group" aria-label="PDF document type">
+                          <button
+                            class="secondary-btn pdfDocumentTypeBtn is-active"
+                            type="button"
+                            data-pdf-document="confirmation"
+                            data-i18n="pdf_document_confirmation"
+                            aria-pressed="true"
+                          >
+                            Підтвердження
+                          </button>
+                          <button
+                            class="secondary-btn pdfDocumentTypeBtn"
+                            type="button"
+                            data-pdf-document="offer"
+                            data-i18n="pdf_document_offer"
+                            aria-pressed="false"
+                          >
+                            Пропозиція
+                          </button>
+                        </div>
+                      </div>
+
                       <div class="wizard-actions">
                         <button
                           class="secondary-btn wizard-back"

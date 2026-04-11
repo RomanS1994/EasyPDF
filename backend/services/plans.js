@@ -29,6 +29,12 @@ export function normalizePlanRecord(plan) {
     monthlyGenerationLimit: limit,
     priceCzk: normalizeInteger(source.priceCzk, defaultPlan?.priceCzk ?? null),
     description: normalizeText(source.description),
+    pdfProfile: normalizeText(source.pdfProfile) || defaultPlan?.pdfProfile || 'starter',
+    pdfQuality: normalizeText(source.pdfQuality) || defaultPlan?.pdfQuality || 'essential',
+    pdfDocuments:
+      Array.isArray(source.pdfDocuments) && source.pdfDocuments.length
+        ? source.pdfDocuments.map(item => normalizeText(item)).filter(Boolean)
+        : defaultPlan?.pdfDocuments || [],
     isActive: source.isActive !== false,
     createdAt: source.createdAt || timestamp,
     updatedAt: source.updatedAt || timestamp,

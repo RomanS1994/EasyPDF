@@ -20,6 +20,7 @@ downloadPdfBtn?.addEventListener('click', async () => {
 
   showAppLoader('generating_pdf');
   let orderId = '';
+  const selectedDocumentType = contractData.documentType || 'confirmation';
 
   try {
     const created = await API_createOrder({
@@ -27,12 +28,16 @@ downloadPdfBtn?.addEventListener('click', async () => {
       status: 'pending_pdf',
       metadata: {
         sourcePage: 'cz/pdf',
+        documentType: selectedDocumentType,
       },
     });
 
     orderId = created.order?.id || '';
 
-    const response = await API_getContractPdf(contractData);
+    const response = await API_getContractPdf(contractData, {
+      orderId,
+      documentType: selectedDocumentType,
+    });
     if (!response?.blob) {
       throw new Error(t('pdf_generation_failed'));
     }
@@ -49,7 +54,10 @@ downloadPdfBtn?.addEventListener('click', async () => {
     if (orderId) {
       await API_updateOrder(orderId, {
         status: 'pdf_generated',
-        pdfFileName: response.fileName,
+        pdf: {
+          fileName: response.fileName,
+          documentType: selectedDocumentType,
+        },
       });
     }
 
@@ -64,6 +72,7 @@ downloadPdfBtn?.addEventListener('click', async () => {
           status: 'pdf_failed',
           metadata: {
             pdfError: error.message,
+            documentType: selectedDocumentType,
           },
         });
       } catch (updateError) {

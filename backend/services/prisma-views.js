@@ -31,6 +31,9 @@ function getFallbackPlan(planId = DEFAULT_PLAN_ID) {
       monthlyGenerationLimit: 25,
       priceCzk: null,
       description: '',
+      pdfProfile: 'starter',
+      pdfQuality: 'essential',
+      pdfDocuments: ['offer', 'confirmation'],
       isActive: true,
       createdAt: '',
       updatedAt: '',
@@ -58,6 +61,12 @@ export function normalizePlanView(plan) {
     ),
     priceCzk: normalizeInteger(plan?.priceCzk, configuredPlan?.priceCzk ?? fallback.priceCzk),
     description: normalizeText(plan?.description) || fallback.description,
+    pdfProfile: normalizeText(plan?.pdfProfile) || configuredPlan?.pdfProfile || fallback.pdfProfile,
+    pdfQuality: normalizeText(plan?.pdfQuality) || configuredPlan?.pdfQuality || fallback.pdfQuality,
+    pdfDocuments:
+      Array.isArray(plan?.pdfDocuments) && plan.pdfDocuments.length
+        ? plan.pdfDocuments.map(item => normalizeText(item)).filter(Boolean)
+        : configuredPlan?.pdfDocuments || fallback.pdfDocuments,
     isActive: plan?.isActive !== false,
     createdAt: toIsoString(plan?.createdAt) || fallback.createdAt,
     updatedAt: toIsoString(plan?.updatedAt) || fallback.updatedAt,
