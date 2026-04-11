@@ -10,6 +10,16 @@ const args = new Set(process.argv.slice(2));
 const mode = args.has("--staged") ? "staged" : "all";
 
 const localHosts = new Set(["localhost", "127.0.0.1", "0.0.0.0"]);
+const exactPlaceholderValues = new Set([
+  "user",
+  "username",
+  "password",
+  "pass",
+  "host",
+  "hostname",
+  "database",
+  "db",
+]);
 const placeholderFragments = [
   "change-me",
   "changeme",
@@ -95,6 +105,9 @@ function isPlaceholderLike(value) {
     return true;
   }
   const lowerValue = value.toLowerCase();
+  if (exactPlaceholderValues.has(lowerValue)) {
+    return true;
+  }
   if (/^\$\{[^}]+\}$/.test(value) || /^\$\{\{[^}]+\}\}$/.test(value)) {
     return true;
   }

@@ -107,6 +107,10 @@ Backend on Render or another Node host:
 
 - root directory: `backend`
 - install command: `npm install`
-- start command: `npm run db:migrate:deploy && npm run start`
+- release command: `npm run db:migrate:deploy`
+- start command: `npm run start`
 - required env: `DATABASE_URL`
 - optional env for Prisma CLI: `DIRECT_DATABASE_URL`
+
+If a deployment fails inside `prisma migrate deploy`, do not keep it in the start command.
+Resolve the failed migration first with `prisma migrate resolve`, then rerun the release command.
