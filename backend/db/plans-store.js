@@ -1,0 +1,63 @@
+import { PLANS as DEFAULT_PLANS } from '../config/plans.js';
+import { normalizePlanView } from '../services/prisma-views.js';
+import { nowIso } from '../validation/common.js';
+import { serializePlanRecord } from './mappers.js';
+
+const PLAN_ORDER_BY = [
+  {
+    monthlyGenerationLimit: 'asc',
+  },
+  {
+    name: 'asc',
+  },
+];
+
+export async function ensureDefaultPlans(client) {
+  const timestamp = nowIso();
+
+  await client.plan.createMany({
+    data: DEFAULT_PLANS.map(plan =>
+      serializePlanRecord({
+        ...plan,
+        isActive: true,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      })
+    ),
+    skipDuplicates: true,
+  });
+}
+
+export async function findStoredPlan(
+  client,
+  planId,
+  { includeInactive = true } = {}
+) {
+  await ensureDefaultPlans(client);
+
+  if (includeInactive) {
+    return client.plan.findUnique({
+      where: {
+        id: planId,
+      },
+    });
+  }
+
+  return client.plan.findFirst({
+    where: {
+      id: planId,
+      isActive: true,
+    },
+  });
+}
+
+export async function listStoredPlans(client, { includeInactive = true } = {}) {
+  await ensureDefaultPlans(client);
+
+  const plans = await client.plan.findMany({
+    where: includeInactive ? undefined : { isActive: true },
+    orderBy: PLAN_ORDER_BY,
+  });
+
+  return plans.map(normalizePlanView);
+}

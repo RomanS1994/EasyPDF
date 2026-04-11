@@ -1,5 +1,4 @@
-import { PLANS as DEFAULT_PLANS } from '../config/plans.js';
-import { nowIso } from '../validation/common.js';
+import { ensureDefaultPlans } from './plans-store.js';
 import {
   extractSubscriptionRecords,
   mapAuditLogRecord,
@@ -25,22 +24,6 @@ function deepEqual(left, right) {
 function stripId(data) {
   const { id, ...rest } = data;
   return rest;
-}
-
-async function ensureDefaultPlans(client) {
-  const timestamp = nowIso();
-
-  await client.plan.createMany({
-    data: DEFAULT_PLANS.map(plan =>
-      serializePlanRecord({
-        ...plan,
-        isActive: true,
-        createdAt: timestamp,
-        updatedAt: timestamp,
-      })
-    ),
-    skipDuplicates: true,
-  });
 }
 
 export async function loadDatabaseSnapshot(

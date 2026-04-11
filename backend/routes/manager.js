@@ -3,6 +3,7 @@ import {
   requireAdmin,
   requireManager,
 } from '../auth/context.js';
+import { mutateFileDatabase as mutateDatabase } from '../db/file-store.js';
 import {
   buildManagerUserSummaries,
   buildSanitizedUser,
@@ -12,8 +13,12 @@ import {
   sanitizeOrderRecord,
   USER_WITH_SUBSCRIPTION_INCLUDE,
 } from '../db/prisma-helpers.js';
+import {
+  findStoredPlan,
+  listStoredPlans,
+} from '../db/plans-store.js';
 import { prisma } from '../db/prisma.js';
-import { mutateDatabase, runStoreTransaction } from '../db/store.js';
+import { runStoreTransaction } from '../db/store.js';
 import { readJsonBody, sendJson } from '../lib/http.js';
 import {
   buildManagerOrdersSummary,
@@ -232,11 +237,7 @@ async function handleManagerUserSubscription(request, response, userId) {
           fallbackStartMode: target.subscription ? 'now' : 'month',
         });
         const nextPlanId = body.planId || before.planId;
-        const selectedPlan = await tx.plan.findUnique({
-          where: {
-            id: nextPlanId,
-          },
-        });
+        const selectedPlan = await findStoredPlan(tx, nextPlanId);
 
         if (!selectedPlan) {
           throw new Error('Invalid plan');
@@ -448,8 +449,14 @@ async function handleManagerUserExtend(request, response, userId) {
           fallbackStartMode: target.subscription ? 'now' : 'month',
         });
         const nextEnd = shiftMonths(before.currentPeriodEnd, months);
+        const selectedPlan = target.subscription?.plan || (await findStoredPlan(tx, before.planId));
+
+        if (!selectedPlan) {
+          throw new Error('Invalid plan');
+        }
+
         const subscriptionData = buildSubscriptionWriteData({
-          plan: target.subscription?.plan,
+          plan: selectedPlan,
           before,
           payload: {
             ...before,
@@ -620,8 +627,14 @@ async function handleManagerUserCancel(request, response, userId) {
           fallbackStartMode: target.subscription ? 'now' : 'month',
         });
         const canceledAt = nowIso();
+        const selectedPlan = target.subscription?.plan || (await findStoredPlan(tx, before.planId));
+
+        if (!selectedPlan) {
+          throw new Error('Invalid plan');
+        }
+
         const subscriptionData = buildSubscriptionWriteData({
-          plan: target.subscription?.plan,
+          plan: selectedPlan,
           before,
           payload: {
             ...before,
@@ -884,19 +897,8 @@ async function handleManagerPlansList(request, response) {
   if (!context) return;
 
   if (context.store === 'prisma') {
-    const plans = await prisma.plan.findMany({
-      orderBy: [
-        {
-          monthlyGenerationLimit: 'asc',
-        },
-        {
-          name: 'asc',
-        },
-      ],
-    });
-
     sendJson(response, 200, {
-      plans: plans.map(normalizePlanView),
+      plans: await listStoredPlans(prisma, { includeInactive: true }),
     });
     return;
   }
@@ -917,11 +919,7 @@ async function handleManagerPlanCreate(request, response) {
     const plan = await runStoreTransaction({
       prisma: async tx => {
         const planId = slugifyPlanId(body.id || name);
-        const existingPlan = await tx.plan.findUnique({
-          where: {
-            id: planId,
-          },
-        });
+        const existingPlan = await findStoredPlan(tx, planId);
 
         if (existingPlan) {
           throw new Error('Plan with this id already exists');
@@ -1026,11 +1024,7 @@ async function handleManagerPlanUpdate(request, response, planId) {
   if (context.store === 'prisma') {
     const plan = await runStoreTransaction({
       prisma: async tx => {
-        const target = await tx.plan.findUnique({
-          where: {
-            id: planId,
-          },
-        });
+        const target = await findStoredPlan(tx, planId);
 
         if (!target) {
           throw new Error('Plan not found');

@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
-import { readDatabase, runStoreRead } from '../db/store.js';
+import { readFileDatabase } from '../db/file-store.js';
+import { runStoreRead } from '../db/store.js';
 import { getBearerToken, sendError } from '../lib/http.js';
 import { nowIso } from '../validation/common.js';
 import { hashToken, verifyAccessToken } from './tokens.js';
@@ -63,10 +64,6 @@ export function pruneExpiredSessions(database) {
   database.sessions = database.sessions.filter(session => {
     return new Date(session.expiresAt).getTime() > now;
   });
-}
-
-export async function loadDatabaseWithFreshSessions() {
-  return readDatabase();
 }
 
 export function getAccessTokenClaims(request) {
@@ -147,7 +144,7 @@ export async function getAuthContext(request, response) {
       };
     },
     file: async () => {
-      const database = await loadDatabaseWithFreshSessions();
+      const database = await readFileDatabase();
       const session = database.sessions.find(item => item.id === tokenClaims.sessionId);
 
       if (!session || session.userId !== tokenClaims.userId) {

@@ -3,7 +3,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import { DEFAULT_PLAN_ID, PLANS as DEFAULT_PLANS } from '../config/plans.js';
-import { writeDatabase, disconnectDatabase } from '../db/store.js';
+import { writeDatabase } from '../db/legacy-store.js';
+import { disconnectDatabase } from '../db/store.js';
 import { normalizeUserProfile } from '../services/profiles.js';
 import { buildDefaultSubscription } from '../services/subscriptions.js';
 

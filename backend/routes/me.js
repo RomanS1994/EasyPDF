@@ -1,9 +1,10 @@
 import { randomUUID } from 'node:crypto';
 
 import { getAuthContext } from '../auth/context.js';
+import { mutateFileDatabase as mutateDatabase } from '../db/file-store.js';
 import { buildSanitizedUser, createAuditLog, USER_WITH_SUBSCRIPTION_INCLUDE } from '../db/prisma-helpers.js';
 import { prisma } from '../db/prisma.js';
-import { mutateDatabase, runStoreTransaction } from '../db/store.js';
+import { runStoreTransaction } from '../db/store.js';
 import {
   readJsonBody,
   sendError,

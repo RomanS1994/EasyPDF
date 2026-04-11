@@ -1,5 +1,16 @@
 import { prisma } from './prisma.js';
-import { getFileDatabaseInfo } from './file-store.js';
+import {
+  getFileDatabaseInfo,
+  mutateFileDatabase,
+  readFileDatabase,
+  writeFileDatabase,
+} from './file-store.js';
+import {
+  getDatabaseInfo as getRepositoryDatabaseInfo,
+  loadDatabaseSnapshot,
+  persistDatabaseSnapshot,
+  replaceDatabaseSnapshot,
+} from './repository.js';
 
 let activeStore = process.env.DB_MODE === 'file' ? 'file' : 'prisma';
 let fallbackWarningShown = false;
@@ -47,40 +58,45 @@ async function withPreferredStore(runPrisma, runFile, error = null) {
   }
 }
 
-export async function runStoreRead({ prisma: runPrisma, file: runFile }) {
+export async function readDatabase() {
   return withPreferredStore(
-    () => runPrisma(prisma),
-    () => runFile()
+    () => prisma.$transaction(async tx => loadDatabaseSnapshot(tx)),
+    () => readFileDatabase()
   );
 }
 
-export async function runStoreTransaction({ prisma: runPrisma, file: runFile }) {
+export async function writeDatabase(database) {
   return withPreferredStore(
-    () => prisma.$transaction(async tx => runPrisma(tx)),
-    () => runFile()
+    () => prisma.$transaction(async tx => replaceDatabaseSnapshot(tx, database)),
+    () => writeFileDatabase(database)
   );
 }
 
-export function getDatabaseInfo() {
-  const prismaInfo = {
-    provider: 'postgresql',
-    configured: Boolean(process.env.DATABASE_URL),
-  };
+export async function mutateDatabase(mutator) {
+  return withPreferredStore(
+    async () =>
+      prisma.$transaction(async tx => {
+        const database = await loadDatabaseSnapshot(tx);
+        const beforeDatabase = structuredClone(database);
+        const result = await mutator(database);
+        await persistDatabaseSnapshot(tx, beforeDatabase, database);
+        return result;
+      }),
+    () => mutateFileDatabase(mutator)
+  );
+}
 
+export function getLegacyDatabaseInfo() {
   if (activeStore === 'file') {
     return getFileDatabaseInfo();
   }
 
   if (canUseFileFallback()) {
     return {
-      ...prismaInfo,
+      ...getRepositoryDatabaseInfo(),
       fallbackAvailable: true,
     };
   }
 
-  return prismaInfo;
-}
-
-export async function disconnectDatabase() {
-  await prisma.$disconnect();
+  return getRepositoryDatabaseInfo();
 }

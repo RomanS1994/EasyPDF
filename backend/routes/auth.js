@@ -4,7 +4,6 @@ import {
   buildSession,
   getAccessTokenClaims,
   getRefreshCookieOptions,
-  loadDatabaseWithFreshSessions,
   pruneExpiredSessions,
   REFRESH_COOKIE_NAME,
 } from '../auth/context.js';
@@ -26,7 +25,9 @@ import {
   createAuditLog,
   USER_WITH_SUBSCRIPTION_INCLUDE,
 } from '../db/prisma-helpers.js';
-import { mutateDatabase, runStoreRead, runStoreTransaction } from '../db/store.js';
+import { mutateFileDatabase as mutateDatabase, readFileDatabase } from '../db/file-store.js';
+import { findStoredPlan } from '../db/plans-store.js';
+import { runStoreRead, runStoreTransaction } from '../db/store.js';
 import {
   clearCookie,
   getClientIp,
@@ -157,12 +158,7 @@ async function handleRegister(request, response) {
               email,
             },
           }),
-          tx.plan.findFirst({
-            where: {
-              id: selectedPlanId,
-              isActive: true,
-            },
-          }),
+          findStoredPlan(tx, selectedPlanId, { includeInactive: false }),
           tx.user.count(),
         ]);
 
@@ -354,7 +350,7 @@ async function handleLogin(request, response) {
         include: USER_WITH_SUBSCRIPTION_INCLUDE,
       }),
     file: async () => {
-      const database = await loadDatabaseWithFreshSessions();
+      const database = await readFileDatabase();
       return database.users.find(item => item.email === email) || null;
     },
   });

@@ -1,5 +1,6 @@
 import { appendAuditLog } from '../audit/service.js';
 import { requireAdmin } from '../auth/context.js';
+import { mutateFileDatabase as mutateDatabase } from '../db/file-store.js';
 import {
   buildManagerUserSummaries,
   buildSanitizedUser,
@@ -8,8 +9,9 @@ import {
   sanitizeOrderRecord,
   USER_WITH_SUBSCRIPTION_INCLUDE,
 } from '../db/prisma-helpers.js';
+import { findStoredPlan } from '../db/plans-store.js';
 import { prisma } from '../db/prisma.js';
-import { mutateDatabase, runStoreTransaction } from '../db/store.js';
+import { runStoreTransaction } from '../db/store.js';
 import { readJsonBody, sendJson } from '../lib/http.js';
 import { sanitizeOrder } from '../services/orders.js';
 import { buildSubscriptionWriteData, resolveSubscriptionView } from '../services/prisma-views.js';
@@ -102,11 +104,7 @@ async function handleLegacyAdminPlanUpdate(request, response, userId) {
           fallbackStartMode: target.subscription ? 'now' : 'month',
         });
         const nextPlanId = body.planId || before.planId;
-        const selectedPlan = await tx.plan.findUnique({
-          where: {
-            id: nextPlanId,
-          },
-        });
+        const selectedPlan = await findStoredPlan(tx, nextPlanId);
 
         if (!selectedPlan) {
           throw new Error('Invalid plan');
