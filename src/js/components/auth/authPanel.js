@@ -39,6 +39,7 @@ import {
   syncPageMeta,
   t,
 } from '../../i18n/app.js';
+import { initAppLoader, setBootLoaderActive } from '../../loaderOverlay.js';
 import { notifyText } from '../../toastify.js';
 
 const refs = {
@@ -545,8 +546,14 @@ function renderGuestContext() {
 
 function setAuthMode(mode = getDefaultAuthMode()) {
   const nextMode = AUTH_MODES.includes(mode) ? mode : getDefaultAuthMode();
+  const showPlans = nextMode === 'register';
+
   state.authMode = nextMode;
   refs.guestPanel?.setAttribute('data-auth-mode', nextMode);
+  if (refs.planCards) {
+    refs.planCards.hidden = !showPlans;
+    refs.planCards.setAttribute('aria-hidden', showPlans ? 'false' : 'true');
+  }
 
   refs.authModeButtons.forEach(button => {
     const isActive = button.dataset.authMode === nextMode;
@@ -580,17 +587,28 @@ function syncSelectedPlan(planId, { scrollToForm = false } = {}) {
   }
 
   refs.planCards?.querySelectorAll('.planCard').forEach(card => {
-    const button = card.querySelector('[data-plan-select]');
-    card.classList.toggle('is-active', button?.dataset.planSelect === planId);
+    const isActive = card.dataset.planSelect === planId;
+    card.classList.toggle('is-active', isActive);
+    card.setAttribute('aria-pressed', isActive ? 'true' : 'false');
   });
 
-  refs.planCards?.querySelectorAll('[data-plan-select]').forEach(button => {
-    button.classList.toggle('is-active', button.dataset.planSelect === planId);
+  refs.planCards?.querySelectorAll('.planCard-action').forEach(action => {
+    const isActive = action.closest('.planCard')?.dataset.planSelect === planId;
+    action.classList.toggle('is-active', isActive);
   });
 
   if (scrollToForm) {
     refs.registerForm?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
+}
+
+function formatPlanPrice(priceCzk) {
+  const value = Number(priceCzk);
+  if (!Number.isFinite(value) || value <= 0) return '';
+
+  return `${new Intl.NumberFormat(getCurrentLocale(), {
+    maximumFractionDigits: 0,
+  }).format(value)} Kč`;
 }
 
 function getPlanVisual(plan) {
@@ -634,9 +652,13 @@ function renderPlans() {
   if (refs.planSelect) {
     refs.planSelect.innerHTML = state.plans
       .map(plan => {
-        return `<option value="${plan.id}">${escapeHtml(plan.name)} - ${escapeHtml(
-          t('plan_option_suffix', { limit: plan.monthlyGenerationLimit })
-        )}</option>`;
+        const priceLabel = formatPlanPrice(plan.priceCzk);
+        const suffix = t('plan_option_suffix', { limit: plan.monthlyGenerationLimit });
+        const optionLabel = priceLabel
+          ? `${plan.name} - ${suffix} - ${t('plan_price_month', { price: priceLabel })}`
+          : `${plan.name} - ${suffix}`;
+
+        return `<option value="${plan.id}">${escapeHtml(optionLabel)}</option>`;
       })
       .join('');
   }
@@ -645,8 +667,19 @@ function renderPlans() {
     refs.planCards.innerHTML = state.plans
       .map(plan => {
         const visual = getPlanVisual(plan);
+        const priceLabel = formatPlanPrice(plan.priceCzk);
+        const quotaLabel = `${plan.monthlyGenerationLimit} ${t('plan_card_caption')}`;
+        const valueLabel = priceLabel || String(plan.monthlyGenerationLimit);
+        const isSelected = plan.id === state.selectedPlanId;
+
         return `
-          <article class="planCard planCard--${visual.tone} ${plan.id === state.selectedPlanId ? 'is-active' : ''}">
+          <article
+            class="planCard planCard--${visual.tone} ${isSelected ? 'is-active' : ''}"
+            data-plan-select="${plan.id}"
+            role="button"
+            tabindex="0"
+            aria-pressed="${isSelected ? 'true' : 'false'}"
+          >
             <div class="planCard-tierRow">
               <span class="planCard-tier">${escapeHtml(visual.tierLabel)}</span>
               <span class="planCard-limit">${escapeHtml(
@@ -655,14 +688,14 @@ function renderPlans() {
             </div>
             <div class="planCard-head">
               <p>${escapeHtml(plan.name)}</p>
-              <strong>${plan.monthlyGenerationLimit}</strong>
+              <strong>${escapeHtml(valueLabel)}</strong>
+              <span class="planCard-price">${escapeHtml(quotaLabel)}</span>
             </div>
-            <span class="planCard-caption">${escapeHtml(t('plan_card_caption'))}</span>
             <p class="planCard-copy">${escapeHtml(visual.note)}</p>
             <div class="planCard-footer">
-              <button class="planCard-action" type="button" data-plan-select="${plan.id}">
+              <span class="planCard-action" aria-hidden="true">
                 ${escapeHtml(t('choose_plan', { plan: plan.name }))}
-              </button>
+              </span>
             </div>
           </article>
         `;
@@ -1711,6 +1744,7 @@ async function loadManagerData({ preserveSelection = true } = {}) {
 }
 
 async function refreshAccountData({ resetTab = false } = {}) {
+  const hadUser = Boolean(state.user);
   let session = getStoredSession();
 
   if (!session?.token) {
@@ -1728,13 +1762,19 @@ async function refreshAccountData({ resetTab = false } = {}) {
   }
 
   try {
-    const [meResponse, ordersResponse] = await Promise.all([
-      API_getMe(),
-      API_getOrders(),
-    ]);
+    const meResponse = await API_getMe();
+    let orders = [];
+
+    try {
+      const ordersResponse = await API_getOrders();
+      orders = ordersResponse.orders || [];
+    } catch (error) {
+      orders = [];
+      notifyText(error.message || t('api_orders_failed'), 'error');
+    }
 
     state.user = meResponse.user;
-    state.orders = ordersResponse.orders || [];
+    state.orders = orders;
 
     setStoredSession({
       token: session.token,
@@ -1755,6 +1795,13 @@ async function refreshAccountData({ resetTab = false } = {}) {
       renderAuthenticatedState({ resetTab: true });
       notifyText(t('session_expired'), 'error');
       return;
+    }
+
+    if (!hadUser) {
+      state.user = null;
+      state.orders = [];
+      clearManagerState();
+      renderAuthenticatedState({ resetTab });
     }
 
     notifyText(error.message || t('account_load_failed'), 'error');
@@ -2024,11 +2071,22 @@ async function handleManagerPlanSubmit(event) {
 }
 
 function handlePlanCardClick(event) {
-  const button = event.target.closest('[data-plan-select]');
-  if (!button) return;
+  const card = event.target.closest('.planCard[data-plan-select]');
+  if (!card) return;
 
   setAuthMode('register');
-  syncSelectedPlan(button.dataset.planSelect, { scrollToForm: true });
+  syncSelectedPlan(card.dataset.planSelect, { scrollToForm: true });
+}
+
+function handlePlanCardKeydown(event) {
+  const card = event.target.closest('.planCard[data-plan-select]');
+  if (!card) return;
+
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+
+  event.preventDefault();
+  setAuthMode('register');
+  syncSelectedPlan(card.dataset.planSelect, { scrollToForm: true });
 }
 
 function handleAuthModeClick(event) {
@@ -2262,6 +2320,7 @@ function bindEvents() {
   refs.accountLanguageSelect?.addEventListener('change', handleLanguageSelectChange);
   refs.adminLanguageSelect?.addEventListener('change', handleLanguageSelectChange);
   refs.planCards?.addEventListener('click', handlePlanCardClick);
+  refs.planCards?.addEventListener('keydown', handlePlanCardKeydown);
   refs.planSelect?.addEventListener('change', event => {
     setAuthMode('register');
     syncSelectedPlan(event.target.value);
@@ -2338,6 +2397,8 @@ function bindEvents() {
 async function init() {
   if (!refs.hub) return;
 
+  initAppLoader();
+  setBootLoaderActive(document.body.dataset.authState === 'booting');
   initLanguage();
   syncInitialRouteState();
   bindEvents();
@@ -2345,8 +2406,12 @@ async function init() {
   setAuthMode(state.authMode);
   activateTab(state.activeTab);
   activateStatsTab(state.activeStatsTab);
-  await loadPlans();
-  await refreshAccountData();
+  try {
+    await loadPlans();
+    await refreshAccountData();
+  } finally {
+    setBootLoaderActive(false);
+  }
 }
 
 init();

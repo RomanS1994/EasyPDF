@@ -1,4 +1,4 @@
-import { DEFAULT_PLAN_ID } from '../config/plans.js';
+import { DEFAULT_PLAN_ID, getPlanById } from '../config/plans.js';
 import { normalizeUserProfile } from '../services/profiles.js';
 
 function toIsoString(value) {
@@ -17,10 +17,13 @@ function toDate(value, fallback = new Date()) {
 }
 
 export function mapPlanRecord(record) {
+  const configuredPlan = record?.id ? getPlanById(record.id) : null;
+
   return {
     id: record.id,
     name: record.name,
     monthlyGenerationLimit: record.monthlyGenerationLimit,
+    priceCzk: configuredPlan?.priceCzk ?? null,
     description: record.description,
     isActive: record.isActive,
     createdAt: toIsoString(record.createdAt),

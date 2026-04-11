@@ -20,11 +20,14 @@ export function normalizePlanRecord(plan) {
   const timestamp = nowIso();
   const source = plan && typeof plan === 'object' ? plan : {};
   const limit = normalizeInteger(source.monthlyGenerationLimit, 0);
+  const planId = normalizeText(source.id) || slugifyPlanId(source.name || `plan-${limit}`);
+  const defaultPlan = DEFAULT_PLANS.find(item => item.id === planId) || null;
 
   return {
-    id: normalizeText(source.id) || slugifyPlanId(source.name || `plan-${limit}`),
+    id: planId,
     name: normalizeText(source.name) || `Plan ${limit || ''}`.trim(),
     monthlyGenerationLimit: limit,
+    priceCzk: normalizeInteger(source.priceCzk, defaultPlan?.priceCzk ?? null),
     description: normalizeText(source.description),
     isActive: source.isActive !== false,
     createdAt: source.createdAt || timestamp,

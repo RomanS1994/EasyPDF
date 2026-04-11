@@ -8,7 +8,7 @@
       const routeTab = document.body?.dataset?.appTab || 'home';
 
       document.documentElement.lang = language;
-      document.body.dataset.authState = session?.token ? 'session' : 'guest';
+      document.body.dataset.authState = session?.token ? 'booting' : 'guest';
       window.__PDF_APP_BOOT__ = {
         language,
         routeTab,
@@ -59,7 +59,7 @@
         <section class="guestAuth">
           <div class="compactHeader">
             <p class="sectionEyebrow" data-i18n="access">Доступ</p>
-            <h2 id="authHeadline" data-i18n="guest_headline">Створити акаунт</h2>
+            <h2 id="authHeadline" data-i18n="guest_headline">Оберіть план і створіть акаунт</h2>
             <p id="guestAuthNote" data-i18n="guest_note">
               Один акаунт. Один план. Усі замовлення зберігаються в одному місці.
             </p>
@@ -200,7 +200,7 @@
                 authModeSwitch: 'Режим доступу',
                 startScreen: 'Стартовий екран',
                 guestSubline: 'Оберіть план і почніть зберігати згенеровані PDF.',
-                guestHeadline: 'Створити акаунт',
+                guestHeadline: 'Оберіть план і створіть акаунт',
                 guestNote: 'Один акаунт. Один план. Усі замовлення зберігаються в одному місці.',
                 guestLoginHeadline: 'Увійти у свій простір',
                 guestLoginNote: 'Поверніться до замовлень, статистики та збережених PDF без зайвих кроків.',
@@ -222,7 +222,7 @@
                 authModeSwitch: 'Access mode',
                 startScreen: 'Start screen',
                 guestSubline: 'Choose a plan and start saving generated PDFs.',
-                guestHeadline: 'Create account',
+                guestHeadline: 'Choose a plan and create an account',
                 guestNote: 'One account. One plan. All orders stay in one place.',
                 guestLoginHeadline: 'Sign in to your workspace',
                 guestLoginNote: 'Get back to orders, stats, and saved PDFs without extra steps.',
@@ -244,7 +244,7 @@
                 authModeSwitch: 'Režim přístupu',
                 startScreen: 'Startovní obrazovka',
                 guestSubline: 'Vyberte plán a začněte ukládat vygenerovaná PDF.',
-                guestHeadline: 'Vytvořit účet',
+                guestHeadline: 'Vyberte plán a vytvořte účet',
                 guestNote: 'Jeden účet. Jeden plán. Všechny objednávky zůstanou na jednom místě.',
                 guestLoginHeadline: 'Přihlásit se do svého prostoru',
                 guestLoginNote: 'Vraťte se k objednávkám, statistikám a uloženým PDF bez zbytečných kroků.',
@@ -279,12 +279,20 @@
             const guestAuthNote = document.getElementById('guestAuthNote');
             const authSubline = document.getElementById('authSubline');
             const guestRouteBadge = document.getElementById('guestRouteBadge');
+            const guestPanel = document.getElementById('guestPanel');
+            const planCards = document.getElementById('planCards');
             const languageToggle = document.querySelector('.languageToggle');
             const authModeSwitch = document.querySelector('.authModeSwitch');
             const registerLabel = registerTab?.querySelector('span');
             const loginLabel = loginTab?.querySelector('span');
             const setMode = mode => {
               const isRegister = mode === 'register';
+
+              guestPanel?.setAttribute('data-auth-mode', mode);
+              if (planCards) {
+                planCards.hidden = !isRegister;
+                planCards.setAttribute('aria-hidden', isRegister ? 'false' : 'true');
+              }
 
               registerTab?.classList.toggle('is-active', isRegister);
               registerTab?.setAttribute('aria-selected', isRegister ? 'true' : 'false');
@@ -1019,7 +1027,7 @@
             <div class="sk-chase-dot"></div>
             <div class="sk-chase-dot"></div>
           </div>
-          <p data-i18n="generating_pdf">Генеруємо PDF...</p>
+          <p id="loaderOverlayText" data-i18n="loading_data">Завантажуємо дані...</p>
         </div>
       </div>
     </div>

@@ -3,12 +3,8 @@ import { API_createOrder, API_updateOrder } from '../../../../api/orders/API_ord
 import { hasAuthenticatedSession } from '../../auth/authPanel.js';
 import { contractData } from '../generateContract';
 import { t } from '../../../i18n/app.js';
+import { hideAppLoader, showAppLoader } from '../../../loaderOverlay.js';
 import { notifyText } from '../../../toastify.js';
-
-const loader = document.getElementById('loaderOverlay');
-
-const showLoader = () => loader?.classList.add('is-active');
-const hideLoader = () => loader?.classList.remove('is-active');
 
 const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 
@@ -22,7 +18,7 @@ downloadPdfBtn?.addEventListener('click', async () => {
     return;
   }
 
-  showLoader();
+  showAppLoader('generating_pdf');
   let orderId = '';
 
   try {
@@ -77,6 +73,6 @@ downloadPdfBtn?.addEventListener('click', async () => {
 
     notifyText(error.message || t('pdf_download_failed'), 'error');
   } finally {
-    hideLoader();
+    hideAppLoader();
   }
 });

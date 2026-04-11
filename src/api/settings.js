@@ -3,6 +3,10 @@ import {
   getSessionToken,
   setStoredSession,
 } from './auth/session.js';
+import {
+  beginApiLoader,
+  endApiLoader,
+} from '../js/loaderOverlay.js';
 
 function resolveApiBase() {
   if (import.meta.env.DEV) {
@@ -50,6 +54,8 @@ async function performRequest({
   options,
   apiKey,
   sessionToken,
+  loaderMessageKey = 'loading_data',
+  showLoader = true,
 }) {
   const headers = { ...(options.headers || {}) };
 
@@ -76,7 +82,17 @@ async function performRequest({
     fetchOptions.body = JSON.stringify(body);
   }
 
-  return fetch(url, fetchOptions);
+  if (showLoader) {
+    beginApiLoader(loaderMessageKey);
+  }
+
+  try {
+    return await fetch(url, fetchOptions);
+  } finally {
+    if (showLoader) {
+      endApiLoader();
+    }
+  }
 }
 
 async function refreshAccessSession(base, apiKey) {
@@ -91,12 +107,21 @@ async function refreshAccessSession(base, apiKey) {
       headers['X-API-KEY'] = apiKey;
     }
 
-    const response = await fetch(`${base}/auth/refresh`, {
-      method: 'POST',
-      credentials: 'include',
-      headers,
-    });
-    const payload = await response.json().catch(() => null);
+    beginApiLoader('loading_data');
+
+    let response;
+    let payload;
+
+    try {
+      response = await fetch(`${base}/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include',
+        headers,
+      });
+      payload = await response.json().catch(() => null);
+    } finally {
+      endApiLoader();
+    }
 
     if (!response.ok || !payload?.token || !payload?.user) {
       clearStoredSession();
@@ -118,7 +143,15 @@ async function refreshAccessSession(base, apiKey) {
 
 export const fetchApi = async (
   endpoint = '',
-  { method = 'GET', query, body, options = {}, skipAuthRefresh = false }
+  {
+    method = 'GET',
+    query,
+    body,
+    options = {},
+    skipAuthRefresh = false,
+    loaderMessageKey = 'loading_data',
+    showLoader = true,
+  }
 ) => {
   const base = resolveApiBase();
   const API_KEY = import.meta.env.VITE_API_KEY;
@@ -131,6 +164,8 @@ export const fetchApi = async (
     options,
     apiKey: API_KEY,
     sessionToken: getSessionToken(),
+    loaderMessageKey,
+    showLoader,
   });
 
   if (
@@ -148,6 +183,8 @@ export const fetchApi = async (
         options,
         apiKey: API_KEY,
         sessionToken: refreshed.token,
+        loaderMessageKey,
+        showLoader,
       });
     }
   }

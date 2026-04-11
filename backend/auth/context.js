@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
-import { readDatabase } from '../db/store.js';
+import { readDatabase, runStoreRead } from '../db/store.js';
 import { getBearerToken, sendError } from '../lib/http.js';
 import { nowIso } from '../validation/common.js';
 import { hashToken, verifyAccessToken } from './tokens.js';
@@ -101,22 +101,70 @@ export async function getAuthContext(request, response) {
     return null;
   }
 
-  const database = await loadDatabaseWithFreshSessions();
-  const session = database.sessions.find(item => item.id === tokenClaims.sessionId);
+  return runStoreRead({
+    prisma: async client => {
+      await client.session.deleteMany({
+        where: {
+          expiresAt: {
+            lte: new Date(),
+          },
+        },
+      });
 
-  if (!session || session.userId !== tokenClaims.userId) {
-    sendError(response, 401, 'Invalid or expired session');
-    return null;
-  }
+      const session = await client.session.findUnique({
+        where: {
+          id: tokenClaims.sessionId,
+        },
+        include: {
+          user: {
+            include: {
+              subscription: {
+                include: {
+                  plan: true,
+                },
+              },
+            },
+          },
+        },
+      });
 
-  const user = database.users.find(item => item.id === tokenClaims.userId);
+      if (!session || session.userId !== tokenClaims.userId) {
+        sendError(response, 401, 'Invalid or expired session');
+        return null;
+      }
 
-  if (!user) {
-    sendError(response, 401, 'User not found for session');
-    return null;
-  }
+      if (!session.user) {
+        sendError(response, 401, 'User not found for session');
+        return null;
+      }
 
-  return { database, user, session, tokenClaims };
+      return {
+        database: null,
+        user: session.user,
+        session,
+        tokenClaims,
+        store: 'prisma',
+      };
+    },
+    file: async () => {
+      const database = await loadDatabaseWithFreshSessions();
+      const session = database.sessions.find(item => item.id === tokenClaims.sessionId);
+
+      if (!session || session.userId !== tokenClaims.userId) {
+        sendError(response, 401, 'Invalid or expired session');
+        return null;
+      }
+
+      const user = database.users.find(item => item.id === tokenClaims.userId);
+
+      if (!user) {
+        sendError(response, 401, 'User not found for session');
+        return null;
+      }
+
+      return { database, user, session, tokenClaims, store: 'file' };
+    },
+  });
 }
 
 export async function requireManager(request, response) {

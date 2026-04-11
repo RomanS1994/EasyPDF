@@ -58,11 +58,25 @@ async function withPreferredStore(runPrisma, runFile, error = null) {
   }
 }
 
-export async function readDatabase() {
+export async function runStoreRead({ prisma: runPrisma, file: runFile }) {
   return withPreferredStore(
-    () => prisma.$transaction(async tx => loadDatabaseSnapshot(tx)),
-    () => readFileDatabase()
+    () => runPrisma(prisma),
+    () => runFile()
   );
+}
+
+export async function runStoreTransaction({ prisma: runPrisma, file: runFile }) {
+  return withPreferredStore(
+    () => prisma.$transaction(async tx => runPrisma(tx)),
+    () => runFile()
+  );
+}
+
+export async function readDatabase() {
+  return runStoreRead({
+    prisma: tx => loadDatabaseSnapshot(tx),
+    file: () => readFileDatabase(),
+  });
 }
 
 export async function writeDatabase(database) {
@@ -73,17 +87,16 @@ export async function writeDatabase(database) {
 }
 
 export async function mutateDatabase(mutator) {
-  return withPreferredStore(
-    () =>
-      prisma.$transaction(async tx => {
-        const database = await loadDatabaseSnapshot(tx);
-        const beforeDatabase = structuredClone(database);
-        const result = await mutator(database);
-        await persistDatabaseSnapshot(tx, beforeDatabase, database);
-        return result;
-      }),
-    () => mutateFileDatabase(mutator)
-  );
+  return runStoreTransaction({
+    prisma: async tx => {
+      const database = await loadDatabaseSnapshot(tx);
+      const beforeDatabase = structuredClone(database);
+      const result = await mutator(database);
+      await persistDatabaseSnapshot(tx, beforeDatabase, database);
+      return result;
+    },
+    file: () => mutateFileDatabase(mutator),
+  });
 }
 
 export function getDatabaseInfo() {
