@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client';
+import { getPrismaDatasourceUrl } from '../config/runtime-env.js';
 
 const globalForPrisma = globalThis;
-const datasourceUrl =
-  process.env.DIRECT_DATABASE_URL || process.env.DATABASE_URL || undefined;
+const datasourceUrl = getPrismaDatasourceUrl();
 
 export const prisma =
   globalForPrisma.__pdfAppPrisma ||

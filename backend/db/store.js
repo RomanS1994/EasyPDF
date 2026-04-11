@@ -1,50 +1,19 @@
 import { prisma } from './prisma.js';
 import { getFileDatabaseInfo } from './file-store.js';
+import {
+  getDatabaseUrl,
+  isLocalFileStoreMode,
+  isProductionEnvironment,
+} from '../config/runtime-env.js';
 
-let activeStore = process.env.DB_MODE === 'file' ? 'file' : 'prisma';
-let fallbackWarningShown = false;
+const activeStore = isLocalFileStoreMode() ? 'file' : 'prisma';
 
-function isExplicitFileStoreRequested() {
-  return (
-    process.env.DB_MODE === 'file' ||
-    Boolean(process.env.DATA_FILE) ||
-    Boolean(process.env.LEGACY_DATA_FILE)
-  );
-}
-
-function canUseFileFallback() {
-  return isExplicitFileStoreRequested() || process.env.NODE_ENV !== 'production';
-}
-
-function logFallbackWarning(error) {
-  if (fallbackWarningShown) return;
-
-  fallbackWarningShown = true;
-  console.warn(
-    'Database fallback activated: using JSON store because PostgreSQL is unavailable.'
-  );
-
-  if (error) {
-    console.warn(error instanceof Error ? error.message : String(error));
-  }
-}
-
-async function withPreferredStore(runPrisma, runFile, error = null) {
+async function withPreferredStore(runPrisma, runFile) {
   if (activeStore === 'file') {
     return runFile();
   }
 
-  try {
-    return await runPrisma();
-  } catch (nextError) {
-    if (!canUseFileFallback()) {
-      throw nextError;
-    }
-
-    activeStore = 'file';
-    logFallbackWarning(nextError || error);
-    return runFile();
-  }
+  return runPrisma();
 }
 
 export async function runStoreRead({ prisma: runPrisma, file: runFile }) {
@@ -64,21 +33,53 @@ export async function runStoreTransaction({ prisma: runPrisma, file: runFile }) 
 export function getDatabaseInfo() {
   const prismaInfo = {
     provider: 'postgresql',
-    configured: Boolean(process.env.DATABASE_URL),
+    configured: Boolean(getDatabaseUrl()),
+    mode: 'prisma',
+    productionOnly: isProductionEnvironment(),
   };
 
   if (activeStore === 'file') {
-    return getFileDatabaseInfo();
-  }
-
-  if (canUseFileFallback()) {
     return {
-      ...prismaInfo,
-      fallbackAvailable: true,
+      ...getFileDatabaseInfo(),
+      mode: 'file',
+      localOnly: true,
+      productionAllowed: false,
     };
   }
 
   return prismaInfo;
+}
+
+export async function getDatabaseHealth() {
+  if (activeStore === 'file') {
+    return {
+      ok: true,
+      database: {
+        ...getDatabaseInfo(),
+        connected: true,
+      },
+    };
+  }
+
+  try {
+    await prisma.$queryRawUnsafe('SELECT 1');
+    return {
+      ok: true,
+      database: {
+        ...getDatabaseInfo(),
+        connected: true,
+      },
+    };
+  } catch {
+    return {
+      ok: false,
+      database: {
+        ...getDatabaseInfo(),
+        connected: false,
+      },
+      error: 'Database connection failed.',
+    };
+  }
 }
 
 export async function disconnectDatabase() {

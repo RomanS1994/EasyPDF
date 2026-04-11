@@ -2,10 +2,18 @@ import 'dotenv/config';
 import http from 'node:http';
 
 import { requireApiKey } from './auth/context.js';
+import { assertRuntimeEnv } from './config/runtime-env.js';
 import { bindRequestContext, handleCors, sendError } from './lib/http.js';
 import { routeRequest } from './routes/index.js';
 
 const PORT = Number(process.env.BACKEND_PORT || process.env.PORT || 3001);
+
+try {
+  assertRuntimeEnv();
+} catch (error) {
+  console.error(error instanceof Error ? error.message : String(error));
+  process.exit(1);
+}
 
 function handleUnexpectedError(response, error) {
   const message =

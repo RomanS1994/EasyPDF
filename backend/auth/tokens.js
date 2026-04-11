@@ -5,15 +5,14 @@ import {
   scryptSync,
   timingSafeEqual,
 } from 'node:crypto';
+import {
+  getAccessTokenTtlMinutes,
+  getAuthTokenSecret,
+} from '../config/runtime-env.js';
 
 const PASSWORD_KEY_LENGTH = 64;
 const PASSWORD_SALT_BYTES = 16;
 const REFRESH_TOKEN_BYTES = 48;
-const ACCESS_TOKEN_TTL_MINUTES = Number(process.env.ACCESS_TOKEN_TTL_MINUTES || 15);
-const ACCESS_TOKEN_SECRET =
-  process.env.AUTH_TOKEN_SECRET ||
-  process.env.API_KEY ||
-  'dev-auth-secret-change-me';
 
 function toBase64Url(value) {
   return Buffer.from(value).toString('base64url');
@@ -24,7 +23,7 @@ function fromBase64Url(value) {
 }
 
 function signTokenPayload(payload) {
-  return createHmac('sha256', ACCESS_TOKEN_SECRET).update(payload).digest('base64url');
+  return createHmac('sha256', getAuthTokenSecret()).update(payload).digest('base64url');
 }
 
 export function hashPassword(password) {
@@ -61,18 +60,20 @@ export function hashToken(token) {
 }
 
 export function getAccessTokenExpiresAt(issuedAt = Date.now()) {
+  const accessTokenTtlMinutes = getAccessTokenTtlMinutes();
   return new Date(
-    issuedAt + ACCESS_TOKEN_TTL_MINUTES * 60 * 1000
+    issuedAt + accessTokenTtlMinutes * 60 * 1000
   ).toISOString();
 }
 
 export function createAccessToken({ userId, sessionId }, issuedAt = Date.now()) {
+  const accessTokenTtlMinutes = getAccessTokenTtlMinutes();
   const payload = {
     typ: 'access',
     sub: userId,
     sid: sessionId,
     exp: Math.floor(
-      (issuedAt + ACCESS_TOKEN_TTL_MINUTES * 60 * 1000) / 1000
+      (issuedAt + accessTokenTtlMinutes * 60 * 1000) / 1000
     ),
   };
 

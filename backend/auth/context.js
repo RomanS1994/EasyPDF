@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
+import { getApiKey } from '../config/runtime-env.js';
 import { readFileDatabase } from '../db/file-store.js';
 import { runStoreRead } from '../db/store.js';
 import { getBearerToken, sendError } from '../lib/http.js';
@@ -13,8 +14,6 @@ export const REFRESH_TOKEN_TTL_HOURS = Number(
 export const REFRESH_TOKEN_TTL_SECONDS = REFRESH_TOKEN_TTL_HOURS * 60 * 60;
 export const REFRESH_COOKIE_NAME =
   process.env.REFRESH_COOKIE_NAME || 'pdfapp_refresh_token';
-
-const API_KEY = process.env.API_KEY || '';
 
 function normalizeSameSite(value) {
   const normalized = String(value || '').trim().toLowerCase();
@@ -73,9 +72,11 @@ export function getAccessTokenClaims(request) {
 }
 
 export function requireApiKey(request, response) {
-  if (!API_KEY) return true;
+  const apiKey = getApiKey();
 
-  if (request.headers['x-api-key'] !== API_KEY) {
+  if (!apiKey) return true;
+
+  if (request.headers['x-api-key'] !== apiKey) {
     sendError(response, 401, 'Invalid API key');
     return false;
   }

@@ -1,5 +1,5 @@
 import { readFileDatabase } from '../db/file-store.js';
-import { getDatabaseInfo, runStoreRead } from '../db/store.js';
+import { getDatabaseHealth, runStoreRead } from '../db/store.js';
 import { listStoredPlans } from '../db/plans-store.js';
 import { readJsonBody, sendJson, sendPdf } from '../lib/http.js';
 import { createContractPdf } from '../pdf/contracts.js';
@@ -8,9 +8,12 @@ import { nowIso } from '../validation/common.js';
 
 export async function handlePublicRoutes(request, response, { pathName }) {
   if (request.method === 'GET' && pathName === '/api/health') {
-    sendJson(response, 200, {
-      ok: true,
-      database: getDatabaseInfo(),
+    const health = await getDatabaseHealth();
+
+    sendJson(response, health.ok ? 200 : 503, {
+      ok: health.ok,
+      database: health.database,
+      error: health.error || null,
       time: nowIso(),
     });
     return true;

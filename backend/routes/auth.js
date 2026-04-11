@@ -152,14 +152,13 @@ async function handleRegister(request, response) {
 
     const payload = await runStoreTransaction({
       prisma: async tx => {
-        const [existingUser, selectedPlan, existingUserCount] = await Promise.all([
+        const [existingUser, selectedPlan] = await Promise.all([
           tx.user.findUnique({
             where: {
               email,
             },
           }),
           findStoredPlan(tx, selectedPlanId, { includeInactive: false }),
-          tx.user.count(),
         ]);
 
         if (existingUser) {
@@ -173,7 +172,6 @@ async function handleRegister(request, response) {
         const timestamp = nowIso();
         const cycle = buildCycleWindow(timestamp);
         const userId = randomUUID();
-        const role = existingUserCount === 0 ? 'admin' : 'user';
         const authSession = issueAuthSession(userId);
         const createdUser = await tx.user.create({
           data: {
@@ -181,7 +179,7 @@ async function handleRegister(request, response) {
             name,
             email,
             passwordHash: hashPassword(password),
-            role,
+            role: 'user',
             profile: normalizeUserProfile(body.profile, name),
             sessions: {
               create: {
@@ -255,13 +253,12 @@ async function handleRegister(request, response) {
           }
 
           const timestamp = nowIso();
-          const role = database.users.length === 0 ? 'admin' : 'user';
           const user = {
             id: randomUUID(),
             name,
             email,
             passwordHash: hashPassword(password),
-            role,
+            role: 'user',
             planId: selectedPlan.id,
             profile: normalizeUserProfile(body.profile, name),
             subscription: buildSubscriptionAssignment(
