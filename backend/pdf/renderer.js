@@ -1,22 +1,30 @@
-import puppeteer from 'puppeteer';
+import puppeteer from "puppeteer";
 
 let browserPromise = null;
 
 async function launchPdfBrowser() {
   try {
-    return await puppeteer.launch({
+    const browser = await puppeteer.launch({
       headless: true,
       executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
       args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--font-render-hinting=medium',
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--no-zygote",
+        "--single-process",
+        "--font-render-hinting=medium",
       ],
     });
+
+    return browser;
   } catch (error) {
     browserPromise = null;
     throw new Error(
-      `Failed to launch PDF renderer: ${error instanceof Error ? error.message : String(error)}`
+      `Failed to launch PDF renderer: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
     );
   }
 }
@@ -39,10 +47,13 @@ export async function renderPdfFromHtml(html) {
       height: 1754,
       deviceScaleFactor: 1,
     });
+
     await page.setContent(html, {
-      waitUntil: 'networkidle0',
+      waitUntil: "networkidle0",
     });
-    await page.emulateMediaType('print');
+
+    await page.emulateMediaType("print");
+
     await page.evaluate(async () => {
       if (document.fonts?.ready) {
         await document.fonts.ready;
@@ -50,14 +61,14 @@ export async function renderPdfFromHtml(html) {
     });
 
     return await page.pdf({
-      format: 'A4',
+      format: "A4",
       printBackground: true,
       preferCSSPageSize: true,
       margin: {
-        top: '12mm',
-        right: '12mm',
-        bottom: '14mm',
-        left: '12mm',
+        top: "12mm",
+        right: "12mm",
+        bottom: "14mm",
+        left: "12mm",
       },
     });
   } finally {

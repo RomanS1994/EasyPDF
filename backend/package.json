@@ -12,7 +12,7 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "db:migrate-json": "node tools/migrate-json-to-postgres.js",
     "admin:create": "node tools/create-admin.js",
-    "postinstall": "node tools/prisma-postinstall.js"
+    "postinstall": "node tools/prisma-postinstall.js && npx puppeteer browsers install chrome"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
