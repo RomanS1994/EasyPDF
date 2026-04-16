@@ -1,0 +1,190 @@
+          <section class="appScreen" data-tab-screen="orders">
+            <div class="screenCard screenCard-settings">
+              <div class="compactHeader">
+                <p class="sectionEyebrow" data-i18n="orders">Замовлення</p>
+                <h2 data-i18n="system_orders">Системні замовлення</h2>
+                <p data-i18n="system_orders_subline">
+                  Переглядайте всі згенеровані, очікувані та помилкові PDF-замовлення.
+                </p>
+              </div>
+
+              <section class="screenSection">
+                <p class="screenSectionLabel" data-i18n="filters">Фільтри</p>
+                <div class="settingsGroup managerToolbar">
+                  <label class="settingsField settingsField-stack">
+                    <span class="settingsRow-label" data-i18n="search">Пошук</span>
+                    <input
+                      id="managerOrdersSearchInput"
+                      type="text"
+                      placeholder="Замовлення, клієнт або акаунт"
+                      data-i18n-placeholder="order_customer_account"
+                    />
+                  </label>
+                  <label class="settingsField">
+                    <span class="settingsRow-label" data-i18n="status">Статус</span>
+                    <select id="managerOrdersStatusFilter">
+                      <option value="all" data-i18n="all">Усі</option>
+                      <option value="pending" data-i18n="pending">Очікують</option>
+                      <option value="generated" data-i18n="pdf_generated">PDF згенеровано</option>
+                      <option value="failed" data-i18n="failed">Помилка</option>
+                    </select>
+                  </label>
+                  <button
+                    class="secondary-btn settingsAction"
+                    id="managerOrdersSelectedUserBtn"
+                    type="button"
+                    data-i18n="selected_account_only"
+                  >
+                    Лише вибраний акаунт
+                  </button>
+                  <button
+                    class="secondary-btn settingsAction"
+                    id="managerOrdersRefreshBtn"
+                    type="button"
+                    data-i18n="refresh"
+                  >
+                    Оновити
+                  </button>
+                </div>
+                <p class="settingsNote managerOrdersContext" id="managerOrdersContextNote" data-i18n="all_accounts_visible">
+                  Показано всі акаунти.
+                </p>
+              </section>
+
+              <section class="screenSection">
+                <p class="screenSectionLabel" data-i18n="triage">Тріаж</p>
+                <div class="managerOverviewGrid managerOverviewGrid-orders">
+                  <button
+                    class="managerOverviewCard managerTriageCard is-active"
+                    type="button"
+                    data-manager-orders-status="all"
+                  >
+                    <span data-i18n="all">Усі</span>
+                    <strong id="managerOrdersAllCount">0</strong>
+                  </button>
+                  <button
+                    class="managerOverviewCard managerTriageCard"
+                    type="button"
+                    data-manager-orders-status="pending"
+                  >
+                    <span data-i18n="pending">Очікують</span>
+                    <strong id="managerOrdersPendingCount">0</strong>
+                  </button>
+                  <button
+                    class="managerOverviewCard managerTriageCard"
+                    type="button"
+                    data-manager-orders-status="failed"
+                  >
+                    <span data-i18n="failed">Помилка</span>
+                    <strong id="managerOrdersFailedCount">0</strong>
+                  </button>
+                  <button
+                    class="managerOverviewCard managerTriageCard"
+                    type="button"
+                    data-manager-orders-status="generated"
+                  >
+                    <span data-i18n="generated">Згенеровано</span>
+                    <strong id="managerOrdersGeneratedCount">0</strong>
+                  </button>
+                </div>
+              </section>
+
+              <section class="screenSection">
+                <p class="screenSectionLabel" data-i18n="history">Історія</p>
+                <p class="ordersEmpty" id="managerOrdersEmpty" data-i18n="orders_empty_admin">
+                  Жодне замовлення не відповідає поточному фільтру.
+                </p>
+                <ul class="ordersList" id="managerOrdersList"></ul>
+              </section>
+
+              <section class="screenSection">
+                <p class="screenSectionLabel" data-i18n="order_detail">Деталі замовлення</p>
+                <div class="emptyStateCard" id="managerOrderDetailEmpty" data-i18n="order_detail_empty">
+                  Виберіть замовлення, щоб переглянути статус, акаунт і стан PDF.
+                </div>
+                <div class="managerDetailStack is-hidden" id="managerOrderDetailCard">
+                  <div class="settingsGroup">
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="order_label">Замовлення</span>
+                      <strong class="settingsValue" id="managerOrderDetailNumber">-</strong>
+                    </div>
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="status">Статус</span>
+                      <strong class="settingsValue" id="managerOrderDetailStatus">-</strong>
+                    </div>
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="account">Акаунт</span>
+                      <strong class="settingsValue" id="managerOrderDetailAccount">-</strong>
+                    </div>
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="customer">Клієнт</span>
+                      <strong class="settingsValue" id="managerOrderDetailCustomer">-</strong>
+                    </div>
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="pickup_time">Час посадки</span>
+                      <strong class="settingsValue" id="managerOrderDetailTime">-</strong>
+                    </div>
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="total">Сума</span>
+                      <strong class="settingsValue" id="managerOrderDetailTotal">-</strong>
+                    </div>
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="created">Створено</span>
+                      <strong class="settingsValue" id="managerOrderDetailCreated">-</strong>
+                    </div>
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="updated">Оновлено</span>
+                      <strong class="settingsValue" id="managerOrderDetailUpdated">-</strong>
+                    </div>
+                  </div>
+
+                  <div class="settingsGroup">
+                    <div class="settingsNote">
+                      <strong class="managerInfoLabel" data-i18n="route">Маршрут</strong>
+                      <span class="managerInfoText" id="managerOrderDetailRoute">-</span>
+                    </div>
+                    <div class="settingsNote">
+                      <strong class="managerInfoLabel" data-i18n="pdf_label">PDF</strong>
+                      <span class="managerInfoText" id="managerOrderDetailPdf">-</span>
+                    </div>
+                    <div class="settingsNote">
+                      <strong class="managerInfoLabel" data-i18n="context">Контекст</strong>
+                      <span class="managerInfoText" id="managerOrderDetailHint">
+                        Видимо в поточних результатах.
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="settingsGroup">
+                    <div class="managerSplitActions">
+                      <button
+                        class="secondary-btn"
+                        id="managerOrderMarkPendingBtn"
+                        type="button"
+                        data-i18n="mark_pending"
+                      >
+                        Позначити як очікує
+                      </button>
+                      <button
+                        class="primary-btn"
+                        id="managerOrderMarkGeneratedBtn"
+                        type="button"
+                        data-i18n="mark_generated"
+                      >
+                        Позначити як згенеровано
+                      </button>
+                      <button
+                        class="danger-btn"
+                        id="managerOrderMarkFailedBtn"
+                        type="button"
+                        data-i18n="mark_failed"
+                      >
+                        Позначити як помилка
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </section>
+

@@ -1,0 +1,112 @@
+          <section class="appScreen" data-tab-screen="stats">
+            <div class="screenCard screenCard-stats">
+              <div class="compactHeader">
+                <p class="sectionEyebrow" data-i18n="stats">Статистика</p>
+                <h2 data-i18n="usage">Використання</h2>
+                <p data-i18n="current_cycle_pdfs">Поточний цикл і згенеровані PDF.</p>
+              </div>
+
+              <div class="statsTabs" aria-label="Види статистики" data-i18n-aria-label="stats_views">
+                <button class="statsTab is-active" type="button" data-stats-tab-target="usage" data-i18n="usage">
+                  Використання
+                </button>
+                <button class="statsTab" type="button" data-stats-tab-target="activity" data-i18n="activity">
+                  Активність
+                </button>
+                <button class="statsTab" type="button" data-stats-tab-target="plan" data-i18n="plan">
+                  План
+                </button>
+              </div>
+
+              <div class="statsPanels">
+                <section class="statsPanel is-active" data-stats-tab-screen="usage">
+                  <div class="statsHero">
+                    <div class="statsRing" id="statsRing">
+                      <div class="statsRing-inner">
+                        <strong id="statsRingValue">0%</strong>
+                        <span id="statsUsagePercent">0% використано</span>
+                      </div>
+                    </div>
+
+                    <div class="statsMiniGrid">
+                      <article class="statsMiniCard">
+                        <span data-i18n="cycle">Цикл</span>
+                        <strong id="statsMonth">-</strong>
+                      </article>
+                      <article class="statsMiniCard">
+                        <span data-i18n="used">Використано</span>
+                        <strong id="statsUsageValue">-</strong>
+                      </article>
+                      <article class="statsMiniCard">
+                        <span data-i18n="remaining">Залишилось</span>
+                        <strong id="statsRemainingValue">-</strong>
+                      </article>
+                      <article class="statsMiniCard">
+                        <span data-i18n="pdf">PDF</span>
+                        <strong id="statsGeneratedValue">-</strong>
+                      </article>
+                    </div>
+                  </div>
+
+                  <div class="usageCard usageCard-stats">
+                    <div class="usageCard-head">
+                      <h3 data-i18n="cycle_limit">Ліміт циклу</h3>
+                      <span id="statsQuotaLabel">-</span>
+                    </div>
+                    <div class="usageBar">
+                      <div class="usageBar-fill" id="statsUsageBar"></div>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="statsPanel" data-stats-tab-screen="activity">
+                  <div class="statsVizCard">
+                    <div class="usageCard-head">
+                      <h3 data-i18n="last_7_days">Останні 7 днів</h3>
+                      <span id="statsActivitySummary">-</span>
+                    </div>
+                    <div class="activityBars" id="statsActivityBars"></div>
+                  </div>
+
+                  <div class="statsVizCard">
+                    <div class="usageCard-head">
+                      <h3 data-i18n="status_mix">Мікс статусів</h3>
+                      <span id="statsStatusSummary">-</span>
+                    </div>
+                    <div class="statusStack" id="statsStatusStack"></div>
+                    <div class="statusLegend" id="statsStatusLegend"></div>
+                  </div>
+                </section>
+
+                <section class="statsPanel" data-stats-tab-screen="plan">
+                  <div class="planFocusCard">
+                    <span class="planFocusLabel" data-i18n="active_plan">Активний план</span>
+                    <strong id="statsPlanValue">-</strong>
+                    <span class="planFocusCopy" id="statsPlanLimit">-</span>
+                  </div>
+
+                  <div class="usageCard usageCard-stats">
+                    <div class="usageCard-head">
+                      <h3 data-i18n="projected_cycle">Прогноз циклу</h3>
+                      <span id="statsForecastVolume">-</span>
+                    </div>
+                    <div class="usageBar usageBar-plan">
+                      <div class="usageBar-fill" id="statsPlanBar"></div>
+                    </div>
+                  </div>
+
+                  <div class="settingsGroup">
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="forecast">Прогноз</span>
+                      <strong class="settingsValue" id="statsForecastDate">-</strong>
+                    </div>
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="orders">Замовлення</span>
+                      <strong class="settingsValue" id="statsOrdersValue">-</strong>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </section>
+

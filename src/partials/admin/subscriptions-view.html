@@ -1,0 +1,109 @@
+          <section class="appScreen" data-tab-screen="subscriptions">
+            <div class="screenCard screenCard-settings">
+              <div class="compactHeader">
+                <p class="sectionEyebrow" data-i18n="subscriptions">Підписки</p>
+                <h2 data-i18n="subscriptions">Підписки</h2>
+                <p data-i18n="subscriptions_subline">
+                  Призначайте плани, коригуйте цикли та залишайте внутрішні нотатки.
+                </p>
+              </div>
+
+              <section class="screenSection">
+                <p class="screenSectionLabel" data-i18n="selected_account">Вибраний акаунт</p>
+                <div class="emptyStateCard" id="managerSubscriptionEmpty" data-i18n="select_account_for_subscription">
+                  Виберіть акаунт у розділі «Акаунти», щоб змінити його підписку.
+                </div>
+                <div class="managerDetailStack is-hidden" id="managerSubscriptionCard">
+                  <div class="settingsGroup">
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="name">Ім’я</span>
+                      <strong class="settingsValue" id="managerSubscriptionName">-</strong>
+                    </div>
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="email">Email</span>
+                      <strong class="settingsValue" id="managerSubscriptionEmail">-</strong>
+                    </div>
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="current_status">Поточний статус</span>
+                      <strong class="settingsValue" id="managerSubscriptionStatusLabel">-</strong>
+                    </div>
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="usage">Використання</span>
+                      <strong class="settingsValue" id="managerSubscriptionUsageLabel">-</strong>
+                    </div>
+                  </div>
+
+                  <div class="settingsGroup">
+                    <label class="settingsField">
+                      <span class="settingsRow-label" data-i18n="plan">План</span>
+                      <select id="managerSubscriptionPlan"></select>
+                    </label>
+                    <label class="settingsField">
+                      <span class="settingsRow-label" data-i18n="status">Статус</span>
+                      <select id="managerSubscriptionStatus">
+                        <option value="active" data-i18n="subscription_active">Активна</option>
+                        <option value="trial" data-i18n="subscription_trial">Пробна</option>
+                        <option value="paused" data-i18n="subscription_paused">Призупинена</option>
+                        <option value="canceled" data-i18n="subscription_canceled">Скасована</option>
+                        <option value="expired" data-i18n="subscription_expired">Завершена</option>
+                      </select>
+                    </label>
+                    <label class="settingsField">
+                      <span class="settingsRow-label" data-i18n="start">Початок</span>
+                      <input id="managerSubscriptionStart" type="date" />
+                    </label>
+                    <label class="settingsField">
+                      <span class="settingsRow-label" data-i18n="end">Кінець</span>
+                      <input id="managerSubscriptionEnd" type="date" />
+                    </label>
+                    <label class="settingsField">
+                      <span class="settingsRow-label" data-i18n="quota_override">Перевизначення квоти</span>
+                      <input
+                        id="managerSubscriptionQuota"
+                        type="number"
+                        min="0"
+                        placeholder="Необов’язково"
+                        data-i18n-placeholder="optional"
+                      />
+                    </label>
+                    <label class="settingsField settingsField-stack">
+                      <span class="settingsRow-label" data-i18n="notes">Нотатки</span>
+                      <input
+                        id="managerSubscriptionNotes"
+                        type="text"
+                        placeholder="Внутрішня нотатка"
+                        data-i18n-placeholder="internal_note"
+                      />
+                    </label>
+                    <div class="managerSplitActions">
+                      <button
+                        class="primary-btn"
+                        id="managerSubscriptionSaveBtn"
+                        type="button"
+                        data-i18n="save_subscription"
+                      >
+                        Зберегти підписку
+                      </button>
+                      <button
+                        class="secondary-btn"
+                        id="managerSubscriptionExtendBtn"
+                        type="button"
+                        data-i18n="extend_30_days"
+                      >
+                        Продовжити на 30 днів
+                      </button>
+                      <button
+                        class="danger-btn"
+                        id="managerSubscriptionCancelBtn"
+                        type="button"
+                        data-i18n="cancel_now"
+                      >
+                        Скасувати зараз
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </section>
+

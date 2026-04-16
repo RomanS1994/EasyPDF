@@ -1,0 +1,190 @@
+      <section class="appShell is-hidden" id="accountPanel">
+        <header class="appTop appTop-admin">
+          <div class="appTitleBlock">
+            <p class="sectionEyebrow">TransferDocs</p>
+            <h1 data-i18n="admin_workspace_title">Admin-простір</h1>
+            <p id="workspaceGreeting">Вітаємо, -</p>
+          </div>
+
+          <div class="topMetrics">
+            <article class="topMetric">
+              <span data-i18n="role">Роль</span>
+              <strong id="workspacePlan">-</strong>
+            </article>
+            <article class="topMetric">
+              <span data-i18n="selected">Вибрано</span>
+              <strong id="workspaceUsage">-</strong>
+            </article>
+          </div>
+        </header>
+
+        <section class="screenCard screenCard-settings" id="managerGate">
+          <div class="compactHeader">
+            <p class="sectionEyebrow" data-i18n="restricted">Обмежено</p>
+            <h2 data-i18n="admin_access_required">Потрібен admin-доступ</h2>
+            <p data-i18n="admin_access_note">
+              Відкрийте user app, якщо ви увійшли під звичайним акаунтом.
+            </p>
+          </div>
+
+          <section class="screenSection">
+            <div class="settingsGroup">
+              <div class="settingsNote" data-i18n="admin_access_routes_note">
+                Для admin-маршрутів потрібен доступ менеджера або адміністратора.
+              </div>
+              <a class="secondary-btn settingsActionLink" href="/cz/pdf/" data-i18n="open_user_app">
+                Відкрити user app
+              </a>
+            </div>
+          </section>
+        </section>
+
+        <main class="appScreens managerWorkspace is-hidden" id="managerWorkspace">
+          <section class="appScreen" data-tab-screen="accounts">
+            <div class="screenCard screenCard-settings">
+              <div class="compactHeader">
+                <p class="sectionEyebrow" data-i18n="accounts">Акаунти</p>
+                <h2 data-i18n="accounts">Акаунти</h2>
+                <p data-i18n="accounts_subline">Шукайте акаунти, перевіряйте доступ і змінюйте ролі.</p>
+              </div>
+
+              <section class="screenSection">
+                <p class="screenSectionLabel" data-i18n="overview">Огляд</p>
+                <div class="managerOverviewGrid">
+                  <article class="managerOverviewCard">
+                    <span data-i18n="users">Користувачі</span>
+                    <strong id="managerUsersCount">0</strong>
+                  </article>
+                  <article class="managerOverviewCard">
+                    <span data-i18n="active">Активні</span>
+                    <strong id="managerActiveCount">0</strong>
+                  </article>
+                  <article class="managerOverviewCard">
+                    <span data-i18n="inactive">Неактивні</span>
+                    <strong id="managerInactiveCount">0</strong>
+                  </article>
+                  <article class="managerOverviewCard">
+                    <span data-i18n="staff">Команда</span>
+                    <strong id="managerStaffCount">0</strong>
+                  </article>
+                </div>
+              </section>
+
+              <section class="screenSection">
+                <p class="screenSectionLabel" data-i18n="directory">Каталог</p>
+                <div class="settingsGroup managerToolbar">
+                  <label class="settingsField settingsField-stack">
+                    <span class="settingsRow-label" data-i18n="search">Пошук</span>
+                    <input id="managerSearchInput" type="text" placeholder="Email або ім’я" data-i18n-placeholder="email_or_name" />
+                  </label>
+                  <label class="settingsField">
+                    <span class="settingsRow-label" data-i18n="status">Статус</span>
+                    <select id="managerStatusFilter">
+                      <option value="all" data-i18n="all">Усі</option>
+                      <option value="active" data-i18n="active">Активна</option>
+                      <option value="trial" data-i18n="trial">Пробна</option>
+                      <option value="paused" data-i18n="paused">Призупинена</option>
+                      <option value="canceled" data-i18n="canceled">Скасована</option>
+                      <option value="expired" data-i18n="expired">Завершена</option>
+                    </select>
+                  </label>
+                  <label class="settingsField">
+                    <span class="settingsRow-label" data-i18n="role">Роль</span>
+                    <select id="managerRoleFilter">
+                      <option value="all" data-i18n="all">Усі</option>
+                      <option value="user" data-i18n="role_user">Користувач</option>
+                      <option value="manager" data-i18n="role_manager">Менеджер</option>
+                      <option value="admin" data-i18n="role_admin">Адміністратор</option>
+                    </select>
+                  </label>
+                  <label class="settingsField">
+                    <span class="settingsRow-label" data-i18n="plan">План</span>
+                    <select id="managerPlanFilter">
+                      <option value="all" data-i18n="all_plans">Усі плани</option>
+                    </select>
+                  </label>
+                  <button
+                    class="secondary-btn settingsAction"
+                    id="managerRefreshBtn"
+                    type="button"
+                    data-i18n="refresh"
+                  >
+                    Оновити
+                  </button>
+                </div>
+                <p class="ordersEmpty" id="managerUsersEmpty" data-i18n="accounts_empty">
+                  Жоден акаунт не відповідає поточному фільтру.
+                </p>
+                <ul class="managerUsersList" id="managerUsersList"></ul>
+              </section>
+
+              <section class="screenSection">
+                <p class="screenSectionLabel" data-i18n="selected_account">Вибраний акаунт</p>
+                <div class="emptyStateCard" id="managerSelectedEmpty" data-i18n="selected_account_note">
+                  Виберіть акаунт, щоб переглянути його доступ.
+                </div>
+                <div class="managerDetailStack is-hidden" id="managerSelectedCard">
+                  <div class="settingsGroup">
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="name">Ім’я</span>
+                      <strong class="settingsValue" id="managerSelectedName">-</strong>
+                    </div>
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="email">Email</span>
+                      <strong class="settingsValue" id="managerSelectedEmail">-</strong>
+                    </div>
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="role">Роль</span>
+                      <strong class="settingsValue" id="managerSelectedRole">-</strong>
+                    </div>
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="plan">План</span>
+                      <strong class="settingsValue" id="managerSelectedPlan">-</strong>
+                    </div>
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="status">Статус</span>
+                      <strong class="settingsValue" id="managerSelectedStatus">-</strong>
+                    </div>
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="cycle">Цикл</span>
+                      <strong class="settingsValue" id="managerSelectedCycle">-</strong>
+                    </div>
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="usage">Використання</span>
+                      <strong class="settingsValue" id="managerSelectedUsage">-</strong>
+                    </div>
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="orders">Замовлення</span>
+                      <strong class="settingsValue" id="managerSelectedOrdersCount">-</strong>
+                    </div>
+                  </div>
+
+                  <div class="settingsGroup is-hidden" id="managerRoleSection">
+                    <label class="settingsField">
+                      <span class="settingsRow-label" data-i18n="role">Роль</span>
+                      <select id="managerRoleSelect">
+                        <option value="user" data-i18n="role_user">Користувач</option>
+                        <option value="manager" data-i18n="role_manager">Менеджер</option>
+                        <option value="admin" data-i18n="role_admin">Адміністратор</option>
+                      </select>
+                    </label>
+                    <button class="primary-btn" id="managerRoleSaveBtn" type="button" data-i18n="save_role">
+                      Зберегти роль
+                    </button>
+                  </div>
+
+                  <div class="settingsGroup">
+                    <div class="settingsRow">
+                      <span class="settingsRow-label" data-i18n="recent_orders">Недавні замовлення</span>
+                      <strong class="settingsValue" id="managerRecentOrdersLabel">-</strong>
+                    </div>
+                    <p class="ordersEmpty" id="managerSelectedOrdersEmpty" data-i18n="recent_orders_empty">
+                      Для цього акаунта ще немає недавніх замовлень.
+                    </p>
+                    <ul class="ordersList" id="managerSelectedOrdersList"></ul>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </section>
+

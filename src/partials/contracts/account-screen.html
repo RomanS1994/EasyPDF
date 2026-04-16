@@ -1,0 +1,156 @@
+          <section class="appScreen" data-tab-screen="account">
+            <div class="screenCard screenCard-settings">
+              <div class="compactHeader">
+                <p class="sectionEyebrow" data-i18n="account">Акаунт</p>
+                <h2 data-i18n="my_account">Мій акаунт</h2>
+                <p data-i18n="account_subline">Профіль, підписка та дії з робочим простором.</p>
+              </div>
+
+              <section class="screenSection">
+                <p class="screenSectionLabel" data-i18n="profile">Профіль</p>
+                <div class="settingsGroup">
+                  <div class="settingsProfile">
+                    <strong id="accountName">-</strong>
+                    <p id="accountEmail">-</p>
+                  </div>
+                  <div class="settingsRow">
+                    <span class="settingsRow-label" data-i18n="role">Роль</span>
+                    <strong class="settingsValue" id="accountRole">-</strong>
+                  </div>
+                </div>
+              </section>
+
+              <section class="screenSection">
+                <p class="screenSectionLabel" data-i18n="subscription">Підписка</p>
+                <div class="settingsGroup">
+                  <div class="settingsRow">
+                    <span class="settingsRow-label" data-i18n="plan">План</span>
+                    <strong class="settingsValue" id="accountPlan">-</strong>
+                  </div>
+                  <div class="settingsRow">
+                    <span class="settingsRow-label" data-i18n="status">Статус</span>
+                    <strong class="settingsValue" id="accountSubscriptionStatus">-</strong>
+                  </div>
+                  <div class="settingsRow">
+                    <span class="settingsRow-label" data-i18n="cycle">Цикл</span>
+                    <strong class="settingsValue" id="accountSubscriptionCycle">-</strong>
+                  </div>
+                  <div class="settingsRow">
+                    <span class="settingsRow-label" data-i18n="usage">Використання</span>
+                    <strong class="settingsValue" id="accountUsage">-</strong>
+                  </div>
+                </div>
+                <p class="settingsNote" data-i18n="subscription_admin_note">
+                  Зміни підписки виконуються з admin-простору.
+                </p>
+              </section>
+
+              <section class="screenSection is-hidden" id="managerEntrySection">
+                <p class="screenSectionLabel" data-i18n="admin_workspace">Admin-простір</p>
+                <div class="settingsGroup">
+                  <div class="settingsNote" data-i18n="admin_workspace_note">
+                    Керуйте акаунтами, підписками, планами та аудитом.
+                  </div>
+                  <a class="primary-btn settingsActionLink" href="/cz/pdf/admin/accounts/" data-i18n="open_admin_workspace">
+                    Відкрити admin-простір
+                  </a>
+                </div>
+              </section>
+
+              <section class="screenSection">
+                <p class="screenSectionLabel" data-i18n="business_profile">Бізнес-профіль</p>
+                <div class="settingsGroup">
+                  <label class="settingsField settingsField-stack">
+                    <span class="settingsRow-label" data-i18n="carrier_name">Ім’я перевізника</span>
+                    <input id="accountDriverName" type="text" placeholder="Ім’я перевізника" data-i18n-placeholder="carrier_name" />
+                  </label>
+                  <label class="settingsField settingsField-stack">
+                    <span class="settingsRow-label" data-i18n="carrier_address">Адреса перевізника</span>
+                    <input
+                      id="accountDriverAddress"
+                      type="text"
+                      placeholder="Адреса перевізника"
+                      data-i18n-placeholder="carrier_address"
+                    />
+                  </label>
+                  <label class="settingsField">
+                    <span class="settingsRow-label" data-i18n="vehicle_plate">Номер авто</span>
+                    <input id="accountDriverSpz" type="text" placeholder="1AF V087" />
+                  </label>
+                  <label class="settingsField">
+                    <span class="settingsRow-label" data-i18n="carrier_id">ID перевізника</span>
+                    <input id="accountDriverIco" type="text" placeholder="22319352" />
+                  </label>
+                  <label class="settingsField settingsField-stack">
+                    <span class="settingsRow-label" data-i18n="company_name">Назва компанії</span>
+                    <input
+                      id="accountProviderName"
+                      type="text"
+                      placeholder="Назва компанії"
+                      data-i18n-placeholder="company_name"
+                    />
+                  </label>
+                  <label class="settingsField settingsField-stack">
+                    <span class="settingsRow-label" data-i18n="company_address">Адреса компанії</span>
+                    <input
+                      id="accountProviderAddress"
+                      type="text"
+                      placeholder="Адреса компанії"
+                      data-i18n-placeholder="company_address"
+                    />
+                  </label>
+                  <label class="settingsField">
+                    <span class="settingsRow-label" data-i18n="company_id">ID компанії</span>
+                    <input id="accountProviderIco" type="text" placeholder="22229973" />
+                  </label>
+                </div>
+                <button
+                  class="primary-btn settingsButton"
+                  id="updateProfileBtn"
+                  type="button"
+                  data-i18n="save_business_profile"
+                >
+                  Зберегти бізнес-профіль
+                </button>
+              </section>
+
+              <section class="screenSection">
+                <p class="screenSectionLabel" data-i18n="account_settings">Налаштування</p>
+                <div class="settingsGroup">
+                  <label class="settingsField">
+                    <span class="settingsRow-label" data-i18n="interface_language">Мова інтерфейсу</span>
+                    <select id="accountLanguageSelect">
+                      <option value="uk" data-i18n="language_uk">Українська</option>
+                      <option value="en" data-i18n="language_en">English</option>
+                      <option value="cs" data-i18n="language_cs">Čeština</option>
+                    </select>
+                  </label>
+                  <div class="settingsNote" data-i18n="interface_language_note">
+                    Обрана мова зберігається для user і admin простору на цьому пристрої.
+                  </div>
+                </div>
+              </section>
+
+              <section class="screenSection">
+                <p class="screenSectionLabel" data-i18n="session">Сесія</p>
+                <div class="settingsGroup">
+                  <button class="secondary-btn settingsAction" id="logoutBtn" type="button" data-i18n="log_out">
+                    Вийти
+                  </button>
+                </div>
+              </section>
+
+              <section class="screenSection">
+                <p class="screenSectionLabel" data-i18n="danger_zone">Небезпечна зона</p>
+                <div class="settingsGroup settingsGroup-danger">
+                  <div class="settingsNote" data-i18n="delete_account_note">
+                    Видалити акаунт і всі збережені замовлення.
+                  </div>
+                  <button class="danger-btn settingsAction" id="deleteAccountBtn" type="button" data-i18n="delete_account">
+                    Видалити акаунт
+                  </button>
+                </div>
+              </section>
+            </div>
+          </section>
+

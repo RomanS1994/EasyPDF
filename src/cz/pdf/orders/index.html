@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uk">
   <head>
     <meta charset="UTF-8" />
@@ -16,7 +16,10 @@
       rel="preload"
       as="style"
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Raleway:wght@500;700;800&display=swap"
-      onload="this.onload=null;this.rel='stylesheet'"
+      onload="
+        this.onload = null;
+        this.rel = 'stylesheet';
+      "
     />
     <noscript>
       <link
@@ -29,7 +32,7 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/spinkit@2.0.1/spinkit.min.css"
       media="print"
-      onload="this.media='all'"
+      onload="this.media = 'all'"
     />
     <noscript>
       <link
@@ -42,7 +45,7 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
       media="print"
-      onload="this.media='all'"
+      onload="this.media = 'all'"
     />
     <noscript>
       <link
@@ -54,19 +57,15 @@
     <link rel="stylesheet" href="/css/styles.css" />
   </head>
 
-  <body class="page-generateContract" data-app-shell="user" data-app-tab="orders">
+  <body
+    class="page-generateContract"
+    data-app-shell="user"
+    data-app-tab="orders"
+  >
     <main>
       <load src="../partials/generateContract.html" />
     </main>
 
-    <script type="module" src="/js/components/auth/authPanel.js"></script>
-    <script
-      type="module"
-      src="/js/components/generateContract/generateContract.js"
-    ></script>
-    <script
-      type="module"
-      src="/js/components/generateContract/utils/downloadBtn.js"
-    ></script>
+    <script type="module" src="/pages/orders/page.js"></script>
   </body>
 </html>

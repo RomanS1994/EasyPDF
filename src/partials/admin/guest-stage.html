@@ -1,0 +1,95 @@
+      <section class="guestStage" id="guestPanel">
+        <div class="guestIntro">
+          <p class="sectionEyebrow">TransferDocs</p>
+          <h1 data-i18n="app_brand_workspace">PDF-простір</h1>
+          <p id="authSubline" data-i18n="guest_subline">
+            Оберіть план і почніть зберігати згенеровані PDF.
+          </p>
+        </div>
+
+        <div class="planCards" id="planCards"></div>
+
+        <section class="guestAuth">
+          <div class="compactHeader">
+            <p class="sectionEyebrow" data-i18n="access">Доступ</p>
+            <h2 id="authHeadline" data-i18n="guest_headline">Створити акаунт</h2>
+            <p data-i18n="guest_note">
+              Один акаунт. Один план. Усі замовлення зберігаються в одному місці.
+            </p>
+          </div>
+
+          <div class="authForms">
+            <form class="authForm" id="registerForm">
+              <h3 data-i18n="new_account">Новий акаунт</h3>
+
+              <label class="authField">
+                <span data-i18n="full_name">Повне ім’я</span>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Roman Stryzhka"
+                  autocomplete="name"
+                />
+              </label>
+
+              <label class="authField">
+                <span data-i18n="email">Email</span>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="name@example.com"
+                  autocomplete="email"
+                />
+              </label>
+
+              <label class="authField">
+                <span data-i18n="password">Пароль</span>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Щонайменше 8 символів"
+                  data-i18n-placeholder="password_min"
+                  autocomplete="new-password"
+                />
+              </label>
+
+              <label class="authField">
+                <span data-i18n="plan">План</span>
+                <select name="planId" id="registerPlan"></select>
+              </label>
+
+              <button class="primary-btn" type="submit" data-i18n="create_workspace">
+                Створити простір
+              </button>
+            </form>
+
+            <form class="authForm authForm-login" id="loginForm">
+              <h3 data-i18n="sign_in">Увійти</h3>
+
+              <label class="authField">
+                <span data-i18n="email">Email</span>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="name@example.com"
+                  autocomplete="email"
+                />
+              </label>
+
+              <label class="authField">
+                <span data-i18n="password">Пароль</span>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Ваш пароль"
+                  data-i18n-placeholder="your_password"
+                  autocomplete="current-password"
+                />
+              </label>
+
+              <button class="secondary-btn" type="submit" data-i18n="sign_in">Увійти</button>
+            </form>
+          </div>
+        </section>
+      </section>
+

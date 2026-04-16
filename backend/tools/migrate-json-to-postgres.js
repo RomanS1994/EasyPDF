@@ -3,8 +3,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import { DEFAULT_PLAN_ID, PLANS as DEFAULT_PLANS } from '../config/plans.js';
-import { writeDatabase } from '../db/legacy-store.js';
-import { disconnectDatabase } from '../db/store.js';
+import { prisma } from '../db/prisma.js';
+import { replaceDatabaseSnapshot } from '../db/repository.js';
 import { normalizeUserProfile } from '../services/profiles.js';
 import { buildDefaultSubscription } from '../services/subscriptions.js';
 
@@ -76,7 +76,9 @@ async function main() {
   const parsed = JSON.parse(raw);
   const legacyDatabase = normalizeLegacyDatabase(parsed);
 
-  await writeDatabase(legacyDatabase);
+  await prisma.$transaction(async tx => {
+    await replaceDatabaseSnapshot(tx, legacyDatabase);
+  });
 
   console.log(
     JSON.stringify(
@@ -104,5 +106,5 @@ main()
     process.exitCode = 1;
   })
   .finally(async () => {
-    await disconnectDatabase();
+    await prisma.$disconnect();
   });
