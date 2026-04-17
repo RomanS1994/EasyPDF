@@ -79,8 +79,10 @@ export async function handleLoginSubmit(event) {
 }
 
 function updatePasswordToggle(button, isVisible) {
-  button.textContent = isVisible ? 'Сховати пароль' : 'Показати пароль';
+  const nextLabel = isVisible ? 'Сховати пароль' : 'Показати пароль';
+
   button.setAttribute('aria-pressed', isVisible ? 'true' : 'false');
+  button.setAttribute('aria-label', nextLabel);
 }
 
 function restoreSelection(input, selectionStart, selectionEnd) {

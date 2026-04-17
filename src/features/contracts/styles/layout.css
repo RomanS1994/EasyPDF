@@ -181,28 +181,68 @@
 }
 
 .authPasswordControl {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px;
-  align-items: stretch;
+  position: relative;
+  display: block;
 }
 
 .authPasswordToggle {
-  min-width: 92px;
-  padding: 0 12px;
-  border: 1px solid rgba(110, 124, 153, 0.18);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.82);
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1;
-  white-space: nowrap;
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  z-index: 1;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #7a869d;
+  transform: translateY(-50%);
+  box-shadow: none;
 }
 
 .authPasswordToggle[aria-pressed='true'] {
-  background: var(--accent-soft);
-  border-color: rgba(0, 122, 255, 0.24);
+  background: rgba(0, 122, 255, 0.08);
+  color: var(--accent);
+}
+
+.authPasswordToggleIcon {
+  display: block;
+  width: 17px;
+  height: 17px;
+  margin: 0 auto;
+}
+
+.authPasswordToggleIcon-eye,
+.authPasswordToggleIcon-pupil,
+.authPasswordToggleIcon-slash {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.authPasswordToggleIcon-pupil {
+  fill: currentColor;
+  stroke: none;
+}
+
+.authPasswordToggleIcon-slash {
+  opacity: 0;
+}
+
+.authPasswordToggle:hover {
+  background: rgba(110, 124, 153, 0.08);
+  color: #526079;
+}
+
+.authPasswordToggle[aria-pressed='true'] .authPasswordToggleIcon-slash {
+  opacity: 1;
+}
+
+.authPasswordControl input {
+  padding-right: 48px;
 }
 
 .guestStage .authForm h3 {
