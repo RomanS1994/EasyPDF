@@ -19,14 +19,10 @@ tools/      root local dev runner
 
 The frontend uses only these active areas:
 
-- `src/cz/pdf`
-- `src/js/components/auth`
-- `src/js/components/generateContract`
-- `src/api`
-- `src/css/base`
-- `src/css/components/buttons.css`
-- `src/css/layout/generateContract/dataContract.css`
-- `src/css/utils`
+- `src/app`
+- `src/pages`
+- `src/features`
+- `src/shared`
 
 ## Local run
 

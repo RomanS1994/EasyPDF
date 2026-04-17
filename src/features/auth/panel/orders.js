@@ -1,5 +1,6 @@
 import { getCurrentLocale, t } from '../../../shared/i18n/app.js';
-import { refs, state } from './context.js';
+import { refs } from './refs.js';
+import { state } from './state.js';
 import { escapeHtml, formatOrderStatusLabel } from './formatters.js';
 
 export function buildOrderMarkup(order, { compact = false, showOwner = false } = {}) {

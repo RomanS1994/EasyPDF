@@ -1,5 +1,6 @@
 import { getCurrentLanguage, syncPageMeta } from '../../../shared/i18n/app.js';
-import { refs, STATS_TAB_NAMES, state, TAB_NAMES } from './context.js';
+import { refs, STATS_TAB_NAMES, TAB_NAMES } from './refs.js';
+import { state } from './state.js';
 
 export function getShellRouteConfig() {
   const shell = document.body.dataset.appShell;

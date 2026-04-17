@@ -1,11 +1,8 @@
 import { getCurrentLanguage, getCurrentLocale, applyLanguage, t } from '../../../shared/i18n/app.js';
 import { escapeHtml } from './formatters.js';
-import {
-  AUTH_MODES,
-  getDefaultAuthMode,
-  refs,
-  state,
-} from './context.js';
+import { AUTH_MODES, refs } from './refs.js';
+import { getDefaultAuthMode } from './shell.js';
+import { state } from './state.js';
 
 export function syncLanguageSelects() {
   const language = getCurrentLanguage();
