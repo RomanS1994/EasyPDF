@@ -1,12 +1,34 @@
+import { existsSync } from "node:fs";
+
 import puppeteer from "puppeteer";
 
 let browserPromise = null;
+
+function resolvePdfExecutablePath() {
+  if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+    return process.env.PUPPETEER_EXECUTABLE_PATH;
+  }
+
+  const fallbackPaths = [
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+  ];
+
+  for (const fallbackPath of fallbackPaths) {
+    if (existsSync(fallbackPath)) {
+      return fallbackPath;
+    }
+  }
+
+  return undefined;
+}
 
 async function launchPdfBrowser() {
   try {
     const browser = await puppeteer.launch({
       headless: true,
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+      executablePath: resolvePdfExecutablePath(),
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",
@@ -49,7 +71,8 @@ export async function renderPdfFromHtml(html) {
     });
 
     await page.setContent(html, {
-      waitUntil: "networkidle0",
+      waitUntil: "domcontentloaded",
+      timeout: 15000,
     });
 
     await page.emulateMediaType("print");

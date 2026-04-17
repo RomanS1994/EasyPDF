@@ -1,6 +1,6 @@
 import { handleAdminRoutes } from './admin.js';
-import { handleAuthRoutes } from './auth.js';
-import { handleManagerRoutes } from './manager.js';
+import { handleAuthRoutes } from './auth/index.js';
+import { handleManagerRoutes } from './manager/index.js';
 import { handleMeRoutes } from './me.js';
 import { handleOrderRoutes } from './orders.js';
 import { handlePublicRoutes } from './public.js';
