@@ -1,0 +1,269 @@
+.usageCard-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.statsTabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 4px;
+  border-radius: 14px;
+  background: #e9e9ee;
+}
+
+.statsTab {
+  min-height: 34px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.statsTab.is-active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.08),
+    0 0 0 0.5px rgba(60, 60, 67, 0.14);
+}
+
+.statsPanel {
+  display: none;
+  gap: 12px;
+}
+
+.statsPanel.is-active {
+  display: grid;
+}
+
+.statsPanels {
+  display: grid;
+}
+
+.statsHero {
+  display: grid;
+  gap: 12px;
+}
+
+.statsRing {
+  --progress: 0%;
+  position: relative;
+  width: 176px;
+  height: 176px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, var(--surface) 59%, transparent 60%),
+    conic-gradient(
+      var(--accent) 0 var(--progress),
+      rgba(0, 122, 255, 0.12) var(--progress) 100%
+    );
+}
+
+.statsRing::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px rgba(60, 60, 67, 0.08);
+}
+
+.statsRing-inner {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-content: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.statsRing-inner strong {
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.statsRing-inner span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.statsMiniGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.statsMiniCard,
+.statsVizCard,
+.planFocusCard {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+}
+
+.statsMiniCard {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+}
+
+.statsMiniCard span,
+.planFocusLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.statsMiniCard strong {
+  font-size: 16px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.usageCard-stats,
+.statsVizCard,
+.planFocusCard {
+  padding: 14px;
+}
+
+.activityBars {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: end;
+  gap: 8px;
+  min-height: 150px;
+}
+
+.activityBarItem {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+}
+
+.activityBarValue {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.activityBarTrack {
+  display: flex;
+  align-items: end;
+  width: 100%;
+  height: 96px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--surface-soft);
+}
+
+.activityBarFill {
+  width: 100%;
+  min-height: 10px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #5ac8fa, var(--accent));
+}
+
+.activityBarLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.statusStack {
+  display: flex;
+  gap: 6px;
+  min-height: 16px;
+}
+
+.statusSegment {
+  min-height: 16px;
+  border-radius: 999px;
+}
+
+.statusSegment-generated {
+  background: var(--success);
+}
+
+.statusSegment-pending {
+  background: var(--warning);
+}
+
+.statusSegment-failed {
+  background: var(--danger);
+}
+
+.statusLegend {
+  display: grid;
+  gap: 8px;
+}
+
+.statusLegendItem {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.statusLegendItem strong {
+  font-size: 13px;
+}
+
+.statusLegendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.statusLegendDot-generated {
+  background: var(--success);
+}
+
+.statusLegendDot-pending {
+  background: var(--warning);
+}
+
+.statusLegendDot-failed {
+  background: var(--danger);
+}
+
+.planFocusCard {
+  display: grid;
+  gap: 6px;
+}
+
+.planFocusCard strong {
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.planFocusCopy {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.usageBar {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e5e5ea;
+}
+
+.usageBar-fill {
+  width: 0;
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.24s ease;
+}
+

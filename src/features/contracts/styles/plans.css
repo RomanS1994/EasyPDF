@@ -1,0 +1,216 @@
+
+.planCards {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(168px, calc(100% - 150px));
+  gap: 6px;
+  overflow-x: auto;
+  margin: 0 -4px;
+  padding: 2px 4px 4px;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.planCards::-webkit-scrollbar {
+  display: none;
+}
+
+.planCard {
+  --plan-accent: var(--accent);
+  --plan-border: rgba(0, 122, 255, 0.18);
+  --plan-soft: #eef4ff;
+  --plan-glow: rgba(0, 122, 255, 0.18);
+  --plan-shadow: rgba(0, 122, 255, 0.24);
+  --plan-ink: #234382;
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr auto;
+  gap: 5px;
+  min-height: 142px;
+  padding: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  border-color: var(--plan-border);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.98), var(--plan-soft));
+  box-shadow: 0 8px 16px rgba(28, 32, 40, 0.06);
+  scroll-snap-align: start;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.planCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 24px rgba(28, 32, 40, 0.1);
+}
+
+.planCard:active {
+  transform: translateY(0) scale(0.985);
+}
+
+.planCard::before,
+.planCard::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.planCard::before {
+  inset: 0;
+  background: linear-gradient(140deg, rgba(255, 255, 255, 0.62), transparent 46%);
+}
+
+.planCard::after {
+  right: -38px;
+  bottom: -70px;
+  width: 188px;
+  height: 188px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--plan-glow), transparent 68%);
+}
+
+.planCard--trial {
+  --plan-accent: #4f6fff;
+  --plan-border: rgba(79, 111, 255, 0.24);
+  --plan-soft: #edf2ff;
+  --plan-glow: rgba(95, 126, 255, 0.36);
+  --plan-shadow: rgba(79, 111, 255, 0.24);
+  --plan-ink: #2e49b4;
+}
+
+.planCard--bronze {
+  --plan-accent: #a86635;
+  --plan-border: rgba(168, 102, 53, 0.22);
+  --plan-soft: #fff0e1;
+  --plan-glow: rgba(196, 126, 73, 0.34);
+  --plan-shadow: rgba(168, 102, 53, 0.22);
+  --plan-ink: #7a4217;
+}
+
+.planCard--silver {
+  --plan-accent: #5b6d84;
+  --plan-border: rgba(91, 109, 132, 0.22);
+  --plan-soft: #eef3f8;
+  --plan-glow: rgba(125, 144, 168, 0.34);
+  --plan-shadow: rgba(91, 109, 132, 0.2);
+  --plan-ink: #415166;
+}
+
+.planCard--gold {
+  --plan-accent: #c28e1f;
+  --plan-border: rgba(194, 142, 31, 0.24);
+  --plan-soft: #fff4d2;
+  --plan-glow: rgba(255, 209, 97, 0.4);
+  --plan-shadow: rgba(194, 142, 31, 0.22);
+  --plan-ink: #8a6108;
+}
+
+.planCard.is-active {
+  transform: translateY(-2px);
+  border-color: var(--plan-accent);
+  box-shadow:
+    0 16px 28px rgba(28, 32, 40, 0.1),
+    inset 0 0 0 1px var(--plan-accent);
+}
+
+.planCard-tierRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.planCard-tier,
+.planCard-limit {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.planCard-tier {
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--plan-ink);
+  backdrop-filter: blur(12px);
+}
+
+.planCard-limit {
+  background: rgba(17, 17, 17, 0.05);
+  color: rgba(17, 17, 17, 0.58);
+}
+
+.planCard-head {
+  display: grid;
+  gap: 4px;
+}
+
+.planCard-head p,
+.planCard-copy,
+.orderItem p,
+.orderItem strong,
+.orderItem span {
+  margin: 0;
+}
+
+.planCard-head p {
+  color: rgba(17, 17, 17, 0.56);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.planCard-head strong {
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+
+.planCard-price {
+  display: inline-flex;
+  width: fit-content;
+  padding: 2px 0 0;
+  color: rgba(17, 17, 17, 0.72);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.planCard-caption {
+  display: inline-flex;
+  width: fit-content;
+  padding: 4px 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.74);
+  color: rgba(17, 17, 17, 0.58);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.planCard-copy {
+  max-width: none;
+  font-size: 10px;
+  line-height: 1.28;
+  color: rgba(17, 17, 17, 0.7);
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.planCard-footer {
+  align-self: end;
+}
+

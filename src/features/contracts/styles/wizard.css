@@ -1,0 +1,214 @@
+.wizard-controls {
+  position: sticky;
+  bottom: calc(68px + env(safe-area-inset-bottom));
+  z-index: 12;
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid rgba(60, 60, 67, 0.12);
+  border-radius: 16px;
+  background: rgba(249, 249, 251, 0.92);
+  backdrop-filter: blur(18px);
+}
+
+.pdfDocumentPicker {
+  display: grid;
+  gap: 8px;
+}
+
+.pdfDocumentPickerHeader {
+  display: grid;
+  gap: 4px;
+}
+
+.pdfDocumentPickerNote {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.pdfDocumentPickerActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.pdfDocumentTypeBtn {
+  min-height: 40px;
+}
+
+.wizard-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.wizard-controls .primary-btn,
+.wizard-controls .secondary-btn {
+  width: 100%;
+}
+
+.stepIndicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.stepText {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.step-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #c7c7cc;
+}
+
+.step-dot.is-active {
+  background: var(--accent);
+}
+
+.screenCard {
+  gap: 12px;
+}
+
+.screenCard-settings {
+  gap: 14px;
+}
+
+.screenCard-stats {
+  gap: 14px;
+}
+
+.screenSection {
+  display: grid;
+  gap: 8px;
+}
+
+.screenSectionLabel {
+  margin: 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.settingsGroup {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+}
+
+.settingsGroup > * + * {
+  border-top: 1px solid var(--line);
+}
+
+.settingsProfile,
+.settingsRow,
+.settingsField,
+.settingsNote {
+  display: grid;
+  gap: 8px;
+  padding: 13px 14px;
+  background: var(--surface);
+}
+
+.settingsProfile strong {
+  font-size: 16px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.settingsProfile p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.settingsRow,
+.settingsField {
+  align-items: center;
+  grid-template-columns: 110px minmax(0, 1fr);
+}
+
+.settingsField-stack {
+  grid-template-columns: 1fr;
+  align-items: stretch;
+}
+
+.settingsRow-label {
+  font-size: 15px;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.settingsValue {
+  justify-self: end;
+  text-align: right;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--muted);
+}
+
+.settingsField select {
+  width: 100%;
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 15px;
+  color: var(--accent);
+  text-align: right;
+}
+
+.settingsField input {
+  width: 100%;
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 15px;
+  text-align: right;
+  color: var(--text);
+}
+
+.settingsField-stack input {
+  text-align: left;
+}
+
+.settingsButton,
+.settingsAction {
+  width: 100%;
+}
+
+.settingsNote {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.settingsGroup-danger {
+  background: var(--surface);
+}
+
+.accountIdentity p {
+  margin-top: 2px;
+}
+
+.accountSettings,
+.accountActions {
+  grid-template-columns: 1fr;
+}
+

@@ -1,0 +1,190 @@
+.emptyStateCard {
+  padding: 14px;
+  border: 1px solid rgba(60, 60, 67, 0.12);
+  border-radius: 16px;
+  background: #ffffff;
+  color: #6e6e73;
+  font-size: 14px;
+}
+
+.managerWorkspace {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.managerOverviewGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.managerOverviewGrid-orders {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.managerOverviewCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(60, 60, 67, 0.12);
+  background: #ffffff;
+}
+
+.managerTriageCard {
+  width: 100%;
+  border: 1px solid rgba(60, 60, 67, 0.12);
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.managerTriageCard.is-active {
+  border-color: rgba(0, 122, 255, 0.35);
+  box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.16);
+  background: linear-gradient(180deg, #ffffff, #f5f9ff);
+}
+
+.managerOverviewCard span,
+.managerPlanMeta,
+.managerUserMeta,
+.auditItem span {
+  font-size: 12px;
+  color: #6e6e73;
+}
+
+.managerOverviewCard strong {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.managerToolbar {
+  gap: 10px;
+}
+
+.managerOrdersContext {
+  margin: 0;
+}
+
+.managerUsersList,
+.managerPlansList,
+.auditList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.managerUserItem,
+.managerPlanItem {
+  margin: 0;
+}
+
+.managerUserButton,
+.managerPlanButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 14px;
+  border: 1px solid rgba(60, 60, 67, 0.12);
+  border-radius: 16px;
+  background: #ffffff;
+  text-align: left;
+}
+
+.managerUserItem.is-active .managerUserButton,
+.managerPlanItem.is-active .managerPlanButton {
+  border-color: rgba(0, 122, 255, 0.35);
+  box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.16);
+}
+
+.managerUserCopy,
+.managerPlanButton > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.managerUserCopy strong,
+.managerPlanButton strong,
+.auditItem strong {
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.managerUserCopy p,
+.managerPlanButton p,
+.auditItem p {
+  margin: 0;
+  color: #6e6e73;
+  font-size: 13px;
+}
+
+.managerUserMeta,
+.managerPlanMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.managerDetailStack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.managerSplitActions {
+  display: grid;
+  gap: 10px;
+}
+
+.settingsCheckbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #1c1c1e;
+  font-size: 14px;
+}
+
+.settingsCheckbox input {
+  width: 18px;
+  height: 18px;
+}
+
+.auditItem {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(60, 60, 67, 0.12);
+  background: #ffffff;
+}
+
+.managerInfoLabel {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6e6e73;
+}
+
+.managerInfoText {
+  display: block;
+  font-size: 14px;
+  color: #1c1c1e;
+  line-height: 1.45;
+}

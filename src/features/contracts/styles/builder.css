@@ -1,0 +1,348 @@
+.page-generateContract[data-app-tab='home'] .appScreen[data-tab-screen='home'],
+.page-generateContract[data-app-tab='stats'] .appScreen[data-tab-screen='stats'],
+.page-generateContract[data-app-tab='orders'] .appScreen[data-tab-screen='orders'],
+.page-generateContract[data-app-tab='account'] .appScreen[data-tab-screen='account'],
+.page-generateContract[data-app-tab='accounts'] .appScreen[data-tab-screen='accounts'],
+.page-generateContract[data-app-tab='subscriptions'] .appScreen[data-tab-screen='subscriptions'],
+.page-generateContract[data-app-tab='settings'] .appScreen[data-tab-screen='settings'] {
+  display: grid;
+  gap: 12px;
+}
+
+.page-generateContract[data-app-tab='home'] .appTop {
+  display: none;
+}
+
+.page-generateContract[data-app-tab='home'] .appShell {
+  padding-top: 0;
+}
+
+.page-generateContract[data-app-tab='home'] .appScreens,
+.page-generateContract[data-app-tab='home'] .appScreen.is-active {
+  gap: 0;
+}
+
+.builderWorkspace {
+  gap: 12px;
+}
+
+.builderWorkspace-home {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.homeStepTabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 4px;
+  border-radius: 12px;
+  background: #e9e9ee;
+}
+
+.homeStepTab {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.homeStepTab.is-active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.08),
+    0 0 0 0.5px rgba(60, 60, 67, 0.14);
+}
+
+.builderBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.builderHint {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.dataContract-container {
+  display: grid;
+  gap: 10px;
+}
+
+.dataContract-page {
+  display: none;
+  gap: 12px;
+}
+
+.dataContract-page.is-active {
+  display: grid;
+}
+
+.builderWorkspace-home .dataContract-container {
+  gap: 12px;
+}
+
+.compactMeta {
+  gap: 0;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+}
+
+.formSection {
+  gap: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+.formSectionHead {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px 8px;
+  background: var(--surface);
+}
+
+.formSectionHead h4 {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.formSectionHead p {
+  display: none;
+}
+
+.metaField,
+.fieldLabel,
+.signatureCard {
+  align-items: center;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 12px;
+  padding: 11px 14px;
+  background: var(--surface);
+}
+
+.metaField:focus-within,
+.fieldLabel:focus-within,
+.signatureCard:focus-within {
+  background: #fbfdff;
+}
+
+.metaField + .metaField,
+.formSection > .fieldLabel,
+.formSection > .fieldRow,
+.formSection > .compactNote {
+  border-top: 1px solid var(--line);
+}
+
+.fieldRow {
+  gap: 0;
+  grid-template-columns: 1fr;
+}
+
+.fieldRow > .fieldLabel,
+.fieldRow > .signatureCard {
+  border-top: 1px solid var(--line);
+}
+
+.fieldRow > .fieldLabel:first-child,
+.fieldRow > .signatureCard:first-child {
+  border-top: 0;
+}
+
+.input-with-clear {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 38px;
+  gap: 8px;
+}
+
+.clear-btn {
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  position: relative;
+}
+
+.clear-btn::before,
+.clear-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 2px;
+  border-radius: 999px;
+  background: #636366;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.clear-btn::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.fieldLabel-full {
+  grid-column: 1 / -1;
+}
+
+.fieldLabel-stack {
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.fieldLabel-stack > span {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.formSection > .quick-picks {
+  padding: 8px 14px 12px;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.quick-picks,
+.currency-switch,
+.wizard-steps {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.quick-pick-btn,
+.currency-btn {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.currency-btn.is-active {
+  border-color: transparent;
+  background: var(--accent);
+  color: #fff;
+}
+
+.priceField,
+.price-input-row {
+  display: grid;
+  gap: 8px;
+}
+
+.dataContract-container .metaField input,
+.dataContract-container .fieldLabel input,
+.dataContract-container .signatureCard input {
+  min-height: auto;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 15px;
+  text-align: right;
+}
+
+.dataContract-container .fieldLabel-stack input,
+.dataContract-container .fieldLabel-stack .price-input-row input {
+  min-height: auto;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.dataContract-container .fieldLabel-stack .input-with-clear input {
+  min-height: auto;
+  height: 24px;
+}
+
+.fieldLabel-stack .input-with-clear {
+  grid-template-columns: minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 6px;
+}
+
+.fieldLabel-stack .priceField,
+.fieldLabel-stack .price-input-row {
+  gap: 6px;
+}
+
+.fieldLabel-stack .price-input-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.fieldLabel-stack .currency-switch {
+  display: inline-flex;
+  justify-self: end;
+  gap: 6px;
+}
+
+.fieldLabel-stack .currency-btn {
+  min-width: 52px;
+}
+
+.fieldLabel-stack .clear-btn {
+  width: 28px;
+  height: 28px;
+  background: #eceef2;
+}
+
+.fieldLabel-stack .clear-btn::before,
+.fieldLabel-stack .clear-btn::after {
+  width: 8px;
+}
+
+.fieldLabel-stack .price-input-row input {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.price-converted {
+  min-height: 16px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.compactNote {
+  padding: 10px 12px;
+  border-radius: 0;
+  background: var(--surface-soft);
+  font-size: 12px;
+}
+
+.signatureCard {
+  border: 0;
+  border-radius: 0;
+}
+

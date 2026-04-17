@@ -1,0 +1,65 @@
+@media (max-width: 380px) {
+  .page-generateContract .container {
+    padding: 0 8px;
+  }
+
+  .guestIntro,
+  .guestAuth {
+    padding: 12px;
+  }
+
+  .guestIntroBar {
+    align-items: stretch;
+  }
+
+  .languageToggle {
+    width: 100%;
+  }
+
+  .guestIntro h1 {
+    font-size: 28px;
+  }
+
+  .guestIntro p:last-child,
+  .guestAuth .compactHeader p {
+    max-width: none;
+    font-size: 13px;
+  }
+
+  .planCards {
+    grid-auto-columns: minmax(156px, calc(100% - 102px));
+  }
+
+  .planCard {
+    min-height: 138px;
+    padding: 10px;
+  }
+
+  .planCard-head strong {
+    font-size: 24px;
+  }
+
+  .planCard-action,
+  .guestStage .primary-btn,
+  .guestStage .secondary-btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .fieldRow,
+  .compactMeta,
+  .wizard-actions,
+  .screenStats,
+  .topMetrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+.settingsActionLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  text-decoration: none;
+}
+
