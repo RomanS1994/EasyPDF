@@ -1,7 +1,7 @@
 import Toastify from 'toastify-js';
 import 'toastify-js/src/toastify.css';
 
-import { messages } from '../../js/i18n/message.js';
+import { messages } from '../i18n/messages.js';
 
 export function notify(key, type = 'info') {
   const lang = document.documentElement.lang || 'uk';

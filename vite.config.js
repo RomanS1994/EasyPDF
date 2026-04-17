@@ -6,19 +6,19 @@ import SortCss from 'postcss-sort-media-queries';
 
 // Minimal Vite config focused only on the PDF page
 export default defineConfig(({ command }) => {
-  const homeHtml = path.resolve(__dirname, 'src/cz/pdf/index.html');
-  const accountHtml = path.resolve(__dirname, 'src/cz/pdf/account/index.html');
-  const statsHtml = path.resolve(__dirname, 'src/cz/pdf/stats/index.html');
-  const ordersHtml = path.resolve(__dirname, 'src/cz/pdf/orders/index.html');
-  const managerHtml = path.resolve(__dirname, 'src/cz/pdf/manager/index.html');
-  const adminHtml = path.resolve(__dirname, 'src/cz/pdf/admin/index.html');
-  const adminAccountsHtml = path.resolve(__dirname, 'src/cz/pdf/admin/accounts/index.html');
+  const homeHtml = path.resolve(__dirname, 'src/pages/pdf/index.html');
+  const accountHtml = path.resolve(__dirname, 'src/pages/account/index.html');
+  const statsHtml = path.resolve(__dirname, 'src/pages/stats/index.html');
+  const ordersHtml = path.resolve(__dirname, 'src/pages/orders/index.html');
+  const managerHtml = path.resolve(__dirname, 'src/pages/manager/index.html');
+  const adminHtml = path.resolve(__dirname, 'src/pages/admin/index.html');
+  const adminAccountsHtml = path.resolve(__dirname, 'src/pages/admin/accounts/index.html');
   const adminSubscriptionsHtml = path.resolve(
     __dirname,
-    'src/cz/pdf/admin/subscriptions/index.html'
+    'src/pages/admin/subscriptions/index.html'
   );
-  const adminOrdersHtml = path.resolve(__dirname, 'src/cz/pdf/admin/orders/index.html');
-  const adminSettingsHtml = path.resolve(__dirname, 'src/cz/pdf/admin/settings/index.html');
+  const adminOrdersHtml = path.resolve(__dirname, 'src/pages/admin/orders/index.html');
+  const adminSettingsHtml = path.resolve(__dirname, 'src/pages/admin/settings/index.html');
   const redirectHtml = path.resolve(__dirname, 'src/index.html');
 
   return {
@@ -41,7 +41,7 @@ export default defineConfig(({ command }) => {
       sourcemap: true,
       rollupOptions: {
         input: {
-          'index': redirectHtml,
+          index: redirectHtml,
           'cz/pdf/index': homeHtml,
           'cz/pdf/account/index': accountHtml,
           'cz/pdf/stats/index': statsHtml,

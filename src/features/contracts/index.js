@@ -1,3 +1,5 @@
+import './styles/dataContract.css';
+
 import { t } from '../../shared/i18n/app.js';
 import { readStorageJson } from '../../shared/lib/storage.js';
 import {
@@ -27,8 +29,8 @@ import {
   syncLocalizedContractDefaults,
 } from './storage.js';
 import { setWizardStep } from './wizard.js';
-import { getRandomDate } from '../../js/components/generateContract/utils/getRandomDate.js';
-import { getRandomOrderNumber } from '../../js/components/generateContract/utils/getRandomOrderNumber.js';
+import { getRandomDate } from './lib/getRandomDate.js';
+import { getRandomOrderNumber } from './lib/getRandomOrderNumber.js';
 
 function applyContractScale() {
   if (!contractRefs.root) return;

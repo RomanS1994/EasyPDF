@@ -16,7 +16,7 @@
     "hooks:install": "node tools/install-git-hooks.js",
     "prepare": "node tools/install-git-hooks.js",
     "secrets:check": "node tools/check-secrets.js",
-    "build": "vite build --base=/",
+    "build": "vite build --base=/ && node tools/postbuild-pages.js",
     "preview": "vite preview",
     "start:server": "npm --prefix backend run start"
   },
