@@ -39,7 +39,7 @@ export function isPlaceholderDatabaseUrl(value) {
       parsed.pathname.replace(/^\//, ''),
     ];
 
-    return parts.some(part => isPlaceholderLike(part));
+    return parts.some(part => part && isPlaceholderLike(part));
   } catch {
     return false;
   }

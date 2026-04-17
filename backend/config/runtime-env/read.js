@@ -46,7 +46,7 @@ export function getDirectDatabaseUrl() {
 }
 
 export function getPrismaDatasourceUrl() {
-  return getDirectDatabaseUrl() || getDatabaseUrl() || undefined;
+  return getDatabaseUrl() || getDirectDatabaseUrl() || undefined;
 }
 
 export function getAccessTokenTtlMinutes() {
