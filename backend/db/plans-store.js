@@ -31,9 +31,11 @@ export async function ensureDefaultPlans(client) {
 export async function findStoredPlan(
   client,
   planId,
-  { includeInactive = true } = {}
+  { includeInactive = true, seedDefaults = true } = {}
 ) {
-  await ensureDefaultPlans(client);
+  if (seedDefaults) {
+    await ensureDefaultPlans(client);
+  }
 
   if (includeInactive) {
     return client.plan.findUnique({
@@ -51,8 +53,13 @@ export async function findStoredPlan(
   });
 }
 
-export async function listStoredPlans(client, { includeInactive = true } = {}) {
-  await ensureDefaultPlans(client);
+export async function listStoredPlans(
+  client,
+  { includeInactive = true, seedDefaults = true } = {}
+) {
+  if (seedDefaults) {
+    await ensureDefaultPlans(client);
+  }
 
   const plans = await client.plan.findMany({
     where: includeInactive ? undefined : { isActive: true },

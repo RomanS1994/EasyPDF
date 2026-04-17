@@ -9,6 +9,7 @@ import {
 import { renderManagerOrders, renderManagerPlans } from './manager-render.js';
 import {
   cancelCurrentManagerSubscription,
+  confirmPendingManagerSubscription,
   extendManagerSubscription,
   handleManagerOrderStatusChange,
   resetManagerPlanForm,
@@ -102,6 +103,10 @@ export function bindManagerEvents(refreshAccountData, loadPlansForGuest) {
   });
   refs.managerSubscriptionCancelBtn?.addEventListener('click', async () => {
     await cancelCurrentManagerSubscription();
+    await refreshAccountData();
+  });
+  refs.managerSubscriptionConfirmBtn?.addEventListener('click', async () => {
+    await confirmPendingManagerSubscription();
     await refreshAccountData();
   });
   refs.managerRoleSaveBtn?.addEventListener('click', async () => {

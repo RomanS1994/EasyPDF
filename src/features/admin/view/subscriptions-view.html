@@ -31,6 +31,14 @@
                       <span class="settingsRow-label" data-i18n="usage">Використання</span>
                       <strong class="settingsValue" id="managerSubscriptionUsageLabel">-</strong>
                     </div>
+                    <div class="settingsRow is-hidden" id="managerSubscriptionPendingRow">
+                      <span class="settingsRow-label" data-i18n="pending_payment">Очікування оплати</span>
+                      <strong class="settingsValue" id="managerSubscriptionPendingPlan">-</strong>
+                    </div>
+                    <div class="settingsRow is-hidden" id="managerSubscriptionPendingRequestedAtRow">
+                      <span class="settingsRow-label" data-i18n="requested_at">Запит створено</span>
+                      <strong class="settingsValue" id="managerSubscriptionPendingRequestedAt">-</strong>
+                    </div>
                   </div>
 
                   <div class="settingsGroup">
@@ -41,8 +49,8 @@
                     <label class="settingsField">
                       <span class="settingsRow-label" data-i18n="status">Статус</span>
                       <select id="managerSubscriptionStatus">
+                        <option value="pending" data-i18n="subscription_pending">Очікує оплату</option>
                         <option value="active" data-i18n="subscription_active">Активна</option>
-                        <option value="trial" data-i18n="subscription_trial">Пробна</option>
                         <option value="paused" data-i18n="subscription_paused">Призупинена</option>
                         <option value="canceled" data-i18n="subscription_canceled">Скасована</option>
                         <option value="expired" data-i18n="subscription_expired">Завершена</option>
@@ -78,6 +86,14 @@
                     <div class="managerSplitActions">
                       <button
                         class="primary-btn"
+                        id="managerSubscriptionConfirmBtn"
+                        type="button"
+                        data-i18n="confirm_payment_activate"
+                      >
+                        Підтвердити оплату
+                      </button>
+                      <button
+                        class="primary-btn"
                         id="managerSubscriptionSaveBtn"
                         type="button"
                         data-i18n="save_subscription"
@@ -106,4 +122,3 @@
               </section>
             </div>
           </section>
-

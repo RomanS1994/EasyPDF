@@ -23,6 +23,7 @@ import { renderAuthenticatedState } from './dashboard.js';
 import {
   handleDeleteAccountClick,
   handleLogoutClick,
+  handleRequestUpgradeClick,
   handleUpdateProfileClick,
   refreshAccountData,
 } from './account-session.js';
@@ -56,6 +57,7 @@ function bindEvents() {
   refs.logoutBtn?.addEventListener('click', handleLogoutClick);
   refs.deleteAccountBtn?.addEventListener('click', handleDeleteAccountClick);
   refs.updateProfileBtn?.addEventListener('click', handleUpdateProfileClick);
+  refs.requestUpgradeBtn?.addEventListener('click', handleRequestUpgradeClick);
   refs.accountLanguageSelect?.addEventListener('change', handleLanguageSelectChange);
   refs.adminLanguageSelect?.addEventListener('change', handleLanguageSelectChange);
   refs.planCards?.addEventListener('click', handlePlanCardClick);

@@ -1,5 +1,6 @@
 import {
   cancelManagerUserSubscription,
+  confirmManagerUserSubscription,
   createManagerPlan,
   extendManagerUserSubscription,
   updateManagerPlan,
@@ -79,6 +80,23 @@ export async function cancelCurrentManagerSubscription() {
     throw error;
   } finally {
     if (refs.managerSubscriptionCancelBtn) refs.managerSubscriptionCancelBtn.disabled = false;
+  }
+}
+
+export async function confirmPendingManagerSubscription() {
+  const userId = state.managerSelectedUserId;
+  if (!userId) return;
+  if (refs.managerSubscriptionConfirmBtn) refs.managerSubscriptionConfirmBtn.disabled = true;
+  try {
+    await confirmManagerUserSubscription(userId, {
+      notes: refs.managerSubscriptionNotes?.value || '',
+    });
+    notifyText(t('subscription_payment_confirmed'), 'success');
+  } catch (error) {
+    notifyText(error.message || t('confirm_payment_failed'), 'error');
+    throw error;
+  } finally {
+    if (refs.managerSubscriptionConfirmBtn) refs.managerSubscriptionConfirmBtn.disabled = false;
   }
 }
 

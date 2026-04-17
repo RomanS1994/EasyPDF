@@ -15,6 +15,16 @@ const PDF_DOCUMENT_IDS = PDF_DOCUMENT_TYPES.map(documentType => documentType.id)
 
 export const PLANS = [
   {
+    id: 'plan-free',
+    name: 'Free',
+    monthlyGenerationLimit: 10,
+    priceCzk: 0,
+    description: '10 PDF/order generations per month with manual paid upgrade available',
+    pdfProfile: 'free',
+    pdfQuality: 'basic',
+    pdfDocuments: PDF_DOCUMENT_IDS,
+  },
+  {
     id: 'plan-25',
     name: 'Starter 25',
     monthlyGenerationLimit: 25,

@@ -19,11 +19,11 @@ function resolvePdfPlan(context) {
     return (
       getDatabasePlans(context.database, { includeInactive: true }).find(plan => plan.id === planId) ||
       getPlanById(planId) ||
-      getPlanById('plan-25')
+      getPlanById('plan-free')
     );
   }
 
-  return getPlanById(context?.user?.subscription?.planId || context?.user?.planId || 'plan-25');
+  return getPlanById(context?.user?.subscription?.planId || context?.user?.planId || 'plan-free');
 }
 
 async function findOrderForPdf(context, orderId) {
@@ -58,13 +58,23 @@ export async function handlePublicRoutes(request, response, { pathName }) {
   }
 
   if (request.method === 'GET' && pathName === '/api/plans') {
-    const plans = await runStoreRead({
-      prisma: client => listStoredPlans(client, { includeInactive: false }),
-      file: async () => {
-        const database = await readFileDatabase();
-        return getDatabasePlans(database, { includeInactive: false });
-      },
-    });
+    let plans;
+
+    try {
+      plans = await runStoreRead({
+        prisma: client =>
+          listStoredPlans(client, {
+            includeInactive: false,
+            seedDefaults: false,
+          }),
+        file: async () => {
+          const database = await readFileDatabase();
+          return getDatabasePlans(database, { includeInactive: false });
+        },
+      });
+    } catch {
+      plans = getDatabasePlans({}, { includeInactive: false });
+    }
 
     sendJson(response, 200, {
       plans,

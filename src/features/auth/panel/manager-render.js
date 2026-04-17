@@ -10,6 +10,7 @@ import {
   buildOrderStatusSummary,
   escapeHtml,
   formatCycleLabel,
+  formatDateLabel,
   formatDateTimeLabel,
   formatOrderStatusLabel,
   isoToDateInput,
@@ -18,6 +19,11 @@ import {
   localizeSubscriptionStatus,
 } from './formatters.js';
 import { getSelectedManagerContextUser, renderOrderList } from './orders.js';
+
+function resolvePlanName(planId, plans = []) {
+  if (!planId) return '-';
+  return plans.find(plan => plan.id === planId)?.name || planId;
+}
 
 function buildManagerOrderListMarkup(order) {
   const createdAt = formatDateTimeLabel(order.createdAt);
@@ -192,8 +198,8 @@ export function renderManagerPlanOptions() {
 
 export function renderManagerUsers() {
   if (refs.managerUsersCount) refs.managerUsersCount.textContent = String(state.managerUsers.length);
-  if (refs.managerActiveCount) refs.managerActiveCount.textContent = String(state.managerUsers.filter(user => ['active', 'trial'].includes(user.subscription?.status)).length);
-  if (refs.managerInactiveCount) refs.managerInactiveCount.textContent = String(state.managerUsers.filter(user => !['active', 'trial'].includes(user.subscription?.status)).length);
+  if (refs.managerActiveCount) refs.managerActiveCount.textContent = String(state.managerUsers.filter(user => user.subscription?.isAccessActive).length);
+  if (refs.managerInactiveCount) refs.managerInactiveCount.textContent = String(state.managerUsers.filter(user => !user.subscription?.isAccessActive).length);
   if (refs.managerStaffCount) refs.managerStaffCount.textContent = String(state.managerUsers.filter(user => isManagerRole(user.role)).length);
   if (!refs.managerUsersList || !refs.managerUsersEmpty) return;
 
@@ -215,7 +221,11 @@ export function renderManagerUsers() {
           </div>
           <div class="managerUserMeta">
             <span>${escapeHtml(user.plan?.name || '-')}</span>
-            <span>${escapeHtml(localizeSubscriptionStatus(user.subscription?.status || '-'))}</span>
+            <span>${escapeHtml(
+              user.subscription?.pendingPlanId
+                ? `${localizeSubscriptionStatus(user.subscription?.status || '-')} · ${t('pending_payment')}`
+                : localizeSubscriptionStatus(user.subscription?.status || '-')
+            )}</span>
           </div>
         </button>
       </li>
@@ -243,6 +253,11 @@ export function renderManagerSelectedUser() {
     if (refs.managerSubscriptionEmail) refs.managerSubscriptionEmail.textContent = '-';
     if (refs.managerSubscriptionStatusLabel) refs.managerSubscriptionStatusLabel.textContent = '-';
     if (refs.managerSubscriptionUsageLabel) refs.managerSubscriptionUsageLabel.textContent = '-';
+    refs.managerSubscriptionPendingRow?.classList.add('is-hidden');
+    refs.managerSubscriptionPendingRequestedAtRow?.classList.add('is-hidden');
+    if (refs.managerSubscriptionPendingPlan) refs.managerSubscriptionPendingPlan.textContent = '-';
+    if (refs.managerSubscriptionPendingRequestedAt) refs.managerSubscriptionPendingRequestedAt.textContent = '-';
+    if (refs.managerSubscriptionConfirmBtn) refs.managerSubscriptionConfirmBtn.hidden = true;
     renderManagerOrders();
     return;
   }
@@ -260,6 +275,18 @@ export function renderManagerSelectedUser() {
   if (refs.managerSubscriptionEmail) refs.managerSubscriptionEmail.textContent = user.email || '-';
   if (refs.managerSubscriptionStatusLabel) refs.managerSubscriptionStatusLabel.textContent = localizeSubscriptionStatus(user.subscription?.status || '-');
   if (refs.managerSubscriptionUsageLabel) refs.managerSubscriptionUsageLabel.textContent = `${user.usage?.used || 0} / ${user.usage?.limit || 0}`;
+  const pendingPlanName = resolvePlanName(
+    user.subscription?.pendingPlanId,
+    state.managerPlans.length ? state.managerPlans : state.plans,
+  );
+  refs.managerSubscriptionPendingRow?.classList.toggle('is-hidden', !user.subscription?.pendingPlanId);
+  refs.managerSubscriptionPendingRequestedAtRow?.classList.toggle('is-hidden', !user.subscription?.pendingPlanId);
+  if (refs.managerSubscriptionPendingPlan) refs.managerSubscriptionPendingPlan.textContent = pendingPlanName;
+  if (refs.managerSubscriptionPendingRequestedAt) {
+    refs.managerSubscriptionPendingRequestedAt.textContent = user.subscription?.pendingRequestedAt
+      ? formatDateLabel(user.subscription.pendingRequestedAt)
+      : '-';
+  }
 
   renderManagerPlanOptions();
   if (refs.managerSubscriptionPlan) refs.managerSubscriptionPlan.value = user.planId || '';
@@ -268,6 +295,7 @@ export function renderManagerSelectedUser() {
   if (refs.managerSubscriptionEnd) refs.managerSubscriptionEnd.value = isoToDateInput(user.subscription?.currentPeriodEnd);
   if (refs.managerSubscriptionQuota) refs.managerSubscriptionQuota.value = user.subscription?.quotaOverride ?? '';
   if (refs.managerSubscriptionNotes) refs.managerSubscriptionNotes.value = user.subscription?.notes || '';
+  if (refs.managerSubscriptionConfirmBtn) refs.managerSubscriptionConfirmBtn.hidden = !user.subscription?.pendingPlanId;
   refs.managerRoleSection?.classList.toggle('is-hidden', state.user?.role !== 'admin');
   if (refs.managerRoleSelect) refs.managerRoleSelect.value = user.role || 'user';
 

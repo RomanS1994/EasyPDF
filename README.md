@@ -5,7 +5,8 @@ Small app split into:
 - frontend deployed separately on Netlify
 - backend API deployed separately with Prisma + PostgreSQL
 - user registration and login
-- plan selection (`25`, `50`, `100` generations per month)
+- free + paid plans (`10`, `25`, `50`, `100` generations per month)
+- manual paid activation after manager confirmation
 - order storage
 - PDF generation for saved orders
 
@@ -70,17 +71,21 @@ URLs:
 - `POST /api/auth/logout`
 - `GET /api/me`
 - `GET /api/me/usage`
+- `POST /api/me/subscription/upgrade-request`
 - `POST /api/orders`
 - `GET /api/orders`
 - `GET /api/orders/:id`
 - `PATCH /api/orders/:id`
-- `GET /api/admin/users`
-- `GET /api/admin/orders`
-- `PATCH /api/admin/users/:id/plan`
+- `GET /api/manager/users`
+- `GET /api/manager/orders`
+- `PATCH /api/manager/users/:id/subscription`
+- `POST /api/manager/users/:id/subscription/confirm-payment`
 
 ## Notes
 
 - public signup always creates `user`, never `admin`
+- public signup always activates `plan-free` with `10` documents/month
+- paid plans are requested manually and stay pending until manager confirmation
 - create an admin only through `npm run admin:create -- --email=admin@example.com --name=\"Admin\" --password=\"strong-password\"`
 - Netlify should deploy only the root frontend package
 - Prisma exists only in `backend/`
@@ -112,6 +117,7 @@ Frontend on Netlify:
 - publish directory: `dist`
 - required env: `VITE_API_BASE_URL`
 - optional env: `VITE_API_KEY`
+- optional env: `VITE_SUPPORT_WHATSAPP_URL`, `VITE_SUPPORT_TELEGRAM_URL`
 
 Backend on Render or another Node host:
 

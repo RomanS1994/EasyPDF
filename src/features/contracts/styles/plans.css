@@ -73,7 +73,8 @@
   background: radial-gradient(circle, var(--plan-glow), transparent 68%);
 }
 
-.planCard--trial {
+.planCard--trial,
+.planCard--free {
   --plan-accent: #4f6fff;
   --plan-border: rgba(79, 111, 255, 0.24);
   --plan-soft: #edf2ff;
@@ -214,3 +215,35 @@
   align-self: end;
 }
 
+.planCard-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--plan-ink);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.72),
+    0 8px 18px rgba(28, 32, 40, 0.08);
+}
+
+.planCard.is-active .planCard-action {
+  background: var(--plan-accent);
+  color: #fff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 10px 20px var(--plan-shadow);
+}
+
+.planCard:focus-visible {
+  outline: none;
+  border-color: var(--plan-accent);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--plan-accent) 14%, transparent),
+    0 12px 24px rgba(28, 32, 40, 0.1);
+}

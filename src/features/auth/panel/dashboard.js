@@ -4,6 +4,7 @@ import { isAdminShell, setGuestVisible } from './shell.js';
 import { clearManagerState, state } from './state.js';
 import {
   formatCycleLabel,
+  formatDateLabel,
   localizeRole,
   localizeSubscriptionStatus,
 } from './formatters.js';
@@ -18,6 +19,14 @@ import {
   renderManagerUsers,
 } from './manager-render.js';
 import { t } from '../../../shared/i18n/app.js';
+
+const WHATSAPP_URL = import.meta.env.VITE_SUPPORT_WHATSAPP_URL || '';
+const TELEGRAM_URL = import.meta.env.VITE_SUPPORT_TELEGRAM_URL || '';
+
+function resolvePlanName(planId) {
+  if (!planId) return '-';
+  return state.plans.find(plan => plan.id === planId)?.name || planId;
+}
 
 export function renderDashboard() {
   if (!state.user) return;
@@ -57,6 +66,54 @@ export function renderDashboard() {
   }
   if (refs.accountSubscriptionCycle) {
     refs.accountSubscriptionCycle.textContent = formatCycleLabel(state.user.usage);
+  }
+  const pendingPlanId = state.user.subscription?.pendingPlanId || '';
+  const hasPendingUpgrade = Boolean(pendingPlanId);
+  const activePaidPlanId = Number(state.user.plan?.priceCzk) > 0 ? state.user.plan?.id : '';
+  const upgradePlans = state.plans.filter(
+    plan => Number(plan.priceCzk) > 0 && plan.id !== activePaidPlanId,
+  );
+  if (refs.accountPendingUpgradeSection) {
+    refs.accountPendingUpgradeSection.classList.toggle('is-hidden', !hasPendingUpgrade);
+  }
+  if (refs.accountPendingUpgradePlan) {
+    refs.accountPendingUpgradePlan.textContent = resolvePlanName(pendingPlanId);
+  }
+  if (refs.accountPendingUpgradeRequestedAt) {
+    refs.accountPendingUpgradeRequestedAt.textContent = state.user.subscription?.pendingRequestedAt
+      ? formatDateLabel(state.user.subscription.pendingRequestedAt)
+      : '-';
+  }
+  if (refs.accountUpgradeSection) {
+    refs.accountUpgradeSection.classList.toggle('is-hidden', !upgradePlans.length);
+  }
+  if (refs.accountUpgradePlan) {
+    refs.accountUpgradePlan.innerHTML = upgradePlans.length
+      ? upgradePlans
+          .map(
+            plan =>
+              `<option value="${plan.id}">${plan.name} - ${t('plan_option_suffix', {
+                limit: plan.monthlyGenerationLimit,
+              })} - ${t('plan_price_month', { price: `${plan.priceCzk} Kc` })}</option>`,
+          )
+          .join('')
+      : `<option value="">${t('no_paid_plans_available')}</option>`;
+  }
+  if (refs.requestUpgradeBtn) {
+    refs.requestUpgradeBtn.disabled = hasPendingUpgrade || !upgradePlans.length;
+  }
+  if (refs.accountUpgradeHint) {
+    refs.accountUpgradeHint.textContent = hasPendingUpgrade
+      ? t('upgrade_pending_hint')
+      : t('upgrade_request_note');
+  }
+  if (refs.accountUpgradeWhatsapp) {
+    refs.accountUpgradeWhatsapp.classList.toggle('is-hidden', !WHATSAPP_URL);
+    if (WHATSAPP_URL) refs.accountUpgradeWhatsapp.href = WHATSAPP_URL;
+  }
+  if (refs.accountUpgradeTelegram) {
+    refs.accountUpgradeTelegram.classList.toggle('is-hidden', !TELEGRAM_URL);
+    if (TELEGRAM_URL) refs.accountUpgradeTelegram.href = TELEGRAM_URL;
   }
 
   const profile = state.user.profile || {};

@@ -127,7 +127,8 @@ export function syncSelectedPlan(planId, { scrollToForm = false } = {}) {
 
 function formatPlanPrice(priceCzk) {
   const value = Number(priceCzk);
-  if (!Number.isFinite(value) || value <= 0) return '';
+  if (!Number.isFinite(value)) return '';
+  if (value <= 0) return t('free_price_label');
 
   return `${new Intl.NumberFormat(getCurrentLocale(), {
     maximumFractionDigits: 0,
@@ -138,11 +139,11 @@ function getPlanVisual(plan) {
   const haystack = `${plan?.id || ''} ${plan?.name || ''}`.toLowerCase();
   const limit = Number(plan?.monthlyGenerationLimit) || 0;
 
-  if (haystack.includes('trial') || limit <= 10) {
+  if (haystack.includes('free') || limit <= 10) {
     return {
-      tone: 'trial',
-      tierLabel: t('plan_tier_trial'),
-      note: t('plan_note_trial'),
+      tone: 'free',
+      tierLabel: t('plan_tier_free'),
+      note: t('plan_note_free'),
     };
   }
 
@@ -177,9 +178,9 @@ export function renderPlans() {
       .map(plan => {
         const priceLabel = formatPlanPrice(plan.priceCzk);
         const suffix = t('plan_option_suffix', { limit: plan.monthlyGenerationLimit });
-        const optionLabel = priceLabel
+        const optionLabel = Number(plan.priceCzk) > 0
           ? `${plan.name} - ${suffix} - ${t('plan_price_month', { price: priceLabel })}`
-          : `${plan.name} - ${suffix}`;
+          : `${plan.name} - ${suffix} - ${t('free_price_label')}`;
 
         return `<option value="${plan.id}">${escapeHtml(optionLabel)}</option>`;
       })
@@ -194,6 +195,7 @@ export function renderPlans() {
         const quotaLabel = `${plan.monthlyGenerationLimit} ${t('plan_card_caption')}`;
         const valueLabel = priceLabel || String(plan.monthlyGenerationLimit);
         const isSelected = plan.id === state.selectedPlanId;
+        const actionLabel = Number(plan.priceCzk) > 0 ? t('request_manual_upgrade') : t('start_free');
 
         return `
           <article
@@ -217,7 +219,7 @@ export function renderPlans() {
             <p class="planCard-copy">${escapeHtml(visual.note)}</p>
             <div class="planCard-footer">
               <span class="planCard-action" aria-hidden="true">
-                ${escapeHtml(t('choose_plan', { plan: plan.name }))}
+                ${escapeHtml(actionLabel)}
               </span>
             </div>
           </article>

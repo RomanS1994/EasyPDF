@@ -87,13 +87,18 @@ export async function handleManagerUserSubscription(request, response, userId) {
             monthlyGenerationLimit: subscriptionData.monthlyGenerationLimit,
             quotaOverride: subscriptionData.quotaOverride,
             assignedByUserId: subscriptionData.assignedByUserId,
-            assignedAt: new Date(subscriptionData.assignedAt),
-            notes: subscriptionData.notes,
-            canceledAt: subscriptionData.canceledAt
-              ? new Date(subscriptionData.canceledAt)
-              : null,
-          },
-          create: {
+          assignedAt: new Date(subscriptionData.assignedAt),
+          notes: subscriptionData.notes,
+          canceledAt: subscriptionData.canceledAt
+            ? new Date(subscriptionData.canceledAt)
+            : null,
+          pendingPlanId: subscriptionData.pendingPlanId,
+          pendingRequestedAt: subscriptionData.pendingRequestedAt
+            ? new Date(subscriptionData.pendingRequestedAt)
+            : null,
+          pendingSource: subscriptionData.pendingSource,
+        },
+        create: {
             id: target.id,
             userId: target.id,
             planId: subscriptionData.planId,
@@ -104,13 +109,18 @@ export async function handleManagerUserSubscription(request, response, userId) {
             monthlyGenerationLimit: subscriptionData.monthlyGenerationLimit,
             quotaOverride: subscriptionData.quotaOverride,
             assignedByUserId: subscriptionData.assignedByUserId,
-            assignedAt: new Date(subscriptionData.assignedAt),
-            notes: subscriptionData.notes,
-            canceledAt: subscriptionData.canceledAt
-              ? new Date(subscriptionData.canceledAt)
-              : null,
-          },
-        });
+          assignedAt: new Date(subscriptionData.assignedAt),
+          notes: subscriptionData.notes,
+          canceledAt: subscriptionData.canceledAt
+            ? new Date(subscriptionData.canceledAt)
+            : null,
+          pendingPlanId: subscriptionData.pendingPlanId,
+          pendingRequestedAt: subscriptionData.pendingRequestedAt
+            ? new Date(subscriptionData.pendingRequestedAt)
+            : null,
+          pendingSource: subscriptionData.pendingSource,
+        },
+      });
 
         const updatedUser = await tx.user.update({
           where: {

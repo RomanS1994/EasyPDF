@@ -1,17 +1,28 @@
-import "dotenv/config";
-import { defineConfig } from "prisma/config";
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import dotenv from 'dotenv';
+import { defineConfig } from 'prisma/config';
+
+const configDir = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(configDir, '.env'), override: true });
 
 const prismaDatasourceUrl =
-  process.env.DIRECT_DATABASE_URL ||
-  process.env.DATABASE_URL ||
-  "postgresql://postgres:postgres@127.0.0.1:5432/pdfapp?schema=public";
+  process.env.DIRECT_DATABASE_URL || process.env.DATABASE_URL;
+
+if (!prismaDatasourceUrl) {
+  throw new Error(
+    'Missing DATABASE_URL or DIRECT_DATABASE_URL. Check backend/.env'
+  );
+}
 
 export default defineConfig({
-  schema: "prisma/schema.prisma",
+  schema: 'prisma/schema.prisma',
   migrations: {
-    path: "prisma/migrations",
+    path: 'prisma/migrations',
+    seed: 'node tools/prisma-seed.js',
   },
-  engine: "classic",
+  engine: 'classic',
   datasource: {
     url: prismaDatasourceUrl,
   },

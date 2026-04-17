@@ -8,6 +8,7 @@ import {
 import { handleManagerUserRole } from './roles.js';
 import {
   handleManagerUserCancel,
+  handleManagerUserConfirmSubscription,
   handleManagerUserExtend,
   handleManagerUserSubscription,
 } from './subscriptions.js';
@@ -49,6 +50,14 @@ export async function handleManagerRoutes(request, response, { pathName, url }) 
   );
   if (request.method === 'POST' && managerCancelMatch) {
     await handleManagerUserCancel(request, response, managerCancelMatch[1]);
+    return true;
+  }
+
+  const managerConfirmMatch = pathName.match(
+    /^\/api\/manager\/users\/([^/]+)\/subscription\/confirm-payment$/
+  );
+  if (request.method === 'POST' && managerConfirmMatch) {
+    await handleManagerUserConfirmSubscription(request, response, managerConfirmMatch[1]);
     return true;
   }
 

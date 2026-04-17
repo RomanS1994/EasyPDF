@@ -72,7 +72,7 @@ function printUsage() {
       '  --email              Required. Admin email.',
       '  --name               Required for new admin. Optional when promoting existing user.',
       '  --password           Required for new admin. Optional when promoting existing user.',
-      '  --plan               Optional. Defaults to plan-25 for new admins or users without subscription.',
+      '  --plan               Optional. Defaults to plan-free for new admins or users without subscription.',
       '  --promote-existing   Optional. Promote existing user to admin instead of failing.',
     ].join('\n')
   );

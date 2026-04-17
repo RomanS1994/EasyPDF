@@ -63,6 +63,9 @@ export async function handleManagerUserCancel(request, response, userId) {
             source: 'manager',
             currentPeriodEnd: canceledAt,
             canceledAt,
+            pendingPlanId: null,
+            pendingRequestedAt: null,
+            pendingSource: null,
           },
           actorUserId: context.user.id,
         });
@@ -80,11 +83,14 @@ export async function handleManagerUserCancel(request, response, userId) {
             monthlyGenerationLimit: subscriptionData.monthlyGenerationLimit,
             quotaOverride: subscriptionData.quotaOverride,
             assignedByUserId: subscriptionData.assignedByUserId,
-            assignedAt: new Date(subscriptionData.assignedAt),
-            notes: subscriptionData.notes,
-            canceledAt: new Date(subscriptionData.canceledAt),
-          },
-          create: {
+          assignedAt: new Date(subscriptionData.assignedAt),
+          notes: subscriptionData.notes,
+          canceledAt: new Date(subscriptionData.canceledAt),
+          pendingPlanId: null,
+          pendingRequestedAt: null,
+          pendingSource: null,
+        },
+        create: {
             id: target.id,
             userId: target.id,
             planId: subscriptionData.planId,
@@ -95,11 +101,14 @@ export async function handleManagerUserCancel(request, response, userId) {
             monthlyGenerationLimit: subscriptionData.monthlyGenerationLimit,
             quotaOverride: subscriptionData.quotaOverride,
             assignedByUserId: subscriptionData.assignedByUserId,
-            assignedAt: new Date(subscriptionData.assignedAt),
-            notes: subscriptionData.notes,
-            canceledAt: new Date(subscriptionData.canceledAt),
-          },
-        });
+          assignedAt: new Date(subscriptionData.assignedAt),
+          notes: subscriptionData.notes,
+          canceledAt: new Date(subscriptionData.canceledAt),
+          pendingPlanId: null,
+          pendingRequestedAt: null,
+          pendingSource: null,
+        },
+      });
 
         const updatedUser = await tx.user.update({
           where: {
@@ -139,6 +148,9 @@ export async function handleManagerUserCancel(request, response, userId) {
               canceledAt: nowIso(),
               assignedByUserId: context.user.id,
               assignedAt: nowIso(),
+              pendingPlanId: null,
+              pendingRequestedAt: null,
+              pendingSource: null,
             })
           );
 
@@ -174,6 +186,9 @@ export async function handleManagerUserCancel(request, response, userId) {
         canceledAt: nowIso(),
         assignedByUserId: context.user.id,
         assignedAt: nowIso(),
+        pendingPlanId: null,
+        pendingRequestedAt: null,
+        pendingSource: null,
       })
     );
 

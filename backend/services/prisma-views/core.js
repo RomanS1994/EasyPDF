@@ -27,12 +27,12 @@ function getFallbackPlan(planId = DEFAULT_PLAN_ID) {
   if (!fallback) {
     return {
       id: DEFAULT_PLAN_ID,
-      name: 'Starter 25',
-      monthlyGenerationLimit: 25,
-      priceCzk: null,
+      name: 'Free',
+      monthlyGenerationLimit: 10,
+      priceCzk: 0,
       description: '',
-      pdfProfile: 'starter',
-      pdfQuality: 'essential',
+      pdfProfile: 'free',
+      pdfQuality: 'basic',
       pdfDocuments: ['offer', 'confirmation'],
       isActive: true,
       createdAt: '',
@@ -92,6 +92,9 @@ function buildDefaultSubscriptionView(
     assignedAt: toIsoString(user?.createdAt) || nowIso(),
     notes: source === 'legacy_migration' ? 'Migrated from legacy plan field' : '',
     canceledAt: null,
+    pendingPlanId: null,
+    pendingRequestedAt: null,
+    pendingSource: null,
   };
 }
 
@@ -112,6 +115,7 @@ export function resolveSubscriptionView({
   const status = SUBSCRIPTION_STATUS_VALUES.includes(source.status)
     ? source.status
     : 'active';
+  const normalizedStatus = status === 'trial' ? 'active' : status;
   const requestedStart = toIsoDate(source.currentPeriodStart);
   const requestedEnd = toIsoDate(source.currentPeriodEnd);
   const defaultCycle = requestedStart && requestedEnd ? null : buildCycleWindow(requestedStart || nowIso());
@@ -119,7 +123,7 @@ export function resolveSubscriptionView({
   const currentPeriodEnd = requestedEnd || defaultCycle.currentPeriodEnd;
   const periodEnded = currentPeriodEnd < nowIso();
   const resolvedStatus =
-    periodEnded && (status === 'active' || status === 'trial') ? 'expired' : status;
+    periodEnded && normalizedStatus === 'active' ? 'expired' : normalizedStatus;
   const monthlyGenerationLimit = normalizeInteger(
     source.monthlyGenerationLimit,
     resolvedPlan.monthlyGenerationLimit
@@ -140,9 +144,15 @@ export function resolveSubscriptionView({
     assignedAt: toIsoDate(source.assignedAt) || nowIso(),
     notes: normalizeText(source.notes),
     canceledAt: toIsoDate(source.canceledAt) || null,
+    pendingPlanId: normalizeText(source.pendingPlanId) || null,
+    pendingRequestedAt:
+      normalizeText(source.pendingPlanId)
+        ? toIsoDate(source.pendingRequestedAt) || toIsoDate(source.assignedAt) || nowIso()
+        : null,
+    pendingSource: normalizeText(source.pendingSource) || null,
     plan: resolvedPlan,
     effectiveLimit,
-    isAccessActive: resolvedStatus === 'active' || resolvedStatus === 'trial',
+    isAccessActive: resolvedStatus === 'active',
   };
 }
 
@@ -181,9 +191,22 @@ export function buildSubscriptionWriteData({ plan, payload = {}, before = null, 
 
   const requestedStatus = normalizeText(payload.status || before?.status).toLowerCase();
   const status = SUBSCRIPTION_STATUS_VALUES.includes(requestedStatus)
-    ? requestedStatus
+    ? (requestedStatus === 'trial' ? 'active' : requestedStatus)
     : 'active';
   const quotaOverride = normalizeInteger(payload.quotaOverride, before?.quotaOverride ?? null);
+
+  const nextPendingPlanId =
+    Object.prototype.hasOwnProperty.call(payload, 'pendingPlanId')
+      ? normalizeText(payload.pendingPlanId) || null
+      : normalizeText(before?.pendingPlanId) || null;
+  const nextPendingRequestedAt =
+    Object.prototype.hasOwnProperty.call(payload, 'pendingRequestedAt')
+      ? toIsoDate(payload.pendingRequestedAt) || null
+      : toIsoDate(before?.pendingRequestedAt) || null;
+  const nextPendingSource =
+    Object.prototype.hasOwnProperty.call(payload, 'pendingSource')
+      ? normalizeText(payload.pendingSource) || null
+      : normalizeText(before?.pendingSource) || null;
 
   return {
     planId: resolvedPlan.id,
@@ -203,6 +226,9 @@ export function buildSubscriptionWriteData({ plan, payload = {}, before = null, 
     assignedAt: nowIso(),
     notes: normalizeText(payload.notes ?? before?.notes),
     canceledAt: status === 'canceled' ? toIsoDate(payload.canceledAt) || nowIso() : null,
+    pendingPlanId: nextPendingPlanId,
+    pendingRequestedAt: nextPendingPlanId ? nextPendingRequestedAt || nowIso() : null,
+    pendingSource: nextPendingPlanId ? nextPendingSource : null,
   };
 }
 
@@ -235,6 +261,9 @@ export function sanitizeUserFromRecords({ user, subscription, plan, usedOrders =
       notes: resolvedSubscription.notes,
       canceledAt: resolvedSubscription.canceledAt,
       isAccessActive: resolvedSubscription.isAccessActive,
+      pendingPlanId: resolvedSubscription.pendingPlanId,
+      pendingRequestedAt: resolvedSubscription.pendingRequestedAt,
+      pendingSource: resolvedSubscription.pendingSource,
     },
     usage: buildUsageView(resolvedSubscription, usedOrders),
     createdAt: toIsoString(user.createdAt),

@@ -1,4 +1,3 @@
-import { handleAdminRoutes } from './admin.js';
 import { handleAuthRoutes } from './auth/index.js';
 import { handleManagerRoutes } from './manager/index.js';
 import { handleMeRoutes } from './me.js';
@@ -11,7 +10,6 @@ const routeHandlers = [
   handleMeRoutes,
   handleOrderRoutes,
   handleManagerRoutes,
-  handleAdminRoutes,
 ];
 
 export async function routeRequest(request, response) {

@@ -2,6 +2,7 @@ import {
   deleteMe,
   getMe,
   logout,
+  requestSubscriptionUpgrade,
   refreshSession,
   updateMyProfile,
 } from '../api.js';
@@ -154,5 +155,34 @@ export async function handleUpdateProfileClick() {
     notifyText(error.message || t('update_profile_failed'), 'error');
   } finally {
     if (refs.updateProfileBtn) refs.updateProfileBtn.disabled = false;
+  }
+}
+
+export async function handleRequestUpgradeClick() {
+  if (!state.user) return;
+
+  const planId = refs.accountUpgradePlan?.value || '';
+  if (!planId) {
+    notifyText(t('choose_paid_plan_validation'), 'error');
+    return;
+  }
+
+  if (refs.requestUpgradeBtn) refs.requestUpgradeBtn.disabled = true;
+
+  try {
+    const data = await requestSubscriptionUpgrade({ planId });
+    state.user = data.user;
+
+    const session = getStoredSession();
+    if (session?.token) {
+      setStoredSession({ token: session.token, user: state.user });
+    }
+
+    notifyText(t('upgrade_requested'), 'success');
+    renderAuthenticatedState();
+  } catch (error) {
+    notifyText(error.message || t('request_upgrade_failed'), 'error');
+  } finally {
+    if (refs.requestUpgradeBtn) refs.requestUpgradeBtn.disabled = false;
   }
 }

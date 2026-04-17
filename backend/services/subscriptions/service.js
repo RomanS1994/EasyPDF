@@ -39,6 +39,9 @@ export function buildDefaultSubscription(
     assignedAt: user.createdAt || nowIso(),
     notes: source === 'legacy_migration' ? 'Migrated from legacy plan field' : '',
     canceledAt: null,
+    pendingPlanId: null,
+    pendingRequestedAt: null,
+    pendingSource: null,
   };
 }
 
@@ -61,6 +64,7 @@ export function normalizeSubscription(
   const status = SUBSCRIPTION_STATUS_VALUES.includes(source.status)
     ? source.status
     : 'active';
+  const normalizedStatus = status === 'trial' ? 'active' : status;
 
   const cycle =
     source.currentPeriodStart && source.currentPeriodEnd
@@ -78,10 +82,14 @@ export function normalizeSubscription(
 
   const limit = normalizeInteger(source.monthlyGenerationLimit, plan?.monthlyGenerationLimit || 0);
   const quotaOverride = normalizeInteger(source.quotaOverride, null);
+  const pendingPlan =
+    source.pendingPlanId
+      ? getPlanRecord(database, source.pendingPlanId, { includeInactive: false })
+      : null;
 
   return {
     planId: plan?.id || DEFAULT_PLAN_ID,
-    status,
+    status: normalizedStatus,
     source: normalizeText(source.source) || 'manager',
     currentPeriodStart: cycle.currentPeriodStart,
     currentPeriodEnd: cycle.currentPeriodEnd,
@@ -91,6 +99,9 @@ export function normalizeSubscription(
     assignedAt: source.assignedAt || nowIso(),
     notes: normalizeText(source.notes),
     canceledAt: source.canceledAt || null,
+    pendingPlanId: pendingPlan?.id || null,
+    pendingRequestedAt: pendingPlan ? toIsoDate(source.pendingRequestedAt) || nowIso() : null,
+    pendingSource: pendingPlan ? normalizeText(source.pendingSource) || 'manual_payment' : null,
   };
 }
 
@@ -100,7 +111,7 @@ export function getResolvedSubscription(database, user) {
   });
   const periodEnded = normalized.currentPeriodEnd < nowIso();
   const resolvedStatus =
-    periodEnded && (normalized.status === 'active' || normalized.status === 'trial')
+    periodEnded && normalized.status === 'active'
       ? 'expired'
       : normalized.status;
   const plan = getPlanRecord(database, normalized.planId, { includeInactive: true });
@@ -114,7 +125,7 @@ export function getResolvedSubscription(database, user) {
     status: resolvedStatus,
     plan,
     effectiveLimit,
-    isAccessActive: resolvedStatus === 'active' || resolvedStatus === 'trial',
+    isAccessActive: resolvedStatus === 'active',
   };
 }
 
@@ -167,9 +178,13 @@ export function buildSubscriptionAssignment(database, planId, payload = {}, acto
 
   const requestedStatus = normalizeText(payload.status).toLowerCase();
   const status = SUBSCRIPTION_STATUS_VALUES.includes(requestedStatus)
-    ? requestedStatus
+    ? (requestedStatus === 'trial' ? 'active' : requestedStatus)
     : 'active';
   const quotaOverride = normalizeInteger(payload.quotaOverride, null);
+  const pendingPlan =
+    payload.pendingPlanId
+      ? getPlanRecord(database, payload.pendingPlanId, { includeInactive: false })
+      : null;
 
   return {
     planId: plan.id,
@@ -186,6 +201,9 @@ export function buildSubscriptionAssignment(database, planId, payload = {}, acto
     assignedAt: nowIso(),
     notes: normalizeText(payload.notes),
     canceledAt: status === 'canceled' ? nowIso() : null,
+    pendingPlanId: pendingPlan?.id || null,
+    pendingRequestedAt: pendingPlan ? toIsoDate(payload.pendingRequestedAt) || nowIso() : null,
+    pendingSource: pendingPlan ? normalizeText(payload.pendingSource) || 'manual_payment' : null,
   };
 }
 

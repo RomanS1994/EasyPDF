@@ -41,8 +41,66 @@
                   </div>
                 </div>
                 <p class="settingsNote" data-i18n="subscription_admin_note">
-                  Зміни підписки виконуються з admin-простору.
+                  Free-план активується одразу. Paid-плани вмикаються лише після ручного підтвердження оплати.
                 </p>
+              </section>
+
+              <section class="screenSection is-hidden" id="accountPendingUpgradeSection">
+                <p class="screenSectionLabel" data-i18n="pending_payment">Очікування оплати</p>
+                <div class="settingsGroup">
+                  <div class="settingsRow">
+                    <span class="settingsRow-label" data-i18n="requested_plan">Запитаний план</span>
+                    <strong class="settingsValue" id="accountPendingUpgradePlan">-</strong>
+                  </div>
+                  <div class="settingsRow">
+                    <span class="settingsRow-label" data-i18n="requested_at">Запит створено</span>
+                    <strong class="settingsValue" id="accountPendingUpgradeRequestedAt">-</strong>
+                  </div>
+                  <div class="settingsNote" data-i18n="manual_payment_pending_note">
+                    Апгрейд очікує ручного підтвердження. Напишіть у WhatsApp або Telegram і дочекайтесь активації менеджером.
+                  </div>
+                  <a
+                    class="secondary-btn settingsActionLink is-hidden"
+                    id="accountUpgradeWhatsapp"
+                    href="#"
+                    target="_blank"
+                    rel="noreferrer"
+                    data-i18n="contact_whatsapp"
+                  >
+                    WhatsApp
+                  </a>
+                  <a
+                    class="secondary-btn settingsActionLink is-hidden"
+                    id="accountUpgradeTelegram"
+                    href="#"
+                    target="_blank"
+                    rel="noreferrer"
+                    data-i18n="contact_telegram"
+                  >
+                    Telegram
+                  </a>
+                </div>
+              </section>
+
+              <section class="screenSection" id="accountUpgradeSection">
+                <p class="screenSectionLabel" data-i18n="upgrade_plan">Апгрейд плану</p>
+                <div class="settingsGroup">
+                  <label class="settingsField">
+                    <span class="settingsRow-label" data-i18n="paid_plan">Paid план</span>
+                    <select id="accountUpgradePlan"></select>
+                  </label>
+                  <div class="settingsNote" id="accountUpgradeHint" data-i18n="upgrade_request_note">
+                    Оберіть paid план. Ми створимо manual payment request, а доступ увімкнеться лише після підтвердження менеджером.
+                  </div>
+                  <button
+                    class="primary-btn settingsButton"
+                    id="requestUpgradeBtn"
+                    type="button"
+                    data-i18n="request_manual_upgrade"
+                  >
+                    Запросити paid апгрейд
+                  </button>
+                </div>
               </section>
 
               <section class="screenSection is-hidden" id="managerEntrySection">

@@ -27,7 +27,7 @@ async function handleCreateOrder(request, response) {
     context.store === 'prisma'
       ? (await buildSanitizedUser(prisma, context.user)).usage
       : sanitizeUser(context.database, context.user).usage;
-  if (resolvedUsage.status !== 'active' && resolvedUsage.status !== 'trial') {
+  if (resolvedUsage.status !== 'active') {
     return sendError(response, 403, 'Subscription is not active', resolvedUsage);
   }
   if (resolvedUsage.used >= resolvedUsage.limit) {
@@ -52,7 +52,7 @@ async function handleCreateOrder(request, response) {
       const freshUserView = await buildSanitizedUser(tx, freshUser);
       const freshUsage = freshUserView.usage;
 
-      if (freshUsage.status !== 'active' && freshUsage.status !== 'trial') {
+      if (freshUsage.status !== 'active') {
         throw new Error('Subscription is not active');
       }
 
@@ -99,7 +99,7 @@ async function handleCreateOrder(request, response) {
         const freshUser = findUserOrThrow(database, context.user.id);
         const freshUsage = sanitizeUser(database, freshUser).usage;
 
-        if (freshUsage.status !== 'active' && freshUsage.status !== 'trial') {
+        if (freshUsage.status !== 'active') {
           throw new Error('Subscription is not active');
         }
 

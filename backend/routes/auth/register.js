@@ -29,6 +29,7 @@ import {
   sendRateLimitExceeded,
   setRefreshTokenCookie,
 } from './shared.js';
+import { DEFAULT_PLAN_ID } from '../../config/plans.js';
 
 export async function handleRegister(request, response) {
   const body = await readJsonBody(request);
@@ -45,20 +46,27 @@ export async function handleRegister(request, response) {
 
     const payload = await runStoreTransaction({
       prisma: async tx => {
-        const [existingUser, selectedPlan] = await Promise.all([
+        const [existingUser, freePlan, requestedPlan] = await Promise.all([
           tx.user.findUnique({
             where: {
               email,
             },
           }),
-          findStoredPlan(tx, selectedPlanId, { includeInactive: false }),
+          findStoredPlan(tx, DEFAULT_PLAN_ID, { includeInactive: false }),
+          selectedPlanId && selectedPlanId !== DEFAULT_PLAN_ID
+            ? findStoredPlan(tx, selectedPlanId, { includeInactive: false })
+            : Promise.resolve(null),
         ]);
 
         if (existingUser) {
           throw new Error('User with this email already exists');
         }
 
-        if (!selectedPlan) {
+        if (!freePlan) {
+          throw new Error('Default free plan is not configured');
+        }
+
+        if (selectedPlanId && selectedPlanId !== DEFAULT_PLAN_ID && !requestedPlan) {
           throw new Error('Invalid plan');
         }
 
@@ -66,6 +74,7 @@ export async function handleRegister(request, response) {
         const cycle = buildCycleWindow(timestamp);
         const userId = randomUUID();
         const authSession = issueAuthSession(userId);
+        const pendingPlanId = requestedPlan?.id || null;
         const createdUser = await tx.user.create({
           data: {
             id: userId,
@@ -85,17 +94,22 @@ export async function handleRegister(request, response) {
             subscription: {
               create: {
                 id: userId,
-                planId: selectedPlan.id,
+                planId: freePlan.id,
                 status: 'active',
-                source: 'self_signup',
+                source: 'self_signup_free',
                 currentPeriodStart: new Date(timestamp),
                 currentPeriodEnd: new Date(cycle.currentPeriodEnd),
-                monthlyGenerationLimit: selectedPlan.monthlyGenerationLimit,
+                monthlyGenerationLimit: freePlan.monthlyGenerationLimit,
                 quotaOverride: null,
                 assignedByUserId: null,
                 assignedAt: new Date(timestamp),
-                notes: '',
+                notes: pendingPlanId
+                  ? `Manual upgrade requested during signup: ${pendingPlanId}`
+                  : '',
                 canceledAt: null,
+                pendingPlanId,
+                pendingRequestedAt: pendingPlanId ? new Date(timestamp) : null,
+                pendingSource: pendingPlanId ? 'manual_payment' : null,
               },
             },
           },
@@ -110,7 +124,8 @@ export async function handleRegister(request, response) {
           entityId: createdUser.id,
           after: {
             role: createdUser.role,
-            planId: createdUser.subscription?.planId || selectedPlan.id,
+            planId: createdUser.subscription?.planId || freePlan.id,
+            pendingPlanId,
           },
           meta: buildRequestMeta(request, {
             email: createdUser.email,
@@ -141,26 +156,40 @@ export async function handleRegister(request, response) {
           const selectedPlan = getPlanRecord(database, selectedPlanId, {
             includeInactive: false,
           });
-          if (!selectedPlan) {
+          const freePlan = getPlanRecord(database, DEFAULT_PLAN_ID, {
+            includeInactive: false,
+          });
+          if (!freePlan) {
+            throw new Error('Default free plan is not configured');
+          }
+          if (selectedPlanId && selectedPlanId !== DEFAULT_PLAN_ID && !selectedPlan) {
             throw new Error('Invalid plan');
           }
 
           const timestamp = nowIso();
+          const pendingPlanId =
+            selectedPlanId && selectedPlanId !== DEFAULT_PLAN_ID ? selectedPlan.id : null;
           const user = {
             id: randomUUID(),
             name,
             email,
             passwordHash: hashPassword(password),
             role: 'user',
-            planId: selectedPlan.id,
+            planId: freePlan.id,
             profile: normalizeUserProfile(body.profile, name),
             subscription: buildSubscriptionAssignment(
               database,
-              selectedPlan.id,
+              freePlan.id,
               {
-                source: 'self_signup',
+                source: 'self_signup_free',
                 status: 'active',
                 currentPeriodStart: timestamp,
+                notes: pendingPlanId
+                  ? `Manual upgrade requested during signup: ${pendingPlanId}`
+                  : '',
+                pendingPlanId,
+                pendingRequestedAt: pendingPlanId ? timestamp : null,
+                pendingSource: pendingPlanId ? 'manual_payment' : null,
               },
               null
             ),
@@ -183,6 +212,7 @@ export async function handleRegister(request, response) {
             after: {
               role: user.role,
               planId: user.planId,
+              pendingPlanId,
             },
             meta: buildRequestMeta(request, {
               email: user.email,

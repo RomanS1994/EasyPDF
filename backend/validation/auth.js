@@ -5,7 +5,7 @@ export function validateRegistrationInput(body = {}) {
   const email = normalizeEmail(body.email);
   const password = String(body.password || '');
   const name = normalizeText(body.name);
-  const selectedPlanId = body.planId || DEFAULT_PLAN_ID;
+  const selectedPlanId = normalizeText(body.planId);
 
   if (!name) {
     throw new Error('Name is required');
@@ -23,7 +23,7 @@ export function validateRegistrationInput(body = {}) {
     email,
     name,
     password,
-    selectedPlanId,
+    selectedPlanId: selectedPlanId || DEFAULT_PLAN_ID,
   };
 }
 

@@ -69,7 +69,11 @@ export async function handleManagerUserList(request, response, url) {
     let users = await buildManagerUserSummaries(prisma, rawUsers);
 
     if (status && status !== 'all') {
-      users = users.filter(user => user.subscription.status === status);
+      users = users.filter(user =>
+        status === 'pending'
+          ? Boolean(user.subscription.pendingPlanId) || user.subscription.status === 'pending'
+          : user.subscription.status === status
+      );
     }
 
     sendJson(response, 200, { users });
@@ -81,7 +85,12 @@ export async function handleManagerUserList(request, response, url) {
       const summary = sanitizeUser(context.database, user);
       const haystack = `${summary.name} ${summary.email}`.toLowerCase();
       const matchesSearch = !search || haystack.includes(search);
-      const matchesStatus = !status || status === 'all' || summary.subscription.status === status;
+      const matchesStatus =
+        !status ||
+        status === 'all' ||
+        (status === 'pending'
+          ? Boolean(summary.subscription.pendingPlanId) || summary.subscription.status === 'pending'
+          : summary.subscription.status === status);
       const matchesRole = !role || role === 'all' || summary.role === role;
       const matchesPlan = !planId || planId === 'all' || summary.planId === planId;
 

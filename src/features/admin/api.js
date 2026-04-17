@@ -3,7 +3,7 @@ import { readJsonResponse } from '../../shared/api/response.js';
 import { t } from '../../shared/i18n/app.js';
 
 function buildManagerPath(pathname) {
-  return `/admin${pathname}`;
+  return `/manager${pathname}`;
 }
 
 export async function getManagerUsers(query = {}) {
@@ -44,6 +44,18 @@ export async function cancelManagerUserSubscription(userId) {
   );
 
   return readJsonResponse(response, t('cancel_subscription_failed'));
+}
+
+export async function confirmManagerUserSubscription(userId, payload = {}) {
+  const response = await fetchApi(
+    buildManagerPath(`/users/${userId}/subscription/confirm-payment`),
+    {
+      method: 'POST',
+      body: payload,
+    }
+  );
+
+  return readJsonResponse(response, t('confirm_payment_failed'));
 }
 
 export async function updateManagerUserRole(userId, role) {

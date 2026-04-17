@@ -58,3 +58,12 @@ export async function updateMyProfile(profile) {
 
   return readJsonResponse(response, t('update_profile_failed'));
 }
+
+export async function requestSubscriptionUpgrade(payload) {
+  const response = await fetchApi('/me/subscription/upgrade-request', {
+    method: 'POST',
+    body: payload,
+  });
+
+  return readJsonResponse(response, t('request_upgrade_failed'));
+}

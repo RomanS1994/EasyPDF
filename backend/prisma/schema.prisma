@@ -15,6 +15,7 @@ enum UserRole {
 
 enum SubscriptionStatus {
   active
+  pending
   trial
   paused
   canceled
@@ -80,6 +81,9 @@ model Subscription {
   assignedAt             DateTime
   notes                  String
   canceledAt             DateTime?
+  pendingPlanId          String?
+  pendingRequestedAt     DateTime?
+  pendingSource          String?
   createdAt              DateTime           @default(now())
   updatedAt              DateTime           @updatedAt
 

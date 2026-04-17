@@ -2,6 +2,7 @@ export const ROLE_VALUES = ['user', 'manager', 'admin'];
 
 export const SUBSCRIPTION_STATUS_VALUES = [
   'active',
+  'pending',
   'trial',
   'paused',
   'canceled',

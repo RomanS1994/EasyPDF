@@ -50,6 +50,9 @@ export function mapSubscriptionRecord(record) {
     assignedAt: toIsoString(record.assignedAt),
     notes: record.notes,
     canceledAt: toIsoString(record.canceledAt),
+    pendingPlanId: record.pendingPlanId || null,
+    pendingRequestedAt: toIsoString(record.pendingRequestedAt),
+    pendingSource: record.pendingSource || null,
     createdAt: toIsoString(record.createdAt),
     updatedAt: toIsoString(record.updatedAt),
   };
@@ -161,6 +164,9 @@ export function serializeSubscriptionRecord(userRecord) {
     assignedAt: toDate(subscription.assignedAt),
     notes: subscription.notes || '',
     canceledAt: subscription.canceledAt ? toDate(subscription.canceledAt) : null,
+    pendingPlanId: subscription.pendingPlanId || null,
+    pendingRequestedAt: subscription.pendingRequestedAt ? toDate(subscription.pendingRequestedAt) : null,
+    pendingSource: subscription.pendingSource || null,
     createdAt: toDate(subscription.createdAt || userRecord.createdAt),
     updatedAt: toDate(subscription.updatedAt || userRecord.updatedAt),
   };

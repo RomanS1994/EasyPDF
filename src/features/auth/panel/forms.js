@@ -29,7 +29,7 @@ export async function handleRegisterSubmit(event) {
   const formData = new FormData(event.currentTarget);
   const payload = Object.fromEntries(formData.entries());
 
-  if (!payload.name || !payload.email || !payload.password || !payload.planId) {
+  if (!payload.name || !payload.email || !payload.password) {
     notifyText(t('register_validation'), 'error');
     return;
   }
@@ -79,7 +79,7 @@ export async function handleLoginSubmit(event) {
 }
 
 function updatePasswordToggle(button, isVisible) {
-  const nextLabel = isVisible ? 'Сховати пароль' : 'Показати пароль';
+  const nextLabel = isVisible ? t('hide_password') : t('show_password');
 
   button.setAttribute('aria-pressed', isVisible ? 'true' : 'false');
   button.setAttribute('aria-label', nextLabel);
