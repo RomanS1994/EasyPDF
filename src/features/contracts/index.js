@@ -1,5 +1,3 @@
-import './styles/dataContract.css';
-
 import { t } from '../../shared/i18n/app.js';
 import { readStorageJson } from '../../shared/lib/storage.js';
 import { contractRefs, hasContractRoot } from './selectors.js';

@@ -78,6 +78,39 @@ export async function handleLoginSubmit(event) {
   }
 }
 
+function updatePasswordToggle(button, isVisible) {
+  button.textContent = isVisible ? 'Сховати' : 'Показати';
+  button.setAttribute('aria-pressed', isVisible ? 'true' : 'false');
+}
+
+function restoreSelection(input, selectionStart, selectionEnd) {
+  if (selectionStart === null || selectionEnd === null) return;
+  if (document.activeElement !== input) return;
+
+  try {
+    input.setSelectionRange(selectionStart, selectionEnd);
+  } catch {
+    // Some browsers reject selection restore while toggling password fields.
+  }
+}
+
+export function handlePasswordToggleClick(event) {
+  const button = event.target.closest('[data-password-toggle]');
+  if (!button) return;
+
+  const targetId = button.dataset.passwordTarget;
+  const input = targetId ? document.getElementById(targetId) : button.closest('.authPasswordField')?.querySelector('input');
+  if (!input) return;
+
+  const selectionStart = input.selectionStart;
+  const selectionEnd = input.selectionEnd;
+  const nextType = input.type === 'password' ? 'text' : 'password';
+
+  input.type = nextType;
+  updatePasswordToggle(button, nextType === 'text');
+  restoreSelection(input, selectionStart, selectionEnd);
+}
+
 export function handlePlanCardClick(event) {
   const card = event.target.closest('.planCard[data-plan-select]');
   if (!card) return;

@@ -4,7 +4,54 @@ import injectHTML from 'vite-plugin-html-inject';
 import FullReload from 'vite-plugin-full-reload';
 import SortCss from 'postcss-sort-media-queries';
 
-// Minimal Vite config focused only on the PDF page
+const devPageRouteMap = {
+  '/cz/pdf': '/pages/pdf/index.html',
+  '/cz/pdf/': '/pages/pdf/index.html',
+  '/cz/pdf/account': '/pages/account/index.html',
+  '/cz/pdf/account/': '/pages/account/index.html',
+  '/cz/pdf/stats': '/pages/stats/index.html',
+  '/cz/pdf/stats/': '/pages/stats/index.html',
+  '/cz/pdf/orders': '/pages/orders/index.html',
+  '/cz/pdf/orders/': '/pages/orders/index.html',
+  '/cz/pdf/manager': '/pages/manager/index.html',
+  '/cz/pdf/manager/': '/pages/manager/index.html',
+  '/cz/pdf/admin': '/pages/admin/index.html',
+  '/cz/pdf/admin/': '/pages/admin/index.html',
+  '/cz/pdf/admin/accounts': '/pages/admin/accounts/index.html',
+  '/cz/pdf/admin/accounts/': '/pages/admin/accounts/index.html',
+  '/cz/pdf/admin/subscriptions': '/pages/admin/subscriptions/index.html',
+  '/cz/pdf/admin/subscriptions/': '/pages/admin/subscriptions/index.html',
+  '/cz/pdf/admin/orders': '/pages/admin/orders/index.html',
+  '/cz/pdf/admin/orders/': '/pages/admin/orders/index.html',
+  '/cz/pdf/admin/settings': '/pages/admin/settings/index.html',
+  '/cz/pdf/admin/settings/': '/pages/admin/settings/index.html',
+};
+
+function devRouteRewritePlugin() {
+  return {
+    name: 'dev-route-rewrite',
+    configureServer(server) {
+      server.middlewares.use((request, _response, next) => {
+        if (!request.url) {
+          next();
+          return;
+        }
+
+        const requestUrl = new URL(request.url, 'http://localhost');
+        const targetPath = devPageRouteMap[requestUrl.pathname];
+
+        if (!targetPath) {
+          next();
+          return;
+        }
+
+        request.url = `${targetPath}${requestUrl.search || ''}`;
+        next();
+      });
+    },
+  };
+}
+
 export default defineConfig(({ command }) => {
   const homeHtml = path.resolve(__dirname, 'src/pages/pdf/index.html');
   const accountHtml = path.resolve(__dirname, 'src/pages/account/index.html');
@@ -70,6 +117,11 @@ export default defineConfig(({ command }) => {
       outDir: '../dist',
       emptyOutDir: true,
     },
-    plugins: [injectHTML(), FullReload(['./**/*.html']), SortCss({ sort: 'mobile-first' })],
+    plugins: [
+      injectHTML(),
+      devRouteRewritePlugin(),
+      FullReload(['./**/*.html']),
+      SortCss({ sort: 'mobile-first' }),
+    ],
   };
 });

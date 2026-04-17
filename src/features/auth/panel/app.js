@@ -30,6 +30,7 @@ import {
   handleAuthModeClick,
   handleAuthModeKeydown,
   handleLoginSubmit,
+  handlePasswordToggleClick,
   handlePlanCardClick,
   handlePlanCardKeydown,
   handleRegisterSubmit,
@@ -46,6 +47,7 @@ function bindEvents() {
   bindNavigationEvents();
   refs.registerForm?.addEventListener('submit', handleRegisterSubmit);
   refs.loginForm?.addEventListener('submit', handleLoginSubmit);
+  refs.guestPanel?.addEventListener('click', handlePasswordToggleClick);
   refs.guestLanguageButtons.forEach(button => button.addEventListener('click', handleGuestLanguageClick));
   refs.authModeButtons.forEach(button => {
     button.addEventListener('click', handleAuthModeClick);

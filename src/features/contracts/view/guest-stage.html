@@ -128,15 +128,28 @@
                 />
               </label>
 
-              <label class="authField">
+              <label class="authField authPasswordField">
                 <span data-i18n="password">Пароль</span>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Щонайменше 8 символів"
-                  data-i18n-placeholder="password_min"
-                  autocomplete="new-password"
-                />
+                <div class="authPasswordControl">
+                  <input
+                    id="registerPassword"
+                    type="password"
+                    name="password"
+                    placeholder="Щонайменше 8 символів"
+                    data-i18n-placeholder="password_min"
+                    autocomplete="new-password"
+                  />
+                  <button
+                    class="authPasswordToggle"
+                    type="button"
+                    data-password-toggle
+                    data-password-target="registerPassword"
+                    aria-controls="registerPassword"
+                    aria-pressed="false"
+                  >
+                    Показати
+                  </button>
+                </div>
               </label>
 
               <label class="authField">
@@ -170,15 +183,28 @@
                 />
               </label>
 
-              <label class="authField">
+              <label class="authField authPasswordField">
                 <span data-i18n="password">Пароль</span>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Ваш пароль"
-                  data-i18n-placeholder="your_password"
-                  autocomplete="current-password"
-                />
+                <div class="authPasswordControl">
+                  <input
+                    id="loginPassword"
+                    type="password"
+                    name="password"
+                    placeholder="Ваш пароль"
+                    data-i18n-placeholder="your_password"
+                    autocomplete="current-password"
+                  />
+                  <button
+                    class="authPasswordToggle"
+                    type="button"
+                    data-password-toggle
+                    data-password-target="loginPassword"
+                    aria-controls="loginPassword"
+                    aria-pressed="false"
+                  >
+                    Показати
+                  </button>
+                </div>
               </label>
 
               <button class="secondary-btn" type="submit" data-i18n="sign_in">Увійти</button>
@@ -346,4 +372,3 @@
           } catch {}
         </script>
       </section>
-
