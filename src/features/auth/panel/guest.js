@@ -11,6 +11,10 @@ export function syncLanguageSelects() {
     refs.accountLanguageSelect.value = language;
   }
 
+  if (refs.settingsLanguageSelect) {
+    refs.settingsLanguageSelect.value = language;
+  }
+
   if (refs.adminLanguageSelect) {
     refs.adminLanguageSelect.value = language;
   }

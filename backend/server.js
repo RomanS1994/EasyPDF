@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 
 import { requireApiKey } from './auth/api-key.js';
 import { assertRuntimeEnv } from './config/runtime-env.js';
+import { ensureDefaultPlans } from './db/plans-store.js';
+import { prisma } from './db/prisma.js';
 import { bindRequestContext, handleCors } from './lib/http.js';
 import { sendHttpError } from './lib/errors.js';
 import { routeRequest } from './routes/index.js';
@@ -34,6 +36,15 @@ const server = http.createServer(async (request, response) => {
   }
 });
 
-server.listen(PORT, () => {
-  console.log(`pdf.app backend is running on http://localhost:${PORT}`);
+async function startServer() {
+  await ensureDefaultPlans(prisma);
+
+  server.listen(PORT, () => {
+    console.log(`pdf.app backend is running on http://localhost:${PORT}`);
+  });
+}
+
+startServer().catch(error => {
+  console.error(error instanceof Error ? error.message : String(error));
+  process.exit(1);
 });

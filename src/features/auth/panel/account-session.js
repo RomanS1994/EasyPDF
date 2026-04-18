@@ -161,7 +161,10 @@ export async function handleUpdateProfileClick() {
 export async function handleRequestUpgradeClick() {
   if (!state.user) return;
 
-  const planId = refs.accountUpgradePlan?.value || '';
+  const planId =
+    refs.accountUpgradePlan?.value ||
+    refs.accountUpgradePlan?.querySelector('option[value]:not([value=""])')?.value ||
+    '';
   if (!planId) {
     notifyText(t('choose_paid_plan_validation'), 'error');
     return;

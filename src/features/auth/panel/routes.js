@@ -19,6 +19,7 @@ export function getShellRouteConfig() {
     stats: '/cz/pdf/stats/',
     orders: '/cz/pdf/orders/',
     account: '/cz/pdf/account/',
+    settings: '/cz/pdf/settings/',
   };
 }
 

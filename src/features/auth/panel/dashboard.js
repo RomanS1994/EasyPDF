@@ -9,6 +9,7 @@ import {
   localizeSubscriptionStatus,
 } from './formatters.js';
 import { renderOrderList } from './orders.js';
+import { renderOrderDetail } from './order-detail.js';
 import { getMetrics, renderStatsCharts } from './stats.js';
 import {
   renderManagerAccessState,
@@ -33,10 +34,13 @@ export function renderDashboard() {
 
   const metrics = getMetrics();
   const usageText = `${metrics.usage.used} / ${metrics.usage.limit}`;
+  const usagePercentText = `${metrics.usagePercent}%`;
   const contextUser =
     state.managerSelectedUser ||
     state.managerUsers.find(user => user.id === state.managerSelectedUserId) ||
     null;
+  const orderSummaryText = metrics.totalOrders > 0 ? String(metrics.totalOrders) : '0';
+  const accountSummaryText = localizeRole(state.user.role || 'user');
 
   if (refs.workspaceGreeting) {
     refs.workspaceGreeting.textContent = t('hello', {
@@ -48,10 +52,31 @@ export function renderDashboard() {
       ? localizeRole(state.user.role || 'user')
       : state.user.plan?.name || '-';
   }
+  if (refs.workspaceCycleHome) {
+    refs.workspaceCycleHome.textContent = formatCycleLabel(state.user.usage);
+  }
   if (refs.workspaceUsage) {
     refs.workspaceUsage.textContent = isAdminShell()
       ? contextUser?.email || t('no_account')
       : usageText;
+  }
+  if (refs.workspaceUsageHome) {
+    refs.workspaceUsageHome.textContent = `${usagePercentText} · ${usageText}`;
+  }
+  if (refs.workspaceOrdersHome) {
+    refs.workspaceOrdersHome.textContent = orderSummaryText;
+  }
+  if (refs.workspaceAccountHome) {
+    refs.workspaceAccountHome.textContent = accountSummaryText;
+  }
+  if (refs.workspaceAccountHomeNote) {
+    refs.workspaceAccountHomeNote.textContent = state.user.email || t('no_account');
+  }
+  if (refs.ordersDateFilter && state.ordersDateFilter) {
+    refs.ordersDateFilter.value = state.ordersDateFilter;
+  }
+  if (refs.statsHistoryDateFilter) {
+    refs.statsHistoryDateFilter.value = state.ordersDateFilter;
   }
 
   if (refs.accountName) refs.accountName.textContent = state.user.name || '-';
@@ -98,9 +123,12 @@ export function renderDashboard() {
           )
           .join('')
       : `<option value="">${t('no_paid_plans_available')}</option>`;
+    if (upgradePlans.length && !upgradePlans.some(plan => plan.id === refs.accountUpgradePlan.value)) {
+      refs.accountUpgradePlan.value = upgradePlans[0].id;
+    }
   }
   if (refs.requestUpgradeBtn) {
-    refs.requestUpgradeBtn.disabled = hasPendingUpgrade || !upgradePlans.length;
+    refs.requestUpgradeBtn.disabled = !upgradePlans.length;
   }
   if (refs.accountUpgradeHint) {
     refs.accountUpgradeHint.textContent = hasPendingUpgrade
@@ -143,6 +171,13 @@ export function renderDashboard() {
   renderOrderList(refs.ordersList, refs.ordersEmpty, state.orders, {
     emptyText: t('orders_empty_home'),
   });
+  renderOrderList(refs.statsHistoryList, refs.statsHistoryEmpty, state.orders, {
+    emptyText: t('orders_empty_home'),
+  });
+  if (refs.statsHistorySummary) {
+    refs.statsHistorySummary.textContent = t('orders_count', { count: state.orders.length });
+  }
+  renderOrderDetail();
   renderManagerAccessState();
   renderManagerUsers();
   renderManagerSelectedUser();
@@ -172,6 +207,10 @@ export function renderAuthenticatedState({ resetTab = false } = {}) {
     clearManagerState();
     renderOrderList(refs.ordersList, refs.ordersEmpty, [], {
       emptyText: t('orders_empty_home'),
+    });
+    renderOrderList(refs.statsHistoryList, refs.statsHistoryEmpty, [], {
+      emptyText: t('orders_empty_home'),
+      ignoreDateFilter: true,
     });
     renderManagerUsers();
     renderManagerSelectedUser();

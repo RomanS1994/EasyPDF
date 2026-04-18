@@ -32,6 +32,8 @@ export const state = {
   managerSelectedOrderId: getStoredManagerSelectedOrderId(),
   managerSelectedOrder: null,
   managerOrdersSelectedOnly: getStoredManagerOrdersSelectedOnly(),
+  ordersDateFilter: '',
+  orderDetailOrderId: '',
 };
 
 export let managerSearchTimer = 0;
@@ -62,6 +64,7 @@ export function clearManagerState() {
   state.managerSelectedOrderId = '';
   state.managerSelectedOrder = null;
   state.managerOrdersSelectedOnly = false;
+  state.orderDetailOrderId = '';
   setStoredManagerSelectedUserId('');
   setStoredManagerSelectedOrderId('');
   setStoredManagerOrdersSelectedOnly(false);

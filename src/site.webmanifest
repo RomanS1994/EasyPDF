@@ -1,0 +1,21 @@
+{
+  "name": "DocTra",
+  "short_name": "DocTra",
+  "icons": [
+    {
+      "src": "/shared/assets/doctra-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/shared/assets/apple-touch-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color": "#0f5fd7",
+  "background_color": "#ffffff",
+  "display": "standalone"
+}

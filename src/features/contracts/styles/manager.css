@@ -1,9 +1,9 @@
 .emptyStateCard {
   padding: 14px;
-  border: 1px solid rgba(60, 60, 67, 0.12);
-  border-radius: 16px;
-  background: #ffffff;
-  color: #6e6e73;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 248, 252, 0.94));
+  color: var(--muted);
   font-size: 14px;
 }
 
@@ -28,9 +28,9 @@
   flex-direction: column;
   gap: 6px;
   padding: 14px;
-  border-radius: 16px;
-  border: 1px solid rgba(60, 60, 67, 0.12);
-  background: #ffffff;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 248, 252, 0.94));
 }
 
 .managerTriageCard {
@@ -45,9 +45,11 @@
 }
 
 .managerTriageCard.is-active {
-  border-color: rgba(0, 122, 255, 0.35);
-  box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.16);
-  background: linear-gradient(180deg, #ffffff, #f5f9ff);
+  border-color: rgba(0, 122, 255, 0.28);
+  box-shadow:
+    0 0 0 1px rgba(0, 122, 255, 0.16),
+    0 12px 30px rgba(0, 122, 255, 0.08);
+  background: linear-gradient(180deg, #ffffff, #f3f8ff);
 }
 
 .managerOverviewCard span,
@@ -95,16 +97,16 @@
   gap: 12px;
   width: 100%;
   padding: 14px;
-  border: 1px solid rgba(60, 60, 67, 0.12);
-  border-radius: 16px;
-  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(247, 248, 252, 0.94));
   text-align: left;
 }
 
 .managerUserItem.is-active .managerUserButton,
 .managerPlanItem.is-active .managerPlanButton {
-  border-color: rgba(0, 122, 255, 0.35);
-  box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.16);
+  border-color: rgba(0, 122, 255, 0.28);
+  box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.14);
 }
 
 .managerUserCopy,
@@ -169,9 +171,9 @@
   justify-content: space-between;
   gap: 12px;
   padding: 14px;
-  border-radius: 16px;
-  border: 1px solid rgba(60, 60, 67, 0.12);
-  background: #ffffff;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(247, 248, 252, 0.94));
 }
 
 .managerInfoLabel {

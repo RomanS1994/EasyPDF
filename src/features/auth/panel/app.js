@@ -11,6 +11,9 @@ import {
 import { refs } from './refs.js';
 import { state } from './state.js';
 import {
+  setOrdersDateFilter,
+} from './orders.js';
+import {
   handleGuestLanguageClick,
   handleLanguageSelectChange,
   renderGuestContext,
@@ -27,6 +30,7 @@ import {
   handleUpdateProfileClick,
   refreshAccountData,
 } from './account-session.js';
+import { bindOrderDetailEvents, handleOrderListClick } from './order-detail.js';
 import {
   handleAuthModeClick,
   handleAuthModeKeydown,
@@ -43,6 +47,7 @@ import {
   initLanguage,
 } from '../../../shared/i18n/app.js';
 import { initAppLoader, setBootLoaderActive } from '../../../shared/ui/loader.js';
+import { initDatePickers } from '../../contracts/date-pickers.js';
 
 function bindEvents() {
   bindNavigationEvents();
@@ -55,10 +60,12 @@ function bindEvents() {
     button.addEventListener('keydown', handleAuthModeKeydown);
   });
   refs.logoutBtn?.addEventListener('click', handleLogoutClick);
+  refs.settingsLogoutBtn?.addEventListener('click', handleLogoutClick);
   refs.deleteAccountBtn?.addEventListener('click', handleDeleteAccountClick);
   refs.updateProfileBtn?.addEventListener('click', handleUpdateProfileClick);
   refs.requestUpgradeBtn?.addEventListener('click', handleRequestUpgradeClick);
   refs.accountLanguageSelect?.addEventListener('change', handleLanguageSelectChange);
+  refs.settingsLanguageSelect?.addEventListener('change', handleLanguageSelectChange);
   refs.adminLanguageSelect?.addEventListener('change', handleLanguageSelectChange);
   refs.planCards?.addEventListener('click', handlePlanCardClick);
   refs.planCards?.addEventListener('keydown', handlePlanCardKeydown);
@@ -66,11 +73,22 @@ function bindEvents() {
     setAuthMode('register');
     syncSelectedPlan(event.target.value);
   });
+  refs.statsHistoryDateFilter?.addEventListener('change', event => {
+    setOrdersDateFilter(event.target.value);
+    renderAuthenticatedState();
+  });
+  refs.statsHistoryDateResetBtn?.addEventListener('click', () => {
+    setOrdersDateFilter('');
+    renderAuthenticatedState();
+  });
+  refs.ordersList?.addEventListener('click', handleOrderListClick);
+  refs.statsHistoryList?.addEventListener('click', handleOrderListClick);
   refs.statsTabButtons.forEach(button => {
     button.addEventListener('click', () => activateStatsTab(button.dataset.statsTabTarget));
   });
   refs.tabButtons.forEach(button => button.addEventListener('click', handleTabClick));
   bindManagerEvents(refreshAccountData, loadPlansForGuest);
+  bindOrderDetailEvents();
   window.addEventListener('pdf-app:order-created', () => {
     refreshAccountData();
   });
@@ -89,6 +107,7 @@ export async function initAuthPage() {
   setBootLoaderActive(document.body.dataset.authState === 'booting');
   initLanguage();
   syncInitialRouteState();
+  initDatePickers(document);
   bindEvents();
   syncLanguageSelects();
   setAuthMode(state.authMode);

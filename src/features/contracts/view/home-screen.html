@@ -1,25 +1,142 @@
       <section class="appShell is-hidden" id="accountPanel">
-        <header class="appTop">
-          <div class="appTitleBlock">
-            <p class="sectionEyebrow">TransferDocs</p>
-            <h1 data-i18n="workspace">Робочий простір</h1>
-            <p id="workspaceGreeting">Вітаємо, -</p>
-          </div>
-
-          <div class="topMetrics">
-            <article class="topMetric">
-              <span data-i18n="plan">План</span>
-              <strong id="workspacePlan">-</strong>
-            </article>
-            <article class="topMetric">
-              <span data-i18n="usage">Використання</span>
-              <strong id="workspaceUsage">-</strong>
-            </article>
-          </div>
-        </header>
-
         <main class="appScreens">
           <section class="appScreen" data-tab-screen="home">
+            <header class="appTop">
+              <div class="appTitleBlock">
+                <p class="sectionEyebrow">DocTra</p>
+                <h1 data-i18n="workspace">Робочий простір</h1>
+                <p id="workspaceGreeting">Вітаємо, -</p>
+              </div>
+
+              <div class="topMetrics">
+                <article class="topMetric">
+                  <span data-i18n="plan">План</span>
+                  <strong id="workspacePlan">-</strong>
+                </article>
+                <article class="topMetric">
+                  <span data-i18n="usage">Використання</span>
+                  <strong id="workspaceUsage">-</strong>
+                </article>
+              </div>
+            </header>
+
+            <div class="screenCard screenCard-home">
+              <div class="homeOverviewGrid">
+                <article class="homeOverviewCard">
+                  <span>Цикл</span>
+                  <strong id="workspaceCycleHome">-</strong>
+                  <p>Поточний розрахунковий період.</p>
+                </article>
+                <article class="homeOverviewCard">
+                  <span>Використання</span>
+                  <strong id="workspaceUsageHome">-</strong>
+                  <p>Вже згенеровано цього циклу.</p>
+                </article>
+                <a class="homeOverviewCard homeOverviewCard-link" href="/cz/pdf/orders/" data-tab-target="orders">
+                  <span>Замовлення</span>
+                  <strong id="workspaceOrdersHome">-</strong>
+                  <p>Усього збережених записів.</p>
+                </a>
+                <article class="homeOverviewCard">
+                  <span>Акаунт</span>
+                  <strong id="workspaceAccountHome">-</strong>
+                  <p id="workspaceAccountHomeNote">Профіль і доступ.</p>
+                </article>
+              </div>
+
+              <div class="homeQuickLinks">
+                <a class="homeQuickLink" href="/cz/pdf/orders/" data-tab-target="orders">
+                  <strong>Створити PDF</strong>
+                  <span>Відкрити генератор замовлення</span>
+                </a>
+                <a class="homeQuickLink" href="/cz/pdf/stats/" data-tab-target="stats">
+                  <strong>Статистика</strong>
+                  <span>Подивитись використання циклу</span>
+                </a>
+                <a class="homeQuickLink" href="/cz/pdf/account/" data-tab-target="account">
+                  <strong>Акаунт</strong>
+                  <span>Профіль і підписка</span>
+                </a>
+                <a class="homeQuickLink" href="/cz/pdf/settings/" data-tab-target="settings">
+                  <strong>Налаштування</strong>
+                  <span>Мова та сесія</span>
+                </a>
+              </div>
+            </div>
+          </section>
+
+          <div class="orderDetailModal" id="orderDetailModal" aria-hidden="true" hidden>
+            <div class="orderDetailBackdrop" id="orderDetailBackdrop"></div>
+            <div class="orderDetailSheet" role="dialog" aria-modal="true" aria-labelledby="orderDetailTitle">
+              <div class="orderDetailHeader">
+                <div>
+                  <p class="sectionEyebrow" data-i18n="order_detail">Замовлення</p>
+                  <h2 id="orderDetailTitle">-</h2>
+                </div>
+                <button class="orderDetailCloseBtn" id="orderDetailCloseBtn" type="button" aria-label="Закрити" data-i18n-aria-label="close">
+                  ×
+                </button>
+              </div>
+
+              <div class="orderDetailMetaGrid">
+                <div class="orderDetailMetaCard">
+                  <span data-i18n="customer">Клієнт</span>
+                  <strong id="orderDetailCustomer">-</strong>
+                  <p id="orderDetailCustomerEmail">-</p>
+                </div>
+                <div class="orderDetailMetaCard">
+                  <span data-i18n="route">Маршрут</span>
+                  <strong id="orderDetailRoute">-</strong>
+                  <p id="orderDetailPickup">-</p>
+                </div>
+                <div class="orderDetailMetaCard">
+                  <span data-i18n="created">Створено</span>
+                  <strong id="orderDetailDate">-</strong>
+                  <p id="orderDetailIssueDate">-</p>
+                </div>
+                <div class="orderDetailMetaCard">
+                  <span data-i18n="total">Сума</span>
+                  <strong id="orderDetailTotal">-</strong>
+                  <p id="orderDetailPayment">-</p>
+                </div>
+              </div>
+
+              <div class="orderDetailRows">
+                <div class="orderDetailRow">
+                  <span data-i18n="order_number">Номер замовлення</span>
+                  <strong id="orderDetailNumber">-</strong>
+                </div>
+                <div class="orderDetailRow">
+                  <span data-i18n="status">Статус</span>
+                  <strong id="orderDetailStatus">-</strong>
+                </div>
+                <div class="orderDetailRow">
+                  <span data-i18n="pdf">PDF</span>
+                  <strong id="orderDetailPdf">-</strong>
+                </div>
+                <div class="orderDetailRow">
+                  <span data-i18n="document">Документ</span>
+                  <strong id="orderDetailDocumentType">-</strong>
+                </div>
+                <div class="orderDetailRow">
+                  <span data-i18n="pickup_time">Час посадки</span>
+                  <strong id="orderDetailTripTime">-</strong>
+                </div>
+              </div>
+
+              <div class="orderDetailActions">
+                <button class="secondary-btn orderDetailActionBtn" id="orderDetailOfferBtn" type="button" data-i18n="pdf_document_offer">
+                  Фактура
+                </button>
+                <button class="primary-btn orderDetailActionBtn" id="orderDetailConfirmationBtn" type="button" data-i18n="pdf_document_confirmation">
+                  Договір
+                </button>
+              </div>
+            </div>
+          </div>
+
+
+          <section class="appScreen" data-tab-screen="orders">
             <div class="builderWorkspace builderWorkspace-home">
               <div class="homeStepTabs" aria-label="Кроки головного сценарію" data-i18n-aria-label="home_steps">
                 <button class="homeStepTab is-active" type="button" data-step-tab="1" data-i18n="client">
@@ -42,22 +159,12 @@
                       <div class="fieldRow">
                         <label class="fieldLabel">
                           <span data-i18n="name">Ім’я</span>
-                          <input
-                            class="value"
-                            name="customer-name"
-                            type="text"
-                            value="John Doe"
-                          />
+                          <input class="value" name="customer-name" type="text" value="John Doe" />
                         </label>
 
                         <label class="fieldLabel">
                           <span data-i18n="email">Email</span>
-                          <input
-                            class="value"
-                            name="customer-email"
-                            type="text"
-                            value="john.doe@gmail.com"
-                          />
+                          <input class="value" name="customer-email" type="text" value="john.doe@gmail.com" />
                         </label>
                       </div>
                     </section>
@@ -71,12 +178,7 @@
                       <label class="fieldLabel fieldLabel-stack">
                         <span data-i18n="pickup_address">Адреса посадки</span>
                         <div class="input-with-clear">
-                          <input
-                            class="value"
-                            name="trip-from-address"
-                            type="text"
-                            value="Terminal 2, Aviatická, Praha"
-                          />
+                          <input class="value" name="trip-from-address" type="text" value="Terminal 2, Aviatická, Praha" />
                           <button
                             class="clear-btn"
                             type="button"
@@ -88,20 +190,10 @@
                       </label>
 
                       <div class="quick-picks" data-target="trip-from-address">
-                        <button
-                          type="button"
-                          class="quick-pick-btn"
-                          data-value="Terminal 1, Aviatická, Praha"
-                          title="Terminal 1, Aviatická, Praha"
-                        >
+                        <button type="button" class="quick-pick-btn" data-value="Terminal 1, Aviatická, Praha" title="Terminal 1, Aviatická, Praha">
                           <span data-i18n="airport_t1">Аеропорт T1</span>
                         </button>
-                        <button
-                          type="button"
-                          class="quick-pick-btn"
-                          data-value="Terminal 2, Aviatická, Praha"
-                          title="Terminal 2, Aviatická, Praha"
-                        >
+                        <button type="button" class="quick-pick-btn" data-value="Terminal 2, Aviatická, Praha" title="Terminal 2, Aviatická, Praha">
                           <span data-i18n="airport_t2">Аеропорт T2</span>
                         </button>
                       </div>
@@ -109,12 +201,7 @@
                       <label class="fieldLabel fieldLabel-stack">
                         <span data-i18n="dropoff_address">Адреса висадки</span>
                         <div class="input-with-clear">
-                          <input
-                            class="value"
-                            name="trip-to-address"
-                            type="text"
-                            value="Hotel Hilton, Pobřežní 311/1, 186 00 Praha 8-Rohanský ostrov"
-                          />
+                          <input class="value" name="trip-to-address" type="text" value="Hotel Hilton, Pobřežní 311/1, 186 00 Praha 8-Rohanský ostrov" />
                           <button
                             class="clear-btn"
                             type="button"
@@ -126,20 +213,10 @@
                       </label>
 
                       <div class="quick-picks" data-target="trip-to-address">
-                        <button
-                          type="button"
-                          class="quick-pick-btn"
-                          data-value="Terminal 1, Aviatická, Praha"
-                          title="Terminal 1, Aviatická, Praha"
-                        >
+                        <button type="button" class="quick-pick-btn" data-value="Terminal 1, Aviatická, Praha" title="Terminal 1, Aviatická, Praha">
                           <span data-i18n="airport_t1">Аеропорт T1</span>
                         </button>
-                        <button
-                          type="button"
-                          class="quick-pick-btn"
-                          data-value="Terminal 2, Aviatická, Praha"
-                          title="Terminal 2, Aviatická, Praha"
-                        >
+                        <button type="button" class="quick-pick-btn" data-value="Terminal 2, Aviatická, Praha" title="Terminal 2, Aviatická, Praha">
                           <span data-i18n="airport_t2">Аеропорт T2</span>
                         </button>
                       </div>
@@ -147,22 +224,12 @@
                       <div class="fieldRow">
                         <label class="fieldLabel">
                           <span data-i18n="pickup_time">Час посадки</span>
-                          <input
-                            class="value"
-                            name="trip-time"
-                            type="text"
-                            value="2025-11-13 10:00"
-                          />
+                          <input class="value" name="trip-time" type="text" value="2025-11-13 10:00" />
                         </label>
 
                         <label class="fieldLabel">
                           <span data-i18n="payment_method">Спосіб оплати</span>
-                          <input
-                            class="value"
-                            type="text"
-                            name="trip-payment-method"
-                            value="готівка / картка / рахунок"
-                          />
+                          <input class="value" type="text" name="trip-payment-method" value="готівка / картка / рахунок" />
                         </label>
                       </div>
 
@@ -179,18 +246,10 @@
                               value=""
                             />
                             <div class="currency-switch">
-                              <button
-                                type="button"
-                                class="currency-btn is-active"
-                                data-currency="EUR"
-                              >
+                              <button type="button" class="currency-btn is-active" data-currency="EUR">
                                 EUR
                               </button>
-                              <button
-                                type="button"
-                                class="currency-btn"
-                                data-currency="CZK"
-                              >
+                              <button type="button" class="currency-btn" data-currency="CZK">
                                 CZK
                               </button>
                             </div>
@@ -332,7 +391,7 @@
                             data-i18n="pdf_document_confirmation"
                             aria-pressed="true"
                           >
-                            Підтвердження
+                            Договір
                           </button>
                           <button
                             class="secondary-btn pdfDocumentTypeBtn"
@@ -341,7 +400,7 @@
                             data-i18n="pdf_document_offer"
                             aria-pressed="false"
                           >
-                            Пропозиція
+                            Фактура
                           </button>
                         </div>
                       </div>
@@ -360,9 +419,16 @@
                         </button>
                       </div>
                     </div>
+
+                    <section class="screenSection">
+                      <p class="screenSectionLabel" data-i18n="history">Історія</p>
+                      <p class="ordersEmpty" id="ordersEmpty" data-i18n="orders_empty_home">
+                        Замовлень ще немає. Згенеруйте PDF на «Замовлення», щоб створити перше.
+                      </p>
+                      <ul class="ordersList" id="ordersList"></ul>
+                    </section>
                   </div>
                 </div>
               </div>
             </div>
           </section>
-
