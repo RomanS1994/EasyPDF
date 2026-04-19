@@ -1,23 +1,15 @@
+import chromium from "@sparticuz/chromium";
 import { existsSync } from "node:fs";
-
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
 
 let browserPromise = null;
 
-function resolveBundledChromiumPath() {
-  try {
-    const executablePath = puppeteer.executablePath();
-    if (executablePath && existsSync(executablePath)) {
-      return executablePath;
-    }
-  } catch {
-    // Ignore and fall back to other browser locations.
+function resolveLocalBrowserPath() {
+  const configuredPath = process.env.PUPPETEER_EXECUTABLE_PATH;
+  if (configuredPath && existsSync(configuredPath)) {
+    return configuredPath;
   }
 
-  return undefined;
-}
-
-function resolveSystemBrowserPath() {
   const fallbackPaths = [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "/Applications/Chromium.app/Contents/MacOS/Chromium",
@@ -33,65 +25,34 @@ function resolveSystemBrowserPath() {
   return undefined;
 }
 
-function resolveConfiguredBrowserPath() {
-  const configuredPath = process.env.PUPPETEER_EXECUTABLE_PATH;
-  return configuredPath && existsSync(configuredPath) ? configuredPath : undefined;
-}
-
-function resolvePdfExecutablePath({ preferBundledChromium = true } = {}) {
-  const configuredPath = resolveConfiguredBrowserPath();
-  if (configuredPath) {
-    return configuredPath;
-  }
-
-  if (preferBundledChromium) {
-    const bundledChromiumPath = resolveBundledChromiumPath();
-    if (bundledChromiumPath) {
-      return bundledChromiumPath;
-    }
-
-    return resolveSystemBrowserPath();
-  }
-
-  return resolveSystemBrowserPath() || resolveBundledChromiumPath();
-}
-
-function buildLaunchOptions({ preferBundledChromium = true } = {}) {
-  const executablePath = resolvePdfExecutablePath({ preferBundledChromium });
-
-  return {
-    headless: 'new',
-    ...(executablePath ? { executablePath } : {}),
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-    ],
-  };
-}
-
 async function launchPdfBrowser() {
-  const attempts = [
-    buildLaunchOptions({ preferBundledChromium: true }),
-    buildLaunchOptions({ preferBundledChromium: false }),
-  ];
+  try {
+    const useServerChromium = process.platform === "linux" || process.env.USE_SPARTICUZ_CHROMIUM === "1";
+    const executablePath = useServerChromium
+      ? await chromium.executablePath()
+      : resolveLocalBrowserPath();
 
-  let lastError = null;
-
-  for (const options of attempts) {
-    try {
-      return await puppeteer.launch(options);
-    } catch (error) {
-      lastError = error;
+    if (!executablePath) {
+      throw new Error("Could not find a local Chrome executable");
     }
-  }
 
-  browserPromise = null;
-  throw new Error(
-    `Failed to launch PDF renderer: ${
-      lastError instanceof Error ? lastError.message : String(lastError)
-    }`,
-  );
+    return await puppeteer.launch({
+      args: useServerChromium
+        ? puppeteer.defaultArgs({ args: chromium.args, headless: "shell" })
+        : puppeteer.defaultArgs({ headless: "new" }),
+      defaultViewport: chromium.defaultViewport,
+      executablePath,
+      headless: useServerChromium ? "shell" : "new",
+      ignoreHTTPSErrors: true,
+    });
+  } catch (error) {
+    browserPromise = null;
+    throw new Error(
+      `Failed to launch PDF renderer: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
+  }
 }
 
 async function getPdfBrowser() {
