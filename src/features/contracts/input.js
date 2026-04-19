@@ -62,6 +62,11 @@ export function handleContractInput(event) {
     return;
   }
 
+  if (name === 'passengers') {
+    persistContractData({ passengers: value });
+    return;
+  }
+
   if (name.startsWith('trip-')) {
     const key = name.split('-')[1];
 

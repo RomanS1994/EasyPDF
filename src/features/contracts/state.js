@@ -21,6 +21,7 @@ const DEFAULT_CONTRACT_DATA = {
     name: 'John Doe',
     email: 'john.doe@gmail.com',
   },
+  passengers: '1',
   trip: {
     from: { address: 'Terminal 2, Aviaticka, Praha' },
     to: {

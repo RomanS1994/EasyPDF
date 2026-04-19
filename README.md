@@ -128,6 +128,7 @@ Backend on Render or another Node host:
 - required env: `AUTH_TOKEN_SECRET`, `DATABASE_URL`
 - optional env: `API_KEY`
 - optional env for Prisma CLI: `DIRECT_DATABASE_URL`
+- PDF generation uses Puppeteer's installed Chrome for Testing/Chromium by default
 - optional env for custom browser location: `PUPPETEER_EXECUTABLE_PATH`
 - production must not set `DB_MODE=file`, `DATA_FILE`, or `LEGACY_DATA_FILE`
 - production health checks should target `/api/health`, which validates the live PostgreSQL connection

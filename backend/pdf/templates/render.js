@@ -175,6 +175,14 @@ export function renderContractPdfHtml({
   const customerEmail = normalizeText(
     contractData?.customer?.email || contractData?.customer?.phone,
   );
+  const passengers = normalizeText(
+    contractData?.passengers ??
+      contractData?.customers ??
+      contractData?.customersCount ??
+      contractData?.trip?.passengers ??
+      contractData?.trip?.customers ??
+      contractData?.trip?.customersCount,
+  );
 
   const pickupAddress = getTripAddress(contractData?.trip?.from);
   const dropoffAddress = getTripAddress(contractData?.trip?.to);
@@ -434,7 +442,7 @@ export function renderContractPdfHtml({
                 ${renderRows([
                   { label: "Jméno:", value: customerName },
                   { label: "E-mail, phone:", value: customerEmail },
-                  { label: "E-mail, phone:", value: customerEmail },
+                  { label: "Počet pasažérů:", value: passengers },
                 ])}
               </div>
             </section>

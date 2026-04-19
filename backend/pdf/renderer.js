@@ -4,11 +4,20 @@ import puppeteer from "puppeteer";
 
 let browserPromise = null;
 
-function resolvePdfExecutablePath() {
-  if (process.env.PUPPETEER_EXECUTABLE_PATH) {
-    return process.env.PUPPETEER_EXECUTABLE_PATH;
+function resolveBundledChromiumPath() {
+  try {
+    const executablePath = puppeteer.executablePath();
+    if (executablePath && existsSync(executablePath)) {
+      return executablePath;
+    }
+  } catch {
+    // Ignore and fall back to other browser locations.
   }
 
+  return undefined;
+}
+
+function resolveSystemBrowserPath() {
   const fallbackPaths = [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "/Applications/Chromium.app/Contents/MacOS/Chromium",
@@ -24,8 +33,31 @@ function resolvePdfExecutablePath() {
   return undefined;
 }
 
-function buildLaunchOptions({ useExecutablePath = true } = {}) {
-  const executablePath = useExecutablePath ? resolvePdfExecutablePath() : undefined;
+function resolveConfiguredBrowserPath() {
+  const configuredPath = process.env.PUPPETEER_EXECUTABLE_PATH;
+  return configuredPath && existsSync(configuredPath) ? configuredPath : undefined;
+}
+
+function resolvePdfExecutablePath({ preferBundledChromium = true } = {}) {
+  const configuredPath = resolveConfiguredBrowserPath();
+  if (configuredPath) {
+    return configuredPath;
+  }
+
+  if (preferBundledChromium) {
+    const bundledChromiumPath = resolveBundledChromiumPath();
+    if (bundledChromiumPath) {
+      return bundledChromiumPath;
+    }
+
+    return resolveSystemBrowserPath();
+  }
+
+  return resolveSystemBrowserPath() || resolveBundledChromiumPath();
+}
+
+function buildLaunchOptions({ preferBundledChromium = true } = {}) {
+  const executablePath = resolvePdfExecutablePath({ preferBundledChromium });
 
   return {
     headless: 'new',
@@ -40,8 +72,8 @@ function buildLaunchOptions({ useExecutablePath = true } = {}) {
 
 async function launchPdfBrowser() {
   const attempts = [
-    buildLaunchOptions({ useExecutablePath: true }),
-    buildLaunchOptions({ useExecutablePath: false }),
+    buildLaunchOptions({ preferBundledChromium: true }),
+    buildLaunchOptions({ preferBundledChromium: false }),
   ];
 
   let lastError = null;

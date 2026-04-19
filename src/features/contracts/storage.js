@@ -38,6 +38,11 @@ function normalizeDateTimeValue(value) {
   return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
+function normalizePassengerValue(value, fallback = '1') {
+  if (value === '' || value === null || value === undefined) return fallback;
+  return String(value);
+}
+
 function getLocalizedPaymentDefaults() {
   return new Set([
     '',
@@ -67,6 +72,7 @@ export function restoreContractData(refs) {
       ? stored.documentType
       : DEFAULT_DOCUMENT_TYPE,
     today: normalizeDateValue(stored.today),
+    passengers: normalizePassengerValue(stored.passengers ?? stored.customers, defaults.passengers),
     trip: {
       ...defaults.trip,
       ...stored.trip,
@@ -75,10 +81,14 @@ export function restoreContractData(refs) {
     totalPrice: stored.totalPrice || '',
   };
 
+  delete normalized.customers;
+
   replaceContractData({
     ...defaults,
     ...normalized,
   });
+
+  writeStorageJson(CONTRACT_STORAGE_KEY, getContractData());
 
   refs.allInputs.forEach(input => {
     const { name } = input;
@@ -127,6 +137,7 @@ export function resetContractData() {
   const nextData = {
     orderNumber: '',
     today: '',
+    passengers: '1',
     documentType: DEFAULT_DOCUMENT_TYPE,
   };
 
