@@ -13,6 +13,10 @@ function formatLocalDateKey(value) {
   return `${year}-${month}-${day}`;
 }
 
+export function getTodayLocalDateKey() {
+  return formatLocalDateKey(new Date());
+}
+
 export function setOrdersDateFilter(dateValue = '') {
   state.ordersDateFilter = dateValue || '';
 
@@ -51,16 +55,21 @@ export function buildOrderMarkup(order, { compact = false, showOwner = false } =
 
   return `
     <li class="orderItem ${compact ? 'orderItem-compact' : ''} ${showOwner ? 'orderItem-admin' : ''}" data-order-id="${escapeHtml(order.id || '')}">
-      <div class="orderItem-main">
-        <strong class="orderItemNumber">${escapeHtml(order.orderNumber || '-')}</strong>
-        ${showOwner ? `<p class="orderItem-owner">${escapeHtml(ownerLabel)}</p>` : ''}
-        <p class="orderItemCustomer">${escapeHtml(customerName)}</p>
+      <div class="orderItem-head">
+        <div class="orderItemIdentity">
+          ${showOwner ? `<p class="orderItem-owner">${escapeHtml(ownerLabel)}</p>` : ''}
+          <strong class="orderItemCustomer">${escapeHtml(customerName)}</strong>
+        </div>
+      </div>
+      <div class="orderItemRouteBlock">
+        <span class="orderItemRouteLabel">${escapeHtml(t('route'))}</span>
         <p class="orderItemRoute">${escapeHtml(route || t('route_not_set'))}</p>
       </div>
-      <div class="orderItem-meta">
-        <span>${escapeHtml(totalPrice)}</span>
-        <span class="orderItemDate">${escapeHtml(createdAt)}</span>
-        <span class="orderStatus">${escapeHtml(statusLabel)}</span>
+      <div class="orderItem-foot">
+        <div class="orderItemMetaGroup">
+          <span class="orderItemMetaValue">${escapeHtml(totalPrice)}</span>
+          <span class="orderItemMetaDate">${escapeHtml(createdAt)}</span>
+        </div>
         ${compact ? '' : `<button type="button" class="orderItemOpenBtn" data-order-open="${escapeHtml(order.id || '')}">${escapeHtml(t('open_order'))}</button>`}
       </div>
     </li>

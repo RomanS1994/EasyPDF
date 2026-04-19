@@ -12,7 +12,43 @@ function hasAuthenticatedSession() {
 
 export function initContractDownload() {
   const downloadPdfBtn = document.getElementById('downloadPdfBtn');
-  if (!downloadPdfBtn) return;
+  const saveOrderBtn = document.getElementById('saveOrderBtn');
+  if (!downloadPdfBtn && !saveOrderBtn) return;
+
+  saveOrderBtn?.addEventListener('click', async () => {
+    if (!hasAuthenticatedSession()) {
+      notifyText(t('auth_required_before_order'), 'error');
+      document.getElementById('accountHub')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+      return;
+    }
+
+    showAppLoader('saving_order');
+
+    const contractData = getCurrentContractData();
+    const documentType = 'confirmation';
+
+    try {
+      await createOrder({
+        contractData,
+        status: 'created',
+        metadata: {
+          sourcePage: 'cz/pdf',
+          documentType,
+        },
+      });
+
+      notifyText(t('order_created'), 'success');
+      window.dispatchEvent(new CustomEvent('pdf-app:order-created'));
+    } catch (error) {
+      console.error('Save order failed', error);
+      notifyText(error.message || t('api_create_order_failed'), 'error');
+    } finally {
+      hideAppLoader();
+    }
+  });
 
   downloadPdfBtn.addEventListener('click', async () => {
     if (!hasAuthenticatedSession()) {

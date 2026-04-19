@@ -10,7 +10,7 @@
 .page-generateContract[data-app-tab='subscriptions'] .appScreen[data-tab-screen='subscriptions'],
 .page-generateContract[data-app-tab='settings'] .appScreen[data-tab-screen='settings'] {
   display: grid;
-  gap: 12px;
+  gap: 8px;
 }
 
 .page-generateContract[data-app-tab='orders'] .appTop {
@@ -31,7 +31,7 @@
 }
 
 .builderWorkspace {
-  gap: 12px;
+  gap: 8px;
 }
 
 .builderWorkspace-home {
@@ -97,6 +97,7 @@
 .dataContract-page {
   display: none;
   gap: 12px;
+  padding-bottom: 84px;
 }
 
 .dataContract-page.is-active {

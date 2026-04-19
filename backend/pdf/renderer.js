@@ -24,31 +24,42 @@ function resolvePdfExecutablePath() {
   return undefined;
 }
 
-async function launchPdfBrowser() {
-  try {
-    const browser = await puppeteer.launch({
-      headless: true,
-      executablePath: resolvePdfExecutablePath(),
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-gpu",
-        "--no-zygote",
-        "--single-process",
-        "--font-render-hinting=medium",
-      ],
-    });
+function buildLaunchOptions({ useExecutablePath = true } = {}) {
+  const executablePath = useExecutablePath ? resolvePdfExecutablePath() : undefined;
 
-    return browser;
-  } catch (error) {
-    browserPromise = null;
-    throw new Error(
-      `Failed to launch PDF renderer: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
-    );
+  return {
+    headless: 'new',
+    ...(executablePath ? { executablePath } : {}),
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+    ],
+  };
+}
+
+async function launchPdfBrowser() {
+  const attempts = [
+    buildLaunchOptions({ useExecutablePath: true }),
+    buildLaunchOptions({ useExecutablePath: false }),
+  ];
+
+  let lastError = null;
+
+  for (const options of attempts) {
+    try {
+      return await puppeteer.launch(options);
+    } catch (error) {
+      lastError = error;
+    }
   }
+
+  browserPromise = null;
+  throw new Error(
+    `Failed to launch PDF renderer: ${
+      lastError instanceof Error ? lastError.message : String(lastError)
+    }`,
+  );
 }
 
 async function getPdfBrowser() {

@@ -12,6 +12,7 @@ import { refs } from './refs.js';
 import { state } from './state.js';
 import {
   setOrdersDateFilter,
+  getTodayLocalDateKey,
 } from './orders.js';
 import {
   handleGuestLanguageClick,
@@ -108,6 +109,9 @@ export async function initAuthPage() {
   initLanguage();
   syncInitialRouteState();
   initDatePickers(document);
+  if (!state.ordersDateFilter) {
+    setOrdersDateFilter(getTodayLocalDateKey());
+  }
   bindEvents();
   syncLanguageSelects();
   setAuthMode(state.authMode);
