@@ -4,18 +4,22 @@ const prefersReducedMotion =
 const SPLASH_DELAY_MS = prefersReducedMotion ? 120 : 1300;
 const SPLASH_EXIT_MS = prefersReducedMotion ? 0 : 240;
 
-function resolveNextPath() {
+function resolveNextUrl() {
   try {
     const url = new URL(window.location.href);
     const nextPath = url.searchParams.get('next');
     if (nextPath && nextPath.startsWith('/')) {
-      return nextPath;
+      const nextUrl = new URL(nextPath, window.location.origin);
+      nextUrl.searchParams.set('startupSplash', 'skip');
+      return nextUrl;
     }
   } catch {
     // Ignore malformed URLs and fall back to the app entry point.
   }
 
-  return DEFAULT_NEXT;
+  const fallbackUrl = new URL(DEFAULT_NEXT, window.location.origin);
+  fallbackUrl.searchParams.set('startupSplash', 'skip');
+  return fallbackUrl;
 }
 
 function startSplashRedirect() {
@@ -23,7 +27,7 @@ function startSplashRedirect() {
     document.body.classList.add('is-leaving');
 
     window.setTimeout(() => {
-      window.location.replace(resolveNextPath());
+      window.location.replace(resolveNextUrl().toString());
     }, SPLASH_EXIT_MS);
   }, SPLASH_DELAY_MS);
 }

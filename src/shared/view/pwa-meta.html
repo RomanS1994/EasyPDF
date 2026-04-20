@@ -1,3 +1,18 @@
+<script>
+  (() => {
+    try {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get('startupSplash') === 'skip') {
+        document.documentElement.dataset.startupSplash = 'skip';
+      } else if (typeof window.performance?.now === 'function') {
+        window.__PDF_APP_STARTUP_SPLASH_AT__ = window.performance.now();
+      }
+    } catch {
+      // Ignore malformed URLs.
+    }
+  })();
+</script>
+<link rel="stylesheet" href="/shared/styles/splash.css" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="DocTra" />

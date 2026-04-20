@@ -2,7 +2,6 @@ const LOADING_TEXT = 'Loading...';
 const MIN_VISIBLE_MS = 250;
 
 const state = {
-  booting: false,
   requestCount: 0,
   visibleSince: 0,
   hideTimer: 0,
@@ -16,7 +15,7 @@ function getOverlayRefs() {
 }
 
 function isActive() {
-  return state.booting || state.requestCount > 0;
+  return state.requestCount > 0;
 }
 
 function clearHideTimer() {
@@ -78,11 +77,6 @@ function updateLoaderState() {
 }
 
 export function initAppLoader() {
-  updateLoaderState();
-}
-
-export function setBootLoaderActive(isActive) {
-  state.booting = Boolean(isActive);
   updateLoaderState();
 }
 

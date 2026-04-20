@@ -47,7 +47,11 @@ import { bindManagerEvents } from './manager-bindings.js';
 import {
   initLanguage,
 } from '../../../shared/i18n/app.js';
-import { initAppLoader, setBootLoaderActive } from '../../../shared/ui/loader.js';
+import { initAppLoader } from '../../../shared/ui/loader.js';
+import {
+  hideStartupSplash,
+  waitForStartupSplashMinVisible,
+} from '../../../shared/ui/startup-splash.js';
 import { initDatePickers } from '../../contracts/date-pickers.js';
 
 function bindEvents() {
@@ -105,7 +109,6 @@ export async function initAuthPage() {
   if (!refs.hub) return;
 
   initAppLoader();
-  setBootLoaderActive(document.body.dataset.authState === 'booting');
   initLanguage();
   syncInitialRouteState();
   initDatePickers(document);
@@ -122,7 +125,8 @@ export async function initAuthPage() {
     await loadPlansForGuest();
     await refreshAccountData();
   } finally {
-    setBootLoaderActive(false);
+    await waitForStartupSplashMinVisible();
+    hideStartupSplash();
   }
 }
 

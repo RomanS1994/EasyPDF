@@ -78,10 +78,6 @@
   display: none !important;
 }
 
-.page-generateContract[data-auth-state='booting'] #loaderOverlay {
-  display: flex;
-}
-
 .appRoot,
 .guestStage,
 .appShell,

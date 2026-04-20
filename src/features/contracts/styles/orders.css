@@ -44,8 +44,16 @@
   padding: 14px 14px 13px;
   border-radius: 24px;
   background:
-    radial-gradient(circle at top right, rgba(0, 122, 255, 0.1), transparent 30%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.995), rgba(244, 247, 253, 0.95));
+    radial-gradient(
+      circle at top right,
+      rgba(0, 122, 255, 0.1),
+      transparent 30%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.995),
+      rgba(244, 247, 253, 0.95)
+    );
   border: 1px solid rgba(60, 60, 67, 0.08);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.98),
@@ -53,16 +61,20 @@
 }
 
 .orderItem::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0 auto 0 0;
   width: 3px;
-  background: linear-gradient(180deg, rgba(0, 122, 255, 0.9), rgba(0, 122, 255, 0.15));
+  background: linear-gradient(
+    180deg,
+    rgba(0, 122, 255, 0.9),
+    rgba(0, 122, 255, 0.15)
+  );
   opacity: 0.9;
 }
 
 .orderItem::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background:
@@ -89,7 +101,11 @@
     0 0 0 1px rgba(0, 122, 255, 0.16),
     0 14px 32px rgba(0, 122, 255, 0.08);
   background:
-    radial-gradient(circle at top right, rgba(0, 122, 255, 0.14), transparent 28%),
+    radial-gradient(
+      circle at top right,
+      rgba(0, 122, 255, 0.14),
+      transparent 28%
+    ),
     linear-gradient(180deg, #ffffff, #f2f7ff);
 }
 
@@ -184,7 +200,11 @@
   padding: 0 13px;
   border-radius: 999px;
   border: 1px solid rgba(0, 122, 255, 0.18);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 245, 255, 0.94));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98),
+    rgba(240, 245, 255, 0.94)
+  );
   color: var(--text);
   font-size: 11px;
   font-weight: 700;
@@ -236,14 +256,14 @@
 .bottomTab-icon {
   display: grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   color: #8e8e93;
 }
 
 .bottomTab-icon svg {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   stroke: currentColor;
   fill: none;
   stroke-width: 1.85;
@@ -278,7 +298,11 @@
   width: 50px;
   height: 50px;
   border-radius: 18px;
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.98), rgba(235, 242, 255, 0.96));
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.98),
+    rgba(235, 242, 255, 0.96)
+  );
   box-shadow:
     0 14px 28px rgba(0, 122, 255, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.92);
@@ -333,8 +357,16 @@
   border-radius: 32px;
   padding: 20px 18px 18px;
   background:
-    radial-gradient(circle at top right, rgba(0, 122, 255, 0.16), transparent 30%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.998), rgba(243, 247, 253, 0.985));
+    radial-gradient(
+      circle at top right,
+      rgba(0, 122, 255, 0.16),
+      transparent 30%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.998),
+      rgba(243, 247, 253, 0.985)
+    );
   border: 1px solid rgba(60, 60, 67, 0.08);
   box-shadow:
     0 34px 76px rgba(17, 24, 39, 0.2),
@@ -368,7 +400,11 @@
   gap: 6px;
   padding: 5px 10px;
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 248, 255, 0.94));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98),
+    rgba(244, 248, 255, 0.94)
+  );
   border: 1px solid rgba(60, 60, 67, 0.08);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.96);
 }
@@ -379,7 +415,11 @@
   height: 40px;
   border-radius: 999px;
   border: 1px solid rgba(60, 60, 67, 0.1);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 252, 0.96));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98),
+    rgba(244, 247, 252, 0.96)
+  );
   font-size: 22px;
   line-height: 1;
   color: #6b7280;
@@ -402,8 +442,16 @@
   padding: 13px 14px 12px;
   border-radius: 24px;
   background:
-    radial-gradient(circle at top right, rgba(0, 122, 255, 0.08), transparent 28%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.996), rgba(244, 248, 255, 0.95));
+    radial-gradient(
+      circle at top right,
+      rgba(0, 122, 255, 0.08),
+      transparent 28%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.996),
+      rgba(244, 248, 255, 0.95)
+    );
   border: 1px solid rgba(60, 60, 67, 0.08);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.95),
@@ -480,7 +528,11 @@
 }
 
 .orderDetailActionBtn.secondary-btn {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 248, 255, 0.95));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98),
+    rgba(244, 248, 255, 0.95)
+  );
   border: 1px solid rgba(60, 60, 67, 0.09);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.96),
@@ -493,14 +545,38 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-.page-generateContract[data-app-tab='home'] .bottomTab[data-tab-target='home'] .bottomTab-icon svg,
-.page-generateContract[data-app-tab='stats'] .bottomTab[data-tab-target='stats'] .bottomTab-icon svg,
-.page-generateContract[data-app-tab='orders'] .bottomTab[data-tab-target='orders'] .bottomTab-icon svg,
-.page-generateContract[data-app-tab='account'] .bottomTab[data-tab-target='account'] .bottomTab-icon svg,
-.page-generateContract[data-app-tab='settings'] .bottomTab[data-tab-target='settings'] .bottomTab-icon svg,
-.page-generateContract[data-app-tab='accounts'] .bottomTab[data-tab-target='accounts'] .bottomTab-icon svg,
-.page-generateContract[data-app-tab='subscriptions'] .bottomTab[data-tab-target='subscriptions'] .bottomTab-icon svg,
-.page-generateContract[data-app-tab='settings'] .bottomTab[data-tab-target='settings'] .bottomTab-icon svg {
+.page-generateContract[data-app-tab="home"]
+  .bottomTab[data-tab-target="home"]
+  .bottomTab-icon
+  svg,
+.page-generateContract[data-app-tab="stats"]
+  .bottomTab[data-tab-target="stats"]
+  .bottomTab-icon
+  svg,
+.page-generateContract[data-app-tab="orders"]
+  .bottomTab[data-tab-target="orders"]
+  .bottomTab-icon
+  svg,
+.page-generateContract[data-app-tab="account"]
+  .bottomTab[data-tab-target="account"]
+  .bottomTab-icon
+  svg,
+.page-generateContract[data-app-tab="settings"]
+  .bottomTab[data-tab-target="settings"]
+  .bottomTab-icon
+  svg,
+.page-generateContract[data-app-tab="accounts"]
+  .bottomTab[data-tab-target="accounts"]
+  .bottomTab-icon
+  svg,
+.page-generateContract[data-app-tab="subscriptions"]
+  .bottomTab[data-tab-target="subscriptions"]
+  .bottomTab-icon
+  svg,
+.page-generateContract[data-app-tab="settings"]
+  .bottomTab[data-tab-target="settings"]
+  .bottomTab-icon
+  svg {
   stroke-width: 2.15;
 }
 
