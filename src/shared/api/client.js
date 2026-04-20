@@ -51,8 +51,6 @@ async function performRequest({
   options,
   apiKey,
   sessionToken,
-  loaderMessageKey = 'loading_data',
-  showLoader = true,
 }) {
   const headers = { ...(options.headers || {}) };
 
@@ -79,16 +77,12 @@ async function performRequest({
     fetchOptions.body = JSON.stringify(body);
   }
 
-  if (showLoader) {
-    beginApiLoader(loaderMessageKey);
-  }
+  beginApiLoader();
 
   try {
     return await fetch(url, fetchOptions);
   } finally {
-    if (showLoader) {
-      endApiLoader();
-    }
+    endApiLoader();
   }
 }
 
@@ -104,7 +98,7 @@ async function refreshAccessSession(base, apiKey) {
       headers['X-API-KEY'] = apiKey;
     }
 
-    beginApiLoader('loading_data');
+    beginApiLoader();
 
     let response;
     let payload;
@@ -146,8 +140,6 @@ export async function fetchApi(
     body,
     options = {},
     skipAuthRefresh = false,
-    loaderMessageKey = 'loading_data',
-    showLoader = true,
   } = {}
 ) {
   const base = resolveApiBase();
@@ -161,8 +153,6 @@ export async function fetchApi(
     options,
     apiKey,
     sessionToken: getSessionToken(),
-    loaderMessageKey,
-    showLoader,
   });
 
   if (
@@ -180,8 +170,6 @@ export async function fetchApi(
         options,
         apiKey,
         sessionToken: refreshed.token,
-        loaderMessageKey,
-        showLoader,
       });
     }
   }

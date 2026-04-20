@@ -1,13 +1,11 @@
-import { t } from '../i18n/app.js';
-
-const DEFAULT_MESSAGE_KEY = 'loading_data';
+const LOADING_TEXT = 'Loading...';
+const MIN_VISIBLE_MS = 250;
 
 const state = {
   booting: false,
   requestCount: 0,
-  requestMessageKey: DEFAULT_MESSAGE_KEY,
-  manualCount: 0,
-  manualMessageKey: DEFAULT_MESSAGE_KEY,
+  visibleSince: 0,
+  hideTimer: 0,
 };
 
 function getOverlayRefs() {
@@ -17,71 +15,107 @@ function getOverlayRefs() {
   };
 }
 
-function getActiveMessageKey() {
-  if (state.manualCount > 0) {
-    return state.manualMessageKey;
-  }
-
-  if (state.booting || state.requestCount > 0) {
-    return state.requestMessageKey;
-  }
-
-  return DEFAULT_MESSAGE_KEY;
+function isActive() {
+  return state.booting || state.requestCount > 0;
 }
 
-function applyLoaderState() {
+function clearHideTimer() {
+  if (state.hideTimer) {
+    clearTimeout(state.hideTimer);
+    state.hideTimer = 0;
+  }
+}
+
+function renderLoader(isVisible) {
   const { overlay, text } = getOverlayRefs();
   if (!overlay) return;
 
-  const isActive = state.booting || state.requestCount > 0 || state.manualCount > 0;
-  overlay.classList.toggle('is-active', isActive);
-  overlay.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+  overlay.classList.toggle('is-active', isVisible);
+  overlay.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
 
   if (text) {
-    text.textContent = t(getActiveMessageKey());
+    text.textContent = LOADING_TEXT;
   }
+}
+
+function getNow() {
+  if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+    return performance.now();
+  }
+
+  return Date.now();
+}
+
+function updateLoaderState() {
+  const active = isActive();
+
+  if (active) {
+    clearHideTimer();
+    if (!state.visibleSince) {
+      state.visibleSince = getNow();
+    }
+    renderLoader(true);
+    return;
+  }
+
+  const elapsed = state.visibleSince ? getNow() - state.visibleSince : MIN_VISIBLE_MS;
+  const remaining = Math.max(0, MIN_VISIBLE_MS - elapsed);
+
+  if (remaining > 0) {
+    renderLoader(true);
+    clearHideTimer();
+    state.hideTimer = setTimeout(() => {
+      state.hideTimer = 0;
+      state.visibleSince = 0;
+      renderLoader(false);
+    }, remaining);
+    return;
+  }
+
+  clearHideTimer();
+  state.visibleSince = 0;
+  renderLoader(false);
 }
 
 export function initAppLoader() {
-  applyLoaderState();
+  updateLoaderState();
 }
 
-export function setBootLoaderActive(isActive, messageKey = DEFAULT_MESSAGE_KEY) {
+export function setBootLoaderActive(isActive) {
   state.booting = Boolean(isActive);
-  state.requestMessageKey = messageKey || DEFAULT_MESSAGE_KEY;
-  applyLoaderState();
+  updateLoaderState();
 }
 
-export function beginApiLoader(messageKey = DEFAULT_MESSAGE_KEY) {
+export function beginApiLoader() {
   state.requestCount += 1;
-  if (state.manualCount === 0) {
-    state.requestMessageKey = messageKey || DEFAULT_MESSAGE_KEY;
-  }
-  applyLoaderState();
+  updateLoaderState();
 }
 
 export function endApiLoader() {
   state.requestCount = Math.max(0, state.requestCount - 1);
-  if (state.requestCount === 0) {
-    state.requestMessageKey = DEFAULT_MESSAGE_KEY;
+  updateLoaderState();
+}
+
+async function waitForNextPaint() {
+  if (
+    typeof window === 'undefined' ||
+    typeof window.requestAnimationFrame !== 'function'
+  ) {
+    return;
   }
-  applyLoaderState();
+
+  await new Promise(resolve => {
+    window.requestAnimationFrame(() => resolve());
+  });
 }
 
-export function showAppLoader(messageKey = DEFAULT_MESSAGE_KEY) {
-  state.manualCount += 1;
-  state.manualMessageKey = messageKey || DEFAULT_MESSAGE_KEY;
-  applyLoaderState();
-}
+export async function withAppLoader(task) {
+  beginApiLoader();
 
-export function hideAppLoader() {
-  state.manualCount = Math.max(0, state.manualCount - 1);
-  if (state.manualCount === 0) {
-    state.manualMessageKey = DEFAULT_MESSAGE_KEY;
+  try {
+    await waitForNextPaint();
+    return await task();
+  } finally {
+    endApiLoader();
   }
-  applyLoaderState();
-}
-
-if (typeof window !== 'undefined') {
-  window.addEventListener('pdf-app:language-changed', applyLoaderState);
 }

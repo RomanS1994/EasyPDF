@@ -3,9 +3,11 @@ import { randomUUID } from 'node:crypto';
 import { nowIso } from '../validation/common.js';
 import { hashToken } from './tokens.js';
 
-const LEGACY_SESSION_TTL_HOURS = Number(process.env.SESSION_TTL_HOURS || 24 * 7);
+const DEFAULT_REFRESH_TOKEN_TTL_HOURS = 720;
 export const REFRESH_TOKEN_TTL_HOURS = Number(
-  process.env.REFRESH_TOKEN_TTL_HOURS || LEGACY_SESSION_TTL_HOURS
+  process.env.REFRESH_TOKEN_TTL_HOURS ||
+    process.env.SESSION_TTL_HOURS ||
+    DEFAULT_REFRESH_TOKEN_TTL_HOURS
 );
 export const REFRESH_TOKEN_TTL_SECONDS = REFRESH_TOKEN_TTL_HOURS * 60 * 60;
 export const REFRESH_COOKIE_NAME =

@@ -6,9 +6,20 @@ import { getDefaultAuthMode, setFormDisabled } from './shell.js';
 import { state } from './state.js';
 import { focusAuthMode, renderPlans, setAuthMode, syncSelectedPlan } from './guest.js';
 import { activateTab, getTabForPath, navigateToTab } from './routes.js';
-import { refreshAccountData } from './account-session.js';
 import { t } from '../../../shared/i18n/app.js';
 import { notifyText } from '../../../shared/ui/toast.js';
+import { withAppLoader } from '../../../shared/ui/loader.js';
+
+function buildSplashRedirectUrl(nextPath = window.location.pathname) {
+  const safeNextPath = nextPath.startsWith('/') ? nextPath : '/cz/pdf/';
+  const url = new URL('/', window.location.origin);
+  url.searchParams.set('next', safeNextPath);
+  return url.toString();
+}
+
+function redirectThroughSplash(nextPath = window.location.pathname) {
+  window.location.replace(buildSplashRedirectUrl(nextPath));
+}
 
 export async function loadPlansForGuest() {
   try {
@@ -34,21 +45,19 @@ export async function handleRegisterSubmit(event) {
     return;
   }
 
-  setFormDisabled(refs.registerForm, true);
+  await withAppLoader(async () => {
+    setFormDisabled(refs.registerForm, true);
 
-  try {
-    const data = await register(payload);
-    setStoredSession({ token: data.token, user: data.user });
-    state.user = data.user;
-    notifyText(t('account_created_signed_in'), 'success');
-    await refreshAccountData({ resetTab: true });
-    refs.registerForm?.reset();
-    syncSelectedPlan(state.selectedPlanId);
-  } catch (error) {
-    notifyText(error.message || t('register_failed'), 'error');
-  } finally {
-    setFormDisabled(refs.registerForm, false);
-  }
+    try {
+      const data = await register(payload);
+      setStoredSession({ token: data.token, user: data.user });
+      redirectThroughSplash(`${window.location.pathname}${window.location.search}${window.location.hash}`);
+    } catch (error) {
+      notifyText(error.message || t('register_failed'), 'error');
+    } finally {
+      setFormDisabled(refs.registerForm, false);
+    }
+  });
 }
 
 export async function handleLoginSubmit(event) {
@@ -62,20 +71,19 @@ export async function handleLoginSubmit(event) {
     return;
   }
 
-  setFormDisabled(refs.loginForm, true);
+  await withAppLoader(async () => {
+    setFormDisabled(refs.loginForm, true);
 
-  try {
-    const data = await login(payload);
-    setStoredSession({ token: data.token, user: data.user });
-    state.user = data.user;
-    notifyText(t('signed_in_successfully'), 'success');
-    await refreshAccountData({ resetTab: true });
-    refs.loginForm?.reset();
-  } catch (error) {
-    notifyText(error.message || t('sign_in_failed'), 'error');
-  } finally {
-    setFormDisabled(refs.loginForm, false);
-  }
+    try {
+      const data = await login(payload);
+      setStoredSession({ token: data.token, user: data.user });
+      redirectThroughSplash(`${window.location.pathname}${window.location.search}${window.location.hash}`);
+    } catch (error) {
+      notifyText(error.message || t('sign_in_failed'), 'error');
+    } finally {
+      setFormDisabled(refs.loginForm, false);
+    }
+  });
 }
 
 function updatePasswordToggle(button, isVisible) {

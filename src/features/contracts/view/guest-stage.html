@@ -1,21 +1,19 @@
 <section class="dataContract">
   <script>
     try {
-      const rawSession = window.localStorage.getItem('pdf-app-session');
-      const session = rawSession ? JSON.parse(rawSession) : null;
       const rawLanguage = window.localStorage.getItem('pdf-app-language');
       const language = ['uk', 'en', 'cs'].includes(rawLanguage) ? rawLanguage : 'uk';
       const routeTab = document.body?.dataset?.appTab || 'home';
 
       document.documentElement.lang = language;
-      document.body.dataset.authState = session?.token ? 'booting' : 'guest';
+      document.body.dataset.authState = 'booting';
       window.__PDF_APP_BOOT__ = {
         language,
         routeTab,
         defaultAuthMode: routeTab === 'home' ? 'register' : 'login',
       };
     } catch {
-      document.body.dataset.authState = 'guest';
+      document.body.dataset.authState = 'booting';
       window.__PDF_APP_BOOT__ = {
         language: 'uk',
         routeTab: document.body?.dataset?.appTab || 'home',

@@ -1,8 +1,8 @@
 import { getContractPdf } from '../../contracts/api.js';
 import { updateOrder } from '../../orders/api.js';
 import { getCurrentLocale, t } from '../../../shared/i18n/app.js';
-import { hideAppLoader, showAppLoader } from '../../../shared/ui/loader.js';
 import { notifyText } from '../../../shared/ui/toast.js';
+import { withAppLoader } from '../../../shared/ui/loader.js';
 import { refs } from './refs.js';
 import { state } from './state.js';
 import { formatDateTimeLabel, formatOrderStatusLabel, titleCase } from './formatters.js';
@@ -48,46 +48,44 @@ export function openOrderDetail(orderId) {
 async function downloadOrderPdf(order, documentType) {
   if (!order) return;
 
-  showAppLoader('generating_pdf');
+  await withAppLoader(async () => {
+    try {
+      const response = await getContractPdf(order.contractData || {}, {
+        orderId: order.id,
+        documentType,
+      });
 
-  try {
-    const response = await getContractPdf(order.contractData || {}, {
-      orderId: order.id,
-      documentType,
-    });
+      if (!response?.blob) {
+        throw new Error(t('pdf_generation_failed'));
+      }
 
-    if (!response?.blob) {
-      throw new Error(t('pdf_generation_failed'));
+      const blobUrl = URL.createObjectURL(response.blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = response.fileName || t('pdf_fallback_name');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(blobUrl);
+
+      await updateOrder(order.id, {
+        status: 'pdf_generated',
+        pdf: {
+          fileName: response.fileName,
+          documentType,
+        },
+        metadata: {
+          documentType,
+        },
+      });
+
+      window.dispatchEvent(new CustomEvent('pdf-app:order-created'));
+      notifyText(t('order_saved_pdf_downloaded'), 'success');
+    } catch (error) {
+      console.error('Order PDF generation failed', error);
+      notifyText(error.message || t('pdf_download_failed'), 'error');
     }
-
-    const blobUrl = URL.createObjectURL(response.blob);
-    const link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = response.fileName || t('pdf_fallback_name');
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(blobUrl);
-
-    await updateOrder(order.id, {
-      status: 'pdf_generated',
-      pdf: {
-        fileName: response.fileName,
-        documentType,
-      },
-      metadata: {
-        documentType,
-      },
-    });
-
-    window.dispatchEvent(new CustomEvent('pdf-app:order-created'));
-    notifyText(t('order_saved_pdf_downloaded'), 'success');
-  } catch (error) {
-    console.error('Order PDF generation failed', error);
-    notifyText(error.message || t('pdf_download_failed'), 'error');
-  } finally {
-    hideAppLoader();
-  }
+  });
 }
 
 export function renderOrderDetail() {

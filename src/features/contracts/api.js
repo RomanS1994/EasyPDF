@@ -10,8 +10,6 @@ export async function getContractPdf(contractData, { orderId, documentType } = {
       contractData,
       language: document.documentElement.lang || 'uk',
     },
-    loaderMessageKey: 'generating_pdf',
-    showLoader: false,
   });
 
   if (!response.ok) {

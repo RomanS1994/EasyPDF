@@ -1,3 +1,15 @@
+  <script>
+    try {
+      const rawLanguage = window.localStorage.getItem('pdf-app-language');
+      const language = ['uk', 'en', 'cs'].includes(rawLanguage) ? rawLanguage : 'uk';
+
+      document.documentElement.lang = language;
+      document.body.dataset.authState = 'booting';
+    } catch {
+      document.body.dataset.authState = 'booting';
+    }
+  </script>
+
       <section class="guestStage" id="guestPanel">
         <div class="guestIntro">
           <p class="sectionEyebrow">DocTra</p>
