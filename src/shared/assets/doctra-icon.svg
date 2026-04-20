@@ -1,14 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <linearGradient id="bg" x1="10" y1="8" x2="54" y2="56" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#3b82f6" />
-      <stop offset="1" stop-color="#0f5fd7" />
+    <linearGradient id="bg" x1="10" y1="8" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6fb0ff" />
+      <stop offset="0.45" stop-color="#2f7df0" />
+      <stop offset="1" stop-color="#0b4ebc" />
+    </linearGradient>
+    <radialGradient id="shine" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(18 14) rotate(40) scale(32 28)">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.5" />
+      <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.13" />
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="shade" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(49 50) rotate(225) scale(28 26)">
+      <stop offset="0" stop-color="#041a42" stop-opacity="0.34" />
+      <stop offset="0.7" stop-color="#041a42" stop-opacity="0.1" />
+      <stop offset="1" stop-color="#041a42" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="bevel" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.42" />
+      <stop offset="0.48" stop-color="#ffffff" stop-opacity="0.1" />
+      <stop offset="1" stop-color="#04193b" stop-opacity="0.2" />
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="18" fill="url(#bg)" />
-  <circle cx="32" cy="32" r="16" fill="none" stroke="#fff" stroke-width="4" />
-  <path d="M16 32h32" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="4" />
-  <path d="M32 16c4.8 4.3 7.5 9.9 7.5 16S36.8 43.7 32 48c-4.8-4.3-7.5-9.9-7.5-16S27.2 20.3 32 16Z" fill="none" stroke="#fff" stroke-width="4" />
-  <path d="M20 24c4.1 2.2 8 3.2 12 3.2S39.9 26.2 44 24" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="4" />
-  <path d="M20 40c4.1-2.2 8-3.2 12-3.2s7.9 1 12 3.2" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="4" />
+
+  <rect x="4" y="5" width="56" height="54" rx="18" fill="#04192f" opacity="0.18" />
+  <rect x="2" y="2" width="60" height="60" rx="18" fill="url(#bg)" />
+  <rect x="2" y="2" width="60" height="60" rx="18" fill="url(#shine)" />
+  <rect x="2" y="2" width="60" height="60" rx="18" fill="url(#shade)" />
+  <rect x="2.5" y="2.5" width="59" height="59" rx="17.5" fill="none" stroke="url(#bevel)" stroke-width="1" />
+
+  <circle cx="32" cy="32" r="16" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2.75" />
+  <path d="M16 32h32" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2.75" />
+  <path d="M32 16c4.8 4.3 7.5 9.9 7.5 16S36.8 43.7 32 48c-4.8-4.3-7.5-9.9-7.5-16S27.2 20.3 32 16Z" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2.75" />
+  <path d="M20 24c4.1 2.2 8 3.2 12 3.2S39.9 26.2 44 24" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2.75" />
+  <path d="M20 40c4.1-2.2 8-3.2 12-3.2s7.9 1 12 3.2" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2.75" />
 </svg>

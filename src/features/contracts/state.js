@@ -18,16 +18,14 @@ const DEFAULT_CONTRACT_DATA = {
     ico: '22319352',
   },
   customer: {
-    name: 'John Doe',
-    email: 'john.doe@gmail.com',
+    name: '',
+    email: '',
   },
-  passengers: '1',
+  passengers: '',
   trip: {
-    from: { address: 'Terminal 2, Aviaticka, Praha' },
-    to: {
-      address: 'Hotel Hilton, Pobrezni 311/1, 186 00 Praha 8-Rohansky ostrov',
-    },
-    time: '2025-11-13 10:00',
+    from: { address: '' },
+    to: { address: '' },
+    time: '',
     paymentMethod: '',
   },
   totalPrice: '',

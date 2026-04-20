@@ -1,3 +1,4 @@
+import { t } from '../../shared/i18n/app.js';
 import { contractRefs } from './selectors.js';
 import { getCurrentCurrency } from './currency.js';
 
@@ -20,6 +21,16 @@ export function syncCurrencyButtons() {
 export function syncConvertedPrice(value) {
   if (!contractRefs.priceConverted) return;
   contractRefs.priceConverted.textContent = value || '';
+}
+
+export function syncTripTimeDisplay(value) {
+  const tripTimeDisplay = contractRefs.root?.querySelector('[data-trip-time-display]');
+  if (!tripTimeDisplay) return;
+
+  const tripTimeButton = tripTimeDisplay.closest('[data-trip-time-trigger]');
+  const nextValue = value || t('pickup_time_placeholder');
+  tripTimeDisplay.textContent = nextValue;
+  tripTimeButton?.classList.toggle('is-placeholder', !value);
 }
 
 export function syncRepeatedTextInput(fieldName, value) {

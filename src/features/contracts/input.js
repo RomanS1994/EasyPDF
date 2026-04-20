@@ -2,7 +2,7 @@ import { findContractInput, contractRefs } from './selectors.js';
 import { formatPrice } from './currency.js';
 import { getContractData } from './state.js';
 import { persistContractData } from './storage.js';
-import { syncConvertedPrice, syncRepeatedTextInput } from './ui.js';
+import { syncConvertedPrice, syncRepeatedTextInput, syncTripTimeDisplay } from './ui.js';
 
 export function handleContractInput(event) {
   const input = event.target;
@@ -87,6 +87,9 @@ export function handleContractInput(event) {
           [key]: value,
         },
       });
+      if (key === 'time') {
+        syncTripTimeDisplay(value);
+      }
       return;
     }
   }

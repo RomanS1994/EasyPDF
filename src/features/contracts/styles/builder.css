@@ -36,17 +36,6 @@
   display: grid;
 }
 
-.builderWorkspace {
-  gap: 8px;
-}
-
-.builderWorkspace-home {
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-
 .homeStepTabs {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -103,15 +92,14 @@
 .dataContract-page {
   display: none;
   gap: 12px;
+  margin: 0;
+  border: 0;
+  background: transparent;
   padding-bottom: 84px;
 }
 
 .dataContract-page.is-active {
   display: grid;
-}
-
-.builderWorkspace-home .dataContract-container {
-  gap: 12px;
 }
 
 .compactMeta {
@@ -166,7 +154,8 @@
   background: rgba(255, 255, 255, 0.98);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    0 0 0 1px rgba(0, 122, 255, 0.08);
+    0 0 0 1px rgba(17, 24, 39, 0.06),
+    0 8px 18px rgba(17, 24, 39, 0.03);
 }
 
 .dataContract-container .fieldLabel > span,
@@ -180,32 +169,135 @@
 }
 
 .dataContract-container .fieldRow {
-  gap: 8px;
+  gap: 14px;
   grid-template-columns: 1fr;
 }
 
-.dataContract-container .input-with-clear {
+.dataContract-container .fieldGroup {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 32px;
-  gap: 8px;
-  width: 100%;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  border: 0;
   min-width: 0;
 }
 
-.dataContract-container .fieldLabel-full {
-  grid-column: 1 / -1;
-}
-
-.dataContract-container .fieldLabel-stack {
+.dataContract-container .fieldLabel {
   grid-template-columns: 1fr;
   align-items: stretch;
-  gap: 8px;
+  gap: 6px;
+  padding: 0 16px;
+  background: transparent;
+  box-shadow: none;
+  position: relative;
 }
 
-.dataContract-container .fieldLabel-stack > span {
+.dataContract-container .fieldLabel:focus-within,
+.dataContract-container .fieldLabel-clearable:focus-within {
+  background: transparent;
+  box-shadow: none;
+}
+
+.dataContract-container .fieldPlainRow {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  min-height: 46px;
+  padding: 6px 16px;
+}
+
+.dataContract-container .fieldPlainRow > dt,
+.dataContract-container .fieldPlainRow > dd {
+  margin: 0;
+}
+
+.dataContract-container .fieldPlainRow > dt {
   font-size: 11px;
   font-weight: 600;
+  letter-spacing: 0;
   color: var(--muted);
+  line-height: 1.2;
+}
+
+.dataContract-container .fieldPlainRow > dd {
+  min-width: 0;
+  justify-self: end;
+}
+
+.dataContract-container .fieldPlainRow > dd > span,
+.dataContract-container .fieldPlainRow > dd > button {
+  display: block;
+  max-width: 100%;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dataContract-container .fieldPlainValue-button {
+  font: inherit;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+}
+
+.dataContract-container .fieldPlainValue-button.is-placeholder {
+  color: rgba(148, 156, 168, 0.72);
+}
+
+.dataContract-container .fieldPlainValue-button:focus-visible {
+  outline: none;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.dataContract-container .fieldLabel-clearable {
+  position: relative;
+}
+
+.dataContract-container .fieldLabel-clearable > input {
+  padding-right: 42px;
+}
+
+.dataContract-container .fieldLabel-clearable > .clear-btn {
+  position: absolute;
+  top: 50%;
+  right: 25px;
+  transform: translateY(-50%);
+}
+
+.dataContract-container .fieldLabel-price {
+  padding: 0;
+}
+
+.dataContract-container .priceField {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 10px;
+  align-items: center;
+  padding: 0 16px;
+}
+
+.dataContract-container .priceField > .fieldLabel-price {
+  grid-column: 1;
+}
+
+.dataContract-container .priceField > .currency-switch {
+  display: inline-flex;
+  justify-self: end;
+  gap: 6px;
+}
+
+.dataContract-container .priceField > .price-converted {
+  grid-column: 1 / -1;
 }
 
 .dataContract-container .formSection > .quick-picks {
@@ -255,78 +347,77 @@
   color: #fff;
 }
 
-.dataContract-container .priceField,
-.dataContract-container .price-input-row {
-  display: grid;
-  gap: 10px;
-}
-
 .dataContract-container .metaField input,
 .dataContract-container .fieldLabel input,
 .dataContract-container .signatureCard input {
   min-height: auto;
-  height: 24px;
+  height: 44px;
   padding: 0;
   border: 0;
   border-radius: 0;
   background: transparent;
+  appearance: none;
+  outline: none;
+  box-shadow: none;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: -0.01em;
-  text-align: right;
-}
-
-.dataContract-container .fieldLabel-stack input,
-.dataContract-container .fieldLabel-stack .price-input-row input {
-  min-height: auto;
-  height: 24px;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
   text-align: left;
 }
 
-.dataContract-container .fieldLabel-stack .input-with-clear input {
-  min-height: auto;
-  height: 24px;
+.dataContract-container .fieldLabel > input,
+.dataContract-container .fieldLabel input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(17, 24, 39, 0.07);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 1px 2px rgba(17, 24, 39, 0.02);
 }
 
-.dataContract-container .fieldLabel-stack .input-with-clear {
-  grid-template-columns: minmax(0, 1fr) 32px;
-  align-items: center;
-  gap: 8px;
+.dataContract-container .fieldLabel > input {
+  font-size: 15px;
+  font-weight: 500;
 }
 
-.dataContract-container .fieldLabel-stack .priceField,
-.dataContract-container .fieldLabel-stack .price-input-row {
-  gap: 8px;
-}
-
-.dataContract-container .fieldLabel-stack .price-input-row {
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-}
-
-.dataContract-container .fieldLabel-stack .currency-switch {
-  display: inline-flex;
-  justify-self: end;
-  gap: 6px;
-}
-
-.dataContract-container .fieldLabel-stack .currency-btn {
-  min-width: 52px;
-}
-
-.dataContract-container .fieldLabel-stack .price-input-row input {
+.dataContract-container .fieldLabel-price > input {
   font-size: 17px;
   font-weight: 600;
   letter-spacing: -0.02em;
 }
 
+.dataContract-container .fieldLabel-clearable > .clear-btn:hover,
+.dataContract-container .fieldLabel-clearable > .clear-btn:focus-visible {
+  background: rgba(241, 243, 247, 0.99);
+  border-color: rgba(17, 24, 39, 0.11);
+}
+
+.dataContract-container .fieldLabel-clearable > .clear-btn:active {
+  transform: translateY(-50%) scale(0.96);
+}
+
 .dataContract-container input[readonly] {
   cursor: pointer;
   caret-color: transparent;
+}
+
+.dataContract-container input:focus,
+.dataContract-container input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.dataContract-container .fieldLabel > input:focus,
+.dataContract-container .fieldLabel > input:focus-visible,
+.dataContract-container .fieldLabel-clearable > input:focus,
+.dataContract-container .fieldLabel-clearable > input:focus-visible {
+  border-color: rgba(17, 24, 39, 0.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    0 0 0 3px rgba(17, 24, 39, 0.03);
 }
 
 .dataContract-container .price-converted {

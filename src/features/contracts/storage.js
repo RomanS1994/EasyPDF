@@ -14,6 +14,7 @@ import {
   mergeContractData,
   replaceContractData,
 } from './state.js';
+import { syncTripTimeDisplay } from './ui.js';
 
 function normalizeDateValue(value) {
   if (!value) return '';
@@ -38,6 +39,11 @@ function normalizeDateTimeValue(value) {
   return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
+function normalizeLegacyValue(value, legacyValues) {
+  if (!value) return '';
+  return legacyValues.includes(value) ? '' : value;
+}
+
 function normalizePassengerValue(value, fallback = '1') {
   if (value === '' || value === null || value === undefined) return fallback;
   return String(value);
@@ -45,7 +51,6 @@ function normalizePassengerValue(value, fallback = '1') {
 
 function getLocalizedPaymentDefaults() {
   return new Set([
-    '',
     t('payment_method_default', {}, 'uk'),
     t('payment_method_default', {}, 'en'),
     t('payment_method_default', {}, 'cs'),
@@ -66,17 +71,48 @@ export function restoreContractData(refs) {
   if (!stored) return getContractData();
 
   const defaults = createDefaultContractData();
+  const legacyPaymentDefaults = getLocalizedPaymentDefaults();
   const normalized = {
     ...stored,
     documentType: SUPPORTED_DOCUMENT_TYPES.has(stored.documentType)
       ? stored.documentType
       : DEFAULT_DOCUMENT_TYPE,
     today: normalizeDateValue(stored.today),
-    passengers: normalizePassengerValue(stored.passengers ?? stored.customers, defaults.passengers),
+    passengers: normalizeLegacyValue(
+      normalizePassengerValue(stored.passengers ?? stored.customers, defaults.passengers),
+      ['1'],
+    ),
+    customer: {
+      ...defaults.customer,
+      ...stored.customer,
+      name: normalizeLegacyValue(stored.customer?.name, ['John Doe']),
+      email: normalizeLegacyValue(stored.customer?.email, ['john.doe@gmail.com']),
+    },
     trip: {
       ...defaults.trip,
       ...stored.trip,
-      time: normalizeDateTimeValue(stored.trip?.time),
+      from: {
+        ...defaults.trip.from,
+        ...stored.trip?.from,
+        address: normalizeLegacyValue(stored.trip?.from?.address, [
+          'Terminal 2, Aviaticka, Praha',
+          'Terminal 2, Aviatická, Praha',
+        ]),
+      },
+      to: {
+        ...defaults.trip.to,
+        ...stored.trip?.to,
+        address: normalizeLegacyValue(stored.trip?.to?.address, [
+          'Hotel Hilton, Pobrezni 311/1, 186 00 Praha 8-Rohansky ostrov',
+          'Hotel Hilton, Pobřežní 311/1, 186 00 Praha 8-Rohanský ostrov',
+        ]),
+      },
+      time: normalizeLegacyValue(normalizeDateTimeValue(stored.trip?.time), ['2025-11-13 10:00']),
+      paymentMethod: normalizeLegacyValue(stored.trip?.paymentMethod, [
+        ...legacyPaymentDefaults,
+        'cash / card / invoice',
+        'hotovost / karta / faktura',
+      ]),
     },
     totalPrice: stored.totalPrice || '',
   };
@@ -118,8 +154,9 @@ export function restoreContractData(refs) {
       if ((key === 'from' || key === 'to') && data.trip[key]?.address) {
         input.value = data.trip[key].address;
       }
-      if (key === 'time' && data.trip.time) {
-        input.value = data.trip.time;
+      if (key === 'time') {
+        input.value = data.trip.time || '';
+        syncTripTimeDisplay(data.trip.time);
       }
       if (key === 'paymentMethod' && data.trip.paymentMethod) {
         input.value = data.trip.paymentMethod;
@@ -137,7 +174,7 @@ export function resetContractData() {
   const nextData = {
     orderNumber: '',
     today: '',
-    passengers: '1',
+    passengers: '',
     documentType: DEFAULT_DOCUMENT_TYPE,
   };
 
@@ -191,15 +228,12 @@ export function applyUserProfileToContract(refs, profile) {
 }
 
 export function syncLocalizedContractDefaults(refs) {
-  const paymentInput = refs.root?.querySelector('input[name="trip-payment-method"]');
-  if (!paymentInput) return;
-
-  const defaults = getLocalizedPaymentDefaults();
-  const currentValue = String(paymentInput.value || '').trim();
-  if (!defaults.has(currentValue)) return;
-
+  const paymentDisplay = refs.root?.querySelector('[data-payment-method-display]');
   const nextValue = t('payment_method_default');
-  paymentInput.value = nextValue;
+  if (paymentDisplay) {
+    paymentDisplay.textContent = nextValue;
+  }
+  syncTripTimeDisplay(getContractData().trip.time);
   persistContractData({
     trip: {
       ...getContractData().trip,

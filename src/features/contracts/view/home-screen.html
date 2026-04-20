@@ -137,179 +137,188 @@
 
 
           <section class="appScreen" data-tab-screen="orders">
-            <div class="builderWorkspace builderWorkspace-home">
-              <div class="dataContract-container">
-                <div class="dataContract-page is-active" data-step="1">
-                  <section class="formSection">
-                    <div class="formSectionHead">
-                      <h4 data-i18n="customer">Клієнт</h4>
-                      <p data-i18n="customer_details">Дані нового клієнта</p>
-                    </div>
+            <form class="dataContract-container dataContract-page is-active" data-step="1" novalidate>
+              <section class="formSection">
+                <header class="formSectionHead">
+                  <h4 data-i18n="customer">Клієнт</h4>
+                  <p data-i18n="customer_details">Дані нового клієнта</p>
+                </header>
 
-                    <div class="fieldRow">
-                      <label class="fieldLabel">
-                        <span data-i18n="name">Ім’я</span>
-                        <div class="input-with-clear">
-                          <input
-                            class="value"
-                            name="customer-name"
-                            type="text"
-                            value="John Doe"
-                            placeholder="Введіть ім’я"
-                            data-i18n-placeholder="customer_name_placeholder"
-                          />
-                          <button
-                            class="clear-btn"
-                            type="button"
-                            data-target="customer-name"
-                            aria-label="Очистити ім’я"
-                            data-i18n-aria-label="clear_name"
-                          ></button>
-                        </div>
-                      </label>
+                <fieldset class="fieldGroup">
+                  <legend class="visually-hidden" data-i18n="customer">Клієнт</legend>
 
-                      <label class="fieldLabel">
-                        <span data-i18n="email">Email</span>
-                        <div class="input-with-clear">
-                          <input
-                            class="value"
-                            name="customer-email"
-                            type="text"
-                            value="john.doe@gmail.com"
-                            placeholder="Введіть email"
-                            data-i18n-placeholder="customer_email_placeholder"
-                          />
-                          <button
-                            class="clear-btn"
-                            type="button"
-                            data-target="customer-email"
-                            aria-label="Очистити email"
-                            data-i18n-aria-label="clear_email"
-                          ></button>
-                        </div>
-                      </label>
+                  <label class="fieldLabel fieldLabel-clearable">
+                    <span class="visually-hidden" data-i18n="name">Ім’я</span>
+                    <input
+                      class="value"
+                      name="customer-name"
+                      type="text"
+                      value=""
+                      placeholder="Введіть ім’я"
+                      data-i18n-placeholder="customer_name_placeholder"
+                    />
+                    <button
+                      class="clear-btn"
+                      type="button"
+                      data-target="customer-name"
+                      aria-label="Очистити ім’я"
+                      data-i18n-aria-label="clear_name"
+                    ></button>
+                  </label>
 
-                      <label class="fieldLabel">
-                        <span data-i18n="passengers">Кількість пасажирів</span>
-                        <input class="value" name="passengers" type="number" min="1" step="1" value="1" inputmode="numeric" />
-                      </label>
-                    </div>
-                  </section>
+                  <label class="fieldLabel fieldLabel-clearable">
+                    <span class="visually-hidden" data-i18n="email">Email</span>
+                    <input
+                      class="value"
+                      name="customer-email"
+                      type="text"
+                      value=""
+                      placeholder="Введіть email"
+                      data-i18n-placeholder="customer_email_placeholder"
+                    />
+                    <button
+                      class="clear-btn"
+                      type="button"
+                      data-target="customer-email"
+                      aria-label="Очистити email"
+                      data-i18n-aria-label="clear_email"
+                    ></button>
+                  </label>
 
-                  <section class="formSection">
-                    <div class="formSectionHead">
-                      <h4 data-i18n="trip">Поїздка</h4>
-                      <p data-i18n="route_payment">Маршрут і оплата</p>
-                    </div>
+                  <label class="fieldLabel">
+                    <span class="visually-hidden" data-i18n="passengers">Кількість пасажирів</span>
+                    <input
+                      class="value"
+                      name="passengers"
+                      type="number"
+                      min="1"
+                      step="1"
+                      value=""
+                      inputmode="numeric"
+                      placeholder="Кількість пасажирів"
+                      data-i18n-placeholder="passengers_placeholder"
+                    />
+                  </label>
+                </fieldset>
+              </section>
 
-                    <label class="fieldLabel fieldLabel-stack">
-                      <span data-i18n="pickup_address">Адреса посадки</span>
-                      <div class="input-with-clear">
-                        <input
-                          class="value"
-                          name="trip-from-address"
-                          type="text"
-                          value="Terminal 2, Aviatická, Praha"
-                          placeholder="Введіть адресу посадки"
-                          data-i18n-placeholder="pickup_address_placeholder"
-                        />
-                        <button
-                          class="clear-btn"
-                          type="button"
-                          data-target="trip-from-address"
-                          aria-label="Очистити адресу посадки"
-                          data-i18n-aria-label="clear_pickup_address"
-                        ></button>
-                      </div>
+              <section class="formSection">
+                <header class="formSectionHead">
+                  <h4 data-i18n="trip">Поїздка</h4>
+                  <p data-i18n="route_payment">Маршрут і оплата</p>
+                </header>
+
+                <fieldset class="fieldGroup">
+                  <legend class="visually-hidden" data-i18n="trip">Поїздка</legend>
+
+                  <label class="fieldLabel fieldLabel-clearable">
+                    <span class="visually-hidden" data-i18n="pickup_address">Адреса посадки</span>
+                    <input
+                      class="value"
+                      name="trip-from-address"
+                      type="text"
+                      list="trip-from-address-options"
+                      value=""
+                      placeholder="Введіть адресу посадки"
+                      data-i18n-placeholder="pickup_address_placeholder"
+                    />
+                    <button
+                      class="clear-btn"
+                      type="button"
+                      data-target="trip-from-address"
+                      aria-label="Очистити адресу посадки"
+                      data-i18n-aria-label="clear_pickup_address"
+                    ></button>
+                  </label>
+                  <datalist id="trip-from-address-options">
+                    <option value="Terminal 1, Aviatická, Praha"></option>
+                    <option value="Terminal 2, Aviatická, Praha"></option>
+                  </datalist>
+
+                  <label class="fieldLabel fieldLabel-clearable">
+                    <span class="visually-hidden" data-i18n="dropoff_address">Адреса висадки</span>
+                    <input
+                      class="value"
+                      name="trip-to-address"
+                      type="text"
+                      list="trip-to-address-options"
+                      value=""
+                      placeholder="Введіть адресу висадки"
+                      data-i18n-placeholder="dropoff_address_placeholder"
+                    />
+                    <button
+                      class="clear-btn"
+                      type="button"
+                      data-target="trip-to-address"
+                      aria-label="Очистити адресу висадки"
+                      data-i18n-aria-label="clear_dropoff_address"
+                    ></button>
+                  </label>
+                  <datalist id="trip-to-address-options">
+                    <option value="Terminal 1, Aviatická, Praha"></option>
+                    <option value="Terminal 2, Aviatická, Praha"></option>
+                  </datalist>
+
+                  <dl class="fieldPlainRow fieldPlainRow-time">
+                    <dt id="trip-time-label" data-i18n="pickup_time">Час посадки</dt>
+                    <dd>
+                      <button
+                        class="fieldPlainValue fieldPlainValue-button is-placeholder"
+                        type="button"
+                        data-trip-time-trigger
+                        aria-labelledby="trip-time-label trip-time-display"
+                      >
+                        <span id="trip-time-display" data-trip-time-display>Виберіть дату і час</span>
+                      </button>
+                      <input
+                        class="visually-hidden"
+                        name="trip-time"
+                        type="text"
+                        value=""
+                        tabindex="-1"
+                        aria-hidden="true"
+                      />
+                    </dd>
+
+                    <dt data-i18n="payment_method">Спосіб оплати</dt>
+                    <dd>
+                      <span data-payment-method-display data-i18n="payment_method_default">cash / card / invoice</span>
+                    </dd>
+                  </dl>
+
+                  <div class="priceField">
+                    <label class="fieldLabel fieldLabel-price">
+                      <span class="visually-hidden" data-i18n="total_price">Загальна сума</span>
+                      <input
+                        class="value"
+                        type="text"
+                        name="trip-totalPrice"
+                        placeholder="Введіть суму"
+                        data-i18n-placeholder="enter_amount"
+                        value=""
+                      />
                     </label>
-
-                    <div class="quick-picks" data-target="trip-from-address">
-                      <button type="button" class="quick-pick-btn" data-value="Terminal 1, Aviatická, Praha" title="Terminal 1, Aviatická, Praha">
-                        <span data-i18n="airport_t1">Аеропорт T1</span>
+                    <div class="currency-switch" role="group" aria-label="Валюта" data-i18n-aria-label="currency">
+                      <button type="button" class="currency-btn is-active" data-currency="EUR">
+                        EUR
                       </button>
-                      <button type="button" class="quick-pick-btn" data-value="Terminal 2, Aviatická, Praha" title="Terminal 2, Aviatická, Praha">
-                        <span data-i18n="airport_t2">Аеропорт T2</span>
-                      </button>
-                    </div>
-
-                    <label class="fieldLabel fieldLabel-stack">
-                      <span data-i18n="dropoff_address">Адреса висадки</span>
-                      <div class="input-with-clear">
-                        <input
-                          class="value"
-                          name="trip-to-address"
-                          type="text"
-                          value="Hotel Hilton, Pobřežní 311/1, 186 00 Praha 8-Rohanský ostrov"
-                          placeholder="Введіть адресу висадки"
-                          data-i18n-placeholder="dropoff_address_placeholder"
-                        />
-                        <button
-                          class="clear-btn"
-                          type="button"
-                          data-target="trip-to-address"
-                          aria-label="Очистити адресу висадки"
-                          data-i18n-aria-label="clear_dropoff_address"
-                        ></button>
-                      </div>
-                    </label>
-
-                    <div class="quick-picks" data-target="trip-to-address">
-                      <button type="button" class="quick-pick-btn" data-value="Terminal 1, Aviatická, Praha" title="Terminal 1, Aviatická, Praha">
-                        <span data-i18n="airport_t1">Аеропорт T1</span>
-                      </button>
-                      <button type="button" class="quick-pick-btn" data-value="Terminal 2, Aviatická, Praha" title="Terminal 2, Aviatická, Praha">
-                        <span data-i18n="airport_t2">Аеропорт T2</span>
+                      <button type="button" class="currency-btn" data-currency="CZK">
+                        CZK
                       </button>
                     </div>
-
-                    <div class="fieldRow">
-                      <label class="fieldLabel">
-                        <span data-i18n="pickup_time">Час посадки</span>
-                        <input class="value" name="trip-time" type="text" value="2025-11-13 10:00" />
-                      </label>
-
-                      <label class="fieldLabel">
-                        <span data-i18n="payment_method">Спосіб оплати</span>
-                        <input class="value" type="text" name="trip-payment-method" value="готівка / картка / рахунок" />
-                      </label>
-                    </div>
-
-                    <label class="fieldLabel fieldLabel-stack fieldLabel-full">
-                      <span data-i18n="total_price">Загальна сума</span>
-                      <div class="priceField">
-                        <div class="price-input-row">
-                          <input
-                            class="value"
-                            type="text"
-                            name="trip-totalPrice"
-                            placeholder="Введіть суму"
-                            data-i18n-placeholder="enter_amount"
-                            value=""
-                          />
-                          <div class="currency-switch">
-                            <button type="button" class="currency-btn is-active" data-currency="EUR">
-                              EUR
-                            </button>
-                            <button type="button" class="currency-btn" data-currency="CZK">
-                              CZK
-                            </button>
-                          </div>
-                        </div>
-                        <div class="price-converted" id="priceConverted"></div>
-                      </div>
-                    </label>
-                  </section>
-
-                  <div class="wizard-controls wizard-controls-single">
-                    <button class="primary-btn wizard-contract" type="button" id="downloadPdfBtn">
-                      <span class="wizard-contract-iconWrap" aria-hidden="true">&#x2B07;</span>
-                      <span data-i18n="pdf_document_confirmation">Договір</span>
-                    </button>
-                    <button class="secondary-btn wizard-save" type="button" id="saveOrderBtn" data-i18n="save_order">
-                      Зберегти
-                    </button>
+                    <div class="price-converted" id="priceConverted"></div>
                   </div>
-                </div>
-              </div>
-            </div>
+                </fieldset>
+              </section>
+
+              <footer class="wizard-controls wizard-controls-single">
+                <button class="primary-btn wizard-contract" type="button" id="downloadPdfBtn">
+                  <span class="wizard-contract-iconWrap" aria-hidden="true">&#x2B07;</span>
+                  <span data-i18n="pdf_document_confirmation">Договір</span>
+                </button>
+                <button class="secondary-btn wizard-save" type="button" id="saveOrderBtn" data-i18n="save_order">
+                  Зберегти
+                </button>
+              </footer>
+            </form>
           </section>
