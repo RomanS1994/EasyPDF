@@ -17,13 +17,22 @@ async function resolveFlatpickrLocale() {
   }
 }
 
+function lockManualDateInput(input) {
+  input.readOnly = true;
+  input.setAttribute('readonly', 'readonly');
+  input.setAttribute('inputmode', 'none');
+  input.setAttribute('autocomplete', 'off');
+  input.setAttribute('spellcheck', 'false');
+  input.setAttribute('aria-readonly', 'true');
+}
+
 export async function initDatePickers(root = contractRefs.root) {
   try {
     const flatpickr = (await import('flatpickr')).default;
     const locale = await resolveFlatpickrLocale();
     const datePickerOptions = {
       dateFormat: 'Y-m-d',
-      allowInput: true,
+      allowInput: false,
       disableMobile: true,
     };
 
@@ -34,6 +43,7 @@ export async function initDatePickers(root = contractRefs.root) {
     root?.querySelectorAll('input[type="date"]').forEach(input => {
       if (input.dataset.flatpickrBound === 'true') return;
       input.dataset.flatpickrBound = 'true';
+      lockManualDateInput(input);
       flatpickr(input, datePickerOptions);
     });
 
@@ -41,11 +51,12 @@ export async function initDatePickers(root = contractRefs.root) {
     if (tripTimeInput) {
       if (tripTimeInput.dataset.flatpickrBound !== 'true') {
         tripTimeInput.dataset.flatpickrBound = 'true';
+        lockManualDateInput(tripTimeInput);
         flatpickr(tripTimeInput, {
           enableTime: true,
           time_24hr: true,
           dateFormat: 'Y-m-d H:i',
-          allowInput: true,
+          allowInput: false,
           disableMobile: true,
           ...(locale ? { locale } : {}),
         });

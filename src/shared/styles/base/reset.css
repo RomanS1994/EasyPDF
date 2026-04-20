@@ -70,6 +70,16 @@ button {
   border: none;
 }
 
+input::placeholder,
+textarea::placeholder {
+  color: rgba(255, 59, 48, 0.76);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0;
+  opacity: 1;
+}
+
 img {
   display: block;
   max-width: 100%;

@@ -149,12 +149,44 @@
                     <div class="fieldRow">
                       <label class="fieldLabel">
                         <span data-i18n="name">Ім’я</span>
-                        <input class="value" name="customer-name" type="text" value="John Doe" />
+                        <div class="input-with-clear">
+                          <input
+                            class="value"
+                            name="customer-name"
+                            type="text"
+                            value="John Doe"
+                            placeholder="Введіть ім’я"
+                            data-i18n-placeholder="customer_name_placeholder"
+                          />
+                          <button
+                            class="clear-btn"
+                            type="button"
+                            data-target="customer-name"
+                            aria-label="Очистити ім’я"
+                            data-i18n-aria-label="clear_name"
+                          ></button>
+                        </div>
                       </label>
 
                       <label class="fieldLabel">
                         <span data-i18n="email">Email</span>
-                        <input class="value" name="customer-email" type="text" value="john.doe@gmail.com" />
+                        <div class="input-with-clear">
+                          <input
+                            class="value"
+                            name="customer-email"
+                            type="text"
+                            value="john.doe@gmail.com"
+                            placeholder="Введіть email"
+                            data-i18n-placeholder="customer_email_placeholder"
+                          />
+                          <button
+                            class="clear-btn"
+                            type="button"
+                            data-target="customer-email"
+                            aria-label="Очистити email"
+                            data-i18n-aria-label="clear_email"
+                          ></button>
+                        </div>
                       </label>
 
                       <label class="fieldLabel">
@@ -173,7 +205,14 @@
                     <label class="fieldLabel fieldLabel-stack">
                       <span data-i18n="pickup_address">Адреса посадки</span>
                       <div class="input-with-clear">
-                        <input class="value" name="trip-from-address" type="text" value="Terminal 2, Aviatická, Praha" />
+                        <input
+                          class="value"
+                          name="trip-from-address"
+                          type="text"
+                          value="Terminal 2, Aviatická, Praha"
+                          placeholder="Введіть адресу посадки"
+                          data-i18n-placeholder="pickup_address_placeholder"
+                        />
                         <button
                           class="clear-btn"
                           type="button"
@@ -196,7 +235,14 @@
                     <label class="fieldLabel fieldLabel-stack">
                       <span data-i18n="dropoff_address">Адреса висадки</span>
                       <div class="input-with-clear">
-                        <input class="value" name="trip-to-address" type="text" value="Hotel Hilton, Pobřežní 311/1, 186 00 Praha 8-Rohanský ostrov" />
+                        <input
+                          class="value"
+                          name="trip-to-address"
+                          type="text"
+                          value="Hotel Hilton, Pobřežní 311/1, 186 00 Praha 8-Rohanský ostrov"
+                          placeholder="Введіть адресу висадки"
+                          data-i18n-placeholder="dropoff_address_placeholder"
+                        />
                         <button
                           class="clear-btn"
                           type="button"
