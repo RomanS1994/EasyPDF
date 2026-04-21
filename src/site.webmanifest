@@ -6,22 +6,10 @@
   "scope": "/cz/pdf/",
   "icons": [
     {
-      "src": "/shared/assets/apple-touch-icon-180.png",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/shared/assets/apple-touch-icon.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
       "src": "/shared/assets/doctra-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ],
   "theme_color": "#0f5fd7",

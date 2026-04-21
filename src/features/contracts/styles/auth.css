@@ -26,8 +26,8 @@
   overflow: hidden;
   -webkit-overflow-scrolling: touch;
   font-family:
-    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
-    'Helvetica Neue', Arial, sans-serif;
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    "Helvetica Neue", Arial, sans-serif;
 }
 
 .page-generateContract main {
@@ -54,7 +54,7 @@
 }
 
 .dataContract {
-  padding: 12px 0 0;
+  padding: 0;
 }
 
 .dataContract .is-hidden {
@@ -65,16 +65,16 @@
   display: none !important;
 }
 
-.page-generateContract[data-auth-state='session'] #guestPanel {
+.page-generateContract[data-auth-state="session"] #guestPanel {
   display: none !important;
 }
 
-.page-generateContract[data-auth-state='session'] #accountPanel {
+.page-generateContract[data-auth-state="session"] #accountPanel {
   display: grid !important;
 }
 
-.page-generateContract[data-auth-state='booting'] #guestPanel,
-.page-generateContract[data-auth-state='booting'] #accountPanel {
+.page-generateContract[data-auth-state="booting"] #guestPanel,
+.page-generateContract[data-auth-state="booting"] #accountPanel {
   display: none !important;
 }
 
@@ -122,13 +122,13 @@
   isolation: isolate;
 }
 
-.guestStage[data-auth-mode='login'] .planCards {
+.guestStage[data-auth-mode="login"] .planCards {
   display: none !important;
 }
 
 .guestStage::before,
 .guestStage::after {
-  content: '';
+  content: "";
   position: absolute;
   z-index: -1;
   border-radius: 999px;
@@ -140,7 +140,11 @@
   right: -42px;
   width: 168px;
   height: 168px;
-  background: radial-gradient(circle, rgba(255, 194, 102, 0.34), transparent 68%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 194, 102, 0.34),
+    transparent 68%
+  );
 }
 
 .guestStage::after {
@@ -181,13 +185,12 @@
   padding: 14px 14px 16px;
   border: 1px solid rgba(109, 124, 151, 0.16);
   border-radius: 22px;
-  background:
-    linear-gradient(
-      155deg,
-      rgba(255, 255, 255, 0.94),
-      rgba(244, 247, 255, 0.92) 54%,
-      rgba(255, 244, 230, 0.72)
-    );
+  background: linear-gradient(
+    155deg,
+    rgba(255, 255, 255, 0.94),
+    rgba(244, 247, 255, 0.92) 54%,
+    rgba(255, 244, 230, 0.72)
+  );
   box-shadow: var(--shadow-soft);
 }
 
