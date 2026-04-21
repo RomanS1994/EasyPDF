@@ -17,12 +17,17 @@ export function setCurrentCurrency(value) {
 
 export function extractNumericPrice(value) {
   if (!value) return '';
-  const match = String(value).match(/(\d+(?:[.,]\d+)?)/);
-  return match ? match[1].replace(',', '.') : '';
+  const match = String(value).match(/(\d+)/);
+  return match ? match[1] : '';
+}
+
+export function sanitizePriceInput(value) {
+  return String(value || '').replace(/\D+/g, '');
 }
 
 export function formatPrice(value) {
-  const number = parseFloat(String(value).replace(',', '.'));
+  const numericValue = extractNumericPrice(value);
+  const number = Number.parseInt(numericValue, 10);
   if (!Number.isFinite(number)) return '';
 
   if (currentCurrency === 'EUR') {

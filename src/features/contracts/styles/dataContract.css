@@ -14,3 +14,26 @@
   font-size: 16px;
   line-height: 1.2;
 }
+
+.page-generateContract .input-date-time {
+  font-size: 16px !important;
+}
+
+.page-generateContract .flatpickr-calendar input,
+.page-generateContract .flatpickr-time .numInput,
+.page-generateContract .flatpickr-time .flatpickr-am-pm,
+.page-generateContract .flatpickr-time .flatpickr-time-separator {
+  font-size: 16px !important;
+  line-height: 1.4;
+}
+
+.page-generateContract .flatpickr-calendar {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+.page-generateContract .flatpickr-time .flatpickr-time-separator,
+.page-generateContract .flatpickr-time .flatpickr-am-pm {
+  -webkit-user-select: none;
+  user-select: none;
+}

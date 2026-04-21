@@ -100,6 +100,13 @@ img {
   overflow: hidden;
 }
 
-body.no-scroll {
+body.no-scroll,
+html.content-no-scroll,
+body.content-no-scroll {
   overflow: hidden;
+}
+
+html.content-no-scroll,
+body.content-no-scroll {
+  overscroll-behavior: none;
 }

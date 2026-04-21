@@ -4,7 +4,7 @@ import {
   readStorageJson,
   writeStorageJson,
 } from '../../shared/lib/storage.js';
-import { extractNumericPrice } from './currency.js';
+import { extractNumericPrice, sanitizePriceInput } from './currency.js';
 import {
   CONTRACT_STORAGE_KEY,
   DEFAULT_DOCUMENT_TYPE,
@@ -14,7 +14,6 @@ import {
   mergeContractData,
   replaceContractData,
 } from './state.js';
-import { syncTripTimeDisplay } from './ui.js';
 
 function normalizeDateValue(value) {
   if (!value) return '';
@@ -156,13 +155,12 @@ export function restoreContractData(refs) {
       }
       if (key === 'time') {
         input.value = data.trip.time || '';
-        syncTripTimeDisplay(data.trip.time);
       }
       if (key === 'paymentMethod' && data.trip.paymentMethod) {
         input.value = data.trip.paymentMethod;
       }
       if (key === 'totalPrice' && data.totalPrice) {
-        input.value = extractNumericPrice(data.totalPrice);
+        input.value = sanitizePriceInput(extractNumericPrice(data.totalPrice));
       }
     }
   });
@@ -233,7 +231,6 @@ export function syncLocalizedContractDefaults(refs) {
   if (paymentDisplay) {
     paymentDisplay.textContent = nextValue;
   }
-  syncTripTimeDisplay(getContractData().trip.time);
   persistContractData({
     trip: {
       ...getContractData().trip,

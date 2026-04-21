@@ -227,17 +227,6 @@
   box-shadow: none;
 }
 
-.page-generateContract[data-app-shell='user'] .accountSettingsLink {
-  width: 100%;
-  justify-content: space-between;
-  padding-inline: 16px;
-  white-space: nowrap;
-  border-color: rgba(0, 122, 255, 0.22);
-  background:
-    radial-gradient(circle at top right, rgba(0, 122, 255, 0.14), transparent 34%),
-    linear-gradient(160deg, rgba(255, 255, 255, 0.98), rgba(240, 245, 255, 0.96));
-}
-
 .page-generateContract[data-app-shell='user'] .settingsBackLink {
   width: fit-content;
   justify-self: start;
@@ -246,19 +235,143 @@
   white-space: nowrap;
 }
 
-.page-generateContract[data-app-shell='user'] .accountSettingsLinkArrow,
 .page-generateContract[data-app-shell='user'] .settingsBackLinkArrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 14px;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.page-generateContract[data-app-shell='user'] .accountSummaryLink {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(60, 60, 67, 0.12);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top right, rgba(0, 122, 255, 0.12), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(244, 247, 252, 0.95));
+  color: var(--text);
+  text-decoration: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 14px 28px rgba(28, 32, 40, 0.05);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.page-generateContract[data-app-shell='user'] .accountSummaryLink:hover,
+.page-generateContract[data-app-shell='user'] .accountSummaryLink:focus-visible {
+  border-color: rgba(0, 122, 255, 0.22);
+  transform: translateY(-1px);
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 16px 30px rgba(28, 32, 40, 0.08);
+}
+
+.page-generateContract[data-app-shell='user'] .accountSummaryLink:active {
+  transform: translateY(0) scale(0.985);
+}
+
+.page-generateContract[data-app-shell='user'] .accountSummaryAvatar {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.98), rgba(242, 247, 255, 0.9)),
+    linear-gradient(180deg, rgba(0, 122, 255, 0.14), rgba(0, 122, 255, 0.04));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 14px 28px rgba(0, 122, 255, 0.12);
+}
+
+.page-generateContract[data-app-shell='user'] .accountSummaryAvatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.page-generateContract[data-app-shell='user'] .accountSummaryAvatarFallback {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 246, 255, 0.94));
+}
+
+.page-generateContract[data-app-shell='user'] .accountSummaryCopy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.page-generateContract[data-app-shell='user'] .accountSummaryCopy .sectionEyebrow {
+  width: fit-content;
+}
+
+.page-generateContract[data-app-shell='user'] .accountSummaryName {
+  font-size: 20px;
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  word-break: break-word;
+}
+
+.page-generateContract[data-app-shell='user'] .accountSummaryEmail {
+  font-size: 14px;
+  line-height: 1.25;
+  color: var(--muted);
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.page-generateContract[data-app-shell='user'] .accountSummaryNote {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.page-generateContract[data-app-shell='user'] .accountSummaryChevron {
+  align-self: center;
   display: inline-grid;
   place-items: center;
   width: 24px;
   height: 24px;
+  color: var(--muted);
+  opacity: 0.9;
   flex: 0 0 24px;
-  border-radius: 999px;
-  background: rgba(0, 122, 255, 0.14);
-  color: var(--accent);
-  font-size: 15px;
-  line-height: 1;
-  font-weight: 900;
+}
+
+.page-generateContract[data-app-shell='user'] .accountSummaryChevron svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .screenSection {
@@ -424,6 +537,123 @@
 
 .settingsGroup-danger {
   background: var(--surface);
+}
+
+.accountProfileGroup {
+  gap: 0;
+}
+
+.accountHero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 12px 14px 10px;
+}
+
+.accountAvatarButton {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+
+.accountAvatarFrame {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  width: 86px;
+  height: 86px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.98), rgba(242, 247, 255, 0.88)),
+    linear-gradient(180deg, rgba(0, 122, 255, 0.14), rgba(0, 122, 255, 0.04));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 14px 28px rgba(0, 122, 255, 0.12);
+}
+
+.accountAvatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.accountAvatarFallback {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 246, 255, 0.94));
+}
+
+.accountAvatarButtonLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--accent);
+}
+
+.accountHeroCopy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  flex: 1 1 220px;
+}
+
+.accountHeroCopy strong {
+  font-size: 22px;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  word-break: break-word;
+}
+
+.accountHeroCopy p {
+  margin: 0;
+}
+
+.accountAvatarActions,
+.accountProfileActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.accountAvatarActions {
+  padding: 12px 14px 0;
+}
+
+.accountAvatarAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.accountProfileActions {
+  padding: 12px 14px 14px;
+}
+
+.accountProfileSaveBtn {
+  width: 100%;
+  border-color: rgba(0, 122, 255, 0.2);
+  background:
+    radial-gradient(circle at top right, rgba(0, 122, 255, 0.12), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 245, 255, 0.96));
 }
 
 .accountIdentity p {

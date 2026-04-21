@@ -26,8 +26,12 @@ import {
 import { renderAuthenticatedState } from './dashboard.js';
 import {
   handleDeleteAccountClick,
+  handleAccountAvatarButtonClick,
+  handleAccountAvatarChange,
+  handleAccountAvatarRemoveClick,
   handleLogoutClick,
   handleRequestUpgradeClick,
+  handleUpdateAccountClick,
   handleUpdateProfileClick,
   refreshAccountData,
 } from './account-session.js';
@@ -67,6 +71,10 @@ function bindEvents() {
   refs.logoutBtn?.addEventListener('click', handleLogoutClick);
   refs.settingsLogoutBtn?.addEventListener('click', handleLogoutClick);
   refs.deleteAccountBtn?.addEventListener('click', handleDeleteAccountClick);
+  refs.saveAccountProfileBtn?.addEventListener('click', handleUpdateAccountClick);
+  refs.accountAvatarButton?.addEventListener('click', handleAccountAvatarButtonClick);
+  refs.accountAvatarInput?.addEventListener('change', handleAccountAvatarChange);
+  refs.accountAvatarRemoveBtn?.addEventListener('click', handleAccountAvatarRemoveClick);
   refs.updateProfileBtn?.addEventListener('click', handleUpdateProfileClick);
   refs.requestUpgradeBtn?.addEventListener('click', handleRequestUpgradeClick);
   refs.accountLanguageSelect?.addEventListener('change', handleLanguageSelectChange);
@@ -98,7 +106,7 @@ function bindEvents() {
     void refreshAccountData();
   });
   window.addEventListener('pdf-app:tab-activated', event => {
-    if (!state.user || !['stats', 'history', 'settings'].includes(event.detail?.tab)) return;
+    if (!state.user || !['stats', 'history', 'settings', 'account'].includes(event.detail?.tab)) return;
 
     void refreshAccountData();
   });

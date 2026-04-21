@@ -20,8 +20,20 @@ export const refs = {
   tabScreens: document.querySelectorAll('[data-tab-screen]'),
   statsTabButtons: document.querySelectorAll('[data-stats-tab-target]'),
   statsTabScreens: document.querySelectorAll('[data-stats-tab-screen]'),
+  accountSummaryAvatarImage: document.getElementById('accountSummaryAvatarImage'),
+  accountSummaryAvatarFallback: document.getElementById('accountSummaryAvatarFallback'),
+  accountSummaryName: document.getElementById('accountSummaryName'),
+  accountSummaryEmail: document.getElementById('accountSummaryEmail'),
   accountName: document.getElementById('accountName'),
   accountEmail: document.getElementById('accountEmail'),
+  accountDisplayName: document.getElementById('accountDisplayName'),
+  accountAvatarButton: document.getElementById('accountAvatarButton'),
+  accountAvatarInput: document.getElementById('accountAvatarInput'),
+  accountAvatarImage: document.getElementById('accountAvatarImage'),
+  accountAvatarFallback: document.getElementById('accountAvatarFallback'),
+  accountAvatarActions: document.getElementById('accountAvatarActions'),
+  accountAvatarRemoveBtn: document.getElementById('accountAvatarRemoveBtn'),
+  saveAccountProfileBtn: document.getElementById('saveAccountProfileBtn'),
   accountPlan: document.getElementById('accountPlan'),
   accountUsage: document.getElementById('accountUsage'),
   accountRole: document.getElementById('accountRole'),
@@ -201,7 +213,7 @@ export const refs = {
 export const TAB_NAMES =
   document.body.dataset.appShell === 'admin'
     ? ['accounts', 'subscriptions', 'orders', 'settings']
-    : ['home', 'stats', 'orders', 'history', 'account', 'settings'];
+    : ['home', 'stats', 'orders', 'history', 'settings', 'account'];
 export const STATS_TAB_NAMES = ['usage', 'activity'];
 export const AUTH_MODES = ['register', 'login'];
 export const CONTRACT_STORAGE_KEY = 'contract-data';

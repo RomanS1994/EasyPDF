@@ -1,127 +1,109 @@
-          <section class="appScreen" data-tab-screen="account">
-            <div class="screenCard screenCard-settings">
-              <div class="accountHeader">
-                <div class="compactHeader accountHeaderCopy">
-                  <p class="sectionEyebrow" data-i18n="account">Акаунт</p>
-                  <h2 data-i18n="my_account">Мій акаунт</h2>
-                  <p data-i18n="account_subline">Профіль, підписка та бізнес-профіль.</p>
-                </div>
-              </div>
+<section class="appScreen" data-tab-screen="account">
+  <div class="screenCard screenCard-settings">
+    <div class="accountHeader">
+      <a
+        class="settingsActionLink settingsBackLink"
+        href="/cz/pdf/settings/"
+        data-tab-target="settings"
+        aria-label="Назад"
+        data-i18n-aria-label="back"
+      >
+        <span class="settingsBackLinkArrow" aria-hidden="true">←</span>
+        <span class="visually-hidden" data-i18n="back">Назад</span>
+      </a>
 
-              <section class="screenSection">
-                <a class="settingsActionLink accountSettingsLink" href="/cz/pdf/settings/" data-tab-target="settings">
-                  <span data-i18n="account_settings">Налаштування</span>
-                  <span class="accountSettingsLinkArrow" aria-hidden="true">→</span>
-                </a>
-              </section>
+      <div class="compactHeader accountHeaderCopy">
+        <h2 data-i18n="account">Акаунт</h2>
+        <p data-i18n="account_subline">Фото та ім'я в окремому вікні.</p>
+      </div>
+    </div>
 
-              <section class="screenSection">
-                <p class="screenSectionLabel" data-i18n="profile">Профіль</p>
-                <div class="settingsGroup">
-                  <div class="settingsProfile">
-                    <strong id="accountName">-</strong>
-                    <p id="accountEmail">-</p>
-                  </div>
-                  <div class="settingsRow">
-                    <span class="settingsRow-label" data-i18n="role">Роль</span>
-                    <strong class="settingsValue" id="accountRole">-</strong>
-                  </div>
-                </div>
-              </section>
+    <section class="screenSection">
+      <div class="settingsGroup accountProfileGroup" id="accountProfileGroup">
+        <div class="accountHero">
+          <button
+            class="accountAvatarButton"
+            id="accountAvatarButton"
+            type="button"
+            data-i18n-title="change_photo"
+            title="Змінити фото"
+          >
+            <span class="accountAvatarFrame" aria-hidden="true">
+              <img class="accountAvatarImage is-hidden" id="accountAvatarImage" alt="" />
+              <span class="accountAvatarFallback" id="accountAvatarFallback">D</span>
+            </span>
+            <span class="accountAvatarButtonLabel" data-i18n="change_photo">Змінити фото</span>
+          </button>
+          <input id="accountAvatarInput" type="file" accept="image/*" hidden />
 
-              <section class="screenSection">
-                <p class="screenSectionLabel" data-i18n="subscription">Підписка</p>
-                <div class="settingsGroup">
-                  <div class="settingsRow">
-                    <span class="settingsRow-label" data-i18n="plan">План</span>
-                    <strong class="settingsValue" id="accountPlan">-</strong>
-                  </div>
-                  <div class="settingsRow">
-                    <span class="settingsRow-label" data-i18n="status">Статус</span>
-                    <strong class="settingsValue" id="accountSubscriptionStatus">-</strong>
-                  </div>
-                  <div class="settingsRow">
-                    <span class="settingsRow-label" data-i18n="cycle">Цикл</span>
-                    <strong class="settingsValue" id="accountSubscriptionCycle">-</strong>
-                  </div>
-                  <div class="settingsRow">
-                    <span class="settingsRow-label" data-i18n="usage">Використання</span>
-                    <strong class="settingsValue" id="accountUsage">-</strong>
-                  </div>
-                </div>
-                <p class="settingsNote" data-i18n="subscription_admin_note">
-                  Free-план активується одразу. Paid-плани вмикаються лише після ручного підтвердження оплати.
-                </p>
-              </section>
+          <div class="accountHeroCopy">
+            <strong id="accountName">-</strong>
+            <p id="accountEmail">-</p>
+            <p class="settingsNote" data-i18n="account_profile_note">
+              Фото зберігається одразу, а ім’я оновлюється після натискання кнопки збереження.
+            </p>
+          </div>
+        </div>
 
-              <section class="screenSection is-hidden" id="managerEntrySection">
-                <p class="screenSectionLabel" data-i18n="admin_workspace">Admin-простір</p>
-                <div class="settingsGroup">
-                  <div class="settingsNote" data-i18n="admin_workspace_note">
-                    Керуйте акаунтами, підписками, планами та аудитом.
-                  </div>
-                  <a class="primary-btn settingsActionLink" href="/cz/pdf/admin/accounts/" data-i18n="open_admin_workspace">
-                    Відкрити admin-простір
-                  </a>
-                </div>
-              </section>
+        <div class="accountAvatarActions" id="accountAvatarActions">
+          <button
+            class="settingsAction accountAvatarAction"
+            id="accountAvatarRemoveBtn"
+            type="button"
+            data-i18n="remove_photo"
+          >
+            Прибрати фото
+          </button>
+        </div>
 
-              <section class="screenSection">
-                <p class="screenSectionLabel" data-i18n="business_profile">Бізнес-профіль</p>
-                <div class="settingsGroup">
-                  <label class="settingsField settingsField-stack">
-                    <span class="settingsRow-label" data-i18n="carrier_name">Ім’я перевізника</span>
-                    <input id="accountDriverName" type="text" placeholder="Ім’я перевізника" data-i18n-placeholder="carrier_name" />
-                  </label>
-                  <label class="settingsField settingsField-stack">
-                    <span class="settingsRow-label" data-i18n="carrier_address">Адреса перевізника</span>
-                    <input
-                      id="accountDriverAddress"
-                      type="text"
-                      placeholder="Адреса перевізника"
-                      data-i18n-placeholder="carrier_address"
-                    />
-                  </label>
-                  <label class="settingsField">
-                    <span class="settingsRow-label" data-i18n="vehicle_plate">Номер авто</span>
-                    <input id="accountDriverSpz" type="text" placeholder="1AF V087" />
-                  </label>
-                  <label class="settingsField">
-                    <span class="settingsRow-label" data-i18n="carrier_id">ID перевізника</span>
-                    <input id="accountDriverIco" type="text" placeholder="22319352" />
-                  </label>
-                  <label class="settingsField settingsField-stack">
-                    <span class="settingsRow-label" data-i18n="company_name">Назва компанії</span>
-                    <input
-                      id="accountProviderName"
-                      type="text"
-                      placeholder="Назва компанії"
-                      data-i18n-placeholder="company_name"
-                    />
-                  </label>
-                  <label class="settingsField settingsField-stack">
-                    <span class="settingsRow-label" data-i18n="company_address">Адреса компанії</span>
-                    <input
-                      id="accountProviderAddress"
-                      type="text"
-                      placeholder="Адреса компанії"
-                      data-i18n-placeholder="company_address"
-                    />
-                  </label>
-                  <label class="settingsField">
-                    <span class="settingsRow-label" data-i18n="company_id">ID компанії</span>
-                    <input id="accountProviderIco" type="text" placeholder="22229973" />
-                  </label>
-                </div>
-                <button
-                  class="primary-btn settingsButton"
-                  id="updateProfileBtn"
-                  type="button"
-                  data-i18n="save_business_profile"
-                >
-                  Зберегти бізнес-профіль
-                </button>
-              </section>
+        <label class="settingsField settingsField-stack">
+          <span class="settingsRow-label" data-i18n="full_name">Повне ім’я</span>
+          <input
+            id="accountDisplayName"
+            type="text"
+            placeholder="Повне ім’я"
+            data-i18n-placeholder="full_name"
+            autocomplete="name"
+          />
+        </label>
 
-            </div>
-          </section>
+        <div class="accountProfileActions">
+          <button
+            class="settingsButton accountProfileSaveBtn"
+            id="saveAccountProfileBtn"
+            type="button"
+            data-i18n="save_account_profile"
+          >
+            Зберегти акаунт
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screenSection">
+      <p class="screenSectionLabel" data-i18n="workspace">Робочий простір</p>
+      <div class="settingsGroup">
+        <div class="settingsRow">
+          <span class="settingsRow-label" data-i18n="role">Роль</span>
+          <strong class="settingsValue" id="accountRole">-</strong>
+        </div>
+        <div class="settingsRow">
+          <span class="settingsRow-label" data-i18n="plan">План</span>
+          <strong class="settingsValue" id="accountPlan">-</strong>
+        </div>
+        <div class="settingsRow">
+          <span class="settingsRow-label" data-i18n="status">Статус</span>
+          <strong class="settingsValue" id="accountSubscriptionStatus">-</strong>
+        </div>
+        <div class="settingsRow">
+          <span class="settingsRow-label" data-i18n="cycle">Цикл</span>
+          <strong class="settingsValue" id="accountSubscriptionCycle">-</strong>
+        </div>
+        <div class="settingsRow">
+          <span class="settingsRow-label" data-i18n="usage">Використання</span>
+          <strong class="settingsValue" id="accountUsage">-</strong>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>

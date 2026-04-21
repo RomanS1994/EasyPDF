@@ -53,7 +53,7 @@ export async function deleteMe() {
 export async function updateMyProfile(profile) {
   const response = await fetchApi('/me/profile', {
     method: 'PATCH',
-    body: { profile },
+    body: profile,
   });
 
   return readJsonResponse(response, t('update_profile_failed'));

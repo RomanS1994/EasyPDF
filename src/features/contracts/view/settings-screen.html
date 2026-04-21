@@ -1,14 +1,8 @@
 <section class="appScreen" data-tab-screen="settings">
   <div class="screenCard screenCard-settings">
-    <a class="settingsActionLink settingsBackLink" href="/cz/pdf/account/" data-tab-target="account">
-      <span class="settingsBackLinkArrow" aria-hidden="true">←</span>
-      <span data-i18n="my_account">Мій акаунт</span>
-    </a>
-
     <div class="compactHeader">
-      <p class="sectionEyebrow" data-i18n="settings">Налаштування</p>
-      <h2 data-i18n="account_settings_heading">Параметри</h2>
-      <p data-i18n="account_settings_subline">Мова, сесія та швидкі дії.</p>
+      <h2 data-i18n="account_settings_heading">Загальні налаштування</h2>
+      <p data-i18n="account_settings_subline">Мова, бізнес-профіль, підписка та сесія.</p>
     </div>
 
     <section class="screenSection">
@@ -25,6 +19,96 @@
           Обрана мова зберігається для user і admin простору на цьому пристрої.
         </div>
       </div>
+    </section>
+
+    <section class="screenSection">
+      <a class="accountSummaryLink" href="/cz/pdf/account/" data-tab-target="account" id="accountSummaryLink">
+        <span class="accountSummaryAvatar" aria-hidden="true">
+          <img class="accountSummaryAvatarImage is-hidden" id="accountSummaryAvatarImage" alt="" />
+          <span class="accountSummaryAvatarFallback" id="accountSummaryAvatarFallback">D</span>
+        </span>
+
+        <span class="accountSummaryCopy">
+          <span class="sectionEyebrow" data-i18n="account">Акаунт</span>
+          <strong class="accountSummaryName" id="accountSummaryName">-</strong>
+          <span class="accountSummaryEmail" id="accountSummaryEmail">-</span>
+        </span>
+
+        <span class="accountSummaryChevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M9.5 6.5 15 12l-5.5 5.5" />
+          </svg>
+        </span>
+      </a>
+    </section>
+
+    <section class="screenSection is-hidden" id="managerEntrySection">
+      <p class="screenSectionLabel" data-i18n="admin_workspace">Admin-простір</p>
+      <div class="settingsGroup">
+        <div class="settingsNote" data-i18n="admin_workspace_note">
+          Керуйте акаунтами, підписками, планами та аудитом.
+        </div>
+        <a class="primary-btn settingsActionLink" href="/cz/pdf/admin/accounts/" data-i18n="open_admin_workspace">
+          Відкрити admin-простір
+        </a>
+      </div>
+    </section>
+
+    <section class="screenSection">
+      <p class="screenSectionLabel" data-i18n="business_profile">Бізнес-профіль</p>
+      <div class="settingsGroup">
+        <label class="settingsField settingsField-stack">
+          <span class="settingsRow-label" data-i18n="carrier_name">Ім’я перевізника</span>
+          <input id="accountDriverName" type="text" placeholder="Ім’я перевізника" data-i18n-placeholder="carrier_name" />
+        </label>
+        <label class="settingsField settingsField-stack">
+          <span class="settingsRow-label" data-i18n="carrier_address">Адреса перевізника</span>
+          <input
+            id="accountDriverAddress"
+            type="text"
+            placeholder="Адреса перевізника"
+            data-i18n-placeholder="carrier_address"
+          />
+        </label>
+        <label class="settingsField">
+          <span class="settingsRow-label" data-i18n="vehicle_plate">Номер авто</span>
+          <input id="accountDriverSpz" type="text" placeholder="1AF V087" />
+        </label>
+        <label class="settingsField">
+          <span class="settingsRow-label" data-i18n="carrier_id">ID перевізника</span>
+          <input id="accountDriverIco" type="text" placeholder="22319352" />
+        </label>
+        <label class="settingsField settingsField-stack">
+          <span class="settingsRow-label" data-i18n="company_name">Назва компанії</span>
+          <input
+            id="accountProviderName"
+            type="text"
+            placeholder="Назва компанії"
+            data-i18n-placeholder="company_name"
+          />
+        </label>
+        <label class="settingsField settingsField-stack">
+          <span class="settingsRow-label" data-i18n="company_address">Адреса компанії</span>
+          <input
+            id="accountProviderAddress"
+            type="text"
+            placeholder="Адреса компанії"
+            data-i18n-placeholder="company_address"
+          />
+        </label>
+        <label class="settingsField">
+          <span class="settingsRow-label" data-i18n="company_id">ID компанії</span>
+          <input id="accountProviderIco" type="text" placeholder="22229973" />
+        </label>
+      </div>
+      <button
+        class="primary-btn settingsButton"
+        id="updateProfileBtn"
+        type="button"
+        data-i18n="save_business_profile"
+      >
+        Зберегти бізнес-профіль
+      </button>
     </section>
 
     <section class="screenSection" id="accountUpgradeSection">

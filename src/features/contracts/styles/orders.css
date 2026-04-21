@@ -662,10 +662,6 @@
   .bottomTab[data-tab-target="history"]
   .bottomTab-icon
   svg,
-.page-generateContract[data-app-tab="account"]
-  .bottomTab[data-tab-target="account"]
-  .bottomTab-icon
-  svg,
 .page-generateContract[data-app-tab="settings"]
   .bottomTab[data-tab-target="settings"]
   .bottomTab-icon

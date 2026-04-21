@@ -4,6 +4,7 @@ export function buildDefaultProfile(name = '') {
   const safeName = normalizeText(name);
 
   return {
+    avatarUrl: '',
     driver: {
       name: safeName,
       address: '',
@@ -27,6 +28,7 @@ export function normalizeUserProfile(profile, name = '') {
     source.provider && typeof source.provider === 'object' ? source.provider : {};
 
   return {
+    avatarUrl: normalizeText(source.avatarUrl || source.avatar || defaults.avatarUrl),
     driver: {
       ...defaults.driver,
       name: normalizeText(driverSource.name || defaults.driver.name),

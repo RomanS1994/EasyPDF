@@ -66,10 +66,17 @@ async function handleUpdateMyProfile(request, response) {
         throw new Error('User not found');
       }
 
-      const before = normalizeUserProfile(target.profile, target.name);
       const currentProfile = normalizeUserProfile(target.profile, target.name);
+      const requestedName = normalizeText(body.name ?? incomingProfile.name ?? target.name) || target.name;
+      const nextAvatarUrl = normalizeText(
+        body.avatarUrl ??
+          incomingProfile.avatarUrl ??
+          incomingProfile.avatar ??
+          currentProfile.avatarUrl
+      );
       const nextProfile = normalizeUserProfile(
         {
+          ...currentProfile,
           driver: {
             ...currentProfile.driver,
             ...(incomingProfile.driver || {}),
@@ -78,15 +85,25 @@ async function handleUpdateMyProfile(request, response) {
             ...currentProfile.provider,
             ...(incomingProfile.provider || {}),
           },
+          avatarUrl: nextAvatarUrl,
         },
-        target.name
+        requestedName
       );
+      const before = {
+        name: target.name,
+        profile: currentProfile,
+      };
+      const after = {
+        name: requestedName,
+        profile: nextProfile,
+      };
 
       const updatedUser = await tx.user.update({
         where: {
           id: context.user.id,
         },
         data: {
+          name: requestedName,
           profile: nextProfile,
           updatedAt: new Date(nowIso()),
         },
@@ -100,7 +117,7 @@ async function handleUpdateMyProfile(request, response) {
         entityType: 'profile',
         entityId: updatedUser.id,
         before,
-        after: nextProfile,
+        after,
       });
 
       return buildSanitizedUser(tx, updatedUser);

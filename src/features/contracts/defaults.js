@@ -3,6 +3,7 @@ import {
   detectCurrency,
   extractNumericPrice,
   formatPrice,
+  sanitizePriceInput,
 } from './currency.js';
 import { syncDocumentTypeButtons } from './document-type.js';
 import { getContractData } from './state.js';
@@ -35,7 +36,7 @@ export function initContractDefaults() {
   detectCurrency(getContractData().totalPrice);
   syncCurrencyButtons();
 
-  const numericPrice = extractNumericPrice(getContractData().totalPrice);
+  const numericPrice = sanitizePriceInput(extractNumericPrice(getContractData().totalPrice));
   if (numericPrice) {
     syncConvertedPrice(formatPrice(numericPrice));
     persistContractData({ totalPrice: formatPrice(numericPrice) });

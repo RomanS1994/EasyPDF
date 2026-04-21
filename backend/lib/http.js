@@ -81,7 +81,7 @@ export function sendError(response, statusCode, message, details = null) {
 export async function readJsonBody(request) {
   const chunks = [];
   let totalLength = 0;
-  const maxBytes = 1024 * 1024;
+  const maxBytes = 5 * 1024 * 1024;
 
   for await (const chunk of request) {
     totalLength += chunk.length;

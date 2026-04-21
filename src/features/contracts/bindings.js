@@ -1,5 +1,5 @@
 import { contractRefs, findContractInput } from './selectors.js';
-import { setCurrentCurrency, formatPrice } from './currency.js';
+import { setCurrentCurrency, formatPrice, sanitizePriceInput } from './currency.js';
 import { setDocumentType, syncDocumentTypeButtons } from './document-type.js';
 import { DEFAULT_DOCUMENT_TYPE, getContractData } from './state.js';
 import {
@@ -67,7 +67,12 @@ export function bindContractUtilities() {
       syncCurrencyButtons();
 
       const priceInput = findContractInput('trip-totalPrice');
-      const formatted = priceInput ? formatPrice(priceInput.value) : '';
+      const sanitizedPrice = priceInput ? sanitizePriceInput(priceInput.value) : '';
+      if (priceInput && priceInput.value !== sanitizedPrice) {
+        priceInput.value = sanitizedPrice;
+      }
+
+      const formatted = priceInput ? formatPrice(sanitizedPrice) : '';
       syncConvertedPrice(formatted);
 
       if (formatted) {

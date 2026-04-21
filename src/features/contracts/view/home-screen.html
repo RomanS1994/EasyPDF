@@ -38,9 +38,9 @@
                   <p>Усього збережених записів.</p>
                 </a>
                 <article class="homeOverviewCard">
-                  <span>Акаунт</span>
+                  <span data-i18n="account">Акаунт</span>
                   <strong id="workspaceAccountHome">-</strong>
-                  <p id="workspaceAccountHomeNote">Профіль і доступ.</p>
+                  <p id="workspaceAccountHomeNote">Фото, ім'я й доступ.</p>
                 </article>
               </div>
 
@@ -53,9 +53,9 @@
                   <strong>Статистика</strong>
                   <span>Подивитись використання циклу</span>
                 </a>
-                <a class="homeQuickLink" href="/cz/pdf/account/" data-tab-target="account">
-                  <strong>Акаунт</strong>
-                  <span data-i18n="account_subline">Профіль, підписка та бізнес-профіль.</span>
+                <a class="homeQuickLink" href="/cz/pdf/settings/" data-tab-target="settings">
+                  <strong data-i18n="profile">Профіль</strong>
+                  <span data-i18n="account_settings_subline">Мова, бізнес-профіль, підписка та сесія.</span>
                 </a>
                 <a class="homeQuickLink" href="/cz/pdf/history/" data-tab-target="history">
                   <strong>Історія</strong>
@@ -143,7 +143,6 @@
               </div>
             </div>
           </div>
-
 
           <section class="appScreen" data-tab-screen="orders">
             <form class="dataContract-container dataContract-page is-active" data-step="1" novalidate>
@@ -269,25 +268,21 @@
                   </datalist>
 
                   <dl class="fieldPlainRow fieldPlainRow-time">
-                    <dt id="trip-time-label" data-i18n="pickup_time">Час посадки</dt>
-                    <dd>
-                      <button
-                        class="fieldPlainValue fieldPlainValue-button is-placeholder"
-                        type="button"
-                        data-trip-time-trigger
-                        aria-labelledby="trip-time-label trip-time-display"
-                      >
-                        <span id="trip-time-display" data-trip-time-display>Виберіть дату і час</span>
-                      </button>
-                      <input
-                        class="visually-hidden"
-                        name="trip-time"
-                        type="text"
-                        value=""
-                        tabindex="-1"
-                        aria-hidden="true"
-                      />
-                    </dd>
+                  <dt id="trip-time-label" data-i18n="pickup_time">Час посадки</dt>
+                  <dd>
+                    <input
+                      class="input-date-time tripTimeInput"
+                      id="tripTimeInput"
+                      name="trip-time"
+                      data-trip-time-input
+                      type="text"
+                      value=""
+                      placeholder="Виберіть дату і час"
+                      autocomplete="off"
+                      inputmode="none"
+                      aria-labelledby="trip-time-label"
+                    />
+                  </dd>
 
                     <dt data-i18n="payment_method">Спосіб оплати</dt>
                     <dd>
@@ -298,14 +293,17 @@
                   <div class="priceField">
                     <label class="fieldLabel fieldLabel-price">
                       <span class="visually-hidden" data-i18n="total_price">Загальна сума</span>
-                      <input
-                        class="value"
-                        type="text"
-                        name="trip-totalPrice"
-                        placeholder="Введіть суму"
-                        data-i18n-placeholder="enter_amount"
-                        value=""
-                      />
+                    <input
+                      class="value"
+                      type="text"
+                      name="trip-totalPrice"
+                      inputmode="numeric"
+                      pattern="[0-9]*"
+                      autocomplete="off"
+                      placeholder="Введіть суму"
+                      data-i18n-placeholder="enter_amount"
+                      value=""
+                    />
                     </label>
                     <div class="currency-switch" role="group" aria-label="Валюта" data-i18n-aria-label="currency">
                       <button type="button" class="currency-btn is-active" data-currency="EUR">

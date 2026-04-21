@@ -26,9 +26,92 @@ const DEFAULT_WHATSAPP_URL = `https://wa.me/${SUPPORT_WHATSAPP_NUMBER.replace(/\
 const WHATSAPP_URL = import.meta.env.VITE_SUPPORT_WHATSAPP_URL || DEFAULT_WHATSAPP_URL;
 const TELEGRAM_URL = import.meta.env.VITE_SUPPORT_TELEGRAM_URL || '';
 
+function getInitials(name = '') {
+  const parts = String(name || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (!parts.length) return 'D';
+
+  return parts
+    .slice(0, 2)
+    .map(part => part.charAt(0))
+    .join('')
+    .toUpperCase();
+}
+
 function resolvePlanName(planId) {
   if (!planId) return '-';
   return state.plans.find(plan => plan.id === planId)?.name || planId;
+}
+
+function syncAvatarPreview({
+  avatarUrl = '',
+  name = state.user?.name || '',
+  imageElement = null,
+  fallbackElement = null,
+  removeButton = null,
+  actionsElement = null,
+  altLabel = t('account'),
+} = {}) {
+  const hasAvatar = Boolean(avatarUrl);
+  const initials = getInitials(name || state.user?.email || '');
+
+  if (imageElement) {
+    if (hasAvatar) {
+      imageElement.src = avatarUrl;
+    } else {
+      imageElement.removeAttribute('src');
+    }
+    imageElement.alt = name || state.user?.email || altLabel;
+    imageElement.hidden = !hasAvatar;
+    imageElement.classList.toggle('is-hidden', !hasAvatar);
+    imageElement.onerror = () => {
+      imageElement.hidden = true;
+      imageElement.classList.add('is-hidden');
+      if (fallbackElement) {
+        fallbackElement.hidden = false;
+        fallbackElement.classList.remove('is-hidden');
+      }
+    };
+  }
+
+  if (fallbackElement) {
+    fallbackElement.textContent = initials;
+    fallbackElement.hidden = hasAvatar;
+    fallbackElement.classList.toggle('is-hidden', hasAvatar);
+  }
+
+  if (removeButton) {
+    removeButton.hidden = !hasAvatar;
+    removeButton.classList.toggle('is-hidden', !hasAvatar);
+  }
+
+  if (actionsElement) {
+    actionsElement.hidden = !hasAvatar;
+    actionsElement.classList.toggle('is-hidden', !hasAvatar);
+  }
+}
+
+export function syncAccountAvatarPreview({ avatarUrl = '', name = state.user?.name || '' } = {}) {
+  syncAvatarPreview({
+    avatarUrl,
+    name,
+    imageElement: refs.accountAvatarImage,
+    fallbackElement: refs.accountAvatarFallback,
+    removeButton: refs.accountAvatarRemoveBtn,
+    actionsElement: refs.accountAvatarActions,
+  });
+}
+
+export function syncAccountSummaryPreview({ avatarUrl = '', name = state.user?.name || '' } = {}) {
+  syncAvatarPreview({
+    avatarUrl,
+    name,
+    imageElement: refs.accountSummaryAvatarImage,
+    fallbackElement: refs.accountSummaryAvatarFallback,
+  });
 }
 
 export function renderDashboard() {
@@ -42,7 +125,7 @@ export function renderDashboard() {
     state.managerUsers.find(user => user.id === state.managerSelectedUserId) ||
     null;
   const orderSummaryText = metrics.totalOrders > 0 ? String(metrics.totalOrders) : '0';
-  const accountSummaryText = localizeRole(state.user.role || 'user');
+  const accountSummaryText = state.user.name || state.user.email || t('no_account');
 
   if (refs.workspaceGreeting) {
     refs.workspaceGreeting.textContent = t('hello', {
@@ -83,6 +166,11 @@ export function renderDashboard() {
 
   if (refs.accountName) refs.accountName.textContent = state.user.name || '-';
   if (refs.accountEmail) refs.accountEmail.textContent = state.user.email || '-';
+  if (refs.accountSummaryName) refs.accountSummaryName.textContent = state.user.name || state.user.email || '-';
+  if (refs.accountSummaryEmail) refs.accountSummaryEmail.textContent = state.user.email || '-';
+  if (refs.accountDisplayName && document.activeElement !== refs.accountDisplayName) {
+    refs.accountDisplayName.value = state.user.name || '';
+  }
   if (refs.accountPlan) refs.accountPlan.textContent = state.user.plan?.name || '-';
   if (refs.accountUsage) refs.accountUsage.textContent = usageText;
   if (refs.accountRole) refs.accountRole.textContent = localizeRole(state.user.role || 'user');
@@ -94,6 +182,14 @@ export function renderDashboard() {
   if (refs.accountSubscriptionCycle) {
     refs.accountSubscriptionCycle.textContent = formatCycleLabel(state.user.usage);
   }
+  syncAccountAvatarPreview({
+    avatarUrl: state.user.profile?.avatarUrl || '',
+    name: state.user.name || state.user.email || '',
+  });
+  syncAccountSummaryPreview({
+    avatarUrl: state.user.profile?.avatarUrl || '',
+    name: state.user.name || state.user.email || '',
+  });
   const pendingPlanId = state.user.subscription?.pendingPlanId || '';
   const hasPendingUpgrade = Boolean(pendingPlanId);
   const pendingPlan = state.plans.find(plan => plan.id === pendingPlanId) || null;
