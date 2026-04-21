@@ -1,6 +1,7 @@
 import { getContractPdf } from '../../contracts/api.js';
 import { updateOrder } from '../../orders/api.js';
 import { getCurrentLocale, t } from '../../../shared/i18n/app.js';
+import { downloadBlobFile } from '../../../shared/lib/download.js';
 import { notifyText } from '../../../shared/ui/toast.js';
 import { withAppLoader } from '../../../shared/ui/loader.js';
 import { refs } from './refs.js';
@@ -70,16 +71,9 @@ async function downloadOrderPdf(order, documentType) {
         throw new Error(t('pdf_generation_failed'));
       }
 
-      const blobUrl = URL.createObjectURL(response.blob);
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = response.fileName || t('pdf_fallback_name');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(blobUrl);
+      downloadBlobFile(response.blob, response.fileName || t('pdf_fallback_name'));
 
-      await updateOrder(order.id, {
+      void updateOrder(order.id, {
         status: 'pdf_generated',
         pdf: {
           fileName: response.fileName,
@@ -88,6 +82,8 @@ async function downloadOrderPdf(order, documentType) {
         metadata: {
           documentType,
         },
+      }, { keepalive: true }).catch(updateError => {
+        console.error('Order update after PDF generation failed', updateError);
       });
 
       window.dispatchEvent(new CustomEvent('pdf-app:order-created'));

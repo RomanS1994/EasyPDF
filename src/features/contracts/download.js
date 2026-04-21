@@ -2,6 +2,7 @@ import { getContractPdf } from './api.js';
 import { createOrder, updateOrder } from '../orders/api.js';
 import { getCurrentContractData } from './index.js';
 import { t } from '../../shared/i18n/app.js';
+import { downloadBlobFile } from '../../shared/lib/download.js';
 import { notifyText } from '../../shared/ui/toast.js';
 import { getStoredSession } from '../auth/session.js';
 import { withAppLoader } from '../../shared/ui/loader.js';
@@ -84,22 +85,17 @@ export function initContractDownload() {
           throw new Error(t('pdf_generation_failed'));
         }
 
-        const blobUrl = URL.createObjectURL(response.blob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = response.fileName || t('pdf_fallback_name');
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        URL.revokeObjectURL(blobUrl);
+        downloadBlobFile(response.blob, response.fileName || t('pdf_fallback_name'));
 
         if (orderId) {
-          await updateOrder(orderId, {
+          void updateOrder(orderId, {
             status: 'pdf_generated',
             pdf: {
               fileName: response.fileName,
               documentType,
             },
+          }, { keepalive: true }).catch(updateError => {
+            console.error('Order update after PDF generation failed', updateError);
           });
         }
 
@@ -116,7 +112,7 @@ export function initContractDownload() {
                 pdfError: error.message,
                 documentType,
               },
-            });
+            }, { keepalive: true });
           } catch (updateError) {
             console.error('Order update after PDF failure failed', updateError);
           }

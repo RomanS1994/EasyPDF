@@ -21,10 +21,11 @@ export async function createOrder(payload) {
   return readJsonResponse(response, t('create_order_failed'));
 }
 
-export async function updateOrder(orderId, payload) {
+export async function updateOrder(orderId, payload, options = {}) {
   const response = await fetchApi(`/orders/${orderId}`, {
     method: 'PATCH',
     body: payload,
+    options,
   });
 
   return readJsonResponse(response, t('update_order_failed'));
