@@ -103,9 +103,7 @@ export function initContractDownload() {
         }
 
         notifyText(t('order_saved_pdf_downloaded'), 'success');
-        window.dispatchEvent(new CustomEvent('pdf-app:order-created', {
-          detail: { refresh: false },
-        }));
+        window.dispatchEvent(new CustomEvent('pdf-app:order-created'));
       } catch (error) {
         console.error('Download PDF failed', error);
 

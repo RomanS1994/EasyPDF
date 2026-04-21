@@ -22,57 +22,59 @@ import { notifyText } from '../../../shared/ui/toast.js';
 import { withAppLoader } from '../../../shared/ui/loader.js';
 
 export async function refreshAccountData({ resetTab = false } = {}) {
-  const hadUser = Boolean(state.user);
-
-  try {
-    const meResponse = await getMe();
-    let orders = [];
+  await withAppLoader(async () => {
+    const hadUser = Boolean(state.user);
 
     try {
-      const ordersResponse = await getOrders();
-      orders = ordersResponse.orders || [];
-    } catch (error) {
-      orders = [];
-      notifyText(error.message || t('api_orders_failed'), 'error');
-    }
+      const meResponse = await getMe();
+      let orders = [];
 
-    state.user = meResponse.user;
-    state.orders = orders;
+      try {
+        const ordersResponse = await getOrders();
+        orders = ordersResponse.orders || [];
+      } catch (error) {
+        orders = [];
+        notifyText(error.message || t('api_orders_failed'), 'error');
+      }
 
-    // fetchApi may rotate the access token during a 401 refresh, so read the latest stored value.
-    const session = getStoredSession();
-    if (session?.token) {
-      setStoredSession({
-        token: session.token,
-        user: state.user,
-      });
-    }
+      state.user = meResponse.user;
+      state.orders = orders;
 
-    renderAuthenticatedState({ resetTab });
+      // fetchApi may rotate the access token during a 401 refresh, so read the latest stored value.
+      const session = getStoredSession();
+      if (session?.token) {
+        setStoredSession({
+          token: session.token,
+          user: state.user,
+        });
+      }
 
-    if (isAdminShell()) {
-      await loadManagerData();
-    }
-  } catch (error) {
-    if (error.status === 401) {
-      clearStoredSession();
-      state.user = null;
-      state.orders = [];
-      clearManagerState();
-      renderAuthenticatedState({ resetTab: true });
-      notifyText(t('session_expired'), 'error');
-      return;
-    }
-
-    if (!hadUser) {
-      state.user = null;
-      state.orders = [];
-      clearManagerState();
       renderAuthenticatedState({ resetTab });
-    }
 
-    notifyText(error.message || t('account_load_failed'), 'error');
-  }
+      if (isAdminShell()) {
+        await loadManagerData();
+      }
+    } catch (error) {
+      if (error.status === 401) {
+        clearStoredSession();
+        state.user = null;
+        state.orders = [];
+        clearManagerState();
+        renderAuthenticatedState({ resetTab: true });
+        notifyText(t('session_expired'), 'error');
+        return;
+      }
+
+      if (!hadUser) {
+        state.user = null;
+        state.orders = [];
+        clearManagerState();
+        renderAuthenticatedState({ resetTab });
+      }
+
+      notifyText(error.message || t('account_load_failed'), 'error');
+    }
+  });
 }
 
 export async function handleLogoutClick() {

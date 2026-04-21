@@ -94,9 +94,13 @@ function bindEvents() {
   refs.tabButtons.forEach(button => button.addEventListener('click', handleTabClick));
   bindManagerEvents(refreshAccountData, loadPlansForGuest);
   bindOrderDetailEvents();
-  window.addEventListener('pdf-app:order-created', event => {
-    if (event?.detail?.refresh === false) return;
-    refreshAccountData();
+  window.addEventListener('pdf-app:order-created', () => {
+    void refreshAccountData();
+  });
+  window.addEventListener('pdf-app:tab-activated', event => {
+    if (event.detail?.tab !== 'stats' || !state.user) return;
+
+    void refreshAccountData();
   });
   window.addEventListener('pdf-app:language-changed', () => {
     syncLanguageSelects();

@@ -41,6 +41,14 @@ export function activateTab(tabName = 'home') {
   });
 }
 
+function notifyTabActivated(tabName) {
+  window.dispatchEvent(
+    new CustomEvent('pdf-app:tab-activated', {
+      detail: { tab: tabName },
+    }),
+  );
+}
+
 export function activateStatsTab(tabName = 'usage') {
   const nextTab = STATS_TAB_NAMES.includes(tabName) ? tabName : 'usage';
   state.activeStatsTab = nextTab;
@@ -60,6 +68,7 @@ export function navigateToTab(tabName, pathname) {
   document.body.dataset.appTab = tabName;
   activateTab(tabName);
   syncPageMeta(getCurrentLanguage());
+  notifyTabActivated(tabName);
 
   if (window.location.pathname !== pathname) {
     window.history.pushState({ appTab: tabName }, '', pathname);
@@ -73,6 +82,7 @@ function handleTabPopState() {
   document.body.dataset.appTab = nextTab;
   activateTab(nextTab);
   syncPageMeta(getCurrentLanguage());
+  notifyTabActivated(nextTab);
 }
 
 export function bindNavigationEvents() {

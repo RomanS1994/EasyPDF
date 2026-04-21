@@ -89,9 +89,7 @@ async function downloadOrderPdf(order, documentType) {
         console.error('Order update after PDF generation failed', updateError);
       });
 
-      window.dispatchEvent(new CustomEvent('pdf-app:order-created', {
-        detail: { refresh: false },
-      }));
+      window.dispatchEvent(new CustomEvent('pdf-app:order-created'));
       notifyText(t('order_saved_pdf_downloaded'), 'success');
     } catch (error) {
       console.error('Order PDF generation failed', error);
