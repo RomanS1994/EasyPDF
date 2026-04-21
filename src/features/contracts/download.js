@@ -2,7 +2,7 @@ import { getContractPdf } from './api.js';
 import { createOrder, updateOrder } from '../orders/api.js';
 import { getCurrentContractData } from './index.js';
 import { t } from '../../shared/i18n/app.js';
-import { downloadBlobFile } from '../../shared/lib/download.js';
+import { downloadBlobFile, prepareDownloadTarget } from '../../shared/lib/download.js';
 import { notifyText } from '../../shared/ui/toast.js';
 import { getStoredSession } from '../auth/session.js';
 import { withAppLoader } from '../../shared/ui/loader.js';
@@ -62,6 +62,7 @@ export function initContractDownload() {
     let orderId = '';
     const contractData = getCurrentContractData();
     const documentType = contractData.documentType || 'confirmation';
+    const downloadTarget = prepareDownloadTarget();
 
     await withAppLoader(async () => {
       try {
@@ -85,7 +86,9 @@ export function initContractDownload() {
           throw new Error(t('pdf_generation_failed'));
         }
 
-        downloadBlobFile(response.blob, response.fileName || t('pdf_fallback_name'));
+        downloadBlobFile(response.blob, response.fileName || t('pdf_fallback_name'), {
+          targetWindow: downloadTarget,
+        });
 
         if (orderId) {
           void updateOrder(orderId, {
@@ -100,7 +103,9 @@ export function initContractDownload() {
         }
 
         notifyText(t('order_saved_pdf_downloaded'), 'success');
-        window.dispatchEvent(new CustomEvent('pdf-app:order-created'));
+        window.dispatchEvent(new CustomEvent('pdf-app:order-created', {
+          detail: { refresh: false },
+        }));
       } catch (error) {
         console.error('Download PDF failed', error);
 

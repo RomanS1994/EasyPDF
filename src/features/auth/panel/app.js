@@ -94,7 +94,8 @@ function bindEvents() {
   refs.tabButtons.forEach(button => button.addEventListener('click', handleTabClick));
   bindManagerEvents(refreshAccountData, loadPlansForGuest);
   bindOrderDetailEvents();
-  window.addEventListener('pdf-app:order-created', () => {
+  window.addEventListener('pdf-app:order-created', event => {
+    if (event?.detail?.refresh === false) return;
     refreshAccountData();
   });
   window.addEventListener('pdf-app:language-changed', () => {
