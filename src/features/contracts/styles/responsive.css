@@ -55,6 +55,18 @@
   }
 }
 
+@media (max-width: 420px) {
+  .accountHeader {
+    grid-template-columns: 1fr;
+  }
+
+  .page-generateContract[data-app-shell='user'] .accountSettingsLink {
+    width: 100%;
+    min-width: 0;
+    justify-self: stretch;
+  }
+}
+
 .settingsActionLink {
   display: inline-flex;
   align-items: center;
@@ -62,4 +74,3 @@
   width: 100%;
   text-decoration: none;
 }
-

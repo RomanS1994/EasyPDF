@@ -1,5 +1,5 @@
 import { t } from '../../../shared/i18n/app.js';
-import { refs, TAB_NAMES } from './refs.js';
+import { refs } from './refs.js';
 import { isAdminShell, isManagerRole } from './shell.js';
 import {
   setStoredManagerOrdersSelectedOnly,

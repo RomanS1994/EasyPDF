@@ -198,7 +198,10 @@ export const refs = {
   managerOrderMarkFailedBtn: document.getElementById('managerOrderMarkFailedBtn'),
 };
 
-export const TAB_NAMES = ['home', 'stats', 'orders', 'account', 'settings', 'accounts', 'subscriptions'];
-export const STATS_TAB_NAMES = ['usage', 'activity', 'history'];
+export const TAB_NAMES =
+  document.body.dataset.appShell === 'admin'
+    ? ['accounts', 'subscriptions', 'orders', 'settings']
+    : ['home', 'stats', 'orders', 'history', 'account', 'settings'];
+export const STATS_TAB_NAMES = ['usage', 'activity'];
 export const AUTH_MODES = ['register', 'login'];
 export const CONTRACT_STORAGE_KEY = 'contract-data';

@@ -7,7 +7,7 @@
     <title>DocTra</title>
     <meta
       name="description"
-      content="Керуйте акаунтом DocTra, оновлюйте бізнес-профіль і переходьте до окремих налаштувань."
+      content="Переглядайте історію згенерованих PDF, відстежуйте фільтр за датою та відкривайте збережені замовлення в DocTra."
     />
     <link rel="icon" type="image/svg+xml" href="/shared/assets/doctra-icon.svg" />
     <link rel="shortcut icon" href="/shared/assets/doctra-icon.svg" />
@@ -15,11 +15,17 @@
     <link rel="manifest" href="/site.webmanifest" />
     <load src="/shared/view/pwa-meta.html" />
     <meta property="og:title" content="DocTra" />
-    <meta property="og:description" content="Керуйте акаунтом DocTra, оновлюйте бізнес-профіль і переходьте до окремих налаштувань." />
+    <meta
+      property="og:description"
+      content="Переглядайте історію згенерованих PDF, відстежуйте фільтр за датою та відкривайте збережені замовлення в DocTra."
+    />
     <meta property="og:image" content="/shared/assets/og-image.png" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="DocTra" />
-    <meta name="twitter:description" content="Керуйте акаунтом DocTra, оновлюйте бізнес-профіль і переходьте до окремих налаштувань." />
+    <meta
+      name="twitter:description"
+      content="Переглядайте історію згенерованих PDF, відстежуйте фільтр за датою та відкривайте збережені замовлення в DocTra."
+    />
     <meta name="twitter:image" content="/shared/assets/og-image.png" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -67,11 +73,11 @@
     <link rel="stylesheet" href="/features/contracts/styles/dataContract.css" />
   </head>
 
-  <body class="page-generateContract" data-app-shell="user" data-app-tab="account">
+  <body class="page-generateContract" data-app-shell="user" data-app-tab="history">
     <main>
       <load src="/features/contracts/view/shell.html" />
     </main>
 
-    <script type="module" src="/pages/account/page.js"></script>
+    <script type="module" src="/pages/history/page.js"></script>
   </body>
 </html>

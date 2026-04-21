@@ -7,6 +7,8 @@
   .appScreen[data-tab-screen="stats"],
 .page-generateContract[data-app-tab="orders"]
   .appScreen[data-tab-screen="orders"],
+.page-generateContract[data-app-tab="history"]
+  .appScreen[data-tab-screen="history"],
 .page-generateContract[data-app-tab="account"]
   .appScreen[data-tab-screen="account"],
 .page-generateContract[data-app-tab="accounts"]

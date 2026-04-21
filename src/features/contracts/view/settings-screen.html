@@ -1,116 +1,121 @@
-          <section class="appScreen" data-tab-screen="settings">
-            <div class="screenCard screenCard-settings">
-              <div class="compactHeader">
-                <p class="sectionEyebrow" data-i18n="settings">Налаштування</p>
-                <h2>Параметри</h2>
-                <p>Мова, сесія та швидкі дії.</p>
-              </div>
+<section class="appScreen" data-tab-screen="settings">
+  <div class="screenCard screenCard-settings">
+    <a class="settingsActionLink settingsBackLink" href="/cz/pdf/account/" data-tab-target="account">
+      <span class="settingsBackLinkArrow" aria-hidden="true">←</span>
+      <span data-i18n="my_account">Мій акаунт</span>
+    </a>
 
-              <section class="screenSection">
-                <div class="settingsGroup">
-                  <label class="settingsField">
-                    <span class="settingsRow-label" data-i18n="interface_language">Мова інтерфейсу</span>
-                    <select id="settingsLanguageSelect">
-                      <option value="uk" data-i18n="language_uk">Українська</option>
-                      <option value="en" data-i18n="language_en">English</option>
-                      <option value="cs" data-i18n="language_cs">Čeština</option>
-                    </select>
-                  </label>
-                  <div class="settingsNote" data-i18n="interface_language_note">
-                    Обрана мова зберігається для user і admin простору на цьому пристрої.
-                  </div>
-                </div>
-              </section>
+    <div class="compactHeader">
+      <p class="sectionEyebrow" data-i18n="settings">Налаштування</p>
+      <h2 data-i18n="account_settings_heading">Параметри</h2>
+      <p data-i18n="account_settings_subline">Мова, сесія та швидкі дії.</p>
+    </div>
 
-              <section class="screenSection" id="accountUpgradeSection">
-                <p class="screenSectionLabel" data-i18n="upgrade_plan">Апгрейд плану</p>
-                <div class="settingsGroup">
-                  <label class="settingsField">
-                    <span class="settingsRow-label" data-i18n="paid_plan">Paid план</span>
-                    <select id="accountUpgradePlan"></select>
-                  </label>
-                  <div class="settingsNote" id="accountUpgradeHint" data-i18n="upgrade_request_note">
-                    Оберіть paid план. Ми створимо manual payment request, а доступ увімкнеться лише після підтвердження менеджером.
-                  </div>
-                  <button
-                    class="primary-btn settingsButton"
-                    id="requestUpgradeBtn"
-                    type="button"
-                    data-i18n="request_manual_upgrade"
-                  >
-                    Запросити paid апгрейд
-                  </button>
-                </div>
-              </section>
+    <section class="screenSection">
+      <div class="settingsGroup">
+        <label class="settingsField">
+          <span class="settingsRow-label" data-i18n="interface_language">Мова інтерфейсу</span>
+          <select id="settingsLanguageSelect">
+            <option value="uk" data-i18n="language_uk">Українська</option>
+            <option value="en" data-i18n="language_en">English</option>
+            <option value="cs" data-i18n="language_cs">Čeština</option>
+          </select>
+        </label>
+        <div class="settingsNote" data-i18n="interface_language_note">
+          Обрана мова зберігається для user і admin простору на цьому пристрої.
+        </div>
+      </div>
+    </section>
 
-              <section class="screenSection is-hidden" id="accountPendingUpgradeSection">
-                <p class="screenSectionLabel" data-i18n="pending_payment">Очікування оплати</p>
-                <div class="settingsGroup">
-                  <div class="settingsRow">
-                    <span class="settingsRow-label" data-i18n="requested_plan">Запитаний план</span>
-                    <strong class="settingsValue" id="accountPendingUpgradePlan">-</strong>
-                  </div>
-                  <div class="settingsRow">
-                    <span class="settingsRow-label" data-i18n="requested_at">Запит створено</span>
-                    <strong class="settingsValue" id="accountPendingUpgradeRequestedAt">-</strong>
-                  </div>
-                  <div class="settingsNote" data-i18n="manual_payment_pending_note">
-                    Апгрейд очікує ручного підтвердження. Напишіть у WhatsApp або Telegram і дочекайтесь активації менеджером.
-                  </div>
-                  <div class="settingsRow">
-                    <span class="settingsRow-label" data-i18n="whatsapp_number">WhatsApp</span>
-                    <a
-                      class="settingsValue settingsInlineLink"
-                      id="accountUpgradeWhatsappNumber"
-                      href="#"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      +420773633433
-                    </a>
-                  </div>
-                  <div class="settingsRow">
-                    <span class="settingsRow-label" data-i18n="payment_amount">Сума до оплати</span>
-                    <strong class="settingsValue" id="accountPendingUpgradeAmount">-</strong>
-                  </div>
-                  <div class="settingsRow">
-                    <span class="settingsRow-label" data-i18n="payment_details">Реквізити для оплати</span>
-                    <span class="settingsValue" data-i18n="payment_details_whatsapp_note">
-                      Надішлемо у WhatsApp
-                    </span>
-                  </div>
-                  <a
-                    class="secondary-btn settingsActionLink is-hidden"
-                    id="accountUpgradeTelegram"
-                    href="#"
-                    target="_blank"
-                    rel="noreferrer"
-                    data-i18n="contact_telegram"
-                  >
-                    Telegram
-                  </a>
-                </div>
-              </section>
+    <section class="screenSection" id="accountUpgradeSection">
+      <p class="screenSectionLabel" data-i18n="upgrade_plan">Апгрейд плану</p>
+      <div class="settingsGroup">
+        <label class="settingsField">
+          <span class="settingsRow-label" data-i18n="paid_plan">Paid план</span>
+          <select id="accountUpgradePlan"></select>
+        </label>
+        <div class="settingsNote" id="accountUpgradeHint" data-i18n="upgrade_request_note">
+          Оберіть paid план. Ми створимо manual payment request, а доступ увімкнеться лише після підтвердження менеджером.
+        </div>
+        <button
+          class="primary-btn settingsButton"
+          id="requestUpgradeBtn"
+          type="button"
+          data-i18n="request_manual_upgrade"
+        >
+          Запросити paid апгрейд
+        </button>
+      </div>
+    </section>
 
-              <section class="screenSection">
-                <p class="screenSectionLabel" data-i18n="session">Сесія</p>
-                <div class="settingsGroup">
-                  <button class="secondary-btn settingsAction" id="settingsLogoutBtn" type="button" data-i18n="log_out">
-                    Вийти
-                  </button>
-                </div>
-              </section>
+    <section class="screenSection is-hidden" id="accountPendingUpgradeSection">
+      <p class="screenSectionLabel" data-i18n="pending_payment">Очікування оплати</p>
+      <div class="settingsGroup">
+        <div class="settingsRow">
+          <span class="settingsRow-label" data-i18n="requested_plan">Запитаний план</span>
+          <strong class="settingsValue" id="accountPendingUpgradePlan">-</strong>
+        </div>
+        <div class="settingsRow">
+          <span class="settingsRow-label" data-i18n="requested_at">Запит створено</span>
+          <strong class="settingsValue" id="accountPendingUpgradeRequestedAt">-</strong>
+        </div>
+        <div class="settingsNote" data-i18n="manual_payment_pending_note">
+          Апгрейд очікує ручного підтвердження. Напишіть у WhatsApp або Telegram і дочекайтесь активації менеджером.
+        </div>
+        <div class="settingsRow">
+          <span class="settingsRow-label" data-i18n="whatsapp_number">WhatsApp</span>
+          <a
+            class="settingsValue settingsInlineLink"
+            id="accountUpgradeWhatsappNumber"
+            href="#"
+            target="_blank"
+            rel="noreferrer"
+          >
+            +420773633433
+          </a>
+        </div>
+        <div class="settingsRow">
+          <span class="settingsRow-label" data-i18n="payment_amount">Сума до оплати</span>
+          <strong class="settingsValue" id="accountPendingUpgradeAmount">-</strong>
+        </div>
+        <div class="settingsRow">
+          <span class="settingsRow-label" data-i18n="payment_details">Реквізити для оплати</span>
+          <span class="settingsValue" data-i18n="payment_details_whatsapp_note">
+            Надішлемо у WhatsApp
+          </span>
+        </div>
+        <a
+          class="settingsActionLink is-hidden"
+          id="accountUpgradeTelegram"
+          href="#"
+          target="_blank"
+          rel="noreferrer"
+          data-i18n="contact_telegram"
+        >
+          Telegram
+        </a>
+      </div>
+    </section>
 
-              <section class="screenSection">
-                <p class="screenSectionLabel" data-i18n="danger_zone">Небезпечна зона</p>
-                <div class="settingsGroup settingsGroup-danger">
-                  <div class="settingsNote" data-i18n="delete_account_note">
-                    Видалити акаунт і всі збережені замовлення.
-                  </div>
-                  <button class="danger-btn settingsAction" id="settingsDeleteAccountBtn" type="button" data-i18n="delete_account">
-                    Видалити акаунт
-                  </button>
-                </div>
-              </section>
-            </div>
-          </section>
+    <section class="screenSection">
+      <p class="screenSectionLabel" data-i18n="session">Сесія</p>
+      <div class="settingsGroup">
+        <button class="settingsAction" id="settingsLogoutBtn" type="button" data-i18n="log_out">
+          Вийти
+        </button>
+      </div>
+    </section>
+
+    <section class="screenSection">
+      <p class="screenSectionLabel" data-i18n="danger_zone">Небезпечна зона</p>
+      <div class="settingsGroup settingsGroup-danger">
+        <div class="settingsNote" data-i18n="delete_account_note">
+          Видалити акаунт і всі збережені замовлення.
+        </div>
+        <button class="danger-btn settingsAction" id="deleteAccountBtn" type="button" data-i18n="delete_account">
+          Видалити акаунт
+        </button>
+      </div>
+    </section>
+  </div>
+</section>

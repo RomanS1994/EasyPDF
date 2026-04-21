@@ -98,7 +98,7 @@ function bindEvents() {
     void refreshAccountData();
   });
   window.addEventListener('pdf-app:tab-activated', event => {
-    if (event.detail?.tab !== 'stats' || !state.user) return;
+    if (!state.user || !['stats', 'history', 'settings'].includes(event.detail?.tab)) return;
 
     void refreshAccountData();
   });

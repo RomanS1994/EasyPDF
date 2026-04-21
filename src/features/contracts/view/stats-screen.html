@@ -13,9 +13,6 @@
                 <button class="statsTab" type="button" data-stats-tab-target="activity" data-i18n="activity">
                   Активність
                 </button>
-                <button class="statsTab" type="button" data-stats-tab-target="history" data-i18n="history">
-                  Історія
-                </button>
               </div>
 
               <div class="statsPanels">
@@ -75,31 +72,6 @@
                     </div>
                     <div class="statusStack" id="statsStatusStack"></div>
                     <div class="statusLegend" id="statsStatusLegend"></div>
-                  </div>
-                </section>
-
-                <section class="statsPanel" data-stats-tab-screen="history">
-                  <div class="statsVizCard statsHistoryCard">
-                    <div class="usageCard-head">
-                      <h3 data-i18n="orders">Історія замовлень</h3>
-                      <span id="statsHistorySummary">-</span>
-                    </div>
-                    <label class="settingsField orderDateField">
-                      <span class="settingsRow-label orderDateLabel">
-                        <svg class="orderDateLabelIcon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-                          <path d="M6 2.5a.75.75 0 0 1 .75.75v1h6.5v-1a.75.75 0 0 1 1.5 0v1h1.5A2.25 2.25 0 0 1 18.5 6.5v9A2.25 2.25 0 0 1 16.25 17.75H3.75A2.25 2.25 0 0 1 1.5 15.5v-9A2.25 2.25 0 0 1 3.75 4.25h1.5v-1A.75.75 0 0 1 6 2.5Zm10.5 6.75H3.5v6.25c0 .414.336.75.75.75h11.5a.75.75 0 0 0 .75-.75V9.25Z" fill="currentColor"/>
-                        </svg>
-                        <span data-i18n="date">Дата</span>
-                      </span>
-                      <input id="statsHistoryDateFilter" type="date" />
-                    </label>
-                    <button class="secondary-btn settingsAction orderDateReset" id="statsHistoryDateResetBtn" type="button" data-i18n="reset">
-                      Скинути
-                    </button>
-                    <p class="ordersEmpty" id="statsHistoryEmpty" data-i18n="orders_empty_home">
-                      Замовлень ще немає. Згенеруйте PDF на «Замовлення», щоб створити перше.
-                    </p>
-                    <ul class="ordersList" id="statsHistoryList"></ul>
                   </div>
                 </section>
               </div>

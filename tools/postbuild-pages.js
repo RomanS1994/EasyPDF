@@ -8,8 +8,10 @@ const distRoot = path.join(projectRoot, 'dist');
 const pageOutputMap = {
   'pages/pdf/index.html': 'cz/pdf/index.html',
   'pages/account/index.html': 'cz/pdf/account/index.html',
+  'pages/settings/index.html': 'cz/pdf/settings/index.html',
   'pages/orders/index.html': 'cz/pdf/orders/index.html',
   'pages/stats/index.html': 'cz/pdf/stats/index.html',
+  'pages/history/index.html': 'cz/pdf/history/index.html',
   'pages/manager/index.html': 'cz/pdf/manager/index.html',
   'pages/admin/index.html': 'cz/pdf/admin/index.html',
   'pages/admin/accounts/index.html': 'cz/pdf/admin/accounts/index.html',

@@ -18,6 +18,7 @@ export function getShellRouteConfig() {
     home: '/cz/pdf/',
     stats: '/cz/pdf/stats/',
     orders: '/cz/pdf/orders/',
+    history: '/cz/pdf/history/',
     account: '/cz/pdf/account/',
     settings: '/cz/pdf/settings/',
   };
@@ -25,7 +26,8 @@ export function getShellRouteConfig() {
 
 export function getTabForPath(pathname) {
   const routes = getShellRouteConfig();
-  return Object.entries(routes).find(([, routePath]) => routePath === pathname)?.[0] || null;
+  const matchedTab = Object.entries(routes).find(([, routePath]) => routePath === pathname)?.[0] || null;
+  return matchedTab;
 }
 
 export function activateTab(tabName = 'home') {

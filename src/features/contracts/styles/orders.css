@@ -627,6 +627,10 @@
   .bottomTab[data-tab-target="orders"]
   .bottomTab-icon
   svg,
+.page-generateContract[data-app-tab="history"]
+  .bottomTab[data-tab-target="history"]
+  .bottomTab-icon
+  svg,
 .page-generateContract[data-app-tab="account"]
   .bottomTab[data-tab-target="account"]
   .bottomTab-icon
@@ -641,10 +645,6 @@
   svg,
 .page-generateContract[data-app-tab="subscriptions"]
   .bottomTab[data-tab-target="subscriptions"]
-  .bottomTab-icon
-  svg,
-.page-generateContract[data-app-tab="settings"]
-  .bottomTab[data-tab-target="settings"]
   .bottomTab-icon
   svg {
   stroke-width: 2.15;

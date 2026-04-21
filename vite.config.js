@@ -9,10 +9,14 @@ const devPageRouteMap = {
   '/cz/pdf/': '/pages/pdf/index.html',
   '/cz/pdf/account': '/pages/account/index.html',
   '/cz/pdf/account/': '/pages/account/index.html',
+  '/cz/pdf/settings': '/pages/settings/index.html',
+  '/cz/pdf/settings/': '/pages/settings/index.html',
   '/cz/pdf/stats': '/pages/stats/index.html',
   '/cz/pdf/stats/': '/pages/stats/index.html',
   '/cz/pdf/orders': '/pages/orders/index.html',
   '/cz/pdf/orders/': '/pages/orders/index.html',
+  '/cz/pdf/history': '/pages/history/index.html',
+  '/cz/pdf/history/': '/pages/history/index.html',
   '/cz/pdf/manager': '/pages/manager/index.html',
   '/cz/pdf/manager/': '/pages/manager/index.html',
   '/cz/pdf/admin': '/pages/admin/index.html',
@@ -55,7 +59,9 @@ function devRouteRewritePlugin() {
 export default defineConfig(({ command }) => {
   const homeHtml = path.resolve(__dirname, 'src/pages/pdf/index.html');
   const accountHtml = path.resolve(__dirname, 'src/pages/account/index.html');
+  const settingsHtml = path.resolve(__dirname, 'src/pages/settings/index.html');
   const statsHtml = path.resolve(__dirname, 'src/pages/stats/index.html');
+  const historyHtml = path.resolve(__dirname, 'src/pages/history/index.html');
   const ordersHtml = path.resolve(__dirname, 'src/pages/orders/index.html');
   const managerHtml = path.resolve(__dirname, 'src/pages/manager/index.html');
   const adminHtml = path.resolve(__dirname, 'src/pages/admin/index.html');
@@ -91,7 +97,9 @@ export default defineConfig(({ command }) => {
           index: redirectHtml,
           'cz/pdf/index': homeHtml,
           'cz/pdf/account/index': accountHtml,
+          'cz/pdf/settings/index': settingsHtml,
           'cz/pdf/stats/index': statsHtml,
+          'cz/pdf/history/index': historyHtml,
           'cz/pdf/orders/index': ordersHtml,
           'cz/pdf/manager/index': managerHtml,
           'cz/pdf/admin/index': adminHtml,
