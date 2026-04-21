@@ -21,7 +21,9 @@ import {
 } from './manager-render.js';
 import { t } from '../../../shared/i18n/app.js';
 
-const WHATSAPP_URL = import.meta.env.VITE_SUPPORT_WHATSAPP_URL || '';
+const SUPPORT_WHATSAPP_NUMBER = '+420773633433';
+const DEFAULT_WHATSAPP_URL = `https://wa.me/${SUPPORT_WHATSAPP_NUMBER.replace(/\D/g, '')}`;
+const WHATSAPP_URL = import.meta.env.VITE_SUPPORT_WHATSAPP_URL || DEFAULT_WHATSAPP_URL;
 const TELEGRAM_URL = import.meta.env.VITE_SUPPORT_TELEGRAM_URL || '';
 
 function resolvePlanName(planId) {
@@ -94,6 +96,7 @@ export function renderDashboard() {
   }
   const pendingPlanId = state.user.subscription?.pendingPlanId || '';
   const hasPendingUpgrade = Boolean(pendingPlanId);
+  const pendingPlan = state.plans.find(plan => plan.id === pendingPlanId) || null;
   const activePaidPlanId = Number(state.user.plan?.priceCzk) > 0 ? state.user.plan?.id : '';
   const upgradePlans = state.plans.filter(
     plan => Number(plan.priceCzk) > 0 && plan.id !== activePaidPlanId,
@@ -108,6 +111,12 @@ export function renderDashboard() {
     refs.accountPendingUpgradeRequestedAt.textContent = state.user.subscription?.pendingRequestedAt
       ? formatDateLabel(state.user.subscription.pendingRequestedAt)
       : '-';
+  }
+  if (refs.accountPendingUpgradeAmount) {
+    refs.accountPendingUpgradeAmount.textContent =
+      pendingPlan && Number(pendingPlan.priceCzk) > 0
+        ? t('plan_price_month', { price: `${pendingPlan.priceCzk} Kc` })
+        : '-';
   }
   if (refs.accountUpgradeSection) {
     refs.accountUpgradeSection.classList.toggle('is-hidden', !upgradePlans.length);
@@ -135,9 +144,10 @@ export function renderDashboard() {
       ? t('upgrade_pending_hint')
       : t('upgrade_request_note');
   }
-  if (refs.accountUpgradeWhatsapp) {
-    refs.accountUpgradeWhatsapp.classList.toggle('is-hidden', !WHATSAPP_URL);
-    if (WHATSAPP_URL) refs.accountUpgradeWhatsapp.href = WHATSAPP_URL;
+  if (refs.accountUpgradeWhatsappNumber) {
+    refs.accountUpgradeWhatsappNumber.classList.toggle('is-hidden', !WHATSAPP_URL);
+    refs.accountUpgradeWhatsappNumber.textContent = SUPPORT_WHATSAPP_NUMBER;
+    if (WHATSAPP_URL) refs.accountUpgradeWhatsappNumber.href = WHATSAPP_URL;
   }
   if (refs.accountUpgradeTelegram) {
     refs.accountUpgradeTelegram.classList.toggle('is-hidden', !TELEGRAM_URL);

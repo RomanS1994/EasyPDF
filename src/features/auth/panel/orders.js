@@ -1,6 +1,7 @@
 import { getCurrentLocale, t } from '../../../shared/i18n/app.js';
 import { refs } from './refs.js';
 import { state } from './state.js';
+import { isAdminShell } from './shell.js';
 import { escapeHtml, formatOrderStatusLabel } from './formatters.js';
 
 function formatLocalDateKey(value) {
@@ -45,7 +46,8 @@ export function buildOrderMarkup(order, { compact = false, showOwner = false } =
   const createdAt = order.createdAt
     ? new Date(order.createdAt).toLocaleString(getCurrentLocale())
     : '-';
-  const route = [order.trip?.from, order.trip?.to].filter(Boolean).join(' -> ');
+  const routeSeparator = isAdminShell() ? ' · ' : ' -> ';
+  const route = [order.trip?.from, order.trip?.to].filter(Boolean).join(routeSeparator);
   const customerName = order.customer?.name || t('no_customer_name');
   const totalPrice = order.totalPrice || t('no_total');
   const ownerLabel = order.user

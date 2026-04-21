@@ -5,6 +5,7 @@ import { notifyText } from '../../../shared/ui/toast.js';
 import { withAppLoader } from '../../../shared/ui/loader.js';
 import { refs } from './refs.js';
 import { state } from './state.js';
+import { isAdminShell } from './shell.js';
 import { formatDateTimeLabel, formatOrderStatusLabel, titleCase } from './formatters.js';
 
 function getSelectedOrder() {
@@ -29,20 +30,30 @@ function formatDocumentTypeLabel(value) {
   return value || '-';
 }
 
+function setOrderDetailVisibility(isVisible) {
+  if (!refs.orderDetailModal) return;
+
+  refs.orderDetailModal.classList.toggle('is-open', isVisible);
+  refs.orderDetailModal.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+
+  if (isVisible) {
+    refs.orderDetailModal.removeAttribute('hidden');
+    document.body.classList.add('no-scroll');
+  } else {
+    refs.orderDetailModal.setAttribute('hidden', '');
+    document.body.classList.remove('no-scroll');
+  }
+}
+
 export function closeOrderDetail() {
   state.orderDetailOrderId = '';
-  refs.orderDetailModal?.classList.remove('is-open');
-  refs.orderDetailModal?.setAttribute('aria-hidden', 'true');
-  refs.orderDetailModal?.setAttribute('hidden', '');
+  renderOrderDetail();
 }
 
 export function openOrderDetail(orderId) {
   if (!orderId) return;
   state.orderDetailOrderId = orderId;
   renderOrderDetail();
-  refs.orderDetailModal?.classList.add('is-open');
-  refs.orderDetailModal?.setAttribute('aria-hidden', 'false');
-  refs.orderDetailModal?.removeAttribute('hidden');
 }
 
 async function downloadOrderPdf(order, documentType) {
@@ -93,21 +104,21 @@ export function renderOrderDetail() {
   if (!refs.orderDetailModal) return;
 
   if (!order) {
-    refs.orderDetailModal.classList.remove('is-open');
-    refs.orderDetailModal.setAttribute('aria-hidden', 'true');
-    refs.orderDetailModal.setAttribute('hidden', '');
+    setOrderDetailVisibility(false);
     if (refs.orderDetailTitle) refs.orderDetailTitle.textContent = t('order_detail');
     return;
   }
 
+  setOrderDetailVisibility(true);
   if (refs.orderDetailTitle) refs.orderDetailTitle.textContent = order.orderNumber || t('order_detail');
   if (refs.orderDetailNumber) refs.orderDetailNumber.textContent = order.orderNumber || '-';
   if (refs.orderDetailCustomer) refs.orderDetailCustomer.textContent = order.customer?.name || order.customer?.email || '-';
   if (refs.orderDetailCustomerEmail) refs.orderDetailCustomerEmail.textContent = order.customer?.email || '-';
   if (refs.orderDetailRoute) {
+    const routeSeparator = isAdminShell() ? ' · ' : ' -> ';
     refs.orderDetailRoute.textContent = [formatLocation(order.trip?.from), formatLocation(order.trip?.to)]
       .filter(value => value && value !== '-')
-      .join(' -> ') || t('route_not_set');
+      .join(routeSeparator) || t('route_not_set');
   }
   if (refs.orderDetailDate) refs.orderDetailDate.textContent = formatDateTimeLabel(order.createdAt);
   if (refs.orderDetailIssueDate) refs.orderDetailIssueDate.textContent = formatDateTimeLabel(order.contractData?.issueDate || order.contractData?.today || order.createdAt);

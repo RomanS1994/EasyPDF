@@ -283,6 +283,16 @@
   text-decoration: none;
 }
 
+.settingsInlineLink {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.settingsInlineLink:hover,
+.settingsInlineLink:focus-visible {
+  text-decoration: underline;
+}
+
 .danger-btn {
   width: 100%;
   min-height: 44px;

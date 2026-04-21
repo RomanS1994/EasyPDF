@@ -28,7 +28,7 @@ function resolvePlanName(planId, plans = []) {
 function buildManagerOrderListMarkup(order) {
   const createdAt = formatDateTimeLabel(order.createdAt);
   const route =
-    [order.trip?.from, order.trip?.to].filter(Boolean).join(' -> ') || t('route_not_set');
+    [order.trip?.from, order.trip?.to].filter(Boolean).join(' · ') || t('route_not_set');
   const ownerLabel = order.user
     ? `${order.user.name || t('no_name')} · ${order.user.email || '-'}`
     : t('no_account');
@@ -118,7 +118,7 @@ export function renderManagerOrderDetail() {
   if (refs.managerOrderDetailUpdated) refs.managerOrderDetailUpdated.textContent = formatDateTimeLabel(order.updatedAt);
   if (refs.managerOrderDetailRoute) {
     refs.managerOrderDetailRoute.textContent =
-      [order.trip?.from, order.trip?.to].filter(Boolean).join(' -> ') || t('route_not_set');
+      [order.trip?.from, order.trip?.to].filter(Boolean).join(' · ') || t('route_not_set');
   }
   if (refs.managerOrderDetailPdf) {
     refs.managerOrderDetailPdf.textContent = order.pdf?.fileName || order.pdf?.url || t('not_attached');

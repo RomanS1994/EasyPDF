@@ -69,13 +69,22 @@
             <div class="orderDetailBackdrop" id="orderDetailBackdrop"></div>
             <div class="orderDetailSheet" role="dialog" aria-modal="true" aria-labelledby="orderDetailTitle">
               <div class="orderDetailHeader">
-                <div>
+                <button
+                  class="orderDetailCloseBtn orderDetailBackBtn"
+                  id="orderDetailCloseBtn"
+                  type="button"
+                  aria-label="Назад"
+                  data-i18n-aria-label="back"
+                >
+                  <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <path d="M15 18 9 12l6-6" />
+                  </svg>
+                  <span class="visually-hidden" data-i18n="back">Назад</span>
+                </button>
+                <div class="orderDetailHeaderContent">
                   <p class="sectionEyebrow" data-i18n="order_detail">Замовлення</p>
                   <h2 id="orderDetailTitle">-</h2>
                 </div>
-                <button class="orderDetailCloseBtn" id="orderDetailCloseBtn" type="button" aria-label="Закрити" data-i18n-aria-label="close">
-                  ×
-                </button>
               </div>
 
               <div class="orderDetailMetaGrid">

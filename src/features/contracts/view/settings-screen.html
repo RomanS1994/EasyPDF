@@ -57,16 +57,28 @@
                   <div class="settingsNote" data-i18n="manual_payment_pending_note">
                     Апгрейд очікує ручного підтвердження. Напишіть у WhatsApp або Telegram і дочекайтесь активації менеджером.
                   </div>
-                  <a
-                    class="secondary-btn settingsActionLink is-hidden"
-                    id="accountUpgradeWhatsapp"
-                    href="#"
-                    target="_blank"
-                    rel="noreferrer"
-                    data-i18n="contact_whatsapp"
-                  >
-                    WhatsApp
-                  </a>
+                  <div class="settingsRow">
+                    <span class="settingsRow-label" data-i18n="whatsapp_number">WhatsApp</span>
+                    <a
+                      class="settingsValue settingsInlineLink"
+                      id="accountUpgradeWhatsappNumber"
+                      href="#"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      +420773633433
+                    </a>
+                  </div>
+                  <div class="settingsRow">
+                    <span class="settingsRow-label" data-i18n="payment_amount">Сума до оплати</span>
+                    <strong class="settingsValue" id="accountPendingUpgradeAmount">-</strong>
+                  </div>
+                  <div class="settingsRow">
+                    <span class="settingsRow-label" data-i18n="payment_details">Реквізити для оплати</span>
+                    <span class="settingsValue" data-i18n="payment_details_whatsapp_note">
+                      Надішлемо у WhatsApp
+                    </span>
+                  </div>
                   <a
                     class="secondary-btn settingsActionLink is-hidden"
                     id="accountUpgradeTelegram"
