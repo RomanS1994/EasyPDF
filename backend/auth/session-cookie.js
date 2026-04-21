@@ -48,11 +48,3 @@ export function buildSession(userId, rawToken, createdAt = nowIso()) {
     expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL_SECONDS * 1000).toISOString(),
   };
 }
-
-export function pruneExpiredSessions(database) {
-  const now = Date.now();
-
-  database.sessions = database.sessions.filter(session => {
-    return new Date(session.expiresAt).getTime() > now;
-  });
-}

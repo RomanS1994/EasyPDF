@@ -1,4 +1,3 @@
-import { readFileDatabase } from '../db/file-store.js';
 import { runStoreRead } from '../db/store.js';
 import { getBearerToken, sendError } from '../lib/http.js';
 import { verifyAccessToken } from './tokens.js';
@@ -66,30 +65,10 @@ export async function getAuthContext(request, response) {
       }
 
       return {
-        database: null,
         user: session.user,
         session,
         tokenClaims,
-        store: 'prisma',
       };
-    },
-    file: async () => {
-      const database = await readFileDatabase();
-      const session = database.sessions.find(item => item.id === tokenClaims.sessionId);
-
-      if (!session || session.userId !== tokenClaims.userId) {
-        sendError(response, 401, 'Invalid or expired session');
-        return null;
-      }
-
-      const user = database.users.find(item => item.id === tokenClaims.userId);
-
-      if (!user) {
-        sendError(response, 401, 'User not found for session');
-        return null;
-      }
-
-      return { database, user, session, tokenClaims, store: 'file' };
     },
   });
 }

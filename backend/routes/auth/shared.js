@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto';
-
 import {
   buildSession,
   getRefreshCookieOptions,
@@ -11,7 +9,6 @@ import {
   getAccessTokenExpiresAt,
 } from '../../auth/tokens.js';
 import { createAuditLog } from '../../db/prisma-helpers.js';
-import { mutateFileDatabase as mutateDatabase } from '../../db/file-store.js';
 import { runStoreTransaction } from '../../db/store.js';
 import {
   clearCookie,
@@ -19,7 +16,6 @@ import {
   sendJson,
   setCookie,
 } from '../../lib/http.js';
-import { nowIso } from '../../validation/common.js';
 
 export function buildRequestMeta(request, extra = {}) {
   return {
@@ -89,23 +85,5 @@ export async function logAuthFailure(request, action, email, userId, reason) {
         }),
       });
     },
-    file: () =>
-      mutateDatabase(database => {
-        database.auditLogs.unshift({
-          id: randomUUID(),
-          action,
-          actorUserId: userId || null,
-          targetUserId: userId || null,
-          entityType: 'auth',
-          entityId: email || null,
-          before: null,
-          after: null,
-          meta: buildRequestMeta(request, {
-            email: email || null,
-            reason,
-          }),
-          createdAt: nowIso(),
-        });
-      }),
   });
 }

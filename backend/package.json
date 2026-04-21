@@ -11,7 +11,6 @@
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
-    "db:migrate-json": "node tools/migrate-json-to-postgres.js",
     "admin:create": "node tools/create-admin.js",
     "postinstall": "node tools/prisma-postinstall.js"
   },

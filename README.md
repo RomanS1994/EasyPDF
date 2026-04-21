@@ -44,9 +44,8 @@ Use:
 - `backend/.env` for backend variables and PostgreSQL connection
 - set a real `AUTH_TOKEN_SECRET` in `backend/.env` before starting the backend
 - keep `VITE_*` variables only in root `.env`, never in `backend/.env`
-- use `DB_MODE=file` and `DATA_FILE` only for local development or tests, never for production
-
-Make sure PostgreSQL is running and `DATABASE_URL` in `backend/.env` points to the target database before starting the app.
+- backend runs only through Prisma + PostgreSQL
+- make sure PostgreSQL is running and `DATABASE_URL` in `backend/.env` points to the target database before starting the app
 
 Security:
 
@@ -90,14 +89,12 @@ URLs:
 - Netlify should deploy only the root frontend package
 - Prisma exists only in `backend/`
 - backend data is stored in PostgreSQL
-- production runs only through Prisma + PostgreSQL, with no JSON fallback
+- production runs only through Prisma + PostgreSQL
 - backend PDF generation is HTML-first and rendered through Puppeteer/Chromium
 - every plan exposes two PDF document types: `offer` and `confirmation`
 - Prisma schema covers `users`, `sessions`, `plans`, `subscriptions`, `orders`, `audit_logs`
 - use `DATABASE_URL` for runtime and optional `DIRECT_DATABASE_URL` for Prisma CLI migrations/introspection inside `backend/`
-- `DB_MODE=file`, `DATA_FILE`, and `LEGACY_DATA_FILE` are local/test-only controls
 - `/api/contracts/get-pdf` requires auth, uses the active subscription plan, and expects an existing `orderId`
-- migrate legacy JSON data with `npm run db:migrate-json -- --input=/path/to/db.json`
 - promote an existing account to admin with `npm run admin:create -- --email=user@example.com --promote-existing`
 - passwords are hashed with Node `crypto.scrypt`
 - auth uses a short-lived `Authorization: Bearer <access-token>` plus a rotating refresh token in a secure `HttpOnly` cookie
@@ -105,7 +102,7 @@ URLs:
 - backend refuses to start without a real `AUTH_TOKEN_SECRET`
 - `AUTH_TOKEN_SECRET` and `API_KEY` are separate values and must not be reused for each other
 - frontend env is limited to public `VITE_*` keys in root `.env`
-- `/api/health` returns `503` when PostgreSQL is unavailable and reports the active database mode
+- `/api/health` returns `503` when PostgreSQL is unavailable and reports the Prisma/PostgreSQL connection state
 
 ## Deploy
 
@@ -129,8 +126,14 @@ Backend on Render or another Node host:
 - optional env: `API_KEY`
 - optional env for Prisma CLI: `DIRECT_DATABASE_URL`
 - PDF generation uses `@sparticuz/chromium` with `puppeteer-core`
-- production must not set `DB_MODE=file`, `DATA_FILE`, or `LEGACY_DATA_FILE`
 - production health checks should target `/api/health`, which validates the live PostgreSQL connection
+
+Local development:
+
+- create a PostgreSQL database and point `DATABASE_URL` at it
+- run `npm run db:generate` and `npm run db:migrate` before `npm run dev`
+- `backend/.env` should contain `AUTH_TOKEN_SECRET`, `DATABASE_URL`, and optionally `DIRECT_DATABASE_URL`
+- there is no JSON/file storage mode anymore
 
 If a deployment fails inside `prisma migrate deploy`, do not keep it in the start command.
 Resolve the failed migration first with `prisma migrate resolve`, then rerun the release command.

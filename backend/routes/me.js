@@ -1,9 +1,10 @@
-import { randomUUID } from 'node:crypto';
-
 import { getAuthContext } from '../auth/context.js';
 import { DEFAULT_PLAN_ID } from '../config/plans.js';
-import { mutateFileDatabase as mutateDatabase } from '../db/file-store.js';
-import { buildSanitizedUser, createAuditLog, USER_WITH_SUBSCRIPTION_INCLUDE } from '../db/prisma-helpers.js';
+import {
+  buildSanitizedUser,
+  createAuditLog,
+  USER_WITH_SUBSCRIPTION_INCLUDE,
+} from '../db/prisma-helpers.js';
 import { prisma } from '../db/prisma.js';
 import { findStoredPlan } from '../db/plans-store.js';
 import { runStoreTransaction } from '../db/store.js';
@@ -13,10 +14,10 @@ import {
   sendJson,
 } from '../lib/http.js';
 import { normalizeUserProfile } from '../services/profiles.js';
-import { buildSubscriptionWriteData, resolveSubscriptionView } from '../services/prisma-views.js';
-import { applySubscriptionToUser, buildSubscriptionAssignment, getResolvedSubscription } from '../services/subscriptions.js';
-import { getPlanRecord } from '../services/plans.js';
-import { findUserOrThrow, sanitizeUser } from '../services/users.js';
+import {
+  buildSubscriptionWriteData,
+  resolveSubscriptionView,
+} from '../services/prisma-views.js';
 import { normalizeText, nowIso } from '../validation/common.js';
 
 async function handleDeleteMe(request, response) {
@@ -32,32 +33,13 @@ async function handleDeleteMe(request, response) {
         entityType: 'user',
         entityId: context.user.id,
       });
+
       await tx.user.delete({
         where: {
           id: context.user.id,
         },
       });
     },
-    file: () =>
-      mutateDatabase(database => {
-        database.users = database.users.filter(user => user.id !== context.user.id);
-        database.orders = database.orders.filter(order => order.userId !== context.user.id);
-        database.sessions = database.sessions.filter(
-          session => session.userId !== context.user.id
-        );
-        database.auditLogs.unshift({
-          id: randomUUID(),
-          action: 'user.deleted_self',
-          actorUserId: context.user.id,
-          targetUserId: context.user.id,
-          entityType: 'user',
-          entityId: context.user.id,
-          before: null,
-          after: null,
-          meta: {},
-          createdAt: nowIso(),
-        });
-      }),
   });
 
   sendJson(response, 200, { ok: true });
@@ -123,42 +105,6 @@ async function handleUpdateMyProfile(request, response) {
 
       return buildSanitizedUser(tx, updatedUser);
     },
-    file: () =>
-      mutateDatabase(database => {
-        const target = findUserOrThrow(database, context.user.id);
-        const before = normalizeUserProfile(target.profile, target.name);
-        const currentProfile = normalizeUserProfile(target.profile, target.name);
-
-        target.profile = normalizeUserProfile(
-          {
-            driver: {
-              ...currentProfile.driver,
-              ...(incomingProfile.driver || {}),
-            },
-            provider: {
-              ...currentProfile.provider,
-              ...(incomingProfile.provider || {}),
-            },
-          },
-          target.name
-        );
-        target.updatedAt = nowIso();
-
-        database.auditLogs.unshift({
-          id: randomUUID(),
-          action: 'user.profile.updated',
-          actorUserId: context.user.id,
-          targetUserId: target.id,
-          entityType: 'profile',
-          entityId: target.id,
-          before,
-          after: target.profile,
-          meta: {},
-          createdAt: nowIso(),
-        });
-
-        return sanitizeUser(database, target);
-      }),
   });
 
   sendJson(response, 200, { user });
@@ -189,7 +135,10 @@ async function handleUpgradeRequest(request, response) {
       }
 
       const [currentPlan, requestedPlan] = await Promise.all([
-        target.subscription?.plan || findStoredPlan(tx, target.subscription?.planId || target.planId || DEFAULT_PLAN_ID),
+        target.subscription?.plan ||
+          findStoredPlan(tx, target.subscription?.planId || target.planId || DEFAULT_PLAN_ID, {
+            includeInactive: true,
+          }),
         findStoredPlan(tx, requestedPlanId, { includeInactive: false }),
       ]);
 
@@ -291,62 +240,6 @@ async function handleUpgradeRequest(request, response) {
 
       return userView;
     },
-    file: () =>
-      mutateDatabase(database => {
-        const target = findUserOrThrow(database, context.user.id);
-        const currentPlan = getPlanRecord(database, target.subscription?.planId || target.planId || DEFAULT_PLAN_ID, {
-          includeInactive: true,
-        });
-        const requestedPlan = getPlanRecord(database, requestedPlanId, {
-          includeInactive: false,
-        });
-
-        if (!currentPlan) {
-          throw new Error('Current plan is not configured');
-        }
-
-        if (!requestedPlan || requestedPlan.id === DEFAULT_PLAN_ID) {
-          throw new Error('Invalid paid plan');
-        }
-
-        const before = getResolvedSubscription(database, target);
-        const updatedUser = sanitizeUser(
-          database,
-          applySubscriptionToUser(
-            database,
-            target,
-            buildSubscriptionAssignment(
-              database,
-              before.planId,
-              {
-                ...before,
-                pendingPlanId: requestedPlan.id,
-                pendingRequestedAt: nowIso(),
-                pendingSource: 'manual_payment',
-                notes: normalizeText(body.notes ?? before.notes),
-              },
-              null
-            )
-          )
-        );
-
-        database.auditLogs.unshift({
-          id: randomUUID(),
-          action: 'subscription.upgrade_requested',
-          actorUserId: target.id,
-          targetUserId: target.id,
-          entityType: 'subscription',
-          entityId: target.id,
-          before,
-          after: updatedUser.subscription,
-          meta: {
-            requestedPlanId: requestedPlan.id,
-          },
-          createdAt: nowIso(),
-        });
-
-        return updatedUser;
-      }),
   });
 
   sendJson(response, 200, { user });
@@ -357,15 +250,8 @@ export async function handleMeRoutes(request, response, { pathName }) {
     const context = await getAuthContext(request, response);
     if (!context) return true;
 
-    if (context.store === 'prisma') {
-      const user = await buildSanitizedUser(prisma, context.user);
-      sendJson(response, 200, { user });
-      return true;
-    }
-
-    sendJson(response, 200, {
-      user: sanitizeUser(context.database, context.user),
-    });
+    const user = await buildSanitizedUser(prisma, context.user);
+    sendJson(response, 200, { user });
     return true;
   }
 
@@ -397,16 +283,9 @@ export async function handleMeRoutes(request, response, { pathName }) {
     const context = await getAuthContext(request, response);
     if (!context) return true;
 
-    if (context.store === 'prisma') {
-      const user = await buildSanitizedUser(prisma, context.user);
-      sendJson(response, 200, {
-        usage: user.usage,
-      });
-      return true;
-    }
-
+    const user = await buildSanitizedUser(prisma, context.user);
     sendJson(response, 200, {
-      usage: sanitizeUser(context.database, context.user).usage,
+      usage: user.usage,
     });
     return true;
   }

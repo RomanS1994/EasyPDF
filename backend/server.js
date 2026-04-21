@@ -7,7 +7,6 @@ import dotenv from 'dotenv';
 import { requireApiKey } from './auth/api-key.js';
 import { assertRuntimeEnv } from './config/runtime-env.js';
 import { ensureDefaultPlans } from './db/plans-store.js';
-import { prisma } from './db/prisma.js';
 import { bindRequestContext, handleCors } from './lib/http.js';
 import { sendHttpError } from './lib/errors.js';
 import { routeRequest } from './routes/index.js';
@@ -24,6 +23,8 @@ try {
   process.exit(1);
 }
 
+const { prisma } = await import('./db/prisma.js');
+
 const server = http.createServer(async (request, response) => {
   try {
     bindRequestContext(response, request);
@@ -37,7 +38,16 @@ const server = http.createServer(async (request, response) => {
 });
 
 async function startServer() {
-  await ensureDefaultPlans(prisma);
+  try {
+    await prisma.$connect();
+    await ensureDefaultPlans(prisma);
+  } catch (error) {
+    throw new Error(
+      `Failed to start backend against PostgreSQL via Prisma: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
+  }
 
   server.listen(PORT, () => {
     console.log(`pdf.app backend is running on http://localhost:${PORT}`);

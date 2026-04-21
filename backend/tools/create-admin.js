@@ -3,10 +3,8 @@ import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { appendAuditLog } from '../audit/service.js';
 import { hashPassword } from '../auth/tokens.js';
 import { DEFAULT_PLAN_ID } from '../config/plans.js';
-import { mutateFileDatabase } from '../db/file-store.js';
 import {
   buildSanitizedUser,
   createAuditLog,
@@ -14,13 +12,8 @@ import {
 } from '../db/prisma-helpers.js';
 import { findStoredPlan } from '../db/plans-store.js';
 import { disconnectDatabase, runStoreTransaction } from '../db/store.js';
-import { getPlanRecord } from '../services/plans.js';
+import { buildSubscriptionWriteData } from '../services/prisma-views.js';
 import { normalizeUserProfile } from '../services/profiles.js';
-import {
-  buildCycleWindow,
-  buildSubscriptionAssignment,
-} from '../services/subscriptions.js';
-import { sanitizeUser } from '../services/users.js';
 import { normalizeEmail, normalizeText, nowIso } from '../validation/common.js';
 
 function parseArgs(argv) {
@@ -127,22 +120,35 @@ async function createOrPromoteAdmin({
           }
 
           const timestamp = nowIso();
-          const cycle = buildCycleWindow(timestamp);
+          const subscriptionData = buildSubscriptionWriteData({
+            plan: selectedPlan,
+            before: null,
+            payload: {
+              source: 'admin_cli',
+              status: 'active',
+              currentPeriodStart: timestamp,
+              notes: 'Created via admin CLI bootstrap',
+            },
+            actorUserId: null,
+          });
+
           await tx.subscription.create({
             data: {
               id: nextUser.id,
               userId: nextUser.id,
-              planId: selectedPlan.id,
-              status: 'active',
-              source: 'admin_cli',
-              currentPeriodStart: new Date(timestamp),
-              currentPeriodEnd: new Date(cycle.currentPeriodEnd),
-              monthlyGenerationLimit: selectedPlan.monthlyGenerationLimit,
-              quotaOverride: null,
-              assignedByUserId: null,
-              assignedAt: new Date(timestamp),
-              notes: 'Created via admin CLI bootstrap',
-              canceledAt: null,
+              planId: subscriptionData.planId,
+              status: subscriptionData.status,
+              source: subscriptionData.source,
+              currentPeriodStart: new Date(subscriptionData.currentPeriodStart),
+              currentPeriodEnd: new Date(subscriptionData.currentPeriodEnd),
+              monthlyGenerationLimit: subscriptionData.monthlyGenerationLimit,
+              quotaOverride: subscriptionData.quotaOverride,
+              assignedByUserId: subscriptionData.assignedByUserId,
+              assignedAt: new Date(subscriptionData.assignedAt),
+              notes: subscriptionData.notes,
+              canceledAt: subscriptionData.canceledAt
+                ? new Date(subscriptionData.canceledAt)
+                : null,
             },
           });
 
@@ -195,8 +201,19 @@ async function createOrPromoteAdmin({
       }
 
       const timestamp = nowIso();
-      const cycle = buildCycleWindow(timestamp);
       const userId = randomUUID();
+      const subscriptionData = buildSubscriptionWriteData({
+        plan: selectedPlan,
+        before: null,
+        payload: {
+          source: 'admin_cli',
+          status: 'active',
+          currentPeriodStart: timestamp,
+          notes: 'Created via admin CLI bootstrap',
+        },
+        actorUserId: null,
+      });
+
       const createdUser = await tx.user.create({
         data: {
           id: userId,
@@ -208,17 +225,20 @@ async function createOrPromoteAdmin({
           subscription: {
             create: {
               id: userId,
-              planId: selectedPlan.id,
-              status: 'active',
-              source: 'admin_cli',
-              currentPeriodStart: new Date(timestamp),
-              currentPeriodEnd: new Date(cycle.currentPeriodEnd),
-              monthlyGenerationLimit: selectedPlan.monthlyGenerationLimit,
-              quotaOverride: null,
-              assignedByUserId: null,
-              assignedAt: new Date(timestamp),
-              notes: 'Created via admin CLI bootstrap',
-              canceledAt: null,
+              userId: userId,
+              planId: subscriptionData.planId,
+              status: subscriptionData.status,
+              source: subscriptionData.source,
+              currentPeriodStart: new Date(subscriptionData.currentPeriodStart),
+              currentPeriodEnd: new Date(subscriptionData.currentPeriodEnd),
+              monthlyGenerationLimit: subscriptionData.monthlyGenerationLimit,
+              quotaOverride: subscriptionData.quotaOverride,
+              assignedByUserId: subscriptionData.assignedByUserId,
+              assignedAt: new Date(subscriptionData.assignedAt),
+              notes: subscriptionData.notes,
+              canceledAt: subscriptionData.canceledAt
+                ? new Date(subscriptionData.canceledAt)
+                : null,
             },
           },
         },
@@ -242,121 +262,6 @@ async function createOrPromoteAdmin({
 
       return buildSanitizedUser(tx, createdUser);
     },
-    file: () =>
-      mutateFileDatabase(database => {
-        const existingUser = database.users.find(item => item.email === email) || null;
-
-        if (existingUser) {
-          if (!promoteExisting) {
-            throw new Error(
-              'User already exists. Re-run with --promote-existing to grant admin role.'
-            );
-          }
-
-          const beforeRole = existingUser.role;
-          const nextName = normalizeText(name) || existingUser.name;
-          existingUser.role = 'admin';
-          existingUser.name = nextName;
-          if (password) {
-            existingUser.passwordHash = hashPassword(password);
-          }
-          if (normalizeText(name)) {
-            existingUser.profile = normalizeUserProfile(existingUser.profile, nextName);
-          }
-          if (!existingUser.subscription) {
-            existingUser.subscription = buildSubscriptionAssignment(
-              database,
-              planId,
-              {
-                source: 'admin_cli',
-                status: 'active',
-                currentPeriodStart: nowIso(),
-                notes: 'Created via admin CLI bootstrap',
-              },
-              null
-            );
-            existingUser.planId = existingUser.subscription.planId;
-          }
-          existingUser.updatedAt = nowIso();
-
-          appendAuditLog(database, {
-            action: 'user.admin.provisioned',
-            targetUserId: existingUser.id,
-            entityType: 'user',
-            entityId: existingUser.id,
-            before: {
-              role: beforeRole,
-            },
-            after: {
-              role: existingUser.role,
-            },
-            meta: {
-              source: 'admin_cli',
-              promotedExisting: true,
-            },
-          });
-
-          return sanitizeUser(database, existingUser);
-        }
-
-        if (!normalizeText(name)) {
-          throw new Error('Name is required for a new admin');
-        }
-
-        if (!password) {
-          throw new Error('Password is required for a new admin');
-        }
-
-        const selectedPlan = getPlanRecord(database, planId, {
-          includeInactive: false,
-        });
-
-        if (!selectedPlan) {
-          throw new Error('Invalid plan');
-        }
-
-        const timestamp = nowIso();
-        const user = {
-          id: randomUUID(),
-          name: normalizeText(name),
-          email,
-          passwordHash: hashPassword(password),
-          role: 'admin',
-          planId: selectedPlan.id,
-          profile: normalizeUserProfile(null, name),
-          subscription: buildSubscriptionAssignment(
-            database,
-            selectedPlan.id,
-            {
-              source: 'admin_cli',
-              status: 'active',
-              currentPeriodStart: timestamp,
-              notes: 'Created via admin CLI bootstrap',
-            },
-            null
-          ),
-          createdAt: timestamp,
-          updatedAt: timestamp,
-        };
-
-        database.users.push(user);
-        appendAuditLog(database, {
-          action: 'user.admin.provisioned',
-          targetUserId: user.id,
-          entityType: 'user',
-          entityId: user.id,
-          after: {
-            role: user.role,
-            email: user.email,
-          },
-          meta: {
-            source: 'admin_cli',
-            promotedExisting: false,
-          },
-        });
-
-        return sanitizeUser(database, user);
-      }),
   });
 }
 

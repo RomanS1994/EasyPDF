@@ -9,8 +9,6 @@ export function validateRuntimeEnv() {
     apiKey,
     databaseUrl,
     directDatabaseUrl,
-    explicitFileStoreMode,
-    productionEnvironment,
   } = getRuntimeEnvSnapshot();
 
   if (!authTokenSecret) {
@@ -32,20 +30,8 @@ export function validateRuntimeEnv() {
     errors.push('API_KEY must not match AUTH_TOKEN_SECRET.');
   }
 
-  if (productionEnvironment && explicitFileStoreMode) {
-    errors.push(
-      'DB_MODE=file, DATA_FILE, and LEGACY_DATA_FILE are not allowed in production. Production uses Prisma/PostgreSQL only.'
-    );
-  }
-
   if (!databaseUrl) {
-    if (productionEnvironment) {
-      errors.push('DATABASE_URL is required in production.');
-    } else if (!explicitFileStoreMode) {
-      errors.push(
-        'DATABASE_URL is required unless local file mode is enabled with DB_MODE=file or DATA_FILE/LEGACY_DATA_FILE.'
-      );
-    }
+    errors.push('DATABASE_URL is required for Prisma/PostgreSQL.');
   }
 
   if (databaseUrl && isPlaceholderDatabaseUrl(databaseUrl)) {

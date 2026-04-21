@@ -1,6 +1,3 @@
-import { randomUUID } from 'node:crypto';
-
-import { pruneExpiredSessions } from '../../auth/context.js';
 import { verifyPassword } from '../../auth/tokens.js';
 import {
   getRateLimitState,
@@ -12,12 +9,10 @@ import {
   createAuditLog,
   USER_WITH_SUBSCRIPTION_INCLUDE,
 } from '../../db/prisma-helpers.js';
-import { mutateFileDatabase as mutateDatabase, readFileDatabase } from '../../db/file-store.js';
 import { runStoreRead, runStoreTransaction } from '../../db/store.js';
 import { readJsonBody, sendError, sendJson } from '../../lib/http.js';
-import { sanitizeUser } from '../../services/users.js';
 import { validateLoginInput } from '../../validation/auth.js';
-import { normalizeEmail, nowIso } from '../../validation/common.js';
+import { normalizeEmail } from '../../validation/common.js';
 import {
   buildRateLimitIdentifier,
   buildRequestMeta,
@@ -46,10 +41,6 @@ export async function handleLogin(request, response) {
         },
         include: USER_WITH_SUBSCRIPTION_INCLUDE,
       }),
-    file: async () => {
-      const database = await readFileDatabase();
-      return database.users.find(item => item.email === email) || null;
-    },
   });
 
   if (!user || !verifyPassword(password, user.passwordHash)) {
@@ -113,39 +104,6 @@ export async function handleLogin(request, response) {
         user: await buildSanitizedUser(tx, freshUser),
       };
     },
-    file: () =>
-      mutateDatabase(nextDatabase => {
-        pruneExpiredSessions(nextDatabase);
-        const freshUser = nextDatabase.users.find(item => item.id === user.id);
-
-        if (!freshUser) {
-          throw new Error('User not found');
-        }
-
-        const authSession = issueAuthSession(freshUser.id);
-        nextDatabase.sessions.push(authSession.session);
-        nextDatabase.auditLogs.unshift({
-          id: randomUUID(),
-          action: 'auth.login.succeeded',
-          actorUserId: freshUser.id,
-          targetUserId: freshUser.id,
-          entityType: 'session',
-          entityId: authSession.session.id,
-          before: null,
-          after: null,
-          meta: buildRequestMeta(request, {
-            email: freshUser.email,
-          }),
-          createdAt: nowIso(),
-        });
-
-        return {
-          refreshToken: authSession.refreshToken,
-          token: authSession.accessToken,
-          accessTokenExpiresAt: authSession.accessTokenExpiresAt,
-          user: sanitizeUser(nextDatabase, freshUser),
-        };
-      }),
   });
 
   resetRateLimit('login', identifier);

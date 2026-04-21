@@ -9,7 +9,6 @@ export {
 export {
   buildSession,
   getRefreshCookieOptions,
-  pruneExpiredSessions,
   REFRESH_COOKIE_NAME,
   REFRESH_TOKEN_TTL_HOURS,
   REFRESH_TOKEN_TTL_SECONDS,

@@ -1,12 +1,8 @@
-import { randomUUID } from 'node:crypto';
-
-import { getAccessTokenClaims, REFRESH_COOKIE_NAME, pruneExpiredSessions } from '../../auth/context.js';
+import { getAccessTokenClaims, REFRESH_COOKIE_NAME } from '../../auth/context.js';
 import { hashToken } from '../../auth/tokens.js';
 import { createAuditLog } from '../../db/prisma-helpers.js';
-import { mutateFileDatabase as mutateDatabase } from '../../db/file-store.js';
 import { runStoreTransaction } from '../../db/store.js';
 import { getCookie, sendJson } from '../../lib/http.js';
-import { nowIso } from '../../validation/common.js';
 import { buildRequestMeta, clearRefreshTokenCookie } from './shared.js';
 
 export async function handleLogout(request, response) {
@@ -74,53 +70,6 @@ export async function handleLogout(request, response) {
         }),
       });
     },
-    file: () =>
-      mutateDatabase(database => {
-        pruneExpiredSessions(database);
-
-        const revokedSessionIds = new Set();
-
-        if (accessTokenClaims?.sessionId) {
-          revokedSessionIds.add(accessTokenClaims.sessionId);
-        }
-
-        if (refreshToken) {
-          const refreshSession = database.sessions.find(
-            session => session.tokenHash === hashToken(refreshToken)
-          );
-
-          if (refreshSession) {
-            revokedSessionIds.add(refreshSession.id);
-          }
-        }
-
-        if (revokedSessionIds.size === 0) {
-          return;
-        }
-
-        const targetSession = database.sessions.find(session =>
-          revokedSessionIds.has(session.id)
-        );
-
-        database.sessions = database.sessions.filter(
-          session => !revokedSessionIds.has(session.id)
-        );
-
-        database.auditLogs.unshift({
-          id: randomUUID(),
-          action: 'auth.logout',
-          actorUserId: targetSession?.userId || accessTokenClaims?.userId || null,
-          targetUserId: targetSession?.userId || accessTokenClaims?.userId || null,
-          entityType: 'session',
-          entityId: targetSession?.id || accessTokenClaims?.sessionId || null,
-          before: null,
-          after: null,
-          meta: buildRequestMeta(request, {
-            revokedSessions: Array.from(revokedSessionIds),
-          }),
-          createdAt: nowIso(),
-        });
-      }),
   });
 
   clearRefreshTokenCookie(response);

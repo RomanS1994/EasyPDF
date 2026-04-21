@@ -11,7 +11,6 @@
     "db:generate": "npm --prefix backend run db:generate",
     "db:migrate": "npm --prefix backend run db:migrate",
     "db:migrate:deploy": "npm --prefix backend run db:migrate:deploy",
-    "db:migrate-json": "npm --prefix backend run db:migrate-json --",
     "admin:create": "npm --prefix backend run admin:create --",
     "hooks:install": "node tools/install-git-hooks.js",
     "prepare": "node tools/install-git-hooks.js",

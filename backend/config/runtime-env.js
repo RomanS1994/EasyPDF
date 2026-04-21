@@ -10,9 +10,6 @@ export {
   getAuthTokenSecret,
   getDatabaseUrl,
   getDirectDatabaseUrl,
-  getPrismaDatasourceUrl,
-  isExplicitFileStoreMode,
-  isLocalFileStoreMode,
   isProductionEnvironment,
 } from './runtime-env/read.js';
 export { assertRuntimeEnv, validateRuntimeEnv } from './runtime-env/validate.js';

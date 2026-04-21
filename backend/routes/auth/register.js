@@ -6,19 +6,12 @@ import {
   recordRateLimitFailure,
   resetRateLimit,
 } from '../../auth/rate-limit.js';
-import {
-  USER_WITH_SUBSCRIPTION_INCLUDE,
-  createAuditLog,
-} from '../../db/prisma-helpers.js';
-import { mutateFileDatabase as mutateDatabase } from '../../db/file-store.js';
+import { buildSanitizedUser, createAuditLog, USER_WITH_SUBSCRIPTION_INCLUDE } from '../../db/prisma-helpers.js';
 import { findStoredPlan } from '../../db/plans-store.js';
 import { runStoreTransaction } from '../../db/store.js';
 import { readJsonBody, sendJson } from '../../lib/http.js';
-import { getPlanRecord } from '../../services/plans.js';
+import { buildSubscriptionWriteData } from '../../services/prisma-views.js';
 import { normalizeUserProfile } from '../../services/profiles.js';
-import { buildCycleWindow, buildSubscriptionAssignment } from '../../services/subscriptions.js';
-import { sanitizeUserFromRecords } from '../../services/prisma-views.js';
-import { sanitizeUser } from '../../services/users.js';
 import { validateRegistrationInput } from '../../validation/auth.js';
 import { normalizeEmail, nowIso } from '../../validation/common.js';
 import {
@@ -71,10 +64,26 @@ export async function handleRegister(request, response) {
         }
 
         const timestamp = nowIso();
-        const cycle = buildCycleWindow(timestamp);
         const userId = randomUUID();
         const authSession = issueAuthSession(userId);
         const pendingPlanId = requestedPlan?.id || null;
+        const subscriptionData = buildSubscriptionWriteData({
+          plan: freePlan,
+          payload: {
+            source: 'self_signup_free',
+            status: 'active',
+            currentPeriodStart: timestamp,
+            notes: pendingPlanId
+              ? `Manual upgrade requested during signup: ${pendingPlanId}`
+              : '',
+            pendingPlanId,
+            pendingRequestedAt: pendingPlanId ? timestamp : null,
+            pendingSource: pendingPlanId ? 'manual_payment' : null,
+          },
+          before: null,
+          actorUserId: null,
+        });
+
         const createdUser = await tx.user.create({
           data: {
             id: userId,
@@ -94,22 +103,25 @@ export async function handleRegister(request, response) {
             subscription: {
               create: {
                 id: userId,
-                planId: freePlan.id,
-                status: 'active',
-                source: 'self_signup_free',
-                currentPeriodStart: new Date(timestamp),
-                currentPeriodEnd: new Date(cycle.currentPeriodEnd),
-                monthlyGenerationLimit: freePlan.monthlyGenerationLimit,
-                quotaOverride: null,
-                assignedByUserId: null,
-                assignedAt: new Date(timestamp),
-                notes: pendingPlanId
-                  ? `Manual upgrade requested during signup: ${pendingPlanId}`
-                  : '',
-                canceledAt: null,
-                pendingPlanId,
-                pendingRequestedAt: pendingPlanId ? new Date(timestamp) : null,
-                pendingSource: pendingPlanId ? 'manual_payment' : null,
+                userId: userId,
+                planId: subscriptionData.planId,
+                status: subscriptionData.status,
+                source: subscriptionData.source,
+                currentPeriodStart: new Date(subscriptionData.currentPeriodStart),
+                currentPeriodEnd: new Date(subscriptionData.currentPeriodEnd),
+                monthlyGenerationLimit: subscriptionData.monthlyGenerationLimit,
+                quotaOverride: subscriptionData.quotaOverride,
+                assignedByUserId: subscriptionData.assignedByUserId,
+                assignedAt: new Date(subscriptionData.assignedAt),
+                notes: subscriptionData.notes,
+                canceledAt: subscriptionData.canceledAt
+                  ? new Date(subscriptionData.canceledAt)
+                  : null,
+                pendingPlanId: subscriptionData.pendingPlanId,
+                pendingRequestedAt: subscriptionData.pendingRequestedAt
+                  ? new Date(subscriptionData.pendingRequestedAt)
+                  : null,
+                pendingSource: subscriptionData.pendingSource,
               },
             },
           },
@@ -137,97 +149,9 @@ export async function handleRegister(request, response) {
           refreshToken: authSession.refreshToken,
           token: authSession.accessToken,
           accessTokenExpiresAt: authSession.accessTokenExpiresAt,
-          user: sanitizeUserFromRecords({
-            user: createdUser,
-            subscription: createdUser.subscription,
-            plan: createdUser.subscription?.plan || selectedPlan,
-            usedOrders: 0,
-          }),
+          user: await buildSanitizedUser(tx, createdUser),
         };
       },
-      file: () =>
-        mutateDatabase(database => {
-          const existingUser = database.users.find(user => user.email === email);
-
-          if (existingUser) {
-            throw new Error('User with this email already exists');
-          }
-
-          const selectedPlan = getPlanRecord(database, selectedPlanId, {
-            includeInactive: false,
-          });
-          const freePlan = getPlanRecord(database, DEFAULT_PLAN_ID, {
-            includeInactive: false,
-          });
-          if (!freePlan) {
-            throw new Error('Default free plan is not configured');
-          }
-          if (selectedPlanId && selectedPlanId !== DEFAULT_PLAN_ID && !selectedPlan) {
-            throw new Error('Invalid plan');
-          }
-
-          const timestamp = nowIso();
-          const pendingPlanId =
-            selectedPlanId && selectedPlanId !== DEFAULT_PLAN_ID ? selectedPlan.id : null;
-          const user = {
-            id: randomUUID(),
-            name,
-            email,
-            passwordHash: hashPassword(password),
-            role: 'user',
-            planId: freePlan.id,
-            profile: normalizeUserProfile(body.profile, name),
-            subscription: buildSubscriptionAssignment(
-              database,
-              freePlan.id,
-              {
-                source: 'self_signup_free',
-                status: 'active',
-                currentPeriodStart: timestamp,
-                notes: pendingPlanId
-                  ? `Manual upgrade requested during signup: ${pendingPlanId}`
-                  : '',
-                pendingPlanId,
-                pendingRequestedAt: pendingPlanId ? timestamp : null,
-                pendingSource: pendingPlanId ? 'manual_payment' : null,
-              },
-              null
-            ),
-            createdAt: timestamp,
-            updatedAt: timestamp,
-          };
-
-          const authSession = issueAuthSession(user.id);
-
-          database.users.push(user);
-          database.sessions.push(authSession.session);
-          database.auditLogs.unshift({
-            id: randomUUID(),
-            action: 'user.registered',
-            actorUserId: user.id,
-            targetUserId: user.id,
-            entityType: 'user',
-            entityId: user.id,
-            before: null,
-            after: {
-              role: user.role,
-              planId: user.planId,
-              pendingPlanId,
-            },
-            meta: buildRequestMeta(request, {
-              email: user.email,
-              sessionId: authSession.session.id,
-            }),
-            createdAt: nowIso(),
-          });
-
-          return {
-            refreshToken: authSession.refreshToken,
-            token: authSession.accessToken,
-            accessTokenExpiresAt: authSession.accessTokenExpiresAt,
-            user: sanitizeUser(database, user),
-          };
-        }),
     });
 
     resetRateLimit('register', identifier);

@@ -1,24 +1,16 @@
-import { randomUUID } from 'node:crypto';
-
 import {
   getCookie,
   sendError,
   sendJson,
 } from '../../lib/http.js';
-import {
-  REFRESH_COOKIE_NAME,
-  pruneExpiredSessions,
-} from '../../auth/context.js';
+import { REFRESH_COOKIE_NAME } from '../../auth/context.js';
 import { hashToken } from '../../auth/tokens.js';
 import {
   buildSanitizedUser,
   createAuditLog,
   USER_WITH_SUBSCRIPTION_INCLUDE,
 } from '../../db/prisma-helpers.js';
-import { mutateFileDatabase as mutateDatabase } from '../../db/file-store.js';
 import { runStoreTransaction } from '../../db/store.js';
-import { sanitizeUser } from '../../services/users.js';
-import { nowIso } from '../../validation/common.js';
 import {
   buildRequestMeta,
   clearRefreshTokenCookie,
@@ -100,54 +92,6 @@ export async function handleRefresh(request, response) {
         user: await buildSanitizedUser(tx, currentSession.user),
       };
     },
-    file: () =>
-      mutateDatabase(database => {
-        pruneExpiredSessions(database);
-
-        const currentSession = database.sessions.find(
-          session => session.tokenHash === hashToken(refreshToken)
-        );
-
-        if (!currentSession) {
-          return null;
-        }
-
-        const user = database.users.find(item => item.id === currentSession.userId);
-        if (!user) {
-          database.sessions = database.sessions.filter(
-            session => session.id !== currentSession.id
-          );
-          return null;
-        }
-
-        database.sessions = database.sessions.filter(
-          session => session.id !== currentSession.id
-        );
-
-        const rotatedSession = issueAuthSession(user.id);
-        database.sessions.push(rotatedSession.session);
-        database.auditLogs.unshift({
-          id: randomUUID(),
-          action: 'auth.session.refreshed',
-          actorUserId: user.id,
-          targetUserId: user.id,
-          entityType: 'session',
-          entityId: rotatedSession.session.id,
-          before: null,
-          after: null,
-          meta: buildRequestMeta(request, {
-            replacedSessionId: currentSession.id,
-          }),
-          createdAt: nowIso(),
-        });
-
-        return {
-          refreshToken: rotatedSession.refreshToken,
-          token: rotatedSession.accessToken,
-          accessTokenExpiresAt: rotatedSession.accessTokenExpiresAt,
-          user: sanitizeUser(database, user),
-        };
-      }),
   });
 
   if (!payload) {

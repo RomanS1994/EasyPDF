@@ -2,23 +2,6 @@ import { randomUUID } from 'node:crypto';
 
 import { nowIso } from '../validation/common.js';
 
-export function sanitizeOrder(order, database) {
-  const owner = database.users.find(user => user.id === order.userId);
-
-  return {
-    ...order,
-    user: owner
-      ? {
-          id: owner.id,
-          name: owner.name,
-          email: owner.email,
-          planId: owner.planId,
-          role: owner.role,
-        }
-      : null,
-  };
-}
-
 export function generateOrderNumber() {
   const suffix = Math.random().toString(36).slice(2, 6).toUpperCase();
   return `ORD-${Date.now()}-${suffix}`;

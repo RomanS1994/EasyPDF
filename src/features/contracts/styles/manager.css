@@ -417,39 +417,6 @@
   margin-top: 2px;
 }
 
-.page-generateContract[data-app-shell='admin'] .bottomTabs {
-  border-top: 1px solid rgba(0, 122, 255, 0.1);
-  background: rgba(250, 251, 255, 0.9);
-  box-shadow: 0 -10px 24px rgba(28, 32, 40, 0.06);
-}
-
-.page-generateContract[data-app-shell='admin'] .bottomTab {
-  border-radius: 16px;
-  transition:
-    transform 0.16s ease,
-    background-color 0.16s ease,
-    box-shadow 0.16s ease;
-}
-
-.page-generateContract[data-app-shell='admin'] .bottomTab:active {
-  transform: translateY(1px) scale(0.99);
-}
-
-.page-generateContract[data-app-shell='admin'] .bottomTab.is-active {
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow:
-    0 8px 18px rgba(0, 122, 255, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.96);
-}
-
-.page-generateContract[data-app-shell='admin'] .bottomTab.is-active .bottomTab-label {
-  color: var(--text);
-}
-
-.page-generateContract[data-app-shell='admin'] .bottomTab.is-active .bottomTab-icon {
-  color: var(--accent);
-}
-
 .settingsCheckbox {
   display: flex;
   align-items: center;

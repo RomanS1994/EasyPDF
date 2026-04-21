@@ -1,12 +1,11 @@
 import { getAuthContext } from '../auth/context.js';
 import { getPlanById, isSupportedPdfDocumentType } from '../config/plans.js';
-import { readFileDatabase } from '../db/file-store.js';
-import { getDatabaseHealth, runStoreRead } from '../db/store.js';
+import { getDatabaseHealth } from '../db/store.js';
 import { listStoredPlans } from '../db/plans-store.js';
+import { ORDER_WITH_OWNER_INCLUDE, sanitizeOrderRecord } from '../db/prisma-helpers.js';
+import { prisma } from '../db/prisma.js';
 import { readJsonBody, sendJson, sendPdf } from '../lib/http.js';
 import { createContractPdf } from '../pdf/contracts.js';
-import { sanitizeOrderRecord } from '../db/prisma-helpers.js';
-import { getDatabasePlans } from '../services/plans.js';
 import { nowIso } from '../validation/common.js';
 
 function resolvePdfPlan(context) {
@@ -14,33 +13,23 @@ function resolvePdfPlan(context) {
     return context.user.subscription.plan;
   }
 
-  if (context?.database) {
-    const planId = context.user?.subscription?.planId || context.user?.planId;
-    return (
-      getDatabasePlans(context.database, { includeInactive: true }).find(plan => plan.id === planId) ||
-      getPlanById(planId) ||
-      getPlanById('plan-free')
-    );
-  }
-
   return getPlanById(context?.user?.subscription?.planId || context?.user?.planId || 'plan-free');
 }
 
-async function findOrderForPdf(context, orderId) {
-  return runStoreRead({
-    prisma: async client => {
-      const order = await client.order.findUnique({
-        where: {
-          id: orderId,
-        },
-      });
+async function findOrderForPdf(orderId) {
+  const order = await prisma.order.findUnique({
+    where: {
+      id: orderId,
+    },
+    include: ORDER_WITH_OWNER_INCLUDE,
+  });
 
-      return order ? sanitizeOrderRecord(order) : null;
-    },
-    file: async () => {
-      const database = context.database || (await readFileDatabase());
-      return database.orders.find(order => order.id === orderId) || null;
-    },
+  return order ? sanitizeOrderRecord(order) : null;
+}
+
+async function listAvailablePlans() {
+  return listStoredPlans(prisma, {
+    includeInactive: false,
   });
 }
 
@@ -58,23 +47,7 @@ export async function handlePublicRoutes(request, response, { pathName }) {
   }
 
   if (request.method === 'GET' && pathName === '/api/plans') {
-    let plans;
-
-    try {
-      plans = await runStoreRead({
-        prisma: client =>
-          listStoredPlans(client, {
-            includeInactive: false,
-            seedDefaults: false,
-          }),
-        file: async () => {
-          const database = await readFileDatabase();
-          return getDatabasePlans(database, { includeInactive: false });
-        },
-      });
-    } catch {
-      plans = getDatabasePlans({}, { includeInactive: false });
-    }
+    const plans = await listAvailablePlans();
 
     sendJson(response, 200, {
       plans,
@@ -93,7 +66,7 @@ export async function handlePublicRoutes(request, response, { pathName }) {
       throw new Error('Order id is required for PDF generation');
     }
 
-    const order = await findOrderForPdf(context, orderId);
+    const order = await findOrderForPdf(orderId);
     if (!order || order.userId !== context.user.id) {
       throw new Error('Order not found');
     }

@@ -1,6 +1,6 @@
 .wizard-controls {
   position: sticky;
-  bottom: calc(68px + env(safe-area-inset-bottom));
+  bottom: calc(80px + env(safe-area-inset-bottom));
   z-index: 12;
   display: grid;
   gap: 8px;

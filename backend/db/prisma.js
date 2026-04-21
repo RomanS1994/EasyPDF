@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import { getPrismaDatasourceUrl } from '../config/runtime-env.js';
+import { getDatabaseUrl } from '../config/runtime-env.js';
 
 const globalForPrisma = globalThis;
-const datasourceUrl = getPrismaDatasourceUrl();
+const datasourceUrl = getDatabaseUrl() || undefined;
 
 export const prisma =
   globalForPrisma.__pdfAppPrisma ||

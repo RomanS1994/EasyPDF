@@ -17,12 +17,14 @@
   box-shadow: 2px 2px 8px 0 rgba(100, 94, 31, 0.9);
   /* box-shadow: 1px 1px 8px 0px rgba(175, 158, 0, 0.64) inset,
     2px 2px 8px 0px rgba(100, 94, 31, 0.9); */
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 20px;
   line-height: normal;
   font-weight: 600;
 
-  transition: transform 0.2s ease, color 0.3s ease;
+  transition:
+    transform 0.2s ease,
+    color 0.3s ease;
 }
 
 .button-text {
@@ -46,7 +48,9 @@
   transform: scale(0.95);
   box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.3);
   background-color: var(--secondary-accent-color);
-  transition: transform 0.1s ease, background 0.1s ease;
+  transition:
+    transform 0.1s ease,
+    background 0.1s ease;
 }
 
 .submit-button {
@@ -63,7 +67,8 @@
 
   border-radius: 50px;
   background-color: var(--black, var(--black));
-  box-shadow: 1px 1px 8px 0px rgba(175, 158, 0, 0.64) inset,
+  box-shadow:
+    1px 1px 8px 0px rgba(175, 158, 0, 0.64) inset,
     2px 2px 8px 0px rgba(100, 94, 31, 0.9);
 }
 
@@ -81,7 +86,7 @@
   padding: 0;
   border: 1px solid rgba(17, 24, 39, 0.08);
   border-radius: 7px;
-  background: rgba(248, 249, 252, 0.98);
+  background: transparent;
   color: rgba(92, 96, 108, 0.74);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.96),
@@ -96,11 +101,11 @@
 
 .clear-btn::before,
 .clear-btn::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 6px;
+  width: 8px;
   height: 1.4px;
   border-radius: 999px;
   background: currentColor;

@@ -1,24 +1,8 @@
 import { DEFAULT_ACCESS_TOKEN_TTL_MINUTES } from './constants.js';
 import { isPlaceholderLike, normalizeEnvValue } from './helpers.js';
 
-function isExplicitFileStoreRequested() {
-  return (
-    process.env.DB_MODE === 'file' ||
-    Boolean(normalizeEnvValue(process.env.DATA_FILE)) ||
-    Boolean(normalizeEnvValue(process.env.LEGACY_DATA_FILE))
-  );
-}
-
 export function isProductionEnvironment() {
   return normalizeEnvValue(process.env.NODE_ENV) === 'production';
-}
-
-export function isExplicitFileStoreMode() {
-  return isExplicitFileStoreRequested();
-}
-
-export function isLocalFileStoreMode() {
-  return isExplicitFileStoreRequested() && !isProductionEnvironment();
 }
 
 export function getAuthTokenSecret() {
@@ -45,10 +29,6 @@ export function getDirectDatabaseUrl() {
   return normalizeEnvValue(process.env.DIRECT_DATABASE_URL);
 }
 
-export function getPrismaDatasourceUrl() {
-  return getDatabaseUrl() || getDirectDatabaseUrl() || undefined;
-}
-
 export function getAccessTokenTtlMinutes() {
   return Number(process.env.ACCESS_TOKEN_TTL_MINUTES || DEFAULT_ACCESS_TOKEN_TTL_MINUTES);
 }
@@ -59,7 +39,6 @@ export function getRuntimeEnvSnapshot() {
     apiKey: getApiKey(),
     databaseUrl: getDatabaseUrl(),
     directDatabaseUrl: getDirectDatabaseUrl(),
-    explicitFileStoreMode: isExplicitFileStoreRequested(),
     productionEnvironment: isProductionEnvironment(),
   };
 }
