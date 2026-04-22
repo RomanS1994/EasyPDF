@@ -1,6 +1,7 @@
 @import url('./shell.css');
+@import url('./nav.css');
 @import url('./plans.css');
-@import url('./forms.css');
+@import url('./layout.css');
 @import url('./builder.css');
 @import url('./wizard.css');
 @import url('./stats.css');

@@ -1,0 +1,204 @@
+.bottomTabs {
+  position: fixed;
+  left: 50%;
+  bottom: calc(8px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 30;
+  width: min(430px, calc(100vw - 16px));
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 28px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.34),
+      rgba(248, 250, 255, 0.18) 52%,
+      rgba(237, 242, 250, 0.12)
+    );
+  box-shadow:
+    0 18px 36px rgba(15, 23, 42, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.56),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(34px) saturate(190%);
+  -webkit-backdrop-filter: blur(34px) saturate(190%);
+  overflow: hidden;
+}
+
+.bottomTabs::before,
+.bottomTabs::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bottomTabs::before {
+  background:
+    radial-gradient(
+      circle at 50% -20%,
+      rgba(255, 255, 255, 0.42),
+      rgba(255, 255, 255, 0.18) 34%,
+      transparent 68%
+    ),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 44%);
+}
+
+.bottomTabs::after {
+  background: radial-gradient(circle at 50% 120%, rgba(0, 122, 255, 0.08), transparent 62%);
+  filter: blur(12px);
+  opacity: 0.45;
+}
+
+.bottomTab {
+  flex: 1 1 0;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  align-content: center;
+  min-height: 56px;
+  padding: 6px 2px 5px;
+  border-radius: 18px;
+  color: inherit;
+  text-decoration: none;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  transition:
+    transform 0.16s ease,
+    background-color 0.16s ease,
+    box-shadow 0.16s ease,
+    color 0.16s ease;
+}
+
+.bottomTab:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08));
+}
+
+.bottomTab:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.bottomTab-icon {
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  color: rgba(60, 60, 67, 0.6);
+}
+
+.bottomTab-icon svg {
+  width: 25px;
+  height: 25px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.bottomTab.is-active {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(246, 249, 255, 0.16));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 10px 20px rgba(15, 23, 42, 0.06),
+    0 0 0 1px rgba(255, 255, 255, 0.16);
+}
+
+.bottomTab.is-active .bottomTab-icon,
+.bottomTab.is-active .bottomTab-label {
+  color: var(--accent);
+}
+
+.bottomTab-label {
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: rgba(60, 60, 67, 0.6);
+}
+
+.bottomTab-primary {
+  flex: 1.15 1 0;
+  margin-top: -14px;
+  transform: translateY(-2px);
+  align-content: end;
+}
+
+.bottomTab-primary .bottomTab-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(236, 243, 252, 0.5));
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  box-shadow:
+    0 12px 24px rgba(0, 122, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  color: #8e8e93;
+}
+
+.bottomTab-primary .bottomTab-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.bottomTab-primary .bottomTab-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(60, 60, 67, 0.78);
+}
+
+.bottomTab.is-active .bottomTab-icon svg {
+  stroke-width: 2.1;
+}
+
+.bottomTab-primary.is-active .bottomTab-icon {
+  color: var(--accent);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(229, 240, 255, 0.6));
+  box-shadow:
+    0 14px 26px rgba(0, 122, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+.bottomTab-primary.is-active .bottomTab-label {
+  color: var(--accent);
+}
+
+.page-generateContract[data-app-tab='home']
+  .bottomTab[data-tab-target='home']
+  .bottomTab-icon
+  svg,
+.page-generateContract[data-app-tab='stats']
+  .bottomTab[data-tab-target='stats']
+  .bottomTab-icon
+  svg,
+.page-generateContract[data-app-tab='orders']
+  .bottomTab[data-tab-target='orders']
+  .bottomTab-icon
+  svg,
+.page-generateContract[data-app-tab='history']
+  .bottomTab[data-tab-target='history']
+  .bottomTab-icon
+  svg,
+.page-generateContract[data-app-tab='settings']
+  .bottomTab[data-tab-target='settings']
+  .bottomTab-icon
+  svg,
+.page-generateContract[data-app-tab='accounts']
+  .bottomTab[data-tab-target='accounts']
+  .bottomTab-icon
+  svg,
+.page-generateContract[data-app-tab='subscriptions']
+  .bottomTab[data-tab-target='subscriptions']
+  .bottomTab-icon
+  svg {
+  stroke-width: 2.15;
+}
