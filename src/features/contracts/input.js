@@ -4,6 +4,14 @@ import { getContractData } from './state.js';
 import { persistContractData } from './storage.js';
 import { syncConvertedPrice, syncRepeatedTextInput } from './ui.js';
 
+function normalizeTripTimeValue(value) {
+  if (!value) return '';
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) {
+    return value.replace('T', ' ');
+  }
+  return value;
+}
+
 export function handleContractInput(event) {
   const input = event.target;
   if (!(input instanceof HTMLInputElement)) return;
@@ -84,7 +92,7 @@ export function handleContractInput(event) {
       persistContractData({
         trip: {
           ...getContractData().trip,
-          [key]: value,
+          [key]: key === 'time' ? normalizeTripTimeValue(value) : value,
         },
       });
       return;

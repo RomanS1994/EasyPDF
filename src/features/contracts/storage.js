@@ -38,6 +38,15 @@ function normalizeDateTimeValue(value) {
   return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
+function formatDateTimeInputValue(value) {
+  if (!value) return '';
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) return value;
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(value)) {
+    return value.replace(' ', 'T');
+  }
+  return value;
+}
+
 function normalizeLegacyValue(value, legacyValues) {
   if (!value) return '';
   return legacyValues.includes(value) ? '' : value;
@@ -154,7 +163,7 @@ export function restoreContractData(refs) {
         input.value = data.trip[key].address;
       }
       if (key === 'time') {
-        input.value = data.trip.time || '';
+        input.value = formatDateTimeInputValue(data.trip.time);
       }
       if (key === 'paymentMethod' && data.trip.paymentMethod) {
         input.value = data.trip.paymentMethod;

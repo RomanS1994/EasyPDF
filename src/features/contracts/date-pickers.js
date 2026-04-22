@@ -1,111 +1,75 @@
-import { getCurrentLocale } from '../../shared/i18n/app.js';
 import { findContractInput, contractRefs } from './selectors.js';
 
 const ONE_HOUR_MS = 60 * 60 * 1000;
-const IOS_LOCKED_VIEWPORT =
-  'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+const TIME_STEP_MINUTES = 5;
+const TIME_STEP_SECONDS = TIME_STEP_MINUTES * 60;
 
-const FLATPICKR_LOCALE_MAP = {
-  uk: () =>
-    import('flatpickr/dist/l10n/uk.js').then(
-      module => module.Ukrainian || module.default,
-    ),
-  cs: () =>
-    import('flatpickr/dist/l10n/cs.js').then(
-      module => module.Czech || module.default,
-    ),
-};
+function pad(value) {
+  return String(value).padStart(2, '0');
+}
+
+function toDateTimeLocalValue(date) {
+  return [
+    date.getFullYear(),
+    pad(date.getMonth() + 1),
+    pad(date.getDate()),
+  ].join('-') + `T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
 
 function getMinDateTime() {
-  const minDate = new Date(Date.now() + ONE_HOUR_MS);
-  minDate.setSeconds(0, 0);
-  return minDate;
-}
+  const next = new Date(Date.now() + ONE_HOUR_MS);
+  next.setSeconds(0, 0);
 
-async function resolveFlatpickrLocale() {
-  const loader = FLATPICKR_LOCALE_MAP[getCurrentLocale()];
-  if (!loader) return undefined;
-
-  try {
-    return await loader();
-  } catch {
-    return undefined;
+  const remainder = next.getMinutes() % TIME_STEP_MINUTES;
+  if (remainder) {
+    next.setMinutes(next.getMinutes() + (TIME_STEP_MINUTES - remainder));
   }
+
+  return next;
 }
 
-function lockViewportZoom(lock) {
-  if (typeof document === 'undefined') return;
+function toDateTimeInputValue(value) {
+  if (!value) return '';
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) return value;
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(value)) {
+    return value.replace(' ', 'T');
+  }
 
-  const viewport = document.querySelector('meta[name="viewport"]');
-  if (!viewport) return;
+  const localized = value.match(/^(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2}):(\d{2})/);
+  if (!localized) return value;
 
-  if (lock) {
-    if (!viewport.dataset.originalContent) {
-      viewport.dataset.originalContent = viewport.getAttribute('content') || '';
+  const [, day, month, year, hour, minute] = localized;
+  return `${year}-${month}-${day}T${hour}:${minute}`;
+}
+
+function bindTripTimeInput(input) {
+  if (!input || input.dataset.nativeDateTimeBound === 'true') return;
+
+  input.dataset.nativeDateTimeBound = 'true';
+  input.step = String(TIME_STEP_SECONDS);
+
+  const syncInput = () => {
+    input.min = toDateTimeLocalValue(getMinDateTime());
+
+    const normalizedValue = toDateTimeInputValue(input.value);
+    if (normalizedValue && input.value !== normalizedValue) {
+      input.value = normalizedValue;
     }
+  };
 
-    viewport.setAttribute('content', IOS_LOCKED_VIEWPORT);
-    return;
-  }
-
-  if (viewport.dataset.originalContent !== undefined) {
-    viewport.setAttribute('content', viewport.dataset.originalContent);
-    delete viewport.dataset.originalContent;
-  }
+  syncInput();
+  input.addEventListener('focus', syncInput);
+  input.addEventListener('click', syncInput);
 }
 
-function dispatchInputEvent(input) {
-  input.dispatchEvent(new Event('input', { bubbles: true }));
-}
-
-function bindFlatpickr(flatpickr, input, options) {
-  if (input.dataset.flatpickrBound === 'true') return;
-  input.dataset.flatpickrBound = 'true';
-  input.classList.add('input-date-time');
-  flatpickr(input, {
-    ...options,
-    onChange: (...args) => {
-      options.onChange?.(...args);
-      dispatchInputEvent(input);
-    },
-  });
-}
-
-export async function initDatePickers(root = contractRefs.root) {
+export function initDatePickers(root = contractRefs.root) {
   try {
-    const flatpickr = (await import('flatpickr')).default;
-    const locale = await resolveFlatpickrLocale();
+    const tripTimeInput =
+      findContractInput('trip-time') ||
+      root?.querySelector('input[name="trip-time"]');
 
-    root?.querySelectorAll('input[type="date"]').forEach(input => {
-      bindFlatpickr(flatpickr, input, {
-        dateFormat: 'Y-m-d',
-        allowInput: true,
-        disableMobile: true,
-        monthSelectorType: 'static',
-        ...(locale ? { locale } : {}),
-      });
-    });
-
-    const tripTimeInput = findContractInput('trip-time');
-    if (!tripTimeInput) return;
-
-    bindFlatpickr(flatpickr, tripTimeInput, {
-      allowInput: true,
-      disableMobile: true,
-      enableTime: true,
-      dateFormat: 'Y-m-d H:i',
-      monthSelectorType: 'static',
-      time_24hr: true,
-      minuteIncrement: 5,
-      minDate: getMinDateTime(),
-      onOpen: (_selectedDates, _dateStr, instance) => {
-        lockViewportZoom(true);
-        instance.set('minDate', getMinDateTime());
-      },
-      onClose: () => lockViewportZoom(false),
-      ...(locale ? { locale } : {}),
-    });
+    bindTripTimeInput(tripTimeInput);
   } catch (error) {
-    console.error('Flatpickr init failed', error);
+    console.error('Native date/time init failed', error);
   }
 }

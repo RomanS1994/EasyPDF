@@ -1,7 +1,7 @@
 import { requireManager } from '../../auth/context.js';
 import {
-  ORDER_WITH_OWNER_INCLUDE,
-  sanitizeOrderRecord,
+  ORDER_LIST_WITH_OWNER_SELECT,
+  sanitizeOrderListRecord,
 } from '../../db/prisma-helpers.js';
 import { prisma } from '../../db/prisma.js';
 import { sendJson } from '../../lib/http.js';
@@ -9,7 +9,7 @@ import {
   buildManagerOrdersSummary,
   matchesManagerOrderStatus,
 } from '../../services/orders.js';
-import { normalizeInteger, normalizeText } from '../../validation/common.js';
+import { normalizePaginationParams, normalizeText } from '../../validation/common.js';
 
 export async function handleManagerOrders(request, response, url) {
   const context = await requireManager(request, response);
@@ -18,7 +18,7 @@ export async function handleManagerOrders(request, response, url) {
   const search = normalizeText(url.searchParams.get('search')).toLowerCase();
   const status = normalizeText(url.searchParams.get('status')).toLowerCase();
   const userId = normalizeText(url.searchParams.get('userId'));
-  const limit = Math.min(200, Math.max(10, normalizeInteger(url.searchParams.get('limit'), 100)));
+  const { skip, limit } = normalizePaginationParams(url.searchParams);
 
   const candidateOrders = await prisma.order.findMany({
     where: userId
@@ -26,11 +26,12 @@ export async function handleManagerOrders(request, response, url) {
           userId,
         }
       : undefined,
-    include: ORDER_WITH_OWNER_INCLUDE,
+    select: ORDER_LIST_WITH_OWNER_SELECT,
     orderBy: {
       createdAt: 'desc',
     },
-    take: search ? Math.max(limit * 5, 250) : Math.max(limit, 100),
+    skip,
+    take: limit,
   });
 
   const scopedOrders = candidateOrders.filter(order => {
@@ -58,8 +59,7 @@ export async function handleManagerOrders(request, response, url) {
   const summary = buildManagerOrdersSummary(scopedOrders);
   const orders = scopedOrders
     .filter(order => matchesManagerOrderStatus(order, status))
-    .slice(0, limit)
-    .map(sanitizeOrderRecord);
+    .map(sanitizeOrderListRecord);
 
   sendJson(response, 200, { orders, summary });
 }

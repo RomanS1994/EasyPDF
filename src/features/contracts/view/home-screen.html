@@ -43,25 +43,6 @@
                   <p id="workspaceAccountHomeNote">Фото, ім'я й доступ.</p>
                 </article>
               </div>
-
-              <div class="homeQuickLinks">
-                <a class="homeQuickLink" href="/cz/pdf/orders/" data-tab-target="orders">
-                  <strong>Створити PDF</strong>
-                  <span>Відкрити генератор замовлення</span>
-                </a>
-                <a class="homeQuickLink" href="/cz/pdf/stats/" data-tab-target="stats">
-                  <strong>Статистика</strong>
-                  <span>Подивитись використання циклу</span>
-                </a>
-                <a class="homeQuickLink" href="/cz/pdf/settings/" data-tab-target="settings">
-                  <strong data-i18n="profile">Профіль</strong>
-                  <span data-i18n="account_settings_subline">Мова, бізнес-профіль, підписка та сесія.</span>
-                </a>
-                <a class="homeQuickLink" href="/cz/pdf/history/" data-tab-target="history">
-                  <strong>Історія</strong>
-                  <span>Усі PDF і фільтр за датою</span>
-                </a>
-              </div>
             </div>
           </section>
 
@@ -271,15 +252,14 @@
                   <dt id="trip-time-label" data-i18n="pickup_time">Час посадки</dt>
                   <dd>
                     <input
-                      class="input-date-time tripTimeInput"
+                      class="tripTimeInput"
                       id="tripTimeInput"
                       name="trip-time"
-                      data-trip-time-input
-                      type="text"
+                      type="datetime-local"
                       value=""
                       placeholder="Виберіть дату і час"
                       autocomplete="off"
-                      inputmode="none"
+                      step="300"
                       aria-labelledby="trip-time-label"
                     />
                   </dd>

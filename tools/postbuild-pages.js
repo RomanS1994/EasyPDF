@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, renameSync, rmSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, renameSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -31,5 +31,9 @@ for (const [from, to] of Object.entries(pageOutputMap)) {
   mkdirSync(path.dirname(targetPath), { recursive: true });
   renameSync(sourcePath, targetPath);
 }
+
+cpSync(path.join(projectRoot, 'src/shared/assets'), path.join(distRoot, 'shared/assets'), {
+  recursive: true,
+});
 
 rmSync(path.join(distRoot, 'pages'), { recursive: true, force: true });

@@ -2,7 +2,9 @@ import { getAuthContext, hasManagerAccess } from '../auth/context.js';
 import {
   buildSanitizedUser,
   createAuditLog,
+  ORDER_LIST_SELECT,
   ORDER_WITH_OWNER_INCLUDE,
+  sanitizeOrderListRecord,
   sanitizeOrderRecord,
   USER_WITH_SUBSCRIPTION_INCLUDE,
 } from '../db/prisma-helpers.js';
@@ -10,7 +12,7 @@ import { prisma } from '../db/prisma.js';
 import { runStoreTransaction } from '../db/store.js';
 import { readJsonBody, sendError, sendJson } from '../lib/http.js';
 import { buildOrderRecord } from '../services/orders.js';
-import { nowIso } from '../validation/common.js';
+import { nowIso, normalizePaginationParams } from '../validation/common.js';
 
 async function handleCreateOrder(request, response) {
   const context = await getAuthContext(request, response);
@@ -177,7 +179,7 @@ async function handleUpdateOrder(request, response, orderId) {
   sendJson(response, 200, { order: updatedOrder });
 }
 
-export async function handleOrderRoutes(request, response, { pathName }) {
+export async function handleOrderRoutes(request, response, { pathName, url }) {
   if (request.method === 'POST' && pathName === '/api/orders') {
     await handleCreateOrder(request, response);
     return true;
@@ -186,19 +188,22 @@ export async function handleOrderRoutes(request, response, { pathName }) {
   if (request.method === 'GET' && pathName === '/api/orders') {
     const context = await getAuthContext(request, response);
     if (!context) return true;
+    const { skip, limit } = normalizePaginationParams(url.searchParams);
 
     const orders = await prisma.order.findMany({
       where: {
         userId: context.user.id,
       },
-      include: ORDER_WITH_OWNER_INCLUDE,
+      select: ORDER_LIST_SELECT,
       orderBy: {
         createdAt: 'desc',
       },
+      skip,
+      take: limit,
     });
 
     sendJson(response, 200, {
-      orders: orders.map(sanitizeOrderRecord),
+      orders: orders.map(sanitizeOrderListRecord),
     });
     return true;
   }

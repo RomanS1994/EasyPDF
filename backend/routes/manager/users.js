@@ -2,14 +2,41 @@ import { requireManager } from '../../auth/context.js';
 import {
   buildManagerUserSummaries,
   buildSanitizedUser,
-  ORDER_WITH_OWNER_INCLUDE,
+  ORDER_LIST_SELECT,
   sanitizeAuditLogs,
-  sanitizeOrderRecord,
-  USER_WITH_SUBSCRIPTION_INCLUDE,
+  sanitizeOrderListRecord,
 } from '../../db/prisma-helpers.js';
 import { prisma } from '../../db/prisma.js';
 import { sendJson } from '../../lib/http.js';
 import { normalizeText } from '../../validation/common.js';
+
+const MANAGER_USER_SELECT = {
+  id: true,
+  name: true,
+  email: true,
+  role: true,
+  createdAt: true,
+  updatedAt: true,
+  subscription: {
+    select: {
+      planId: true,
+      status: true,
+      source: true,
+      currentPeriodStart: true,
+      currentPeriodEnd: true,
+      monthlyGenerationLimit: true,
+      quotaOverride: true,
+      assignedByUserId: true,
+      assignedAt: true,
+      notes: true,
+      canceledAt: true,
+      pendingPlanId: true,
+      pendingRequestedAt: true,
+      pendingSource: true,
+      plan: true,
+    },
+  },
+};
 
 export async function handleManagerUserList(request, response, url) {
   const context = await requireManager(request, response);
@@ -53,7 +80,7 @@ export async function handleManagerUserList(request, response, url) {
 
   const rawUsers = await prisma.user.findMany({
     where,
-    include: USER_WITH_SUBSCRIPTION_INCLUDE,
+    select: MANAGER_USER_SELECT,
     orderBy: {
       updatedAt: 'desc',
     },
@@ -80,7 +107,7 @@ export async function handleManagerUserDetail(request, response, userId) {
     where: {
       id: userId,
     },
-    include: USER_WITH_SUBSCRIPTION_INCLUDE,
+    select: MANAGER_USER_SELECT,
   });
 
   if (!target) {
@@ -93,7 +120,7 @@ export async function handleManagerUserDetail(request, response, userId) {
       where: {
         userId: target.id,
       },
-      include: ORDER_WITH_OWNER_INCLUDE,
+      select: ORDER_LIST_SELECT,
       orderBy: {
         createdAt: 'desc',
       },
@@ -119,7 +146,7 @@ export async function handleManagerUserDetail(request, response, userId) {
 
   sendJson(response, 200, {
     user: summary[0] || (await buildSanitizedUser(prisma, target)),
-    recentOrders: recentOrders.map(sanitizeOrderRecord),
+    recentOrders: recentOrders.map(sanitizeOrderListRecord),
     audit: await sanitizeAuditLogs(prisma, auditRecords),
   });
 }

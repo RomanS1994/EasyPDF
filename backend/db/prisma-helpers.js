@@ -9,6 +9,31 @@ import {
 } from '../services/prisma-views.js';
 import { normalizeText, nowIso } from '../validation/common.js';
 
+function toIsoString(value) {
+  if (!value) return '';
+
+  const parsed = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return '';
+  }
+
+  return parsed.toISOString();
+}
+
+function pickTextValue(value) {
+  if (typeof value === 'string' || typeof value === 'number') {
+    return normalizeText(value);
+  }
+
+  if (value && typeof value === 'object') {
+    return normalizeText(
+      value.address || value.name || value.email || value.value || value.url || ''
+    );
+  }
+
+  return '';
+}
+
 export const USER_WITH_SUBSCRIPTION_INCLUDE = {
   subscription: {
     include: {
@@ -21,6 +46,27 @@ export const ORDER_WITH_OWNER_INCLUDE = {
   user: {
     include: {
       subscription: true,
+    },
+  },
+};
+
+export const ORDER_LIST_SELECT = {
+  id: true,
+  orderNumber: true,
+  status: true,
+  customer: true,
+  trip: true,
+  totalPrice: true,
+  createdAt: true,
+};
+
+export const ORDER_LIST_WITH_OWNER_SELECT = {
+  ...ORDER_LIST_SELECT,
+  user: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
     },
   },
 };
@@ -176,6 +222,33 @@ export async function buildManagerUserSummaries(client, users) {
 
 export function sanitizeOrderRecord(order) {
   return sanitizeOrderFromRecords(order, order.user || null);
+}
+
+export function sanitizeOrderListRecord(order) {
+  return {
+    id: order.id,
+    orderNumber: pickTextValue(order.orderNumber),
+    status: pickTextValue(order.status),
+    customer: {
+      name: pickTextValue(order.customer?.name),
+      email: pickTextValue(order.customer?.email),
+    },
+    trip: {
+      from: pickTextValue(order.trip?.from),
+      to: pickTextValue(order.trip?.to),
+    },
+    totalPrice: pickTextValue(order.totalPrice),
+    createdAt: toIsoString(order.createdAt),
+    ...(order.user
+      ? {
+          user: {
+            id: order.user.id,
+            name: pickTextValue(order.user.name),
+            email: pickTextValue(order.user.email),
+          },
+        }
+      : {}),
+  };
 }
 
 export async function sanitizeAuditLogs(client, records) {

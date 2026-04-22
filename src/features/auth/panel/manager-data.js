@@ -79,7 +79,8 @@ export function getManagerOrdersFilters() {
     search: refs.managerOrdersSearchInput?.value?.trim() || '',
     status: refs.managerOrdersStatusFilter?.value || 'all',
     userId: state.managerOrdersSelectedOnly ? state.managerSelectedUserId || '' : '',
-    limit: 100,
+    page: 1,
+    limit: 50,
   };
 }
 

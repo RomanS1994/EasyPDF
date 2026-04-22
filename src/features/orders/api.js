@@ -2,8 +2,14 @@ import { fetchApi } from '../../shared/api/client.js';
 import { readJsonResponse } from '../../shared/api/response.js';
 import { t } from '../../shared/i18n/app.js';
 
-export async function getOrders() {
-  const response = await fetchApi('/orders');
+export async function getOrders(query = {}) {
+  const response = await fetchApi('/orders', {
+    query: {
+      page: 1,
+      limit: 50,
+      ...query,
+    },
+  });
   return readJsonResponse(response, t('api_orders_failed'));
 }
 

@@ -31,6 +31,20 @@ export function normalizeInteger(value, fallback = null) {
   return Math.max(0, Math.round(next));
 }
 
+export function normalizePaginationParams(searchParams, { defaultLimit = 20, maxLimit = 50 } = {}) {
+  const page = Math.max(1, normalizeInteger(searchParams.get('page'), 1));
+  const limit = Math.min(
+    maxLimit,
+    Math.max(1, normalizeInteger(searchParams.get('limit'), defaultLimit))
+  );
+
+  return {
+    page,
+    limit,
+    skip: (page - 1) * limit,
+  };
+}
+
 export function toIsoDate(value) {
   if (!value) return '';
 
