@@ -10,7 +10,7 @@ export function getRouteTab() {
 }
 
 export function getDefaultAuthMode() {
-  return getRouteTab() === 'home' ? 'register' : 'login';
+  return 'login';
 }
 
 export function isManagerRole(role) {

@@ -6,6 +6,12 @@ import { getDefaultAuthMode, setFormDisabled } from './shell.js';
 import { state } from './state.js';
 import { focusAuthMode, renderPlans, setAuthMode, syncSelectedPlan } from './guest.js';
 import { activateTab, getTabForPath, navigateToTab } from './routes.js';
+import {
+  getGenerationSession,
+  hasGenerationSession,
+  openGenerationGate,
+  openGenerationSession,
+} from '../../contracts/generation-session.js';
 import { t } from '../../../shared/i18n/app.js';
 import { notifyText } from '../../../shared/ui/toast.js';
 import { withAppLoader } from '../../../shared/ui/loader.js';
@@ -189,5 +195,35 @@ export function handleTabClick(event) {
   if (!nextTab) return;
 
   event.preventDefault();
+
+  if (nextTab === 'orders') {
+    if (hasGenerationSession()) {
+      navigateToTab(nextTab, url.pathname);
+      openGenerationSession(getGenerationSession());
+      return;
+    }
+
+    openGenerationGate({
+      onConfirmed: () => {
+        navigateToTab(nextTab, url.pathname);
+      },
+    });
+    return;
+  }
+
   navigateToTab(nextTab, url.pathname);
+}
+
+export function handleSettingsNavClick(event) {
+  const button = event.target.closest('[data-settings-target]');
+  if (!button) return;
+
+  const href = button.getAttribute('href');
+  if (!href) return;
+
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+  const url = new URL(href, window.location.origin);
+  event.preventDefault();
+  navigateToTab('settings', url.pathname);
 }

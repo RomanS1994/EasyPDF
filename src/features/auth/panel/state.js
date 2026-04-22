@@ -13,6 +13,7 @@ export const state = {
   user: null,
   orders: [],
   activeTab: getRouteTab(),
+  activeSettingsPage: document.body?.dataset?.appSettingsPage || 'hub',
   activeStatsTab: 'usage',
   selectedPlanId: '',
   authMode: getDefaultAuthMode(),
@@ -35,17 +36,6 @@ export const state = {
   ordersDateFilter: '',
   orderDetailOrderId: '',
 };
-
-export let managerSearchTimer = 0;
-export let managerOrdersSearchTimer = 0;
-
-export function setManagerSearchTimer(value) {
-  managerSearchTimer = value;
-}
-
-export function setManagerOrdersSearchTimer(value) {
-  managerOrdersSearchTimer = value;
-}
 
 export function clearManagerState() {
   state.managerUsers = [];

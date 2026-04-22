@@ -175,11 +175,9 @@ export function renderContractPdfHtml({
   const customerEmail = normalizeText(
     contractData?.customer?.email || contractData?.customer?.phone,
   );
-  const passengers = normalizeText(
-    contractData?.passengers ??
-      contractData?.customers ??
+  const customers = normalizeText(
+    contractData?.customers ??
       contractData?.customersCount ??
-      contractData?.trip?.passengers ??
       contractData?.trip?.customers ??
       contractData?.trip?.customersCount,
   );
@@ -368,7 +366,7 @@ export function renderContractPdfHtml({
             justify-items: center;
             grid-template-columns: 1fr 1fr;
             gap: 0 50px;
-            margin-top: 40px;
+            margin-top: 20px;
           }
 
           .signature {
@@ -385,7 +383,7 @@ export function renderContractPdfHtml({
           }
 
           footer {
-            margin-top: 15px;
+            margin-top: 10px;
             text-align: center;
             color: #666;
             font-size: 12px;
@@ -442,7 +440,7 @@ export function renderContractPdfHtml({
                 ${renderRows([
                   { label: "Jméno:", value: customerName },
                   { label: "E-mail, phone:", value: customerEmail },
-                  { label: "Počet pasažérů:", value: passengers },
+                  { label: "Počet klientů:", value: customers },
                 ])}
               </div>
             </section>
@@ -494,10 +492,6 @@ export function renderContractPdfHtml({
                 <p class="value">${renderText(customerName)}</p>
               </div>
             </div>
-
-            <footer>
-              ${escapeHtml(company.name)} — • — ${escapeHtml(company.email)} — • — ${escapeHtml(company.phone)}
-            </footer>
           </div>
         </main>
       </body>

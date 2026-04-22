@@ -45,6 +45,7 @@ import {
   handlePlanCardKeydown,
   handleRegisterSubmit,
   handleTabClick,
+  handleSettingsNavClick,
   loadPlansForGuest,
 } from './forms.js';
 import { bindManagerEvents } from './manager-bindings.js';
@@ -82,6 +83,7 @@ function bindEvents() {
   refs.adminLanguageSelect?.addEventListener('change', handleLanguageSelectChange);
   refs.planCards?.addEventListener('click', handlePlanCardClick);
   refs.planCards?.addEventListener('keydown', handlePlanCardKeydown);
+  refs.settingsNavButtons.forEach(button => button.addEventListener('click', handleSettingsNavClick));
   refs.planSelect?.addEventListener('change', event => {
     setAuthMode('register');
     syncSelectedPlan(event.target.value);

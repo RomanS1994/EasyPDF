@@ -1,139 +1,218 @@
-# pdfApp
+# DocTra / pdfApp
 
-Small app split into:
+> Workspace для приватних водіїв і невеликих transfer-команд. Створюйте PDF-договори, зберігайте замовлення, стежте за лімітом плану та керуйте підписками в одному застосунку.
 
-- frontend deployed separately on Netlify
-- backend API deployed separately with Prisma + PostgreSQL
-- user registration and login
-- free + paid plans (`10`, `25`, `50`, `100` generations per month)
-- manual paid activation after manager confirmation
-- order storage
-- PDF generation for saved orders
+## Що це
 
-## Project structure
+DocTra побудований як split-stack система:
+
+| Частина | Що робить |
+| --- | --- |
+| Frontend | Мультисторінковий Vite-застосунок у `src/`, який працює під `/cz/pdf/` |
+| Backend | Node HTTP API з Prisma та PostgreSQL |
+| PDF | HTML-first шаблони, що рендеряться через Puppeteer/Chromium |
+| Auth | `Authorization: Bearer <token>` + rotating refresh cookie |
+| Ops | Audit logs, health checks, rate limits, secret scanning, deploy-ready scripts |
+
+## Головні можливості
+
+- покроковий wizard для створення transfer-замовлень
+- збереження замовлень і повторний доступ до них у кабінеті
+- генерація двох типів PDF: `offer` і `confirmation`
+- облік місячного ліміту генерацій і статистики використання
+- редагування профілю, фото, бізнес-даних і мови інтерфейсу
+- ручний запит paid-апгрейду з підтвердженням менеджером
+- manager/admin workspace для користувачів, підписок, планів, замовлень і аудиту
+- PWA-обгортка зі splash screen, manifest та іконками
+
+## Ролі
+
+| Роль | Доступ |
+| --- | --- |
+| `user` | Створення замовлень, власний профіль, статистика, історія, запит апгрейду |
+| `manager` | Керування користувачами, підписками, планами, замовленнями та audit log |
+| `admin` | Усе з `manager` + зміна ролей користувачів |
+
+## Поточний набір планів
+
+| Plan | Ліміт на місяць | Ціна |
+| --- | --- | --- |
+| `plan-free` | 10 | 0 CZK |
+| `plan-25` | 25 | 299 CZK |
+| `plan-50` | 50 | 499 CZK |
+| `plan-100` | 100 | 899 CZK |
+
+Усі плани підтримують обидва типи документів:
+
+- `offer`
+- `confirmation`
+
+## Структура репозиторію
 
 ```text
-backend/    isolated API app, Prisma schema, migrations, auth, orders
-src/        frontend app for Netlify
-tools/      root local dev runner
+backend/   API, Prisma schema, migrations, auth, orders, PDF renderer
+src/       frontend app
+tools/     dev runner, build/postbuild helpers, hooks
+dist/      production build output
 ```
 
-The frontend uses only these active areas:
+## Основні сторінки
 
-- `src/app`
-- `src/pages`
-- `src/features`
-- `src/shared`
+| Зона | Шляхи |
+| --- | --- |
+| User app | `/cz/pdf/`, `/cz/pdf/orders/`, `/cz/pdf/history/`, `/cz/pdf/stats/`, `/cz/pdf/account/`, `/cz/pdf/settings/` |
+| Manager/Admin app | `/cz/pdf/admin/accounts/`, `/cz/pdf/admin/subscriptions/`, `/cz/pdf/admin/orders/`, `/cz/pdf/admin/settings/` |
+| Додатковий вхід | `/cz/pdf/manager/` |
 
-## Local run
+## Локальний запуск
+
+Потрібні Node.js і PostgreSQL.
 
 ```bash
 cp .env.example .env
 cp backend/.env.example backend/.env
 npm install
 npm --prefix backend install
-npm run hooks:install
 npm run db:generate
 npm run db:migrate
 npm run dev
 ```
 
-Use:
-
-- root `.env` for frontend variables
-- `backend/.env` for backend variables and PostgreSQL connection
-- set a real `AUTH_TOKEN_SECRET` in `backend/.env` before starting the backend
-- keep `VITE_*` variables only in root `.env`, never in `backend/.env`
-- backend runs only through Prisma + PostgreSQL
-- make sure PostgreSQL is running and `DATABASE_URL` in `backend/.env` points to the target database before starting the app
-
-Security:
-
-- `backend/.env.example` must contain placeholders only, never live credentials
-- `backend/.env` stays local and must not be committed
-- run `npm run secrets:check` to scan tracked files for accidental secrets
-- `npm install` also runs `npm run hooks:install` to enable the local `pre-commit` secret check
-
-URLs:
+Після старту:
 
 - frontend: `http://localhost:5173`
 - backend: `http://localhost:3001`
+- основний mount-point застосунку: `/cz/pdf/`
 
-## Main API
+`npm install` на корені також підключає git hooks. Якщо потрібно запустити їх окремо, використовуйте `npm run hooks:install`.
+
+## Змінні середовища
+
+### Frontend (`.env`)
+
+| Variable | Обов’язково | Призначення |
+| --- | --- | --- |
+| `VITE_API_BASE_URL` | так | Базовий URL API, наприклад `http://localhost:3001/api` |
+| `VITE_API_KEY` | ні | Публічний ключ заголовка `X-API-KEY`, якщо він увімкнений на backend |
+| `VITE_SUPPORT_WHATSAPP_URL` | ні | Посилання для ручного підтвердження оплати |
+| `VITE_SUPPORT_TELEGRAM_URL` | ні | Додаткове посилання підтримки |
+
+### Backend (`backend/.env`)
+
+| Variable | Обов’язково | Призначення |
+| --- | --- | --- |
+| `AUTH_TOKEN_SECRET` | так | Секрет для підпису access token |
+| `DATABASE_URL` | так | Runtime connection до PostgreSQL через Prisma |
+| `DIRECT_DATABASE_URL` | ні | Direct DB connection для Prisma CLI |
+| `API_KEY` | ні | Перевірка `X-API-KEY` на backend |
+| `CLIENT_ORIGIN` | ні | CORS origin override |
+| `BACKEND_PORT` | ні | Порт сервера, за замовчуванням `3001` |
+
+Додаткові параметри cookie, auth windows і rate limits описані у `backend/.env.example`.
+
+## Скрипти
+
+| Команда | Що робить |
+| --- | --- |
+| `npm run dev` | Запускає frontend і backend одночасно |
+| `npm run dev:client` | Запускає лише Vite frontend |
+| `npm run dev:server` | Запускає лише backend |
+| `npm run build` | Збирає production build у `dist/` |
+| `npm run preview` | Локальний preview зібраного frontend |
+| `npm run db:generate` | `prisma generate` у `backend/` |
+| `npm run db:migrate` | Локальна Prisma migration |
+| `npm run db:migrate:deploy` | Deployment migration для production |
+| `npm run admin:create -- --email=...` | Створює або підвищує admin-акаунт |
+| `npm run secrets:check` | Сканує tracked files на випадкові секрети |
+
+## API
+
+### Public
 
 - `GET /api/health`
 - `GET /api/plans`
 - `POST /api/contracts/get-pdf`
+
+### Auth
+
 - `POST /api/auth/register`
 - `POST /api/auth/login`
 - `POST /api/auth/refresh`
 - `POST /api/auth/logout`
+
+### My account
+
 - `GET /api/me`
 - `GET /api/me/usage`
+- `PATCH /api/me/profile`
 - `POST /api/me/subscription/upgrade-request`
+- `DELETE /api/me`
+
+### Orders
+
 - `POST /api/orders`
 - `GET /api/orders`
 - `GET /api/orders/:id`
 - `PATCH /api/orders/:id`
+
+### Manager / Admin
+
 - `GET /api/manager/users`
-- `GET /api/manager/orders`
+- `GET /api/manager/users/:id`
 - `PATCH /api/manager/users/:id/subscription`
+- `POST /api/manager/users/:id/subscription/extend`
+- `POST /api/manager/users/:id/subscription/cancel`
 - `POST /api/manager/users/:id/subscription/confirm-payment`
+- `PATCH /api/manager/users/:id/role` - `admin` only
+- `GET /api/manager/plans`
+- `POST /api/manager/plans`
+- `PATCH /api/manager/plans/:id`
+- `GET /api/manager/orders`
+- `GET /api/manager/audit`
 
-## Notes
+## Операційні правила
 
-- public signup always creates `user`, never `admin`
-- public signup always activates `plan-free` with `10` documents/month
-- paid plans are requested manually and stay pending until manager confirmation
-- create an admin only through `npm run admin:create -- --email=admin@example.com --name=\"Admin\" --password=\"strong-password\"`
-- Netlify should deploy only the root frontend package
-- Prisma exists only in `backend/`
-- backend data is stored in PostgreSQL
-- production runs only through Prisma + PostgreSQL
-- backend PDF generation is HTML-first and rendered through Puppeteer/Chromium
-- every plan exposes two PDF document types: `offer` and `confirmation`
-- Prisma schema covers `users`, `sessions`, `plans`, `subscriptions`, `orders`, `audit_logs`
-- use `DATABASE_URL` for runtime and optional `DIRECT_DATABASE_URL` for Prisma CLI migrations/introspection inside `backend/`
-- `/api/contracts/get-pdf` requires auth, uses the active subscription plan, and expects an existing `orderId`
-- promote an existing account to admin with `npm run admin:create -- --email=user@example.com --promote-existing`
-- passwords are hashed with Node `crypto.scrypt`
-- auth uses a short-lived `Authorization: Bearer <access-token>` plus a rotating refresh token in a secure `HttpOnly` cookie
-- `/api/auth/login` and `/api/auth/register` are protected by brute-force lockouts and failed login auditing
-- backend refuses to start without a real `AUTH_TOKEN_SECRET`
-- `AUTH_TOKEN_SECRET` and `API_KEY` are separate values and must not be reused for each other
-- frontend env is limited to public `VITE_*` keys in root `.env`
-- `/api/health` returns `503` when PostgreSQL is unavailable and reports the Prisma/PostgreSQL connection state
+- public signup завжди створює `user`
+- public signup завжди стартує на `plan-free`
+- paid-плани залишаються pending, доки менеджер не підтвердить оплату
+- self-service зміна плану вимкнена навмисно
+- backend у production працює лише через Prisma + PostgreSQL
+- `GET /api/health` повертає `503`, якщо PostgreSQL недоступний
+- login і register мають brute-force lockouts та audit logging
+- backend не стартує без реального `AUTH_TOKEN_SECRET`
 
-## Deploy
+## Деплой
 
-Frontend on Netlify:
+### Frontend на Netlify
 
 - base directory: repo root
 - install command: `npm install`
 - build command: `npm run build`
 - publish directory: `dist`
 - required env: `VITE_API_BASE_URL`
-- optional env: `VITE_API_KEY`
-- optional env: `VITE_SUPPORT_WHATSAPP_URL`, `VITE_SUPPORT_TELEGRAM_URL`
+- optional env: `VITE_API_KEY`, `VITE_SUPPORT_WHATSAPP_URL`, `VITE_SUPPORT_TELEGRAM_URL`
 
-Backend on Render or another Node host:
+### Backend на Render або іншому Node-host
 
 - root directory: `backend`
 - install command: `npm install`
 - release command: `npm run db:migrate:deploy`
 - start command: `npm run start`
 - required env: `AUTH_TOKEN_SECRET`, `DATABASE_URL`
-- optional env: `API_KEY`
-- optional env for Prisma CLI: `DIRECT_DATABASE_URL`
-- PDF generation uses `@sparticuz/chromium` with `puppeteer-core`
-- production health checks should target `/api/health`, which validates the live PostgreSQL connection
+- optional env: `API_KEY`, `DIRECT_DATABASE_URL`
+- health check: `/api/health`
 
-Local development:
+## Модель даних
 
-- create a PostgreSQL database and point `DATABASE_URL` at it
-- run `npm run db:generate` and `npm run db:migrate` before `npm run dev`
-- `backend/.env` should contain `AUTH_TOKEN_SECRET`, `DATABASE_URL`, and optionally `DIRECT_DATABASE_URL`
-- there is no JSON/file storage mode anymore
+| Model | Призначення |
+| --- | --- |
+| `users` | Акаунти, ролі, профіль |
+| `sessions` | Refresh-сесії |
+| `plans` | Каталог планів |
+| `subscriptions` | Статус підписки, цикл, квота, pending upgrade |
+| `orders` | Збережені замовлення та payload для PDF |
+| `audit_logs` | Події auth, профілю, підписок, планів і замовлень |
 
-If a deployment fails inside `prisma migrate deploy`, do not keep it in the start command.
-Resolve the failed migration first with `prisma migrate resolve`, then rerun the release command.
+## Ліцензія
+
+ISC

@@ -16,6 +16,7 @@ import {
   bindWizardNavigation,
 } from './bindings.js';
 import { initDatePickers } from './date-pickers.js';
+import { initOrderGenerationSession } from './generation-session.js';
 
 export function initContractFeature() {
   if (!hasContractRoot()) return;
@@ -27,6 +28,7 @@ export function initContractFeature() {
   bindContractWindowEvents();
 
   initDatePickers();
+  initOrderGenerationSession();
 }
 
 export function getCurrentContractData() {

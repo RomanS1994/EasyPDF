@@ -10,14 +10,14 @@
       window.__PDF_APP_BOOT__ = {
         language,
         routeTab,
-        defaultAuthMode: routeTab === 'home' ? 'register' : 'login',
+        defaultAuthMode: 'login',
       };
     } catch {
       document.body.dataset.authState = 'booting';
       window.__PDF_APP_BOOT__ = {
         language: 'uk',
         routeTab: document.body?.dataset?.appTab || 'home',
-        defaultAuthMode: (document.body?.dataset?.appTab || 'home') === 'home' ? 'register' : 'login',
+        defaultAuthMode: 'login',
       };
     }
   </script>
@@ -26,7 +26,7 @@
       <section class="guestStage" id="guestPanel">
         <div class="guestIntro">
           <div class="guestIntroBar">
-            <p class="guestRouteBadge" id="guestRouteBadge">Стартовий екран</p>
+            <p class="guestRouteBadge" id="guestRouteBadge">Ваш простір</p>
             <div
               class="languageToggle"
               role="group"
@@ -46,9 +46,9 @@
           </div>
 
           <p class="sectionEyebrow">DocTra</p>
-          <h1 data-i18n="app_brand_workspace">PDF-простір</h1>
+          <h1 data-i18n="app_brand_workspace">Ваш особистий асистент</h1>
           <p id="authSubline" data-i18n="guest_subline">
-            Оберіть план і почніть зберігати згенеровані PDF.
+            Замовлення, документи й щоденні дії зібрані в одному місці.
           </p>
         </div>
 
@@ -56,10 +56,9 @@
 
         <section class="guestAuth">
           <div class="compactHeader">
-            <p class="sectionEyebrow" data-i18n="access">Доступ</p>
-            <h2 id="authHeadline" data-i18n="guest_headline">Оберіть план і створіть акаунт</h2>
-            <p id="guestAuthNote" data-i18n="guest_note">
-              Один акаунт. Один план. Усі замовлення зберігаються в одному місці.
+            <h2 id="authHeadline" data-i18n="guest_login_headline">Увійти у свій простір</h2>
+            <p id="guestAuthNote" data-i18n="guest_login_note">
+              Поверніться до замовлень, документів, статистики та нотаток без зайвих кроків.
             </p>
           </div>
 
@@ -72,37 +71,101 @@
             <button
               class="authModeSwitch-btn is-active"
               type="button"
-              id="authModeTabRegister"
+              id="authModeTabLogin"
               role="tab"
-              aria-controls="registerForm"
+              aria-controls="loginForm"
               aria-selected="true"
               tabindex="0"
-              data-auth-mode="register"
+              data-auth-mode="login"
             >
-              <span data-i18n="new_account">Новий акаунт</span>
+              <span data-i18n="sign_in">Увійти</span>
             </button>
             <button
               class="authModeSwitch-btn"
               type="button"
-              id="authModeTabLogin"
+              id="authModeTabRegister"
               role="tab"
-              aria-controls="loginForm"
+              aria-controls="registerForm"
               aria-selected="false"
               tabindex="-1"
-              data-auth-mode="login"
+              data-auth-mode="register"
             >
-              <span data-i18n="sign_in">Увійти</span>
+              <span data-i18n="new_account">Новий акаунт</span>
             </button>
           </div>
 
           <div class="authForms">
             <form
-              class="authForm authForm-register is-active"
+              class="authForm authForm-login is-active"
+              id="loginForm"
+              role="tabpanel"
+              aria-labelledby="authModeTabLogin"
+              aria-hidden="false"
+              data-auth-mode-panel="login"
+            >
+              <h3 data-i18n="sign_in">Увійти</h3>
+
+              <label class="authField">
+                <span data-i18n="email">Email</span>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="name@example.com"
+                  autocomplete="email"
+                />
+              </label>
+
+              <label class="authField authPasswordField">
+                <span data-i18n="password">Пароль</span>
+                <div class="authPasswordControl">
+                  <input
+                    id="loginPassword"
+                    type="password"
+                    name="password"
+                    placeholder="Ваш пароль"
+                    data-i18n-placeholder="your_password"
+                    autocomplete="current-password"
+                  />
+                  <button
+                    class="authPasswordToggle"
+                    type="button"
+                    data-password-toggle
+                    data-password-target="loginPassword"
+                    aria-controls="loginPassword"
+                    aria-pressed="false"
+                    aria-label="Показати пароль"
+                  >
+                    <svg
+                      class="authPasswordToggleIcon"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path
+                        class="authPasswordToggleIcon-eye"
+                        d="M2.5 12C4.7 7.9 8 5.8 12 5.8S19.3 7.9 21.5 12C19.3 16.1 16 18.2 12 18.2S4.7 16.1 2.5 12Z"
+                      />
+                      <circle class="authPasswordToggleIcon-pupil" cx="12" cy="12" r="2.6" />
+                      <path
+                        class="authPasswordToggleIcon-slash"
+                        d="M5 19 19 5"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </label>
+
+              <button class="secondary-btn" type="submit" data-i18n="sign_in">Увійти</button>
+            </form>
+
+            <form
+              class="authForm authForm-register"
               id="registerForm"
               role="tabpanel"
               aria-labelledby="authModeTabRegister"
-              aria-hidden="false"
+              aria-hidden="true"
               data-auth-mode-panel="register"
+              hidden
             >
               <h3 data-i18n="new_account">Новий акаунт</h3>
 
@@ -179,70 +242,6 @@
                 Створити простір
               </button>
             </form>
-
-            <form
-              class="authForm authForm-login"
-              id="loginForm"
-              role="tabpanel"
-              aria-labelledby="authModeTabLogin"
-              aria-hidden="true"
-              data-auth-mode-panel="login"
-              hidden
-            >
-              <h3 data-i18n="sign_in">Увійти</h3>
-
-              <label class="authField">
-                <span data-i18n="email">Email</span>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="name@example.com"
-                  autocomplete="email"
-                />
-              </label>
-
-              <label class="authField authPasswordField">
-                <span data-i18n="password">Пароль</span>
-                <div class="authPasswordControl">
-                  <input
-                    id="loginPassword"
-                    type="password"
-                    name="password"
-                    placeholder="Ваш пароль"
-                    data-i18n-placeholder="your_password"
-                    autocomplete="current-password"
-                  />
-                  <button
-                    class="authPasswordToggle"
-                    type="button"
-                    data-password-toggle
-                    data-password-target="loginPassword"
-                    aria-controls="loginPassword"
-                    aria-pressed="false"
-                    aria-label="Показати пароль"
-                  >
-                    <svg
-                      class="authPasswordToggleIcon"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                      focusable="false"
-                    >
-                      <path
-                        class="authPasswordToggleIcon-eye"
-                        d="M2.5 12C4.7 7.9 8 5.8 12 5.8S19.3 7.9 21.5 12C19.3 16.1 16 18.2 12 18.2S4.7 16.1 2.5 12Z"
-                      />
-                      <circle class="authPasswordToggleIcon-pupil" cx="12" cy="12" r="2.6" />
-                      <path
-                        class="authPasswordToggleIcon-slash"
-                        d="M5 19 19 5"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </label>
-
-              <button class="secondary-btn" type="submit" data-i18n="sign_in">Увійти</button>
-            </form>
           </div>
         </section>
 
@@ -253,84 +252,55 @@
               ? boot.language
               : document.documentElement.lang || 'uk';
             const routeTab = boot.routeTab || document.body?.dataset?.appTab || 'home';
-            const defaultAuthMode = boot.defaultAuthMode || (routeTab === 'home' ? 'register' : 'login');
+            const defaultAuthMode = boot.defaultAuthMode || 'login';
             const copy = {
               uk: {
                 chooseLanguage: 'Обрати мову',
                 authModeSwitch: 'Режим доступу',
-                startScreen: 'Стартовий екран',
-                guestSubline: 'Оберіть план і почніть зберігати згенеровані PDF.',
-                guestHeadline: 'Оберіть план і створіть акаунт',
-                guestNote: 'Один акаунт. Один план. Усі замовлення зберігаються в одному місці.',
+                startScreen: 'Ваш простір',
+                guestSubline: 'Замовлення, документи й щоденні дії зібрані в одному місці.',
+                guestHeadline: 'Підключіть свій простір',
+                guestNote: 'Один акаунт. Один простір. Усе потрібне під рукою.',
                 guestLoginHeadline: 'Увійти у свій простір',
-                guestLoginNote: 'Поверніться до замовлень, статистики та збережених PDF без зайвих кроків.',
+                guestLoginNote: 'Поверніться до замовлень, документів, статистики та нотаток без зайвих кроків.',
                 newAccount: 'Новий акаунт',
                 signIn: 'Увійти',
-                screens: {
-                  stats: 'Статистика',
-                  orders: 'Замовлення',
-                  account: 'Акаунт',
-                  accounts: 'Акаунти',
-                  subscriptions: 'Підписки',
-                  settings: 'Налаштування',
-                },
-                continueTo: 'Після входу відкриємо «{screen}»',
-                redirectNote: 'Увійдіть, і ми одразу відкриємо розділ «{screen}».',
+                continueTo: 'Після входу продовжимо з вашого місця',
+                redirectNote: 'Увійдіть, і ми одразу повернемо вас до роботи.',
               },
               en: {
                 chooseLanguage: 'Choose language',
                 authModeSwitch: 'Access mode',
-                startScreen: 'Start screen',
-                guestSubline: 'Choose a plan and start saving generated PDFs.',
-                guestHeadline: 'Choose a plan and create an account',
-                guestNote: 'One account. One plan. All orders stay in one place.',
+                startScreen: 'Your space',
+                guestSubline: 'Keep orders, documents, and daily tasks in one place.',
+                guestHeadline: 'Set up your space',
+                guestNote: 'One account. One space. Everything you need at hand.',
                 guestLoginHeadline: 'Sign in to your workspace',
-                guestLoginNote: 'Get back to orders, stats, and saved PDFs without extra steps.',
+                guestLoginNote: 'Return to orders, documents, stats, and notes without extra steps.',
                 newAccount: 'New account',
                 signIn: 'Sign in',
-                screens: {
-                  stats: 'Stats',
-                  orders: 'Orders',
-                  account: 'Account',
-                  accounts: 'Accounts',
-                  subscriptions: 'Subscriptions',
-                  settings: 'Settings',
-                },
-                continueTo: 'After sign-in, we will open “{screen}”',
-                redirectNote: 'Sign in and we will open the “{screen}” section right away.',
+                continueTo: 'After sign-in, we will continue where you left off',
+                redirectNote: 'Sign in and we will take you back to work right away.',
               },
               cs: {
                 chooseLanguage: 'Vybrat jazyk',
                 authModeSwitch: 'Režim přístupu',
-                startScreen: 'Startovní obrazovka',
-                guestSubline: 'Vyberte plán a začněte ukládat vygenerovaná PDF.',
-                guestHeadline: 'Vyberte plán a vytvořte účet',
-                guestNote: 'Jeden účet. Jeden plán. Všechny objednávky zůstanou na jednom místě.',
+                startScreen: 'Váš prostor',
+                guestSubline: 'Mějte objednávky, dokumenty a každodenní úkoly na jednom místě.',
+                guestHeadline: 'Nastavte si svůj prostor',
+                guestNote: 'Jeden účet. Jeden prostor. Vše potřebné po ruce.',
                 guestLoginHeadline: 'Přihlásit se do svého prostoru',
-                guestLoginNote: 'Vraťte se k objednávkám, statistikám a uloženým PDF bez zbytečných kroků.',
+                guestLoginNote: 'Vraťte se k objednávkám, dokumentům, statistikám a poznámkám bez zbytečných kroků.',
                 newAccount: 'Nový účet',
                 signIn: 'Přihlásit se',
-                screens: {
-                  stats: 'Statistiky',
-                  orders: 'Objednávky',
-                  account: 'Účet',
-                  accounts: 'Účty',
-                  subscriptions: 'Předplatné',
-                  settings: 'Nastavení',
-                },
-                continueTo: 'Po přihlášení otevřeme „{screen}“',
-                redirectNote: 'Přihlaste se a hned otevřeme sekci „{screen}“.',
+                continueTo: 'Po přihlášení budeme pokračovat tam, kde jste skončili',
+                redirectNote: 'Přihlaste se a hned se vrátíme k práci.',
               },
             };
             const messages = copy[language] || copy.uk;
             const isHome = routeTab === 'home';
-            const screenLabel = messages.screens[routeTab] || messages.screens.account;
-            const routeLabel = isHome
-              ? messages.startScreen
-              : messages.continueTo.replace('{screen}', screenLabel);
-            const subline = isHome
-              ? messages.guestSubline
-              : messages.redirectNote.replace('{screen}', screenLabel);
+            const routeLabel = isHome ? messages.startScreen : messages.continueTo;
+            const subline = isHome ? messages.guestSubline : messages.redirectNote;
             const registerTab = document.getElementById('authModeTabRegister');
             const loginTab = document.getElementById('authModeTabLogin');
             const registerForm = document.getElementById('registerForm');

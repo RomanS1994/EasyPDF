@@ -7,6 +7,12 @@
   font-size: 14px;
 }
 
+.page-generateContract[data-app-shell='admin'] {
+  --accent: #8a5a33;
+  --accent-soft: rgba(138, 90, 51, 0.1);
+  --accent-rgb: 138, 90, 51;
+}
+
 .page-generateContract[data-app-shell='admin'] .primary-btn,
 .page-generateContract[data-app-shell='admin'] .secondary-btn,
 .page-generateContract[data-app-shell='admin'] .danger-btn,
@@ -71,7 +77,7 @@
 .page-generateContract[data-app-shell='admin'] .settingsActionLink:focus-visible {
   outline: none;
   box-shadow:
-    0 0 0 4px rgba(0, 122, 255, 0.14),
+    0 0 0 4px rgba(var(--accent-rgb), 0.16),
     0 8px 18px rgba(28, 32, 40, 0.06);
 }
 
@@ -94,12 +100,12 @@
 }
 
 .page-generateContract[data-app-shell='admin'] .primary-btn {
-  background: linear-gradient(180deg, rgba(31, 132, 255, 0.98), rgba(11, 110, 232, 0.98));
+  background: linear-gradient(180deg, rgba(150, 101, 63, 0.98), rgba(111, 69, 38, 0.98));
   color: #fff;
-  border-color: rgba(11, 110, 232, 0.35);
+  border-color: rgba(111, 69, 38, 0.38);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 12px 24px rgba(11, 110, 232, 0.22);
+    0 12px 24px rgba(111, 69, 38, 0.24);
 }
 
 .page-generateContract[data-app-shell='admin'] .secondary-btn,
@@ -151,49 +157,6 @@
     linear-gradient(135deg, currentColor 50%, transparent 50%);
 }
 
-.page-generateContract[data-app-shell='admin'] .appTop {
-  gap: 12px;
-  padding: 14px;
-  border-color: rgba(0, 122, 255, 0.16);
-  border-radius: 26px;
-  background:
-    radial-gradient(circle at top right, rgba(0, 122, 255, 0.12), transparent 30%),
-    linear-gradient(160deg, rgba(255, 255, 255, 0.99), rgba(239, 245, 255, 0.96));
-  box-shadow:
-    0 14px 30px rgba(28, 32, 40, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92);
-}
-
-.page-generateContract[data-app-shell='admin'] .appTop::after {
-  right: -28px;
-  top: -36px;
-  width: 144px;
-  height: 144px;
-  background: radial-gradient(circle, rgba(0, 122, 255, 0.18), transparent 68%);
-}
-
-.page-generateContract[data-app-shell='admin'] .appTop .appTitleBlock h1 {
-  font-size: clamp(30px, 7.2vw, 38px);
-}
-
-.page-generateContract[data-app-shell='admin'] .appTop .appTitleBlock p:last-child {
-  max-width: 22ch;
-}
-
-.page-generateContract[data-app-shell='admin'] .topMetrics {
-  gap: 8px;
-}
-
-.page-generateContract[data-app-shell='admin'] .topMetric {
-  min-height: 78px;
-  padding: 12px 13px;
-  background: rgba(255, 255, 255, 0.88);
-}
-
-.page-generateContract[data-app-shell='admin'] .topMetric strong {
-  font-size: 15px;
-}
-
 .managerWorkspace {
   display: flex;
   flex-direction: column;
@@ -237,11 +200,11 @@
 }
 
 .managerTriageCard.is-active {
-  border-color: rgba(0, 122, 255, 0.28);
+  border-color: rgba(var(--accent-rgb), 0.28);
   box-shadow:
-    0 0 0 1px rgba(0, 122, 255, 0.16),
-    0 12px 30px rgba(0, 122, 255, 0.08);
-  background: linear-gradient(180deg, #ffffff, #f3f8ff);
+    0 0 0 1px rgba(var(--accent-rgb), 0.16),
+    0 12px 30px rgba(var(--accent-rgb), 0.08);
+  background: linear-gradient(180deg, #ffffff, #fbf4ec);
 }
 
 .managerTriageCard:hover,
@@ -251,16 +214,16 @@
 }
 
 .managerTriageCard:hover {
-  border-color: rgba(0, 122, 255, 0.22);
+  border-color: rgba(var(--accent-rgb), 0.22);
   box-shadow:
-    0 0 0 1px rgba(0, 122, 255, 0.08),
-    0 14px 30px rgba(0, 122, 255, 0.08);
+    0 0 0 1px rgba(var(--accent-rgb), 0.08),
+    0 14px 30px rgba(var(--accent-rgb), 0.08);
 }
 
 .managerUserButton:hover,
 .managerPlanButton:hover {
-  border-color: rgba(0, 122, 255, 0.2);
-  box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.08);
+  border-color: rgba(var(--accent-rgb), 0.2);
+  box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.08);
 }
 
 .managerTriageCard:active,
@@ -336,8 +299,8 @@
 
 .managerUserItem.is-active .managerUserButton,
 .managerPlanItem.is-active .managerPlanButton {
-  border-color: rgba(0, 122, 255, 0.28);
-  box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.14);
+  border-color: rgba(var(--accent-rgb), 0.28);
+  box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.14);
 }
 
 .managerUserCopy,
@@ -454,4 +417,84 @@
   font-size: 14px;
   color: #1c1c1e;
   line-height: 1.45;
+}
+
+.page-generateContract[data-app-shell='admin'] .settingsPage {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.page-generateContract[data-app-shell='admin'] .settingsNavGrid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.page-generateContract[data-app-shell='admin'] .settingsNavCard {
+  position: relative;
+  min-height: 114px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 16px 16px 14px;
+  text-align: left;
+  white-space: normal;
+  border-color: rgba(var(--accent-rgb), 0.18);
+  background: linear-gradient(180deg, rgba(255, 250, 244, 0.99), rgba(247, 238, 229, 0.95));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 10px 20px rgba(28, 32, 40, 0.04);
+}
+
+.page-generateContract[data-app-shell='admin'] .settingsNavCard:hover,
+.page-generateContract[data-app-shell='admin'] .settingsNavCard:focus-visible {
+  border-color: rgba(var(--accent-rgb), 0.3);
+  box-shadow:
+    0 0 0 1px rgba(var(--accent-rgb), 0.14),
+    0 12px 26px rgba(28, 32, 40, 0.06);
+}
+
+.page-generateContract[data-app-shell='admin'] .settingsNavCard strong,
+.page-generateContract[data-app-shell='admin'] .settingsNavCard > span:not(.settingsNavCta) {
+  display: block;
+  width: 100%;
+}
+
+.page-generateContract[data-app-shell='admin'] .settingsNavCard strong {
+  font-size: 15px;
+}
+
+.page-generateContract[data-app-shell='admin'] .settingsNavCard > span:not(.settingsNavCta) {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.page-generateContract[data-app-shell='admin'] .settingsNavCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 10px;
+  color: var(--accent);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.page-generateContract[data-app-shell='admin'] .settingsNavCta:hover {
+  color: color-mix(in srgb, var(--accent) 88%, #000 12%);
+}
+
+.page-generateContract[data-app-shell='admin'] .settingsBackLink {
+  width: fit-content;
+  min-width: 0;
+  padding-inline: 16px;
+  border-color: rgba(var(--accent-rgb), 0.18);
+  background: linear-gradient(180deg, rgba(255, 250, 244, 0.98), rgba(247, 240, 231, 0.94));
+  color: var(--accent);
 }

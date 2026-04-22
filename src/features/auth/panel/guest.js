@@ -42,7 +42,7 @@ export function getGuestRouteLabel() {
     return t('guest_start_screen');
   }
 
-  return t('guest_continue_to', { screen: t(state.activeTab) });
+  return t('guest_continue_to');
 }
 
 export function renderGuestContext() {
@@ -57,7 +57,7 @@ export function renderGuestContext() {
     refs.authSubline.textContent =
       state.activeTab === 'home'
         ? t('guest_subline')
-        : t('guest_redirect_note', { screen: t(state.activeTab) });
+        : t('guest_redirect_note');
   }
 
   if (refs.authHeadline) {
@@ -139,7 +139,7 @@ function formatPlanPrice(priceCzk) {
   }).format(value)} Kc`;
 }
 
-function getPlanVisual(plan) {
+export function getPlanVisual(plan) {
   const haystack = `${plan?.id || ''} ${plan?.name || ''}`.toLowerCase();
   const limit = Number(plan?.monthlyGenerationLimit) || 0;
 

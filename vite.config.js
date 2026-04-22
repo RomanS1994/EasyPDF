@@ -29,6 +29,12 @@ const devPageRouteMap = {
   '/cz/pdf/admin/orders/': '/pages/admin/orders/index.html',
   '/cz/pdf/admin/settings': '/pages/admin/settings/index.html',
   '/cz/pdf/admin/settings/': '/pages/admin/settings/index.html',
+  '/cz/pdf/admin/settings/language': '/pages/admin/settings/language/index.html',
+  '/cz/pdf/admin/settings/language/': '/pages/admin/settings/language/index.html',
+  '/cz/pdf/admin/settings/plans': '/pages/admin/settings/plans/index.html',
+  '/cz/pdf/admin/settings/plans/': '/pages/admin/settings/plans/index.html',
+  '/cz/pdf/admin/settings/audit': '/pages/admin/settings/audit/index.html',
+  '/cz/pdf/admin/settings/audit/': '/pages/admin/settings/audit/index.html',
 };
 
 function devRouteRewritePlugin() {
@@ -72,6 +78,18 @@ export default defineConfig(({ command }) => {
   );
   const adminOrdersHtml = path.resolve(__dirname, 'src/pages/admin/orders/index.html');
   const adminSettingsHtml = path.resolve(__dirname, 'src/pages/admin/settings/index.html');
+  const adminSettingsLanguageHtml = path.resolve(
+    __dirname,
+    'src/pages/admin/settings/language/index.html'
+  );
+  const adminSettingsPlansHtml = path.resolve(
+    __dirname,
+    'src/pages/admin/settings/plans/index.html'
+  );
+  const adminSettingsAuditHtml = path.resolve(
+    __dirname,
+    'src/pages/admin/settings/audit/index.html'
+  );
   const redirectHtml = path.resolve(__dirname, 'src/index.html');
 
   return {
@@ -107,6 +125,9 @@ export default defineConfig(({ command }) => {
           'cz/pdf/admin/subscriptions/index': adminSubscriptionsHtml,
           'cz/pdf/admin/orders/index': adminOrdersHtml,
           'cz/pdf/admin/settings/index': adminSettingsHtml,
+          'cz/pdf/admin/settings/language/index': adminSettingsLanguageHtml,
+          'cz/pdf/admin/settings/plans/index': adminSettingsPlansHtml,
+          'cz/pdf/admin/settings/audit/index': adminSettingsAuditHtml,
         },
         output: {
           manualChunks(id) {

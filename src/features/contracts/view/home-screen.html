@@ -125,8 +125,97 @@
             </div>
           </div>
 
+          <div class="generationGateModal" id="generationGateModal" aria-hidden="true" hidden>
+            <div class="generationGateBackdrop" id="generationGateBackdrop"></div>
+            <div class="generationGateSheet" role="dialog" aria-modal="true" aria-labelledby="generationGateTitle">
+              <div class="generationGateHeader">
+                <div class="generationGateHeading">
+                  <span class="generationTokenBadge">
+                    <span class="generationTokenBadgeIcon" aria-hidden="true"></span>
+                    <span data-i18n="tokens">Токени</span>
+                  </span>
+                  <h2 id="generationGateTitle" data-i18n="generation_gate_title">10 хвилин до замовлення</h2>
+                  <p id="generationGateDescription" data-i18n="generation_gate_description">
+                    Списується 1 токен. Після свайпу відкриється замовлення.
+                  </p>
+                </div>
+                <button
+                  class="generationGateCloseBtn"
+                  id="generationGateCloseBtn"
+                  type="button"
+                  aria-label="Закрити"
+                  data-i18n-aria-label="close"
+                >
+                  &times;
+                </button>
+              </div>
+
+              <div class="generationGateStats">
+                <article class="generationGateStat">
+                  <span data-i18n="token_cost_label">Списання</span>
+                  <strong class="generationGateTokenValue">
+                    <span class="generationGateTokenValueIcon" aria-hidden="true"></span>
+                    <span>1T</span>
+                  </strong>
+                </article>
+                <article class="generationGateStat">
+                  <span data-i18n="generation_window_label">Вікно</span>
+                  <strong data-i18n="generation_window_value">10 хвилин</strong>
+                </article>
+              </div>
+
+              <p class="generationGateHint" data-i18n="generation_gate_hint">
+                Проведіть повзунок до кінця, щоб списати токен і перейти до замовлення.
+              </p>
+
+              <div class="generationSwipe" id="generationGateSwipe">
+                <div class="generationSwipeFill" id="generationGateSwipeFill"></div>
+                <button
+                  class="generationSwipeHandle"
+                  id="generationGateSwipeHandle"
+                  type="button"
+                  aria-label="Перейти до замовлення"
+                  data-i18n-aria-label="generation_gate_swipe_aria"
+                >
+                  <span aria-hidden="true">→</span>
+                </button>
+                <div class="generationSwipeLabel" data-i18n="proceed_to_order_with_token">
+                  Перейти до замовлення
+                </div>
+              </div>
+
+              <button
+                class="secondary-btn generationGateLaterBtn"
+                id="generationGateLaterBtn"
+                type="button"
+                data-i18n="generate_later"
+              >
+                Не зараз
+              </button>
+            </div>
+          </div>
+
           <section class="appScreen" data-tab-screen="orders">
             <form class="dataContract-container dataContract-page is-active" data-step="1" novalidate>
+              <section
+                class="generationSessionBanner"
+                id="generationSessionModal"
+                aria-hidden="true"
+                hidden
+              >
+                <div class="generationSessionBannerCopy">
+                  <p class="sectionEyebrow" data-i18n="generation_session_eyebrow">Замовлення</p>
+                  <h2 id="generationSessionTitle" data-i18n="generation_session_title">Замовлення зарезервовано</h2>
+                  <p id="generationSessionDescription" data-i18n="generation_session_description">
+                    У вас є 10 хвилин, щоб завершити замовлення.
+                  </p>
+                </div>
+
+                <div class="generationSessionTimer" id="generationSessionCountdownRing" aria-hidden="true">
+                  <div class="generationSessionCountdownValue" id="generationSessionCountdownValue">10:00</div>
+                </div>
+              </section>
+
               <section class="formSection">
                 <header class="formSectionHead">
                   <h4 data-i18n="customer">Клієнт</h4>
@@ -301,7 +390,7 @@
               <footer class="wizard-controls wizard-controls-single">
                 <button class="primary-btn wizard-contract" type="button" id="downloadPdfBtn">
                   <span class="wizard-contract-iconWrap" aria-hidden="true">&#x2B07;</span>
-                  <span data-i18n="pdf_document_confirmation">Договір</span>
+                  <span data-i18n="generate_order">Згенерувати</span>
                 </button>
                 <button class="secondary-btn wizard-save" type="button" id="saveOrderBtn" data-i18n="save_order">
                   Зберегти

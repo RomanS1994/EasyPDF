@@ -19,12 +19,35 @@ import {
   renderManagerSelectedUser,
   renderManagerUsers,
 } from './manager-render.js';
+import { getPlanVisual } from './guest.js';
 import { t } from '../../../shared/i18n/app.js';
 
 const SUPPORT_WHATSAPP_NUMBER = '+420773633433';
 const DEFAULT_WHATSAPP_URL = `https://wa.me/${SUPPORT_WHATSAPP_NUMBER.replace(/\D/g, '')}`;
 const WHATSAPP_URL = import.meta.env.VITE_SUPPORT_WHATSAPP_URL || DEFAULT_WHATSAPP_URL;
 const TELEGRAM_URL = import.meta.env.VITE_SUPPORT_TELEGRAM_URL || '';
+const WORKSPACE_PLAN_THEMES = {
+  free: {
+    border: 'rgba(79, 111, 255, 0.24)',
+    soft: '#edf2ff',
+    glow: 'rgba(95, 126, 255, 0.36)',
+  },
+  bronze: {
+    border: 'rgba(168, 102, 53, 0.22)',
+    soft: '#fff0e1',
+    glow: 'rgba(196, 126, 73, 0.34)',
+  },
+  silver: {
+    border: 'rgba(91, 109, 132, 0.22)',
+    soft: '#eef3f8',
+    glow: 'rgba(125, 144, 168, 0.34)',
+  },
+  gold: {
+    border: 'rgba(194, 142, 31, 0.24)',
+    soft: '#fff4d2',
+    glow: 'rgba(255, 209, 97, 0.4)',
+  },
+};
 
 function getInitials(name = '') {
   const parts = String(name || '')
@@ -44,6 +67,27 @@ function getInitials(name = '') {
 function resolvePlanName(planId) {
   if (!planId) return '-';
   return state.plans.find(plan => plan.id === planId)?.name || planId;
+}
+
+function applyWorkspacePlanTheme(plan) {
+  const top = refs.workspaceTop;
+  if (!top) return;
+
+  const tone = !plan || isAdminShell() ? null : getPlanVisual(plan).tone;
+  const theme = tone ? WORKSPACE_PLAN_THEMES[tone] || WORKSPACE_PLAN_THEMES.free : null;
+
+  if (!theme) {
+    top.removeAttribute('data-plan-tone');
+    top.style.removeProperty('--plan-border');
+    top.style.removeProperty('--plan-soft');
+    top.style.removeProperty('--plan-glow');
+    return;
+  }
+
+  top.dataset.planTone = tone;
+  top.style.setProperty('--plan-border', theme.border);
+  top.style.setProperty('--plan-soft', theme.soft);
+  top.style.setProperty('--plan-glow', theme.glow);
 }
 
 function syncAvatarPreview({
@@ -116,6 +160,8 @@ export function syncAccountSummaryPreview({ avatarUrl = '', name = state.user?.n
 
 export function renderDashboard() {
   if (!state.user) return;
+
+  applyWorkspacePlanTheme(state.user.plan || null);
 
   const metrics = getMetrics();
   const usageText = `${metrics.usage.used} / ${metrics.usage.limit}`;
@@ -305,6 +351,8 @@ export function broadcastAuthState() {
 
 export function renderAuthenticatedState({ resetTab = false } = {}) {
   if (!state.user) {
+    applyWorkspacePlanTheme(null);
+
     if (state.activeTab !== 'home') {
       state.authMode = 'login';
     }

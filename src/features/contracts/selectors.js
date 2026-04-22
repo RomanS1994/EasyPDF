@@ -15,6 +15,16 @@ export const contractRefs = {
   priceConverted: document.getElementById('priceConverted'),
   currencyButtons: document.querySelectorAll('.dataContract-container .currency-btn'),
   documentTypeButtons: document.querySelectorAll('[data-pdf-document]'),
+  generationGateModal: document.getElementById('generationGateModal'),
+  generationGateBackdrop: document.getElementById('generationGateBackdrop'),
+  generationGateCloseBtn: document.getElementById('generationGateCloseBtn'),
+  generationGateLaterBtn: document.getElementById('generationGateLaterBtn'),
+  generationGateSwipe: document.getElementById('generationGateSwipe'),
+  generationGateSwipeFill: document.getElementById('generationGateSwipeFill'),
+  generationGateSwipeHandle: document.getElementById('generationGateSwipeHandle'),
+  generationSessionModal: document.getElementById('generationSessionModal'),
+  generationSessionCountdownRing: document.getElementById('generationSessionCountdownRing'),
+  generationSessionCountdownValue: document.getElementById('generationSessionCountdownValue'),
 };
 
 export function hasContractRoot() {

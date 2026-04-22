@@ -18,6 +18,8 @@ export const refs = {
   planCards: document.getElementById('planCards'),
   tabButtons: document.querySelectorAll('[data-tab-target]'),
   tabScreens: document.querySelectorAll('[data-tab-screen]'),
+  settingsPages: document.querySelectorAll('[data-settings-page]'),
+  settingsNavButtons: document.querySelectorAll('[data-settings-target]'),
   statsTabButtons: document.querySelectorAll('[data-stats-tab-target]'),
   statsTabScreens: document.querySelectorAll('[data-stats-tab-screen]'),
   accountSummaryAvatarImage: document.getElementById('accountSummaryAvatarImage'),
@@ -61,6 +63,7 @@ export const refs = {
   updateProfileBtn: document.getElementById('updateProfileBtn'),
   managerEntrySection: document.getElementById('managerEntrySection'),
   workspaceGreeting: document.getElementById('workspaceGreeting'),
+  workspaceTop: document.querySelector('.appTop'),
   workspacePlan: document.getElementById('workspacePlan'),
   workspaceUsage: document.getElementById('workspaceUsage'),
   workspaceCycleHome: document.getElementById('workspaceCycleHome'),
@@ -215,5 +218,5 @@ export const TAB_NAMES =
     ? ['accounts', 'subscriptions', 'orders', 'settings']
     : ['home', 'stats', 'orders', 'history', 'settings', 'account'];
 export const STATS_TAB_NAMES = ['usage', 'activity'];
-export const AUTH_MODES = ['register', 'login'];
+export const AUTH_MODES = ['login', 'register'];
 export const CONTRACT_STORAGE_KEY = 'contract-data';
