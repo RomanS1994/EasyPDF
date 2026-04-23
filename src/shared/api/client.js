@@ -2,7 +2,7 @@ import {
   clearStoredSession,
   getSessionToken,
   setStoredSession,
-} from '../../features/auth/session.js';
+} from '../lib/session-storage.js';
 import { beginApiLoader, endApiLoader } from '../ui/loader.js';
 
 function resolveApiBase() {

@@ -56,6 +56,15 @@ tools/     dev runner, build/postbuild helpers, hooks
 dist/      production build output
 ```
 
+## Frontend structure
+
+- `src/pages/*/page.js` contains the route entry shells for each page.
+- `src/app/bootstrap.js` contains the page-level bootstrap functions.
+- `src/features/auth` contains the auth workspace split into guest, account, orders, history, stats, and shell subfeatures.
+- `src/features/contracts` contains the contract editor, storage, bindings, validation, and PDF generation flow.
+- `src/features/manager` contains the manager/admin workspace logic.
+- `src/shared` contains shared infrastructure such as i18n, API client, storage helpers, formatting, download helpers, and UI utilities.
+
 ## Основні сторінки
 
 | Зона | Шляхи |

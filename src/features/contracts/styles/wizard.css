@@ -107,14 +107,6 @@
     0 14px 26px rgba(0, 122, 255, 0.12);
 }
 
-.wizard-contract:disabled,
-.wizard-save:disabled {
-  opacity: 0.48;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
 .stepIndicator {
   display: inline-flex;
   align-items: center;

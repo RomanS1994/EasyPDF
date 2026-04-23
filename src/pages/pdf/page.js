@@ -1,3 +1,3 @@
-import { bootstrapUserPage } from '../../app/bootstrap.js';
+import { bootstrapPdfPage } from '../../app/bootstrap.js';
 
-bootstrapUserPage();
+bootstrapPdfPage();

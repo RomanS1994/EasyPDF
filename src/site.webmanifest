@@ -6,13 +6,13 @@
   "scope": "/cz/pdf/",
   "icons": [
     {
-      "src": "/shared/assets/main_robot.png",
+      "src": "/shared/assets/doctra-icon.png",
       "sizes": "1254x1254",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/shared/assets/main_robot.png",
+      "src": "/shared/assets/doctra-icon.png",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any maskable"

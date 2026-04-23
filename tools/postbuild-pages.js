@@ -36,7 +36,7 @@ cpSync(path.join(projectRoot, 'src/shared/assets'), path.join(distRoot, 'shared/
   recursive: true,
 });
 
-for (const assetName of ['doctra-icon.png', 'doctra-icon.svg', 'doctra-robot.svg']) {
+for (const assetName of ['doctra-icon.svg', 'doctra-robot.svg']) {
   rmSync(path.join(distRoot, 'shared/assets', assetName), { force: true });
 }
 

@@ -1,3 +1,3 @@
-import { bootstrapAdminPage } from '../../app/bootstrap.js';
+import { bootstrapManagerPage } from '../../app/bootstrap.js';
 
-bootstrapAdminPage();
+bootstrapManagerPage();

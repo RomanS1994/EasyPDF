@@ -4,9 +4,9 @@ import {
   readStorageJson,
   writeStorageJson,
 } from '../../shared/lib/storage.js';
+import { CONTRACT_STORAGE_KEY } from '../../shared/lib/storage-keys.js';
 import { extractNumericPrice, sanitizePriceInput } from './currency.js';
 import {
-  CONTRACT_STORAGE_KEY,
   DEFAULT_DOCUMENT_TYPE,
   SUPPORTED_DOCUMENT_TYPES,
   createDefaultContractData,

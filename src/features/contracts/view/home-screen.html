@@ -196,7 +196,7 @@
           </div>
 
           <section class="appScreen" data-tab-screen="orders">
-            <form class="dataContract-container dataContract-page is-active" data-step="1" novalidate>
+            <form class="dataContract-container dataContract-page is-active" data-step="1">
               <section
                 class="generationSessionBanner"
                 id="generationSessionModal"
@@ -275,8 +275,6 @@
                       name="passengers"
                       type="number"
                       required
-                      min="1"
-                      step="1"
                       value=""
                       inputmode="numeric"
                       placeholder="Кількість пасажирів"
@@ -357,7 +355,6 @@
                       value=""
                       placeholder="Виберіть дату і час"
                       autocomplete="off"
-                      step="300"
                       aria-labelledby="trip-time-label"
                     />
                   </dd>
@@ -377,7 +374,6 @@
                       name="trip-totalPrice"
                       inputmode="numeric"
                       required
-                      pattern="[0-9]*"
                       autocomplete="off"
                       placeholder="Введіть суму"
                       data-i18n-placeholder="enter_amount"

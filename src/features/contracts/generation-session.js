@@ -1,6 +1,6 @@
 import { t } from '../../shared/i18n/app.js';
 import { contractRefs } from './selectors.js';
-import { getShellRouteConfig, navigateToTab } from '../auth/panel/routes.js';
+import { getShellRouteConfig, navigateToTab } from '../auth/shell/routes.js';
 
 const SESSION_STORAGE_KEY = 'pdf-app-generation-session';
 const SESSION_WINDOW_MS = 10 * 60 * 1000;

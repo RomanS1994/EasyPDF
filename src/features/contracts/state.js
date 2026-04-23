@@ -1,4 +1,3 @@
-export const CONTRACT_STORAGE_KEY = 'contract-data';
 export const DEFAULT_DOCUMENT_TYPE = 'confirmation';
 export const SUPPORTED_DOCUMENT_TYPES = new Set(['offer', 'confirmation']);
 

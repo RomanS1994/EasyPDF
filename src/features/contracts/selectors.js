@@ -37,8 +37,3 @@ export function findContractInput(name) {
   if (!contractRefs.root) return null;
   return contractRefs.root.querySelector(`input[name="${name}"]`);
 }
-
-export function findContractInputs(name) {
-  if (!contractRefs.root) return [];
-  return Array.from(contractRefs.root.querySelectorAll(`input[name="${name}"]`));
-}
