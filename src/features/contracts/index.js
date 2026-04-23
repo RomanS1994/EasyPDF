@@ -17,6 +17,7 @@ import {
 } from './bindings.js';
 import { initDatePickers } from './date-pickers.js';
 import { initOrderGenerationSession } from './generation-session.js';
+import { syncContractActionState } from './validation.js';
 
 export function initContractFeature() {
   if (!hasContractRoot()) return;
@@ -29,6 +30,7 @@ export function initContractFeature() {
 
   initDatePickers();
   initOrderGenerationSession();
+  syncContractActionState();
 }
 
 export function getCurrentContractData() {
@@ -38,4 +40,5 @@ export function getCurrentContractData() {
 export function clearContractData() {
   resetContractData();
   syncDocumentTypeButtons(contractRefs.documentTypeButtons);
+  syncContractActionState();
 }

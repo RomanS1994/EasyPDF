@@ -207,7 +207,7 @@ export function renderDashboard() {
     refs.ordersDateFilter.value = state.ordersDateFilter;
   }
   if (refs.statsHistoryDateFilter) {
-    refs.statsHistoryDateFilter.value = state.ordersDateFilter;
+    refs.statsHistoryDateFilter.value = state.ordersHistoryDateFilter;
   }
 
   if (refs.accountName) refs.accountName.textContent = state.user.name || '-';
@@ -323,11 +323,13 @@ export function renderDashboard() {
   renderOrderList(refs.ordersList, refs.ordersEmpty, state.orders, {
     emptyText: t('orders_empty_home'),
   });
-  renderOrderList(refs.statsHistoryList, refs.statsHistoryEmpty, state.orders, {
-    emptyText: t('orders_empty_home'),
+  const historyRender = renderOrderList(refs.statsHistoryList, refs.statsHistoryEmpty, state.orders, {
+    emptyText: t('orders_empty_history'),
+    historyMode: true,
+    dateFilter: state.ordersHistoryDateFilter,
   });
   if (refs.statsHistorySummary) {
-    refs.statsHistorySummary.textContent = t('orders_count', { count: state.orders.length });
+    refs.statsHistorySummary.textContent = t('orders_count', { count: historyRender.visibleCount });
   }
   renderOrderDetail();
   renderManagerAccessState();
@@ -363,8 +365,9 @@ export function renderAuthenticatedState({ resetTab = false } = {}) {
       emptyText: t('orders_empty_home'),
     });
     renderOrderList(refs.statsHistoryList, refs.statsHistoryEmpty, [], {
-      emptyText: t('orders_empty_home'),
-      ignoreDateFilter: true,
+      emptyText: t('orders_empty_history'),
+      historyMode: true,
+      dateFilter: state.ordersHistoryDateFilter,
     });
     renderManagerUsers();
     renderManagerSelectedUser();

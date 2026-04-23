@@ -12,6 +12,7 @@ import { prisma } from '../db/prisma.js';
 import { runStoreTransaction } from '../db/store.js';
 import { readJsonBody, sendError, sendJson } from '../lib/http.js';
 import { buildOrderRecord } from '../services/orders.js';
+import { validateOrderCreateInput } from '../validation/orders.js';
 import { nowIso, normalizePaginationParams } from '../validation/common.js';
 
 async function handleCreateOrder(request, response) {
@@ -27,6 +28,7 @@ async function handleCreateOrder(request, response) {
   }
 
   const body = await readJsonBody(request);
+  validateOrderCreateInput(body);
 
   const order = await runStoreTransaction({
     prisma: async tx => {

@@ -26,6 +26,7 @@ const STATUS_BY_MESSAGE = new Map([
   ['Plan name is required', 400],
   ['Subscription end date must be after start date', 400],
   ['Plan limit must be greater than 0', 400],
+  ['Order contract data is incomplete', 400],
 ]);
 
 export function resolveErrorStatus(error) {

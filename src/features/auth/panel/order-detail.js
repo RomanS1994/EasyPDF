@@ -111,18 +111,20 @@ export function renderOrderDetail() {
   setOrderDetailVisibility(true);
   if (refs.orderDetailTitle) refs.orderDetailTitle.textContent = order.orderNumber || t('order_detail');
   if (refs.orderDetailNumber) refs.orderDetailNumber.textContent = order.orderNumber || '-';
-  if (refs.orderDetailCustomer) refs.orderDetailCustomer.textContent = order.customer?.name || order.customer?.email || '-';
+  if (refs.orderDetailCustomer) {
+    refs.orderDetailCustomer.textContent = order.customer?.name || order.customer?.email || t('client_not_specified');
+  }
   if (refs.orderDetailCustomerEmail) refs.orderDetailCustomerEmail.textContent = order.customer?.email || '-';
   if (refs.orderDetailRoute) {
     const routeSeparator = isAdminShell() ? ' · ' : ' -> ';
     refs.orderDetailRoute.textContent = [formatLocation(order.trip?.from), formatLocation(order.trip?.to)]
       .filter(value => value && value !== '-')
-      .join(routeSeparator) || t('route_not_set');
+      .join(routeSeparator) || t('route_not_added');
   }
   if (refs.orderDetailDate) refs.orderDetailDate.textContent = formatDateTimeLabel(order.createdAt);
   if (refs.orderDetailIssueDate) refs.orderDetailIssueDate.textContent = formatDateTimeLabel(order.contractData?.issueDate || order.contractData?.today || order.createdAt);
   if (refs.orderDetailStatus) refs.orderDetailStatus.textContent = formatOrderStatusLabel(order.status || '-');
-  if (refs.orderDetailTotal) refs.orderDetailTotal.textContent = order.totalPrice || '-';
+  if (refs.orderDetailTotal) refs.orderDetailTotal.textContent = order.totalPrice || t('no_price');
   if (refs.orderDetailPdf) refs.orderDetailPdf.textContent = order.pdf?.fileName || order.pdf?.url || t('not_attached');
   if (refs.orderDetailDocumentType) {
     refs.orderDetailDocumentType.textContent = formatDocumentTypeLabel(

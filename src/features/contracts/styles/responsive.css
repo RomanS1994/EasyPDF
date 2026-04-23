@@ -3,16 +3,28 @@
     padding: 0 8px;
   }
 
-  .guestIntro,
+  .guestIntro {
+    padding: 12px 12px 60px;
+  }
+
   .guestAuth {
     padding: 12px;
   }
 
-  .guestIntroBar {
-    align-items: stretch;
+  .guestIntroHomeMark {
+    right: 12px;
+    bottom: 12px;
+    width: 72px;
+    height: 72px;
+  }
+
+  .guestIntroHomeMark img {
+    width: 100%;
+    height: 100%;
   }
 
   .languageToggle {
+    justify-self: stretch;
     width: 100%;
   }
 
@@ -20,7 +32,11 @@
     font-size: 28px;
   }
 
-  .guestIntro p:last-child,
+  .guestIntro p:last-child {
+    max-width: min(21rem, calc(100% - 5.5rem));
+    font-size: 13px;
+  }
+
   .guestAuth .compactHeader p {
     max-width: none;
     font-size: 13px;
@@ -91,6 +107,10 @@
 
   .page-generateContract[data-app-shell='user'] .accountSummaryEmail {
     font-size: 14px;
+  }
+
+  .accountAvatarButtonLabel {
+    max-width: 78px;
   }
 }
 

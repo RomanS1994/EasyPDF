@@ -12,6 +12,9 @@ import { refs } from './refs.js';
 import { state } from './state.js';
 import {
   setOrdersDateFilter,
+  setHistoryDateFilter,
+  setOrdersHistorySort,
+  setOrdersHistoryTab,
   getTodayLocalDateKey,
 } from './orders.js';
 import {
@@ -89,11 +92,21 @@ function bindEvents() {
     syncSelectedPlan(event.target.value);
   });
   refs.statsHistoryDateFilter?.addEventListener('change', event => {
-    setOrdersDateFilter(event.target.value);
+    setHistoryDateFilter(event.target.value);
     renderAuthenticatedState();
   });
+  refs.statsHistorySortSelect?.addEventListener('change', event => {
+    setOrdersHistorySort(event.target.value);
+    renderAuthenticatedState();
+  });
+  refs.statsHistoryTabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      setOrdersHistoryTab(button.dataset.historyTabTarget);
+      renderAuthenticatedState();
+    });
+  });
   refs.statsHistoryDateResetBtn?.addEventListener('click', () => {
-    setOrdersDateFilter('');
+    setHistoryDateFilter('');
     renderAuthenticatedState();
   });
   refs.ordersList?.addEventListener('click', handleOrderListClick);

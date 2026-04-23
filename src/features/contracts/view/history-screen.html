@@ -1,31 +1,89 @@
           <section class="appScreen" data-tab-screen="history">
-            <div class="screenCard screenCard-stats">
+            <div class="screenCard screenCard-stats orderHistoryScreen">
               <div class="compactHeader">
                 <h2 data-i18n="saved_pdfs">Збережені PDF</h2>
                 <p data-i18n="saved_pdfs_subline">Усі згенеровані замовлення в цьому робочому просторі.</p>
               </div>
 
-              <div class="statsVizCard statsHistoryCard">
-                <div class="usageCard-head">
-                  <h3 data-i18n="orders">Історія замовлень</h3>
-                  <span id="statsHistorySummary">-</span>
-                </div>
-                <label class="settingsField orderDateField">
-                  <span class="settingsRow-label orderDateLabel">
-                    <svg class="orderDateLabelIcon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-                      <path d="M6 2.5a.75.75 0 0 1 .75.75v1h6.5v-1a.75.75 0 0 1 1.5 0v1h1.5A2.25 2.25 0 0 1 18.5 6.5v9A2.25 2.25 0 0 1 16.25 17.75H3.75A2.25 2.25 0 0 1 1.5 15.5v-9A2.25 2.25 0 0 1 3.75 4.25h1.5v-1A.75.75 0 0 1 6 2.5Zm10.5 6.75H3.5v6.25c0 .414.336.75.75.75h11.5a.75.75 0 0 0 .75-.75V9.25Z" fill="currentColor"/>
-                    </svg>
-                    <span data-i18n="date">Дата</span>
-                  </span>
-                  <input id="statsHistoryDateFilter" type="date" />
-                </label>
-                <button class="secondary-btn settingsAction orderDateReset" id="statsHistoryDateResetBtn" type="button" data-i18n="reset">
-                  Скинути
+              <div class="orderHistoryTabs" role="tablist" aria-label="Order status tabs" data-i18n-aria-label="orders_history_tabs">
+                <button
+                  class="orderHistoryTab is-active"
+                  type="button"
+                  role="tab"
+                  aria-selected="true"
+                  aria-controls="statsHistoryList"
+                  data-history-tab-target="all"
+                  data-i18n="orders_tab_all"
+                >
+                  All
                 </button>
-                <p class="ordersEmpty" id="statsHistoryEmpty" data-i18n="orders_empty_home">
-                  Замовлень ще немає. Згенеруйте PDF на «Замовлення», щоб створити перше.
-                </p>
-                <ul class="ordersList" id="statsHistoryList"></ul>
+                <button
+                  class="orderHistoryTab"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="statsHistoryList"
+                  data-history-tab-target="today"
+                  data-i18n="orders_tab_today"
+                >
+                  Сьогодні
+                </button>
+                <button
+                  class="orderHistoryTab"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="statsHistoryList"
+                  data-history-tab-target="planned"
+                  data-i18n="orders_tab_planned"
+                >
+                  Заплановані
+                </button>
+                <button
+                  class="orderHistoryTab"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="statsHistoryList"
+                  data-history-tab-target="completed"
+                  data-i18n="orders_tab_completed"
+                >
+                  Завершені
+                </button>
               </div>
+
+              <div class="orderHistoryToolbar">
+                <div class="orderHistoryToolbarLeft">
+                  <label class="settingsField orderHistoryDateField">
+                    <span class="settingsRow-label orderHistoryLabel">
+                      <svg class="orderHistoryLabelIcon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                        <path d="M6 2.5a.75.75 0 0 1 .75.75v1h6.5v-1a.75.75 0 0 1 1.5 0v1h1.5A2.25 2.25 0 0 1 18.5 6.5v9A2.25 2.25 0 0 1 16.25 17.75H3.75A2.25 2.25 0 0 1 1.5 15.5v-9A2.25 2.25 0 0 1 3.75 4.25h1.5v-1A.75.75 0 0 1 6 2.5Zm10.5 6.75H3.5v6.25c0 .414.336.75.75.75h11.5a.75.75 0 0 0 .75-.75V9.25Z" fill="currentColor"/>
+                      </svg>
+                      <span data-i18n="date">Дата</span>
+                    </span>
+                    <input id="statsHistoryDateFilter" type="date" />
+                  </label>
+                  <button class="secondary-btn settingsAction orderHistoryResetBtn" id="statsHistoryDateResetBtn" type="button" data-i18n="reset">
+                    Скинути
+                  </button>
+                </div>
+
+                <div class="orderHistoryToolbarRight">
+                  <span class="orderHistorySummary" id="statsHistorySummary" aria-live="polite">-</span>
+                  <label class="settingsField orderHistorySortField">
+                    <span class="settingsRow-label orderHistoryLabel" data-i18n="sort">Сортування</span>
+                    <select id="statsHistorySortSelect" aria-label="Sort orders" data-i18n-aria-label="sort">
+                      <option value="newest" data-i18n="sort_newest_first">Спочатку нові</option>
+                      <option value="oldest" data-i18n="sort_oldest_first">Спочатку старі</option>
+                      <option value="trip-date" data-i18n="sort_trip_date">За датою поїздки</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <p class="ordersEmpty orderHistoryEmpty" id="statsHistoryEmpty" data-i18n="orders_empty_history">
+                Збережені замовлення ще не з'явилися.
+              </p>
+              <ul class="ordersList orderHistoryList" id="statsHistoryList"></ul>
             </div>
           </section>

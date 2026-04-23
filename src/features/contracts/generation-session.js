@@ -9,6 +9,7 @@ const state = {
   gateVisible: false,
   gateBusy: false,
   gateConfirmedAction: null,
+  gateIntent: 'order-reserve',
   sessionDismissed: false,
   focusTarget: null,
   pointerId: null,
@@ -32,7 +33,9 @@ function safeParseSession(rawSession) {
 
 function normalizeStoredSession(rawSession, { includeExpired = false } = {}) {
   if (!rawSession || typeof rawSession !== 'object') return null;
-  if (!rawSession.orderId) return null;
+  const hasOrderId = Boolean(String(rawSession.orderId || '').trim());
+  const hasAccessGrant = rawSession.accessGranted === true;
+  if (!hasOrderId && !hasAccessGrant) return null;
 
   const expiresAt = Number(new Date(rawSession.expiresAt || '').getTime());
   if (!Number.isFinite(expiresAt) || expiresAt <= 0) return null;
@@ -43,6 +46,7 @@ function normalizeStoredSession(rawSession, { includeExpired = false } = {}) {
   return {
     expired,
     session: {
+      accessGranted: hasAccessGrant || hasOrderId,
       orderId: String(rawSession.orderId || ''),
       orderNumber: String(rawSession.orderNumber || ''),
       documentType: String(rawSession.documentType || 'confirmation'),
@@ -274,6 +278,12 @@ function emitEvent(name, detail = {}) {
   window.dispatchEvent(new CustomEvent(name, { detail }));
 }
 
+function emitSessionChanged() {
+  emitEvent('pdf-app:generation-session-changed', {
+    session: getActiveSession(),
+  });
+}
+
 function resetSwipeState({ preserveVisibility = true } = {}) {
   state.swipeProgress = 0;
   state.swipeCompleted = false;
@@ -305,7 +315,9 @@ function confirmSwipe() {
   state.swipeProgress = 1;
   state.gateBusy = true;
   renderGateSwipe();
-  emitEvent('pdf-app:token-gate-confirmed');
+  emitEvent('pdf-app:token-gate-confirmed', {
+    intent: state.gateIntent,
+  });
 
   const action = state.gateConfirmedAction;
   state.gateConfirmedAction = null;
@@ -318,21 +330,8 @@ function closeGate({ restore = true } = {}) {
   state.gateVisible = false;
   state.gateBusy = false;
   state.gateConfirmedAction = null;
+  state.gateIntent = 'order-reserve';
   resetSwipeState({ preserveVisibility: true });
-  syncLayerVisibility();
-
-  if (restore) {
-    restoreFocus();
-  }
-}
-
-function closeSession({ restore = true, manual = true } = {}) {
-  if (manual) {
-    state.sessionDismissed = true;
-  } else {
-    state.sessionDismissed = false;
-  }
-
   syncLayerVisibility();
 
   if (restore) {
@@ -439,11 +438,12 @@ export function initOrderGenerationSession() {
   syncLayerVisibility();
 }
 
-export function openGenerationGate({ onConfirmed = null } = {}) {
+export function openGenerationGate({ onConfirmed = null, intent = 'order-reserve' } = {}) {
   rememberFocus();
   state.gateVisible = true;
   state.gateBusy = false;
   state.gateConfirmedAction = typeof onConfirmed === 'function' ? onConfirmed : null;
+  state.gateIntent = intent;
   resetSwipeState({ preserveVisibility: true });
   syncLayerVisibility();
   focusElement(contractRefs.generationGateSwipeHandle || contractRefs.generationGateCloseBtn);
@@ -458,8 +458,22 @@ export function resetGenerationGateSwipe() {
   resetSwipeState({ preserveVisibility: true });
 }
 
-export function closeGenerationGate() {
-  closeGate();
+export function closeGenerationGate(options = {}) {
+  closeGate(options);
+}
+
+export function createGenerationAccessSession() {
+  const createdAt = new Date().toISOString();
+
+  return {
+    accessGranted: true,
+    orderId: '',
+    orderNumber: '',
+    documentType: 'confirmation',
+    contractData: {},
+    createdAt,
+    expiresAt: new Date(Date.now() + SESSION_WINDOW_MS).toISOString(),
+  };
 }
 
 export function openGenerationSession(session) {
@@ -470,10 +484,7 @@ export function openGenerationSession(session) {
   writeStoredSession(normalizedSession);
   state.sessionDismissed = false;
   syncLayerVisibility();
-}
-
-export function dismissGenerationSession() {
-  closeSession();
+  emitSessionChanged();
 }
 
 export function clearGenerationSession() {
@@ -481,6 +492,7 @@ export function clearGenerationSession() {
   state.sessionDismissed = false;
   stopSessionTimer();
   syncLayerVisibility();
+  emitSessionChanged();
   restoreFocus();
 }
 
@@ -496,17 +508,6 @@ export function isGenerationSessionExpired() {
   return Boolean(readStoredSessionSnapshot().expired);
 }
 
-export function getGenerationSessionRemainingMs() {
-  const session = getActiveSession();
-  if (!session) return 0;
-
-  return Math.max(0, new Date(session.expiresAt).getTime() - getNow());
-}
-
-export function isGenerationSessionDismissed() {
-  return state.sessionDismissed;
-}
-
 export function getGenerationWindowMs() {
   return SESSION_WINDOW_MS;
 }
@@ -516,6 +517,7 @@ export function markGenerationSessionExpired() {
   state.sessionDismissed = false;
   stopSessionTimer();
   syncLayerVisibility();
+  emitSessionChanged();
   navigateToTab('home', getShellRouteConfig().home);
   emitEvent('pdf-app:generation-session-expired');
 }

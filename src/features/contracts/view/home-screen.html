@@ -231,6 +231,8 @@
                       class="value"
                       name="customer-name"
                       type="text"
+                      required
+                      autocomplete="name"
                       value=""
                       placeholder="Введіть ім’я"
                       data-i18n-placeholder="customer_name_placeholder"
@@ -250,7 +252,10 @@
                       class="value"
                       name="customer-email"
                       type="text"
+                      inputmode="email"
                       value=""
+                      required
+                      autocomplete="email"
                       placeholder="Введіть email"
                       data-i18n-placeholder="customer_email_placeholder"
                     />
@@ -269,6 +274,7 @@
                       class="value"
                       name="passengers"
                       type="number"
+                      required
                       min="1"
                       step="1"
                       value=""
@@ -296,6 +302,7 @@
                       name="trip-from-address"
                       type="text"
                       list="trip-from-address-options"
+                      required
                       value=""
                       placeholder="Введіть адресу посадки"
                       data-i18n-placeholder="pickup_address_placeholder"
@@ -320,6 +327,7 @@
                       name="trip-to-address"
                       type="text"
                       list="trip-to-address-options"
+                      required
                       value=""
                       placeholder="Введіть адресу висадки"
                       data-i18n-placeholder="dropoff_address_placeholder"
@@ -345,6 +353,7 @@
                       id="tripTimeInput"
                       name="trip-time"
                       type="datetime-local"
+                      required
                       value=""
                       placeholder="Виберіть дату і час"
                       autocomplete="off"
@@ -367,6 +376,7 @@
                       type="text"
                       name="trip-totalPrice"
                       inputmode="numeric"
+                      required
                       pattern="[0-9]*"
                       autocomplete="off"
                       placeholder="Введіть суму"

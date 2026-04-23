@@ -34,6 +34,9 @@ export const state = {
   managerSelectedOrder: null,
   managerOrdersSelectedOnly: getStoredManagerOrdersSelectedOnly(),
   ordersDateFilter: '',
+  ordersHistoryDateFilter: '',
+  ordersHistoryTab: 'all',
+  ordersHistorySort: 'newest',
   orderDetailOrderId: '',
 };
 

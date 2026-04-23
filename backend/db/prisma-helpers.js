@@ -58,6 +58,7 @@ export const ORDER_LIST_SELECT = {
   trip: true,
   totalPrice: true,
   createdAt: true,
+  updatedAt: true,
 };
 
 export const ORDER_LIST_WITH_OWNER_SELECT = {
@@ -236,9 +237,11 @@ export function sanitizeOrderListRecord(order) {
     trip: {
       from: pickTextValue(order.trip?.from),
       to: pickTextValue(order.trip?.to),
+      time: pickTextValue(order.trip?.time),
     },
     totalPrice: pickTextValue(order.totalPrice),
     createdAt: toIsoString(order.createdAt),
+    updatedAt: toIsoString(order.updatedAt),
     ...(order.user
       ? {
           user: {

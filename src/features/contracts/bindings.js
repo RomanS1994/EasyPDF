@@ -7,6 +7,7 @@ import {
   persistContractData,
   syncLocalizedContractDefaults,
 } from './storage.js';
+import { syncContractActionState } from './validation.js';
 import { setWizardStep } from './wizard.js';
 import {
   applyContractScale,
@@ -86,6 +87,7 @@ export function bindContractUtilities() {
       setDocumentType(button.dataset.pdfDocument || DEFAULT_DOCUMENT_TYPE);
       persistContractData({ documentType: getContractData().documentType });
       syncDocumentTypeButtons(contractRefs.documentTypeButtons);
+      syncContractActionState();
     });
   });
 }
@@ -102,6 +104,7 @@ export function bindContractWindowEvents() {
 
   window.addEventListener('pdf-app:language-changed', () => {
     syncLocalizedContractDefaults(contractRefs);
+    syncContractActionState();
   });
 
   window.addEventListener('pdf-app:auth-changed', event => {

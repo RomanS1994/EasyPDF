@@ -103,7 +103,7 @@ npm run dev
 | --- | --- | --- |
 | `AUTH_TOKEN_SECRET` | так | Секрет для підпису access token |
 | `DATABASE_URL` | так | Runtime connection до PostgreSQL через Prisma |
-| `DIRECT_DATABASE_URL` | ні | Direct DB connection для Prisma CLI |
+| `DIRECT_DATABASE_URL` | ні | Direct DB connection для Prisma CLI та runtime fallback |
 | `API_KEY` | ні | Перевірка `X-API-KEY` на backend |
 | `CLIENT_ORIGIN` | ні | CORS origin override |
 | `BACKEND_PORT` | ні | Порт сервера, за замовчуванням `3001` |

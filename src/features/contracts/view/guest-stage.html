@@ -1,4 +1,3 @@
-<section class="dataContract">
   <script>
     try {
       const rawLanguage = window.localStorage.getItem('pdf-app-language');
@@ -21,42 +20,40 @@
       };
     }
   </script>
-  <div class="container">
-    <div class="appRoot" id="accountHub">
       <section class="guestStage" id="guestPanel">
         <div class="guestIntro">
-          <div class="guestIntroBar">
-            <p class="guestRouteBadge" id="guestRouteBadge">Ваш простір</p>
-            <div
-              class="languageToggle"
-              role="group"
-              aria-label="Обрати мову"
-              data-i18n-aria-label="choose_language"
-            >
-              <button class="languageToggle-btn is-active" type="button" data-language-option="uk">
-                UA
-              </button>
-              <button class="languageToggle-btn" type="button" data-language-option="en">
-                EN
-              </button>
-              <button class="languageToggle-btn" type="button" data-language-option="cs">
-                CZ
-              </button>
-            </div>
+          <div
+            class="languageToggle"
+            role="group"
+            aria-label="Обрати мову"
+            data-i18n-aria-label="choose_language"
+          >
+            <button class="languageToggle-btn is-active" type="button" data-language-option="uk">
+              UA
+            </button>
+            <button class="languageToggle-btn" type="button" data-language-option="en">
+              EN
+            </button>
+            <button class="languageToggle-btn" type="button" data-language-option="cs">
+              CZ
+            </button>
           </div>
 
-          <p class="sectionEyebrow">DocTra</p>
           <h1 data-i18n="app_brand_workspace">Ваш особистий асистент</h1>
           <p id="authSubline" data-i18n="guest_subline">
             Замовлення, документи й щоденні дії зібрані в одному місці.
           </p>
+
+          <span class="guestIntroHomeMark" aria-hidden="true">
+            <img src="/shared/assets/main_robot.png" alt="" />
+          </span>
         </div>
 
         <div class="planCards" id="planCards"></div>
 
         <section class="guestAuth">
           <div class="compactHeader">
-            <h2 id="authHeadline" data-i18n="guest_login_headline">Увійти у свій простір</h2>
+            <h2 id="authHeadline" data-i18n="guest_login_headline">Поверніться до свого простору</h2>
             <p id="guestAuthNote" data-i18n="guest_login_note">
               Поверніться до замовлень, документів, статистики та нотаток без зайвих кроків.
             </p>
@@ -65,7 +62,7 @@
           <div
             class="authModeSwitch"
             role="tablist"
-            aria-label="Режим доступу"
+            aria-label="Режим входу"
             data-i18n-aria-label="auth_mode_switch"
           >
             <button
@@ -78,7 +75,7 @@
               tabindex="0"
               data-auth-mode="login"
             >
-              <span data-i18n="sign_in">Увійти</span>
+              <span data-i18n="access">Вхід</span>
             </button>
             <button
               class="authModeSwitch-btn"
@@ -103,7 +100,7 @@
               aria-hidden="false"
               data-auth-mode-panel="login"
             >
-              <h3 data-i18n="sign_in">Увійти</h3>
+              <h3 data-i18n="login_details">Дані входу</h3>
 
               <label class="authField">
                 <span data-i18n="email">Email</span>
@@ -155,7 +152,9 @@
                 </div>
               </label>
 
-              <button class="secondary-btn" type="submit" data-i18n="sign_in">Увійти</button>
+              <button class="secondary-btn authLoginBtn" type="submit" data-i18n="sign_in">
+                Увійти
+              </button>
             </form>
 
             <form
@@ -256,50 +255,40 @@
             const copy = {
               uk: {
                 chooseLanguage: 'Обрати мову',
-                authModeSwitch: 'Режим доступу',
-                startScreen: 'Ваш простір',
+                authModeSwitch: 'Режим входу',
                 guestSubline: 'Замовлення, документи й щоденні дії зібрані в одному місці.',
                 guestHeadline: 'Підключіть свій простір',
                 guestNote: 'Один акаунт. Один простір. Усе потрібне під рукою.',
-                guestLoginHeadline: 'Увійти у свій простір',
+                guestLoginHeadline: 'Поверніться до свого простору',
                 guestLoginNote: 'Поверніться до замовлень, документів, статистики та нотаток без зайвих кроків.',
                 newAccount: 'Новий акаунт',
-                signIn: 'Увійти',
-                continueTo: 'Після входу продовжимо з вашого місця',
                 redirectNote: 'Увійдіть, і ми одразу повернемо вас до роботи.',
               },
               en: {
                 chooseLanguage: 'Choose language',
                 authModeSwitch: 'Access mode',
-                startScreen: 'Your space',
                 guestSubline: 'Keep orders, documents, and daily tasks in one place.',
                 guestHeadline: 'Set up your space',
                 guestNote: 'One account. One space. Everything you need at hand.',
-                guestLoginHeadline: 'Sign in to your workspace',
+                guestLoginHeadline: 'Return to your workspace',
                 guestLoginNote: 'Return to orders, documents, stats, and notes without extra steps.',
                 newAccount: 'New account',
-                signIn: 'Sign in',
-                continueTo: 'After sign-in, we will continue where you left off',
                 redirectNote: 'Sign in and we will take you back to work right away.',
               },
               cs: {
                 chooseLanguage: 'Vybrat jazyk',
                 authModeSwitch: 'Režim přístupu',
-                startScreen: 'Váš prostor',
                 guestSubline: 'Mějte objednávky, dokumenty a každodenní úkoly na jednom místě.',
                 guestHeadline: 'Nastavte si svůj prostor',
                 guestNote: 'Jeden účet. Jeden prostor. Vše potřebné po ruce.',
-                guestLoginHeadline: 'Přihlásit se do svého prostoru',
+                guestLoginHeadline: 'Vraťte se do pracovního prostoru',
                 guestLoginNote: 'Vraťte se k objednávkám, dokumentům, statistikám a poznámkám bez zbytečných kroků.',
                 newAccount: 'Nový účet',
-                signIn: 'Přihlásit se',
-                continueTo: 'Po přihlášení budeme pokračovat tam, kde jste skončili',
                 redirectNote: 'Přihlaste se a hned se vrátíme k práci.',
               },
             };
             const messages = copy[language] || copy.uk;
             const isHome = routeTab === 'home';
-            const routeLabel = isHome ? messages.startScreen : messages.continueTo;
             const subline = isHome ? messages.guestSubline : messages.redirectNote;
             const registerTab = document.getElementById('authModeTabRegister');
             const loginTab = document.getElementById('authModeTabLogin');
@@ -308,13 +297,11 @@
             const authHeadline = document.getElementById('authHeadline');
             const guestAuthNote = document.getElementById('guestAuthNote');
             const authSubline = document.getElementById('authSubline');
-            const guestRouteBadge = document.getElementById('guestRouteBadge');
             const guestPanel = document.getElementById('guestPanel');
             const planCards = document.getElementById('planCards');
             const languageToggle = document.querySelector('.languageToggle');
             const authModeSwitch = document.querySelector('.authModeSwitch');
             const registerLabel = registerTab?.querySelector('span');
-            const loginLabel = loginTab?.querySelector('span');
             const setMode = mode => {
               const isRegister = mode === 'register';
 
@@ -362,12 +349,6 @@
             });
             if (registerLabel) {
               registerLabel.textContent = messages.newAccount;
-            }
-            if (loginLabel) {
-              loginLabel.textContent = messages.signIn;
-            }
-            if (guestRouteBadge) {
-              guestRouteBadge.textContent = routeLabel;
             }
             if (authSubline) {
               authSubline.textContent = subline;

@@ -24,7 +24,7 @@ export async function createOrder(payload) {
     body: payload,
   });
 
-  return readJsonResponse(response, t('create_order_failed'));
+  return readJsonResponse(response, t('api_create_order_failed'));
 }
 
 export async function updateOrder(orderId, payload, options = {}) {
@@ -34,5 +34,5 @@ export async function updateOrder(orderId, payload, options = {}) {
     options,
   });
 
-  return readJsonResponse(response, t('update_order_failed'));
+  return readJsonResponse(response, t('api_update_order_failed'));
 }

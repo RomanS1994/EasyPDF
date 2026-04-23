@@ -2,6 +2,7 @@ import { findContractInput, contractRefs } from './selectors.js';
 import { formatPrice, sanitizePriceInput } from './currency.js';
 import { getContractData } from './state.js';
 import { persistContractData } from './storage.js';
+import { syncContractActionState } from './validation.js';
 import { syncConvertedPrice, syncRepeatedTextInput } from './ui.js';
 
 function normalizeTripTimeValue(value) {
@@ -23,11 +24,13 @@ export function handleContractInput(event) {
     contractRefs.dateInputs.forEach(dateInput => {
       dateInput.value = value;
     });
+    syncContractActionState();
     return;
   }
 
   if (name === 'orderNumber') {
     persistContractData({ orderNumber: value });
+    syncContractActionState();
     return;
   }
 
@@ -42,6 +45,7 @@ export function handleContractInput(event) {
     if (key === 'name') {
       syncRepeatedTextInput('driver-name', value);
     }
+    syncContractActionState();
     return;
   }
 
@@ -53,6 +57,7 @@ export function handleContractInput(event) {
         [key]: value,
       },
     });
+    syncContractActionState();
     return;
   }
 
@@ -67,11 +72,13 @@ export function handleContractInput(event) {
     if (key === 'name' || key === 'email') {
       syncRepeatedTextInput(name, value);
     }
+    syncContractActionState();
     return;
   }
 
   if (name === 'passengers') {
     persistContractData({ passengers: value });
+    syncContractActionState();
     return;
   }
 
@@ -85,6 +92,7 @@ export function handleContractInput(event) {
           [key]: { address: value },
         },
       });
+      syncContractActionState();
       return;
     }
 
@@ -95,6 +103,7 @@ export function handleContractInput(event) {
           [key]: key === 'time' ? normalizeTripTimeValue(value) : value,
         },
       });
+      syncContractActionState();
       return;
     }
   }
@@ -110,6 +119,7 @@ export function handleContractInput(event) {
     persistContractData({
       totalPrice: formatted || value,
     });
+    syncContractActionState();
   }
 }
 

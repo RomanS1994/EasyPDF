@@ -1,7 +1,6 @@
 export const refs = {
   hub: document.getElementById('accountHub') || document.querySelector('.appRoot'),
   guestPanel: document.getElementById('guestPanel'),
-  guestRouteBadge: document.getElementById('guestRouteBadge'),
   accountPanel: document.getElementById('accountPanel'),
   registerForm: document.getElementById('registerForm'),
   loginForm: document.getElementById('loginForm'),
@@ -117,8 +116,10 @@ export const refs = {
   statsForecastVolume: document.getElementById('statsForecastVolume'),
   statsForecastDate: document.getElementById('statsForecastDate'),
   statsHistorySummary: document.getElementById('statsHistorySummary'),
+  statsHistoryTabButtons: document.querySelectorAll('[data-history-tab-target]'),
   statsHistoryDateFilter: document.getElementById('statsHistoryDateFilter'),
   statsHistoryDateResetBtn: document.getElementById('statsHistoryDateResetBtn'),
+  statsHistorySortSelect: document.getElementById('statsHistorySortSelect'),
   statsHistoryList: document.getElementById('statsHistoryList'),
   statsHistoryEmpty: document.getElementById('statsHistoryEmpty'),
   managerGate: document.getElementById('managerGate'),

@@ -42,20 +42,23 @@ function toDateTimeInputValue(value) {
   return `${year}-${month}-${day}T${hour}:${minute}`;
 }
 
+export function syncTripTimeInputConstraints(input) {
+  if (!input) return;
+
+  input.step = String(TIME_STEP_SECONDS);
+  input.min = toDateTimeLocalValue(getMinDateTime());
+
+  const normalizedValue = toDateTimeInputValue(input.value);
+  if (normalizedValue && input.value !== normalizedValue) {
+    input.value = normalizedValue;
+  }
+}
+
 function bindTripTimeInput(input) {
   if (!input || input.dataset.nativeDateTimeBound === 'true') return;
 
   input.dataset.nativeDateTimeBound = 'true';
-  input.step = String(TIME_STEP_SECONDS);
-
-  const syncInput = () => {
-    input.min = toDateTimeLocalValue(getMinDateTime());
-
-    const normalizedValue = toDateTimeInputValue(input.value);
-    if (normalizedValue && input.value !== normalizedValue) {
-      input.value = normalizedValue;
-    }
-  };
+  const syncInput = () => syncTripTimeInputConstraints(input);
 
   syncInput();
   input.addEventListener('focus', syncInput);

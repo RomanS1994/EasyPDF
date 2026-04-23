@@ -10,6 +10,8 @@ export const contractRefs = {
   stepTabs: document.querySelectorAll('[data-step-tab]'),
   nextButtons: document.querySelectorAll('.dataContract-container .wizard-next'),
   backButtons: document.querySelectorAll('.dataContract-container .wizard-back'),
+  downloadPdfBtn: document.getElementById('downloadPdfBtn'),
+  saveOrderBtn: document.getElementById('saveOrderBtn'),
   clearButtons: document.querySelectorAll('.dataContract-container .clear-btn'),
   quickPickButtons: document.querySelectorAll('.dataContract-container .quick-pick-btn'),
   priceConverted: document.getElementById('priceConverted'),

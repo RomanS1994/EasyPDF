@@ -37,21 +37,8 @@ export function handleGuestLanguageClick(event) {
   applyLanguage(button.dataset.languageOption || 'uk');
 }
 
-export function getGuestRouteLabel() {
-  if (state.activeTab === 'home') {
-    return t('guest_start_screen');
-  }
-
-  return t('guest_continue_to');
-}
-
 export function renderGuestContext() {
-  const routeLabel = getGuestRouteLabel();
   const authMode = AUTH_MODES.includes(state.authMode) ? state.authMode : getDefaultAuthMode();
-
-  if (refs.guestRouteBadge) {
-    refs.guestRouteBadge.textContent = routeLabel;
-  }
 
   if (refs.authSubline) {
     refs.authSubline.textContent =

@@ -1,13 +1,10 @@
 import { readFileSync } from "node:fs";
 
-const DOCTRA_LOGO_SVG = readFileSync(
-  new URL("../../../src/shared/assets/doctra-icon.svg", import.meta.url),
-  "utf8",
+const MAIN_ROBOT_PNG = readFileSync(
+  new URL("../../../src/shared/assets/main_robot.png", import.meta.url),
 );
 
-const DOCTRA_LOGO_DATA_URI = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
-  DOCTRA_LOGO_SVG,
-)}`;
+const MAIN_ROBOT_DATA_URI = `data:image/png;base64,${MAIN_ROBOT_PNG.toString("base64")}`;
 
 function resolveLanguage() {
   return "cs";
@@ -400,7 +397,7 @@ export function renderContractPdfHtml({
       <body>
         <div class="logo">
           <div class="logoMark" aria-label="DocTra">
-            <img src="${DOCTRA_LOGO_DATA_URI}" alt="DocTra" />
+            <img src="${MAIN_ROBOT_DATA_URI}" alt="DocTra" />
           </div>
         </div>
 

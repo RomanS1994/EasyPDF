@@ -7,6 +7,8 @@ import { state } from './state.js';
 import { focusAuthMode, renderPlans, setAuthMode, syncSelectedPlan } from './guest.js';
 import { activateTab, getTabForPath, navigateToTab } from './routes.js';
 import {
+  closeGenerationGate,
+  createGenerationAccessSession,
   getGenerationSession,
   hasGenerationSession,
   openGenerationGate,
@@ -204,7 +206,10 @@ export function handleTabClick(event) {
     }
 
     openGenerationGate({
+      intent: 'order-access',
       onConfirmed: () => {
+        openGenerationSession(createGenerationAccessSession());
+        closeGenerationGate({ restore: false });
         navigateToTab(nextTab, url.pathname);
       },
     });

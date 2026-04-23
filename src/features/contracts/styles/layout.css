@@ -33,8 +33,12 @@
 }
 
 .authForm {
-  gap: 10px;
-  padding: 12px;
+  gap: 12px;
+  padding: 14px;
+}
+
+.authField {
+  gap: 5px;
 }
 
 .authField > span {
@@ -69,7 +73,7 @@
 }
 
 .authPasswordField {
-  gap: 4px;
+  gap: 6px;
 }
 
 .authPasswordControl {
@@ -140,7 +144,7 @@
 .authForm .primary-btn,
 .authForm .secondary-btn {
   width: 100%;
-  min-height: 46px;
+  min-height: 48px;
   border: 0;
   border-radius: 15px;
   font-size: 14px;
@@ -157,9 +161,53 @@
 }
 
 .authForm .secondary-btn {
+  margin-top: 8px;
   background: rgba(255, 255, 255, 0.92);
   color: var(--text);
   box-shadow: inset 0 0 0 1px rgba(110, 124, 153, 0.18);
+}
+
+.authForm .secondary-btn.authLoginBtn {
+  min-height: 50px;
+  border: 1px solid rgba(0, 122, 255, 0.24);
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.24), transparent 42%),
+    linear-gradient(180deg, rgba(33, 142, 255, 0.98), rgba(0, 122, 255, 0.98));
+  color: #fff;
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 14px 28px rgba(0, 122, 255, 0.24);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  text-shadow: 0 1px 1px rgba(9, 42, 110, 0.15);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    filter 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.authForm .secondary-btn.authLoginBtn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.02);
+  border-color: rgba(0, 122, 255, 0.32);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 16px 32px rgba(0, 122, 255, 0.28);
+}
+
+.authForm .secondary-btn.authLoginBtn:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.authForm .secondary-btn.authLoginBtn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 4px rgba(0, 122, 255, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 16px 32px rgba(0, 122, 255, 0.28);
 }
 
 .guestAuth .settingsNote {
@@ -170,7 +218,7 @@
 
 @media (max-width: 420px) {
   .guestAuth {
-    padding: 10px;
+    padding: 12px;
     border-radius: 22px;
   }
 
@@ -179,19 +227,27 @@
   }
 
   .authForm {
-    padding: 10px;
-    gap: 9px;
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .authField {
+    gap: 4px;
+  }
+
+  .authPasswordField {
+    gap: 5px;
   }
 
   .authField input,
   .authField select {
-    min-height: 38px;
+    min-height: 40px;
     font-size: 12px;
   }
 
   .authForm .primary-btn,
   .authForm .secondary-btn {
-    min-height: 44px;
+    min-height: 46px;
     font-size: 13px;
   }
 }

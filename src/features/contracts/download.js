@@ -6,6 +6,7 @@ import { downloadBlobFile, prepareDownloadTarget } from '../../shared/lib/downlo
 import { notifyText } from '../../shared/ui/toast.js';
 import { getStoredSession } from '../auth/session.js';
 import { withAppLoader } from '../../shared/ui/loader.js';
+import { syncContractActionState, validateContractForm } from './validation.js';
 import {
   clearGenerationSession,
   closeGenerationGate,
@@ -19,6 +20,7 @@ import {
   resetGenerationGateSwipe,
   setGenerationGateBusy,
 } from './generation-session.js';
+import { getShellRouteConfig, navigateToTab } from '../auth/panel/routes.js';
 
 let reserveInFlight = false;
 let generationInFlight = false;
@@ -31,6 +33,7 @@ function buildGenerationSessionPayload(order, contractData, documentType) {
   const generationWindowMs = getGenerationWindowMs();
 
   return {
+    accessGranted: true,
     orderId: order.id,
     orderNumber: order.orderNumber || contractData.orderNumber || '',
     documentType,
@@ -40,8 +43,90 @@ function buildGenerationSessionPayload(order, contractData, documentType) {
   };
 }
 
+function buildSessionSnapshot(session, order, contractData, documentType) {
+  return {
+    accessGranted: true,
+    orderId: order?.id || session?.orderId || '',
+    orderNumber:
+      order?.orderNumber ||
+      session?.orderNumber ||
+      contractData.orderNumber ||
+      '',
+    documentType: documentType || session?.documentType || 'confirmation',
+    contractData,
+    createdAt: session?.createdAt || order?.createdAt || new Date().toISOString(),
+    expiresAt:
+      session?.expiresAt || new Date(Date.now() + getGenerationWindowMs()).toISOString(),
+  };
+}
+
+async function createPendingGenerationOrder(contractData, documentType) {
+  const created = await createOrder({
+    contractData,
+    status: 'pending_pdf',
+    metadata: {
+      sourcePage: 'cz/pdf',
+      documentType,
+      generationMode: 'token',
+      tokenCost: 1,
+      generationWindowMs: getGenerationWindowMs(),
+    },
+  });
+
+  const order = created?.order || null;
+  if (!order?.id) {
+    throw new Error(t('api_create_order_failed'));
+  }
+
+  return order;
+}
+
+async function persistSavedOrder(session, contractData, documentType) {
+  if (session?.orderId) {
+    const updated = await updateOrder(session.orderId, {
+      status: 'created',
+      totalPrice: contractData.totalPrice,
+      contractData,
+      metadata: {
+        documentType,
+        generationMode: 'token',
+      },
+    });
+
+    return updated?.order || {
+      id: session.orderId,
+      orderNumber: session.orderNumber || contractData.orderNumber || '',
+      createdAt: session.createdAt,
+    };
+  }
+
+  const created = await createOrder({
+    contractData,
+    status: 'created',
+    metadata: {
+      sourcePage: 'cz/pdf',
+      documentType,
+      generationMode: session ? 'token' : 'manual',
+    },
+  });
+
+  const order = created?.order || null;
+  if (!order?.id) {
+    throw new Error(t('api_create_order_failed'));
+  }
+
+  return order;
+}
+
 async function reserveGenerationOrder() {
   if (reserveInFlight) return;
+
+  if (!validateContractForm({ report: false })) {
+    closeGenerationGate();
+    validateContractForm({ report: true });
+    syncContractActionState();
+    return;
+  }
 
   reserveInFlight = true;
   setGenerationGateBusy(true);
@@ -50,27 +135,11 @@ async function reserveGenerationOrder() {
   const documentType = contractData.documentType || 'confirmation';
 
   try {
-    const created = await withAppLoader(async () => {
-      return createOrder({
-        contractData,
-        status: 'pending_pdf',
-        metadata: {
-          sourcePage: 'cz/pdf',
-          documentType,
-          generationMode: 'token',
-          tokenCost: 1,
-          generationWindowMs: getGenerationWindowMs(),
-        },
-      });
-    });
-
-    const order = created?.order || null;
-    if (!order?.id) {
-      throw new Error(t('api_create_order_failed'));
-    }
+    const order = await withAppLoader(async () => createPendingGenerationOrder(contractData, documentType));
 
     closeGenerationGate();
     openGenerationSession(buildGenerationSessionPayload(order, contractData, documentType));
+    navigateToTab('orders', getShellRouteConfig().orders);
     notifyText(
       t('generation_token_reserved', {
         orderNumber: order.orderNumber || contractData.orderNumber || '',
@@ -108,14 +177,27 @@ async function generateReservedOrderPdf() {
     return;
   }
 
+  if (!validateContractForm({ report: true })) {
+    return;
+  }
+
   generationInFlight = true;
   const downloadTarget = prepareDownloadTarget();
+  const contractData = structuredClone(getCurrentContractData());
+  const documentType = contractData.documentType || session.documentType || 'confirmation';
+  let orderId = session.orderId || '';
 
   try {
     await withAppLoader(async () => {
-      const response = await getContractPdf(session.contractData || {}, {
-        orderId: session.orderId,
-        documentType: session.documentType || 'confirmation',
+      if (!orderId) {
+        const order = await createPendingGenerationOrder(contractData, documentType);
+        orderId = order.id;
+        openGenerationSession(buildGenerationSessionPayload(order, contractData, documentType));
+      }
+
+      const response = await getContractPdf(contractData, {
+        orderId,
+        documentType,
       });
 
       if (!response?.blob) {
@@ -126,17 +208,19 @@ async function generateReservedOrderPdf() {
         targetWindow: downloadTarget,
       });
 
-      if (session.orderId) {
+      if (orderId) {
         void updateOrder(
-          session.orderId,
+          orderId,
           {
             status: 'pdf_generated',
+            totalPrice: contractData.totalPrice,
+            contractData,
             pdf: {
               fileName: response.fileName,
-              documentType: session.documentType || 'confirmation',
+              documentType,
             },
             metadata: {
-              documentType: session.documentType || 'confirmation',
+              documentType,
               generationMode: 'token',
             },
           },
@@ -153,15 +237,17 @@ async function generateReservedOrderPdf() {
   } catch (error) {
     console.error('Token generation failed', error);
 
-    if (session.orderId) {
+    if (orderId) {
       try {
         await updateOrder(
-          session.orderId,
+          orderId,
           {
             status: 'pdf_failed',
+            totalPrice: contractData.totalPrice,
+            contractData,
             metadata: {
               pdfError: error.message,
-              documentType: session.documentType || 'confirmation',
+              documentType,
               generationMode: 'token',
             },
           },
@@ -183,16 +269,25 @@ export function initContractDownload() {
   const saveOrderBtn = document.getElementById('saveOrderBtn');
   if (!downloadPdfBtn && !saveOrderBtn) return;
 
-  window.addEventListener('pdf-app:token-gate-confirmed', () => {
-    void reserveGenerationOrder();
-  });
+  window.addEventListener('pdf-app:token-gate-confirmed', event => {
+    if (event.detail?.intent !== 'order-reserve') {
+      return;
+    }
 
-  window.addEventListener('pdf-app:generation-session-generate', () => {
-    void generateReservedOrderPdf();
+    void reserveGenerationOrder();
   });
 
   window.addEventListener('pdf-app:generation-session-expired', () => {
     notifyText(t('generation_session_expired'), 'error');
+    syncContractActionState();
+  });
+
+  window.addEventListener('pdf-app:generation-session-changed', () => {
+    syncContractActionState();
+  });
+
+  window.addEventListener('pdf-app:order-created', () => {
+    syncContractActionState();
   });
 
   saveOrderBtn?.addEventListener('click', async () => {
@@ -205,25 +300,30 @@ export function initContractDownload() {
       return;
     }
 
-    const contractData = getCurrentContractData();
-    const documentType = 'confirmation';
+    if (!validateContractForm({ report: true })) {
+      return;
+    }
+
+    const contractData = structuredClone(getCurrentContractData());
+    const documentType = contractData.documentType || 'confirmation';
+    const session = getGenerationSession();
 
     await withAppLoader(async () => {
       try {
-        await createOrder({
-          contractData,
-          status: 'created',
-          metadata: {
-            sourcePage: 'cz/pdf',
-            documentType,
-          },
-        });
+        const order = await persistSavedOrder(session, contractData, documentType);
 
-        notifyText(t('order_created'), 'success');
+        if (session) {
+          openGenerationSession(buildSessionSnapshot(session, order, contractData, documentType));
+        }
+
+        notifyText(t('order_saved'), 'success');
         window.dispatchEvent(new CustomEvent('pdf-app:order-created'));
       } catch (error) {
         console.error('Save order failed', error);
-        notifyText(error.message || t('api_create_order_failed'), 'error');
+        notifyText(
+          error.message || (session ? t('api_update_order_failed') : t('api_create_order_failed')),
+          'error',
+        );
       }
     });
   });
@@ -248,6 +348,12 @@ export function initContractDownload() {
       return;
     }
 
+    if (!validateContractForm({ report: true })) {
+      return;
+    }
+
     openGenerationGate();
   });
+
+  syncContractActionState();
 }

@@ -1,8 +1,11 @@
 import { PrismaClient } from '@prisma/client';
-import { getDatabaseUrl } from '../config/runtime-env.js';
+import { getDatabaseUrl, getDirectDatabaseUrl } from '../config/runtime-env.js';
 
 const globalForPrisma = globalThis;
-const datasourceUrl = getDatabaseUrl() || undefined;
+// Prefer the direct connection when it is available.
+// This keeps the runtime aligned with prisma.config.ts and avoids routing
+// the app through Prisma proxy URLs when a plain Postgres connection exists.
+const datasourceUrl = getDirectDatabaseUrl() || getDatabaseUrl() || undefined;
 
 export const prisma =
   globalForPrisma.__pdfAppPrisma ||
