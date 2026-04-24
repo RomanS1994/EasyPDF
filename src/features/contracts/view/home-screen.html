@@ -264,24 +264,26 @@
                   </label>
 
                   <label class="fieldLabel fieldLabel-clearable">
-                    <span class="visually-hidden" data-i18n="email">Email</span>
+                    <span class="visually-hidden" data-i18n="customer_contact">Контакт</span>
                     <input
                       class="value"
                       name="customer-email"
-                      type="email"
-                      inputmode="email"
+                      type="text"
+                      inputmode="text"
                       value=""
                       required
-                      autocomplete="email"
-                      placeholder="Введіть email"
-                      data-i18n-placeholder="customer_email_placeholder"
+                      autocomplete="off"
+                      autocapitalize="off"
+                      spellcheck="false"
+                      placeholder="Введіть email або телефон"
+                      data-i18n-placeholder="customer_contact_placeholder"
                     />
                     <button
                       class="clear-btn"
                       type="button"
                       data-target="customer-email"
-                      aria-label="Очистити email"
-                      data-i18n-aria-label="clear_email"
+                      aria-label="Очистити контакт"
+                      data-i18n-aria-label="clear_contact"
                     ></button>
                   </label>
 

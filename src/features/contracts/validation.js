@@ -22,6 +22,15 @@ function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim());
 }
 
+function isValidPhone(value) {
+  const normalized = String(value || '').trim().replace(/[\s().-]/g, '');
+  return /^\+?\d{6,15}$/.test(normalized);
+}
+
+function isValidContact(value) {
+  return isValidEmail(value) || isValidPhone(value);
+}
+
 function isPositiveInteger(value) {
   return /^[1-9]\d*$/.test(String(value || '').trim());
 }
@@ -38,8 +47,8 @@ function getValidationMessage(input) {
     return t('form_complete');
   }
 
-  if (input.name === 'customer-email' && !isValidEmail(value)) {
-    return t('order_contract_email_invalid');
+  if (input.name === 'customer-email' && !isValidContact(value)) {
+    return t('order_contract_contact_invalid');
   }
 
   if (input.name === 'passengers' && !isPositiveInteger(value)) {

@@ -118,9 +118,16 @@ export function renderOrderDetail() {
   if (ordersRefs.orderDetailTitle) ordersRefs.orderDetailTitle.textContent = order.orderNumber || t('order_detail');
   if (ordersRefs.orderDetailNumber) ordersRefs.orderDetailNumber.textContent = order.orderNumber || '-';
   if (ordersRefs.orderDetailCustomer) {
-    ordersRefs.orderDetailCustomer.textContent = order.customer?.name || order.customer?.email || t('client_not_specified');
+    ordersRefs.orderDetailCustomer.textContent =
+      order.customer?.name ||
+      order.customer?.email ||
+      order.customer?.phone ||
+      t('client_not_specified');
   }
-  if (ordersRefs.orderDetailCustomerEmail) ordersRefs.orderDetailCustomerEmail.textContent = order.customer?.email || '-';
+  if (ordersRefs.orderDetailCustomerEmail) {
+    ordersRefs.orderDetailCustomerEmail.textContent =
+      order.customer?.email || order.customer?.phone || '-';
+  }
   if (ordersRefs.orderDetailRoute) {
     const routeSeparator = isAdminShell() ? ' · ' : ' -> ';
     ordersRefs.orderDetailRoute.textContent = [formatLocation(order.trip?.from), formatLocation(order.trip?.to)]

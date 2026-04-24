@@ -86,10 +86,7 @@ export function restoreContractData(refs) {
       ? stored.documentType
       : DEFAULT_DOCUMENT_TYPE,
     today: normalizeDateValue(stored.today),
-    passengers: normalizeLegacyValue(
-      normalizePassengerValue(stored.passengers ?? stored.customers, defaults.passengers),
-      ['1'],
-    ),
+    passengers: normalizePassengerValue(stored.passengers ?? stored.customers, defaults.passengers),
     customer: {
       ...defaults.customer,
       ...stored.customer,

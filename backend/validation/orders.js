@@ -19,6 +19,15 @@ function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeText(value));
 }
 
+function isValidPhone(value) {
+  const normalized = normalizeText(value).replace(/[\s().-]/g, '');
+  return /^\+?\d{6,15}$/.test(normalized);
+}
+
+function isValidContact(value) {
+  return isValidEmail(value) || isValidPhone(value);
+}
+
 export function validateOrderCreateInput(body = {}) {
   const contractData =
     body.contractData && typeof body.contractData === 'object'
@@ -38,10 +47,16 @@ export function validateOrderCreateInput(body = {}) {
     : body.trip && typeof body.trip === 'object'
       ? body.trip
       : {};
+  const customerContact =
+    customer.email ||
+    customer.phone ||
+    body.customer?.email ||
+    body.customer?.phone ||
+    '';
 
   const requiredFields = [
     customer.name,
-    customer.email,
+    customerContact,
     resolveAddress(trip.from) || resolveAddress(body.trip?.from),
     resolveAddress(trip.to) || resolveAddress(body.trip?.to),
     trip.time,
@@ -55,7 +70,7 @@ export function validateOrderCreateInput(body = {}) {
 
   if (
     !hasAllRequiredFields ||
-    !isValidEmail(customer.email) ||
+    !isValidContact(customerContact) ||
     passengers < 1 ||
     !hasPositivePrice(contractData.totalPrice || body.totalPrice)
   ) {

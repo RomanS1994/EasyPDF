@@ -28,7 +28,12 @@ function getOrderRouteLabel(order) {
 }
 
 function getOrderCustomerLabel(order) {
-  return normalizeText(order?.customer?.name) || normalizeText(order?.customer?.email) || t('client_not_specified');
+  return (
+    normalizeText(order?.customer?.name) ||
+    normalizeText(order?.customer?.email) ||
+    normalizeText(order?.customer?.phone) ||
+    t('client_not_specified')
+  );
 }
 
 function setOrderActionsVisibility(isVisible) {
