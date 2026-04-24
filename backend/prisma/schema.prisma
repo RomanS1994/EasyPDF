@@ -110,6 +110,7 @@ model Order {
   metadata     Json
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  archivedAt   DateTime?
 
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 

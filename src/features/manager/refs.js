@@ -90,4 +90,5 @@ export const refs = {
   managerOrderMarkPendingBtn: document.getElementById('managerOrderMarkPendingBtn'),
   managerOrderMarkGeneratedBtn: document.getElementById('managerOrderMarkGeneratedBtn'),
   managerOrderMarkFailedBtn: document.getElementById('managerOrderMarkFailedBtn'),
+  managerOrderDeleteBtn: document.getElementById('managerOrderDeleteBtn'),
 };

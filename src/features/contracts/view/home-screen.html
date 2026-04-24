@@ -122,8 +122,25 @@
                   Договір
                 </button>
               </div>
+
+              <div class="orderDetailDeleteArea">
+                <p class="settingsNote orderDetailDeleteNote" data-i18n="order_delete_prompt">
+                  Open the confirmation screen before anything is removed from the visible list.
+                </p>
+                <button
+                  class="danger-btn orderDetailActionBtn orderDetailDeleteBtn"
+                  id="orderDetailDeleteBtn"
+                  type="button"
+                  data-i18n="delete_order"
+                >
+                  Delete order
+                </button>
+              </div>
             </div>
           </div>
+
+          <load src="/features/contracts/view/order-actions.html" />
+          <load src="/features/contracts/view/order-transfer.html" />
 
           <div class="generationGateModal" id="generationGateModal" aria-hidden="true" hidden>
             <div class="generationGateBackdrop" id="generationGateBackdrop"></div>

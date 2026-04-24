@@ -2,7 +2,7 @@ import { getAuthContext } from '../auth/context.js';
 import { getPlanById, isSupportedPdfDocumentType } from '../config/plans.js';
 import { getDatabaseHealth } from '../db/store.js';
 import { listStoredPlans } from '../db/plans-store.js';
-import { ORDER_WITH_OWNER_INCLUDE, sanitizeOrderRecord } from '../db/prisma-helpers.js';
+import { ACTIVE_ORDER_WHERE, ORDER_WITH_OWNER_INCLUDE, sanitizeOrderRecord } from '../db/prisma-helpers.js';
 import { prisma } from '../db/prisma.js';
 import { readJsonBody, sendJson, sendPdf } from '../lib/http.js';
 import { createContractPdf } from '../pdf/contracts.js';
@@ -17,9 +17,10 @@ function resolvePdfPlan(context) {
 }
 
 async function findOrderForPdf(orderId) {
-  const order = await prisma.order.findUnique({
+  const order = await prisma.order.findFirst({
     where: {
       id: orderId,
+      ...ACTIVE_ORDER_WHERE,
     },
     include: ORDER_WITH_OWNER_INCLUDE,
   });

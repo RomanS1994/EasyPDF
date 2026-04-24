@@ -1,0 +1,364 @@
+.orderActionsModal,
+.orderTransferModal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: stretch end;
+  padding: 12px;
+}
+
+.orderActionsModal {
+  z-index: 92;
+}
+
+.orderTransferModal {
+  z-index: 96;
+}
+
+.orderActionsModal[hidden],
+.orderTransferModal[hidden] {
+  display: none;
+}
+
+.orderActionsBackdrop,
+.orderTransferBackdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.36);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.orderActionsSheet,
+.orderTransferSheet {
+  position: relative;
+  width: min(100%, 540px);
+  height: 100%;
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+  border: 1px solid rgba(60, 60, 67, 0.08);
+  border-radius: 30px;
+  padding: 18px;
+  background:
+    radial-gradient(circle at top left, rgba(0, 122, 255, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.998), rgba(243, 247, 253, 0.985));
+  box-shadow:
+    0 34px 76px rgba(17, 24, 39, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+  opacity: 0;
+  transform: translateX(20px);
+  transition:
+    transform 0.24s ease,
+    opacity 0.24s ease;
+}
+
+.orderTransferSheet {
+  width: min(100%, 620px);
+}
+
+.orderActionsModal.is-open .orderActionsSheet,
+.orderTransferModal.is-open .orderTransferSheet {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.orderActionsHeader,
+.orderTransferHeader {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 0 0 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(60, 60, 67, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 249, 255, 0.96));
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.orderActionsHeaderContent,
+.orderTransferHeaderContent {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.orderActionsHeader h2,
+.orderTransferHeader h2 {
+  margin: 0;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-weight: 800;
+  word-break: break-word;
+}
+
+.orderActionsHeader .sectionEyebrow,
+.orderTransferHeader .sectionEyebrow {
+  width: fit-content;
+}
+
+.orderFlowCloseBtn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(60, 60, 67, 0.1);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 252, 0.96));
+  color: #6b7280;
+  font-size: 22px;
+  line-height: 1;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 8px 18px rgba(28, 32, 40, 0.06);
+}
+
+.orderFlowCloseBtn:hover,
+.orderFlowCloseBtn:focus-visible {
+  color: #3f475a;
+  border-color: rgba(60, 60, 67, 0.16);
+}
+
+.orderActionsSummary,
+.orderTransferSummary,
+.orderTransferSelected,
+.orderTransferState,
+.orderActionsTransferPreview {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.orderActionsSummary .settingsRow,
+.orderTransferSummary .settingsRow {
+  align-items: flex-start;
+}
+
+.orderActionsSummary .settingsRow strong,
+.orderTransferSummary .settingsRow strong {
+  text-align: right;
+}
+
+.orderActionsNote,
+.orderTransferBackendNote {
+  margin: 0 0 14px;
+}
+
+.orderActionsTransferPreview {
+  margin-top: 14px;
+}
+
+.orderActionsStack {
+  display: grid;
+  gap: 10px;
+}
+
+.orderActionsButton {
+  min-height: 48px;
+  border-radius: 18px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.orderActionBtn--cancel,
+.orderActionBtn--transfer {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-align: center;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    filter 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.orderActionBtn--cancel {
+  border-color: rgba(21, 128, 61, 0.5);
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 30%),
+    linear-gradient(180deg, #42c96e, #198847);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 12px 24px rgba(25, 136, 71, 0.22);
+}
+
+.orderActionBtn--transfer {
+  border-color: rgba(20, 104, 223, 0.5);
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.2), transparent 30%),
+    linear-gradient(180deg, #3ea2ff, #1570f0);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 12px 24px rgba(20, 104, 223, 0.24);
+}
+
+.orderActionBtn--cancel:hover,
+.orderActionBtn--cancel:focus-visible,
+.orderActionBtn--transfer:hover,
+.orderActionBtn--transfer:focus-visible {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+.orderActionBtn--cancel:active,
+.orderActionBtn--transfer:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.orderActionBtn--cancel:focus-visible,
+.orderActionBtn--transfer:focus-visible {
+  outline: none;
+}
+
+.orderActionBtn--cancel:disabled,
+.orderActionBtn--transfer:disabled {
+  opacity: 0.56;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+  box-shadow: none;
+}
+
+.orderTransferControls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.orderTransferControls .settingsField {
+  min-width: 0;
+}
+
+.orderTransferControls .settingsField input {
+  width: 100%;
+}
+
+.orderTransferLoadingInner {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.orderTransferSpinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: 2px solid rgba(20, 104, 223, 0.14);
+  border-top-color: var(--accent);
+  animation: orderTransferSpin 0.8s linear infinite;
+}
+
+.orderTransferError {
+  margin-bottom: 12px;
+}
+
+.orderTransferErrorActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.orderTransferEmpty {
+  margin: 0 0 12px;
+}
+
+.orderTransferList {
+  max-height: min(52vh, 480px);
+  overflow: auto;
+  margin-bottom: 12px;
+}
+
+.orderTransferSelected {
+  margin-top: 4px;
+}
+
+.orderTransferSelected p,
+.orderTransferSelected strong,
+.orderTransferSummary p,
+.orderTransferSummary strong {
+  margin: 0;
+}
+
+.orderTransferFooter {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.orderTransferFooterActions {
+  display: grid;
+  gap: 10px;
+}
+
+.orderTransferConfirmBtn {
+  width: 100%;
+}
+
+.orderTransferBackBtn {
+  width: 100%;
+}
+
+.orderTransferList .managerUserButton[disabled] {
+  opacity: 0.68;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@keyframes orderTransferSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .orderActionsModal,
+  .orderTransferModal {
+    padding: 0;
+  }
+
+  .orderActionsSheet,
+  .orderTransferSheet {
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+    padding: 0 14px calc(16px + env(safe-area-inset-bottom));
+    transform: translateX(100%);
+  }
+
+  .orderActionsHeader,
+  .orderTransferHeader {
+    margin: 0 -14px 14px;
+    padding: calc(14px + env(safe-area-inset-top)) 14px 12px;
+  }
+
+  .orderTransferControls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .orderTransferFooterActions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .orderTransferList {
+    max-height: none;
+  }
+}

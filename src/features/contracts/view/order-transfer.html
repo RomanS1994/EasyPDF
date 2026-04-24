@@ -1,0 +1,116 @@
+<div class="orderTransferModal" id="orderTransferModal" aria-hidden="true" hidden>
+  <div class="orderTransferBackdrop" id="orderTransferBackdrop"></div>
+  <div
+    class="orderTransferSheet"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="orderTransferTitle"
+    aria-describedby="orderTransferDescription"
+  >
+    <div class="orderTransferHeader">
+      <div class="orderTransferHeaderContent">
+        <p class="sectionEyebrow" data-i18n="transfer_to_another_driver">Transfer to another driver</p>
+        <h2 id="orderTransferTitle">-</h2>
+        <p id="orderTransferDescription" data-i18n="order_transfer_subline">
+          Choose a driver or manager to prepare this reassignment.
+        </p>
+      </div>
+      <button
+        class="orderFlowCloseBtn"
+        id="orderTransferCloseBtn"
+        type="button"
+        aria-label="Close"
+        data-i18n-aria-label="close"
+      >
+        &times;
+      </button>
+    </div>
+
+    <div class="settingsGroup orderTransferSummary is-hidden" id="orderTransferSummary">
+      <div class="settingsRow">
+        <span class="settingsRow-label" data-i18n="order_number">Order number</span>
+        <strong class="settingsValue" id="orderTransferSummaryNumber">-</strong>
+      </div>
+      <div class="settingsRow">
+        <span class="settingsRow-label" data-i18n="route">Route</span>
+        <strong class="settingsValue" id="orderTransferSummaryRoute">-</strong>
+      </div>
+    </div>
+
+    <div class="settingsGroup orderTransferControls">
+      <label class="settingsField settingsField-stack">
+        <span class="settingsRow-label" data-i18n="search">Search</span>
+        <input
+          id="orderTransferSearchInput"
+          type="text"
+          placeholder="Search driver by name"
+          data-i18n-placeholder="order_transfer_search_placeholder"
+        />
+      </label>
+      <button
+        class="secondary-btn orderTransferClearBtn"
+        id="orderTransferClearBtn"
+        type="button"
+        data-i18n="reset"
+      >
+        Reset
+      </button>
+    </div>
+
+    <div class="emptyStateCard orderTransferState orderTransferLoading is-hidden" id="orderTransferLoading" aria-live="polite">
+      <div class="orderTransferLoadingInner">
+        <span class="orderTransferSpinner" aria-hidden="true"></span>
+        <span data-i18n="order_transfer_loading">Loading drivers...</span>
+      </div>
+    </div>
+
+    <div class="emptyStateCard orderTransferState orderTransferError is-hidden" id="orderTransferError" aria-live="polite">
+      <strong id="orderTransferErrorMessage">-</strong>
+      <div class="orderTransferErrorActions">
+        <button class="secondary-btn" id="orderTransferRetryBtn" type="button" data-i18n="refresh">
+          Refresh
+        </button>
+      </div>
+    </div>
+
+    <p class="emptyStateCard orderTransferEmpty is-hidden" id="orderTransferEmpty" data-i18n="order_transfer_empty_default">
+      No drivers or managers match this filter.
+    </p>
+
+    <ul class="managerUsersList orderTransferList" id="orderTransferList"></ul>
+
+    <div class="emptyStateCard orderTransferSelected is-hidden" id="orderTransferSelected">
+      <p class="settingsRow-label" data-i18n="selected_driver">Selected driver</p>
+      <strong id="orderTransferSelectedName">-</strong>
+      <p id="orderTransferSelectedMeta">-</p>
+      <p class="settingsNote orderTransferBackendNote" id="orderTransferSelectedHint" data-i18n="order_transfer_backend_note">
+        Select a driver, then confirm to save the reassignment.
+      </p>
+    </div>
+
+    <div class="orderTransferFooter">
+      <p class="settingsNote orderTransferBackendNote" id="orderTransferBackendNote" data-i18n="order_transfer_backend_note">
+        Select a driver, then confirm to save the reassignment.
+      </p>
+      <div class="orderTransferFooterActions">
+        <button
+          class="orderActionBtn orderActionBtn--transfer orderTransferConfirmBtn"
+          id="orderTransferConfirmBtn"
+          type="button"
+          data-i18n="confirm_transfer"
+          disabled
+        >
+          Transfer selected driver
+        </button>
+        <button
+          class="secondary-btn orderTransferBackBtn"
+          id="orderTransferBackBtn"
+          type="button"
+          data-i18n="back"
+        >
+          Back
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

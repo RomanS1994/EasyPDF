@@ -72,6 +72,10 @@ export const ORDER_LIST_WITH_OWNER_SELECT = {
   },
 };
 
+export const ACTIVE_ORDER_WHERE = Object.freeze({
+  archivedAt: null,
+});
+
 export async function createAuditLog(client, payload) {
   return client.auditLog.create({
     data: {
@@ -93,6 +97,7 @@ export async function countOrdersForWindow(client, userId, subscriptionView) {
   return client.order.count({
     where: {
       userId,
+      ...ACTIVE_ORDER_WHERE,
       createdAt: {
         gte: new Date(subscriptionView.currentPeriodStart),
         lte: new Date(subscriptionView.currentPeriodEnd),
@@ -151,6 +156,7 @@ export async function buildSanitizedUsers(client, users) {
         userId: {
           in: userIds,
         },
+        ...ACTIVE_ORDER_WHERE,
       },
       _count: {
         _all: true,
@@ -162,6 +168,7 @@ export async function buildSanitizedUsers(client, users) {
             userId: {
               in: userIds,
             },
+            ...ACTIVE_ORDER_WHERE,
             createdAt: {
               gte: new Date(minStart),
               lte: new Date(maxEnd),

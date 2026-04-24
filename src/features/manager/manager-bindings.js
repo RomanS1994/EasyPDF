@@ -7,6 +7,7 @@ import {
   refreshManagerUserDetail,
 } from './manager-data.js';
 import { renderManagerOrders, renderManagerPlans } from './manager-render.js';
+import { openOrderActions } from '../auth/orders/order-actions.js';
 import {
   cancelCurrentManagerSubscription,
   confirmPendingManagerSubscription,
@@ -92,6 +93,9 @@ export function bindManagerEvents(refreshAccountData, loadPlansForGuest) {
   });
   refs.managerOrderMarkFailedBtn?.addEventListener('click', () => {
     handleManagerOrderStatusChange('pdf_failed', refreshAccountData);
+  });
+  refs.managerOrderDeleteBtn?.addEventListener('click', () => {
+    openOrderActions(state.managerSelectedOrder, { origin: 'manager-detail' });
   });
   refs.managerSubscriptionSaveBtn?.addEventListener('click', async () => {
     await saveManagerSubscription();

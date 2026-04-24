@@ -86,6 +86,7 @@ export function setManagerOrderActionButtonsDisabled(disabled) {
   if (refs.managerOrderMarkPendingBtn) refs.managerOrderMarkPendingBtn.disabled = disabled;
   if (refs.managerOrderMarkGeneratedBtn) refs.managerOrderMarkGeneratedBtn.disabled = disabled;
   if (refs.managerOrderMarkFailedBtn) refs.managerOrderMarkFailedBtn.disabled = disabled;
+  if (refs.managerOrderDeleteBtn) refs.managerOrderDeleteBtn.disabled = disabled;
 }
 
 export function renderManagerOrderDetail() {

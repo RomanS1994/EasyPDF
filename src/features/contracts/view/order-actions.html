@@ -1,0 +1,82 @@
+<div class="orderActionsModal" id="orderActionsModal" aria-hidden="true" hidden>
+  <div class="orderActionsBackdrop" id="orderActionsBackdrop"></div>
+  <div
+    class="orderActionsSheet"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="orderActionsTitle"
+    aria-describedby="orderActionsDescription"
+  >
+    <div class="orderActionsHeader">
+      <div class="orderActionsHeaderContent">
+        <p class="sectionEyebrow" data-i18n="order_actions_title">Order actions</p>
+        <h2 id="orderActionsTitle">-</h2>
+      </div>
+      <button
+        class="orderFlowCloseBtn"
+        id="orderActionsCloseBtn"
+        type="button"
+        aria-label="Close"
+        data-i18n-aria-label="close"
+      >
+        &times;
+      </button>
+    </div>
+
+    <div class="settingsGroup orderActionsSummary">
+      <div class="settingsRow">
+        <span class="settingsRow-label" data-i18n="order_number">Order number</span>
+        <strong class="settingsValue" id="orderActionsOrderNumber">-</strong>
+      </div>
+      <div class="settingsRow">
+        <span class="settingsRow-label" data-i18n="customer">Customer</span>
+        <strong class="settingsValue" id="orderActionsOrderCustomer">-</strong>
+      </div>
+      <div class="settingsRow">
+        <span class="settingsRow-label" data-i18n="route">Route</span>
+        <strong class="settingsValue" id="orderActionsOrderRoute">-</strong>
+      </div>
+    </div>
+
+    <p class="settingsNote orderActionsNote" id="orderActionsDescription" data-i18n="order_delete_prompt">
+      Open the confirmation screen before anything is removed from the visible list.
+    </p>
+
+    <div class="orderActionsStack">
+      <button
+        class="danger-btn orderActionsButton"
+        id="orderActionsDeleteBtn"
+        type="button"
+        data-i18n="delete_from_list"
+      >
+        Delete from list
+      </button>
+      <button
+        class="orderActionBtn orderActionBtn--cancel orderActionsButton"
+        id="orderActionsCancelBtn"
+        type="button"
+        data-i18n="cancel"
+      >
+        Cancel
+      </button>
+      <button
+        class="orderActionBtn orderActionBtn--transfer orderActionsButton"
+        id="orderActionsTransferBtn"
+        type="button"
+        data-i18n="transfer_to_another_driver"
+      >
+        Transfer to another driver
+      </button>
+    </div>
+
+    <div class="emptyStateCard orderActionsTransferPreview is-hidden" id="orderActionsTransferPreview">
+      <p class="settingsRow-label" data-i18n="selected">Selected</p>
+      <strong id="orderActionsTransferPreviewName">-</strong>
+      <p id="orderActionsTransferPreviewMeta">-</p>
+    </div>
+
+    <p class="settingsNote orderActionsTransferHint" id="orderActionsTransferHint" data-i18n="order_transfer_backend_note">
+      Select a driver, then confirm to save the reassignment.
+    </p>
+  </div>
+</div>

@@ -15,6 +15,8 @@ import { bindGuestEvents, loadPlansForGuest } from './guest/forms.js';
 import { setAuthMode, syncLanguageSelects } from './guest/guest.js';
 import { bindAccountEvents, refreshAccountData } from './account/account-session.js';
 import { bindOrderDetailEvents } from './orders/order-detail.js';
+import { bindOrderActionEvents } from './orders/order-actions.js';
+import { bindOrderTransferEvents } from './orders/order-transfer.js';
 import { bindHistoryEvents } from './history/history.js';
 import { bindStatsEvents } from './stats/stats.js';
 import { bindManagerEvents } from '../manager/manager-bindings.js';
@@ -41,9 +43,19 @@ export async function initAuthPage() {
   bindGuestEvents(renderAuthenticatedState);
   bindAccountEvents(refreshAccountData);
   bindOrderDetailEvents();
+  bindOrderActionEvents();
+  bindOrderTransferEvents();
   bindHistoryEvents(renderAuthenticatedState);
   bindStatsEvents();
   bindManagerEvents(refreshAccountData, loadPlansForGuest);
+
+  window.addEventListener('pdf-app:orders-local-changed', () => {
+    renderAuthenticatedState();
+  });
+
+  window.addEventListener('pdf-app:orders-data-changed', () => {
+    void refreshAccountData();
+  });
 
   syncLanguageSelects();
   setAuthMode(guestState.authMode);

@@ -10,6 +10,7 @@ import {
   matchesManagerOrderStatus,
 } from '../../services/orders.js';
 import { normalizePaginationParams, normalizeText } from '../../validation/common.js';
+import { ACTIVE_ORDER_WHERE } from '../../db/prisma-helpers.js';
 
 export async function handleManagerOrders(request, response, url) {
   const context = await requireManager(request, response);
@@ -24,8 +25,9 @@ export async function handleManagerOrders(request, response, url) {
     where: userId
       ? {
           userId,
+          ...ACTIVE_ORDER_WHERE,
         }
-      : undefined,
+      : ACTIVE_ORDER_WHERE,
     select: ORDER_LIST_WITH_OWNER_SELECT,
     orderBy: {
       createdAt: 'desc',

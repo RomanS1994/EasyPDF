@@ -76,3 +76,20 @@ export async function updateOrder(orderId, payload, options = {}) {
 
   return readJsonResponse(response, t('api_update_order_failed'));
 }
+
+export async function archiveOrder(orderId) {
+  const response = await fetchApi(`/orders/${orderId}/archive`, {
+    method: 'PATCH',
+  });
+
+  return readJsonResponse(response, t('api_archive_order_failed'));
+}
+
+export async function assignOrderDriver(orderId, payload) {
+  const response = await fetchApi(`/orders/${orderId}/assign-driver`, {
+    method: 'PATCH',
+    body: payload,
+  });
+
+  return readJsonResponse(response, t('api_assign_order_failed'));
+}

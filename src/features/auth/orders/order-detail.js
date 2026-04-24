@@ -10,6 +10,8 @@ import { state as orderDetailState } from './state.js';
 import { state as accountState } from '../account/state.js';
 import { isAdminShell } from '../shell/shell.js';
 import { formatDateTimeLabel, formatOrderStatusLabel } from '../../../shared/lib/formatters.js';
+import { isOrderOverlayOpen, syncOrderOverlayScrollLock } from './overlay.js';
+import { openOrderActions } from './order-actions.js';
 
 function getSelectedOrder() {
   const orderId = orderDetailState.orderDetailOrderId;
@@ -42,11 +44,11 @@ function setOrderDetailVisibility(isVisible) {
 
   if (isVisible) {
     ordersRefs.orderDetailModal.removeAttribute('hidden');
-    document.body.classList.add('no-scroll');
   } else {
     ordersRefs.orderDetailModal.setAttribute('hidden', '');
-    document.body.classList.remove('no-scroll');
   }
+
+  syncOrderOverlayScrollLock();
 }
 
 export function closeOrderDetail() {
@@ -108,6 +110,7 @@ export function renderOrderDetail() {
   if (!order) {
     setOrderDetailVisibility(false);
     if (ordersRefs.orderDetailTitle) ordersRefs.orderDetailTitle.textContent = t('order_detail');
+    if (ordersRefs.orderDetailDeleteBtn) ordersRefs.orderDetailDeleteBtn.disabled = true;
     return;
   }
 
@@ -138,6 +141,9 @@ export function renderOrderDetail() {
   if (ordersRefs.orderDetailDropoff) ordersRefs.orderDetailDropoff.textContent = formatLocation(order.trip?.to);
   if (ordersRefs.orderDetailTripTime) ordersRefs.orderDetailTripTime.textContent = order.trip?.time || '-';
   if (ordersRefs.orderDetailPayment) ordersRefs.orderDetailPayment.textContent = order.trip?.paymentMethod || '-';
+  if (ordersRefs.orderDetailDeleteBtn) {
+    ordersRefs.orderDetailDeleteBtn.disabled = false;
+  }
 }
 
 export function bindOrderDetailEvents() {
@@ -145,6 +151,10 @@ export function bindOrderDetailEvents() {
   historyRefs.statsHistoryList?.addEventListener('click', handleOrderListClick);
   ordersRefs.orderDetailBackdrop?.addEventListener('click', closeOrderDetail);
   ordersRefs.orderDetailCloseBtn?.addEventListener('click', closeOrderDetail);
+  ordersRefs.orderDetailDeleteBtn?.addEventListener('click', () => {
+    const order = getSelectedOrder();
+    openOrderActions(order, { origin: 'user-detail' });
+  });
   ordersRefs.orderDetailOfferBtn?.addEventListener('click', async () => {
     const order = getSelectedOrder();
     await downloadOrderPdf(order, 'offer');
@@ -154,7 +164,11 @@ export function bindOrderDetailEvents() {
     await downloadOrderPdf(order, 'confirmation');
   });
   window.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && ordersRefs.orderDetailModal?.classList.contains('is-open')) {
+    if (
+      event.key === 'Escape' &&
+      ordersRefs.orderDetailModal?.classList.contains('is-open') &&
+      !isOrderOverlayOpen()
+    ) {
       closeOrderDetail();
     }
   });

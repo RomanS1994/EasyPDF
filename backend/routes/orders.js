@@ -1,5 +1,6 @@
 import { getAuthContext, hasManagerAccess } from '../auth/context.js';
 import {
+  ACTIVE_ORDER_WHERE,
   buildSanitizedUser,
   createAuditLog,
   ORDER_LIST_SELECT,
@@ -13,7 +14,7 @@ import { runStoreTransaction } from '../db/store.js';
 import { readJsonBody, sendError, sendJson } from '../lib/http.js';
 import { buildOrderRecord } from '../services/orders.js';
 import { validateOrderCreateInput } from '../validation/orders.js';
-import { nowIso, normalizePaginationParams } from '../validation/common.js';
+import { nowIso, normalizePaginationParams, normalizeText } from '../validation/common.js';
 
 async function handleCreateOrder(request, response) {
   const context = await getAuthContext(request, response);
@@ -101,9 +102,10 @@ async function handleUpdateOrder(request, response, orderId) {
 
   const updatedOrder = await runStoreTransaction({
     prisma: async tx => {
-      const order = await tx.order.findUnique({
+      const order = await tx.order.findFirst({
         where: {
           id: orderId,
+          ...ACTIVE_ORDER_WHERE,
         },
         include: ORDER_WITH_OWNER_INCLUDE,
       });
@@ -181,6 +183,151 @@ async function handleUpdateOrder(request, response, orderId) {
   sendJson(response, 200, { order: updatedOrder });
 }
 
+async function handleArchiveOrder(request, response, orderId) {
+  const context = await getAuthContext(request, response);
+  if (!context) return;
+
+  const archivedOrder = await runStoreTransaction({
+    prisma: async tx => {
+      const order = await tx.order.findFirst({
+        where: {
+          id: orderId,
+          ...ACTIVE_ORDER_WHERE,
+        },
+        include: ORDER_WITH_OWNER_INCLUDE,
+      });
+
+      if (!order) {
+        throw new Error('Order not found');
+      }
+
+      const isOwner = order.userId === context.user.id;
+      const isManager = hasManagerAccess(context.user.role);
+
+      if (!isOwner && !isManager) {
+        throw new Error('You do not have access to this order');
+      }
+
+      const archivedAt = nowIso();
+      const updated = await tx.order.update({
+        where: {
+          id: orderId,
+        },
+        data: {
+          archivedAt: new Date(archivedAt),
+          updatedAt: new Date(archivedAt),
+        },
+        include: ORDER_WITH_OWNER_INCLUDE,
+      });
+
+      await createAuditLog(tx, {
+        action: 'order.archived',
+        actorUserId: context.user.id,
+        targetUserId: updated.userId,
+        entityType: 'order',
+        entityId: updated.id,
+        before: {
+          archivedAt: order.archivedAt || null,
+          status: order.status,
+          userId: order.userId,
+        },
+        after: {
+          archivedAt: archivedAt,
+          status: updated.status,
+          userId: updated.userId,
+        },
+      });
+
+      return sanitizeOrderRecord(updated);
+    },
+  });
+
+  sendJson(response, 200, { order: archivedOrder });
+}
+
+async function handleAssignDriver(request, response, orderId) {
+  const context = await getAuthContext(request, response);
+  if (!context) return;
+
+  const body = await readJsonBody(request);
+  const targetUserId = normalizeText(body?.userId);
+
+  if (!targetUserId) {
+    throw new Error('Driver id is required');
+  }
+
+  const transferredOrder = await runStoreTransaction({
+    prisma: async tx => {
+      const order = await tx.order.findFirst({
+        where: {
+          id: orderId,
+          ...ACTIVE_ORDER_WHERE,
+        },
+        include: ORDER_WITH_OWNER_INCLUDE,
+      });
+
+      if (!order) {
+        throw new Error('Order not found');
+      }
+
+      if (!hasManagerAccess(context.user.role)) {
+        throw new Error('Manager access is required to transfer this order');
+      }
+
+      const targetUser = await tx.user.findUnique({
+        where: {
+          id: targetUserId,
+        },
+        select: {
+          id: true,
+          role: true,
+        },
+      });
+
+      if (!targetUser) {
+        throw new Error('Selected driver not found');
+      }
+
+      if (targetUser.role === 'admin') {
+        throw new Error('Administrators cannot be selected as transfer targets');
+      }
+
+      if (targetUser.id === order.userId) {
+        return sanitizeOrderRecord(order);
+      }
+
+      const updated = await tx.order.update({
+        where: {
+          id: orderId,
+        },
+        data: {
+          userId: targetUser.id,
+          updatedAt: new Date(nowIso()),
+        },
+        include: ORDER_WITH_OWNER_INCLUDE,
+      });
+
+      await createAuditLog(tx, {
+        action: 'order.reassigned',
+        actorUserId: context.user.id,
+        targetUserId: updated.userId,
+        entityType: 'order',
+        entityId: updated.id,
+        before: {
+          userId: order.userId,
+        },
+        after: {
+          userId: updated.userId,
+        },
+      });
+
+      return sanitizeOrderRecord(updated);
+    },
+  });
+
+  sendJson(response, 200, { order: transferredOrder });
+}
+
 export async function handleOrderRoutes(request, response, { pathName, url }) {
   if (request.method === 'POST' && pathName === '/api/orders') {
     await handleCreateOrder(request, response);
@@ -195,6 +342,7 @@ export async function handleOrderRoutes(request, response, { pathName, url }) {
     const orders = await prisma.order.findMany({
       where: {
         userId: context.user.id,
+        ...ACTIVE_ORDER_WHERE,
       },
       select: ORDER_LIST_SELECT,
       orderBy: {
@@ -214,15 +362,26 @@ export async function handleOrderRoutes(request, response, { pathName, url }) {
     return false;
   }
 
-  const orderId = pathName.split('/').pop();
+  const segments = pathName.split('/').filter(Boolean);
+  const orderId = segments[2] || '';
+  const action = segments[3] || '';
+
+  if (!orderId) {
+    return false;
+  }
+
+  if (segments.length > 3 && request.method !== 'PATCH') {
+    return false;
+  }
 
   if (request.method === 'GET') {
     const context = await getAuthContext(request, response);
     if (!context) return true;
 
-    const order = await prisma.order.findUnique({
+    const order = await prisma.order.findFirst({
       where: {
         id: orderId,
+        ...ACTIVE_ORDER_WHERE,
       },
       include: ORDER_WITH_OWNER_INCLUDE,
     });
@@ -244,6 +403,20 @@ export async function handleOrderRoutes(request, response, { pathName, url }) {
       order: sanitizeOrderRecord(order),
     });
     return true;
+  }
+
+  if (action === 'archive' && request.method === 'PATCH') {
+    await handleArchiveOrder(request, response, orderId);
+    return true;
+  }
+
+  if (action === 'assign-driver' && request.method === 'PATCH') {
+    await handleAssignDriver(request, response, orderId);
+    return true;
+  }
+
+  if (segments.length > 3) {
+    return false;
   }
 
   if (request.method === 'PATCH') {
