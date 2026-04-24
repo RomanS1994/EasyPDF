@@ -229,7 +229,7 @@
                 </div>
 
                 <div class="generationSessionTimer" id="generationSessionCountdownRing" aria-hidden="true">
-                  <div class="generationSessionCountdownValue" id="generationSessionCountdownValue">00:10</div>
+                  <div class="generationSessionCountdownValue" id="generationSessionCountdownValue">10:00</div>
                 </div>
               </section>
 
@@ -268,7 +268,7 @@
                     <input
                       class="value"
                       name="customer-email"
-                      type="text"
+                      type="email"
                       inputmode="email"
                       value=""
                       required
@@ -292,6 +292,8 @@
                       name="passengers"
                       type="number"
                       required
+                      min="1"
+                      step="1"
                       value=""
                       inputmode="numeric"
                       placeholder="Кількість пасажирів"
