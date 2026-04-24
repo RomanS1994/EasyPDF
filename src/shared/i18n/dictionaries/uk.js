@@ -98,7 +98,7 @@ export const uk = {
     account: 'Акаунт',
     my_account: 'Мій акаунт',
     account_subline: 'Фото, ім’я та робочий простір в окремому вікні.',
-    account_settings_heading: 'Загальні налаштування',
+    account_settings_heading: 'Портал водія',
     account_settings_subline: 'Мова, бізнес-профіль, підписка та сесія.',
     profile: 'Профіль',
     role: 'Роль',

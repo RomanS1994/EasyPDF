@@ -99,7 +99,7 @@ export const cs = {
   account: 'Účet',
   my_account: 'Můj účet',
   account_subline: 'Fotka, jméno a pracovní prostor v samostatném okně.',
-  account_settings_heading: 'Obecná nastavení',
+  account_settings_heading: 'Portál řidiče',
   account_settings_subline: 'Jazyk, firemní profil, předplatné a relace.',
   profile: 'Profil',
   role: 'Role',

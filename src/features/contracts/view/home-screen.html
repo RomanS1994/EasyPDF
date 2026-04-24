@@ -212,7 +212,7 @@
                 </div>
 
                 <div class="generationSessionTimer" id="generationSessionCountdownRing" aria-hidden="true">
-                  <div class="generationSessionCountdownValue" id="generationSessionCountdownValue">10:00</div>
+                  <div class="generationSessionCountdownValue" id="generationSessionCountdownValue">00:10</div>
                 </div>
               </section>
 
@@ -395,7 +395,14 @@
 
               <footer class="wizard-controls wizard-controls-single">
                 <button class="primary-btn wizard-contract" type="button" id="downloadPdfBtn">
-                  <span class="wizard-contract-iconWrap" aria-hidden="true">&#x2B07;</span>
+                  <span class="wizard-contract-iconWrap" aria-hidden="true">
+                    <svg class="wizard-contract-icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                      <path d="M7.5 3.75h6.9L18.75 8.1v12.15a1.5 1.5 0 0 1-1.5 1.5h-9a1.5 1.5 0 0 1-1.5-1.5V5.25a1.5 1.5 0 0 1 1.5-1.5Z" />
+                      <path d="M14.4 3.75V8.1h4.35" />
+                      <path d="M12 11v4.9" />
+                      <path d="M9.85 13.65 12 15.8l2.15-2.15" />
+                    </svg>
+                  </span>
                   <span data-i18n="generate_order">Згенерувати</span>
                 </button>
                 <button class="secondary-btn wizard-save" type="button" id="saveOrderBtn" data-i18n="save_order">

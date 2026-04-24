@@ -11,7 +11,7 @@ import {
   setStoredSession,
 } from '../../../shared/lib/session-storage.js';
 import { CONTRACT_STORAGE_KEY } from '../../../shared/lib/storage-keys.js';
-import { getOrders } from '../../orders/api.js';
+import { getAllOrders } from '../../orders/api.js';
 import { refs } from './refs.js';
 import { isAdminShell } from '../shell/shell.js';
 import { state } from './state.js';
@@ -161,7 +161,7 @@ export async function refreshAccountData({ resetTab = false } = {}) {
       let orders = [];
 
       try {
-        const ordersResponse = await getOrders();
+        const ordersResponse = await getAllOrders();
         orders = ordersResponse.orders || [];
       } catch (error) {
         orders = [];

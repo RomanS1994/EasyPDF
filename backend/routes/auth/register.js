@@ -103,7 +103,6 @@ export async function handleRegister(request, response) {
             subscription: {
               create: {
                 id: userId,
-                userId: userId,
                 planId: subscriptionData.planId,
                 status: subscriptionData.status,
                 source: subscriptionData.source,

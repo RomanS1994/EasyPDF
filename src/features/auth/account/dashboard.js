@@ -331,14 +331,11 @@ export function renderDashboard() {
   renderOrderList(ordersRefs.ordersList, ordersRefs.ordersEmpty, accountState.orders, {
     emptyText: t('orders_empty_home'),
   });
-  const historyRender = renderOrderList(historyRefs.statsHistoryList, historyRefs.statsHistoryEmpty, accountState.orders, {
+  renderOrderList(historyRefs.statsHistoryList, historyRefs.statsHistoryEmpty, accountState.orders, {
     emptyText: t('orders_empty_history'),
     historyMode: true,
     dateFilter: historyState.ordersHistoryDateFilter,
   });
-  if (historyRefs.statsHistorySummary) {
-    historyRefs.statsHistorySummary.textContent = t('orders_count', { count: historyRender.visibleCount });
-  }
   renderOrderDetail();
   renderManagerAccessState();
   renderManagerUsers();

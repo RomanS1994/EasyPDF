@@ -99,7 +99,7 @@ export const en = {
   account: 'Account',
   my_account: 'My Account',
   account_subline: 'Photo, name, and workspace details in a separate window.',
-  account_settings_heading: 'General settings',
+  account_settings_heading: 'Driver portal',
   account_settings_subline: 'Language, business profile, subscription, and session.',
   profile: 'Profile',
   role: 'Role',

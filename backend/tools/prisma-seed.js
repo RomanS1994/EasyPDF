@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 import { PLANS } from '../config/plans.js';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.join(scriptDir, '..', '.env'), override: true });
+dotenv.config({ path: path.join(scriptDir, '..', '.env') });
 
 async function seedPlans() {
   const { prisma } = await import('../db/prisma.js');

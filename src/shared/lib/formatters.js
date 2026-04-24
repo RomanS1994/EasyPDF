@@ -51,10 +51,16 @@ export function formatDateLabel(value) {
 export function formatDateTimeLabel(value) {
   if (!value) return '-';
 
-  const date = new Date(value);
+  const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) return String(value);
 
-  return date.toLocaleString(getCurrentLocale());
+  return date.toLocaleString(getCurrentLocale(), {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 export function formatCycleLabel(usage) {

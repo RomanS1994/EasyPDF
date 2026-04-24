@@ -8,6 +8,46 @@ import { escapeHtml } from '../../../shared/lib/formatters.js';
 
 const ORDER_HISTORY_TABS = ['all', 'today', 'planned', 'completed'];
 const ORDER_HISTORY_SORTS = ['newest', 'oldest', 'trip-date'];
+const ORDER_HISTORY_SORT_META = {
+  newest: {
+    labelKey: 'sort_newest_first',
+    icon: `
+      <svg viewBox="0 0 20 20" focusable="false" aria-hidden="true">
+        <path d="M4.5 6h6" />
+        <path d="M4.5 10h9" />
+        <path d="M4.5 14h4.5" />
+        <path d="M15.5 5.5v8" />
+        <path d="M13.6 11.4 15.5 13.3 17.4 11.4" />
+      </svg>
+    `,
+  },
+  oldest: {
+    labelKey: 'sort_oldest_first',
+    icon: `
+      <svg viewBox="0 0 20 20" focusable="false" aria-hidden="true">
+        <path d="M4.5 6h4.5" />
+        <path d="M4.5 10h9" />
+        <path d="M4.5 14h6" />
+        <path d="M15.5 14.5v-8" />
+        <path d="M13.6 8.6 15.5 6.7 17.4 8.6" />
+      </svg>
+    `,
+  },
+  'trip-date': {
+    labelKey: 'sort_trip_date',
+    icon: `
+      <svg viewBox="0 0 20 20" focusable="false" aria-hidden="true">
+        <rect x="3" y="4.5" width="13.5" height="12" rx="2.5" />
+        <path d="M3 8h13.5" />
+        <path d="M6.5 2.8v3" />
+        <path d="M13 2.8v3" />
+        <circle cx="13.2" cy="12.2" r="2.2" />
+        <path d="M13.2 11.2v1.2" />
+        <path d="M13.2 12.2l.9.7" />
+      </svg>
+    `,
+  },
+};
 
 function parseDateValue(value) {
   if (!value) return null;
@@ -52,7 +92,19 @@ function formatDateFilterLabel(value) {
 function formatOrderDateTime(value) {
   const date = parseDateValue(value);
   if (!date) return '-';
-  return date.toLocaleString(getCurrentLocale());
+
+  const datePart = date.toLocaleDateString(getCurrentLocale(), {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+  const timePart = date.toLocaleTimeString(getCurrentLocale(), {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+
+  return `${datePart}, ${timePart}`;
 }
 
 function normalizeTextValue(value) {
@@ -146,14 +198,39 @@ export function normalizeHistorySort(value) {
   return ORDER_HISTORY_SORTS.includes(value) ? value : 'newest';
 }
 
-function syncHistoryControls(activeTab, activeSort, visibleCount, dateFilterValue) {
-  if (historyRefs.statsHistorySummary) {
-    historyRefs.statsHistorySummary.textContent = t('orders_count', { count: visibleCount });
+export function syncHistorySortControl(activeSort) {
+  const sortMeta = ORDER_HISTORY_SORT_META[activeSort] || ORDER_HISTORY_SORT_META.newest;
+  const sortLabel = t('sort');
+  const selectedLabel = t(sortMeta.labelKey);
+  const ariaLabel = `${sortLabel}: ${selectedLabel}`;
+
+  if (historyRefs.statsHistorySortTriggerIcon) {
+    historyRefs.statsHistorySortTriggerIcon.innerHTML = sortMeta.icon;
   }
 
+  if (historyRefs.statsHistorySortTrigger) {
+    historyRefs.statsHistorySortTrigger.setAttribute('aria-label', ariaLabel);
+    historyRefs.statsHistorySortTrigger.setAttribute('title', ariaLabel);
+    historyRefs.statsHistorySortTrigger.dataset.sortValue = activeSort;
+    const isOpen = !historyRefs.statsHistorySortMenu?.hidden;
+    historyRefs.statsHistorySortTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  }
+
+  if (historyRefs.statsHistorySortOptions?.length) {
+    historyRefs.statsHistorySortOptions.forEach(option => {
+      const isSelected = option.dataset.historySortOption === activeSort;
+      option.classList.toggle('is-selected', isSelected);
+      option.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+    });
+  }
+}
+
+function syncHistoryControls(activeTab, activeSort, dateFilterValue, tabCounts = null) {
   if (historyRefs.statsHistorySortSelect && historyRefs.statsHistorySortSelect.value !== activeSort) {
     historyRefs.statsHistorySortSelect.value = activeSort;
   }
+
+  syncHistorySortControl(activeSort);
 
   if (historyRefs.statsHistoryDateFilter && historyRefs.statsHistoryDateFilter.value !== dateFilterValue) {
     historyRefs.statsHistoryDateFilter.value = dateFilterValue;
@@ -164,6 +241,14 @@ function syncHistoryControls(activeTab, activeSort, visibleCount, dateFilterValu
     button.classList.toggle('is-active', isActive);
     button.setAttribute('aria-selected', isActive ? 'true' : 'false');
     button.tabIndex = isActive ? 0 : -1;
+
+    const badge = button.querySelector('.orderHistoryTabCount');
+    if (badge) {
+      const countValue = tabCounts && Object.prototype.hasOwnProperty.call(tabCounts, button.dataset.historyTabTarget)
+        ? tabCounts[button.dataset.historyTabTarget]
+        : 0;
+      badge.textContent = String(countValue);
+    }
   });
 }
 
@@ -301,6 +386,24 @@ export function renderOrderList(listElement, emptyElement, orders, options = {})
   const visibleOrders = isHistoryMode
     ? [...filteredByTab].sort((left, right) => compareOrdersForSort(left, right, historySort))
     : [...filteredByTab];
+  const historyTabCounts = isHistoryMode
+    ? filteredByDate.reduce(
+        (counts, order) => {
+          counts.all += 1;
+          const bucket = getOrderHistoryBucket(order).bucket;
+          if (Object.prototype.hasOwnProperty.call(counts, bucket)) {
+            counts[bucket] += 1;
+          }
+          return counts;
+        },
+        {
+          all: 0,
+          today: 0,
+          planned: 0,
+          completed: 0,
+        },
+      )
+    : null;
   const markupOptions = isHistoryMode
     ? options
     : {
@@ -308,10 +411,10 @@ export function renderOrderList(listElement, emptyElement, orders, options = {})
         compact: Object.prototype.hasOwnProperty.call(options, 'compact')
           ? options.compact
           : true,
-      };
+  };
 
   if (isHistoryMode) {
-    syncHistoryControls(historyTab, historySort, visibleOrders.length, dateFilter);
+    syncHistoryControls(historyTab, historySort, dateFilter, historyTabCounts);
   }
 
   if (!visibleOrders.length) {

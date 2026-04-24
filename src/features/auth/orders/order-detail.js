@@ -6,14 +6,16 @@ import { notifyText } from '../../../shared/ui/toast.js';
 import { withAppLoader } from '../../../shared/ui/loader.js';
 import { refs as ordersRefs } from './refs.js';
 import { refs as historyRefs } from '../history/refs.js';
-import { state } from './state.js';
+import { state as orderDetailState } from './state.js';
+import { state as accountState } from '../account/state.js';
 import { isAdminShell } from '../shell/shell.js';
 import { formatDateTimeLabel, formatOrderStatusLabel } from '../../../shared/lib/formatters.js';
 
 function getSelectedOrder() {
-  const orderId = state.orderDetailOrderId;
+  const orderId = orderDetailState.orderDetailOrderId;
   if (!orderId) return null;
-  return state.orders.find(order => order.id === orderId) || null;
+  const normalizedOrderId = String(orderId);
+  return accountState.orders.find(order => String(order.id) === normalizedOrderId) || null;
 }
 
 function getContractValue(order, path, fallback = '-') {
@@ -48,13 +50,13 @@ function setOrderDetailVisibility(isVisible) {
 }
 
 export function closeOrderDetail() {
-  state.orderDetailOrderId = '';
+  orderDetailState.orderDetailOrderId = '';
   renderOrderDetail();
 }
 
 export function openOrderDetail(orderId) {
   if (!orderId) return;
-  state.orderDetailOrderId = orderId;
+  orderDetailState.orderDetailOrderId = orderId;
   renderOrderDetail();
 }
 
@@ -159,10 +161,10 @@ export function bindOrderDetailEvents() {
 }
 
 export function handleOrderListClick(event) {
-  const button = event.target.closest('[data-order-open]');
-  if (!button) return;
+  const target = event.target.closest('[data-order-open], [data-order-id]');
+  if (!target) return;
 
-  const orderId = button.dataset.orderOpen || button.closest('[data-order-id]')?.dataset.orderId || '';
+  const orderId = target.dataset.orderOpen || target.dataset.orderId || '';
   if (!orderId) return;
 
   openOrderDetail(orderId);

@@ -12,7 +12,7 @@ import { sendHttpError } from './lib/errors.js';
 import { routeRequest } from './routes/index.js';
 
 const serverDir = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.join(serverDir, '.env'), override: true });
+dotenv.config({ path: path.join(serverDir, '.env') });
 
 const PORT = Number(process.env.BACKEND_PORT || process.env.PORT || 3001);
 

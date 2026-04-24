@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import { defineConfig } from 'prisma/config';
 
 const configDir = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.join(configDir, '.env'), override: true });
+dotenv.config({ path: path.join(configDir, '.env') });
 
 const prismaDatasourceUrl =
   process.env.DIRECT_DATABASE_URL || process.env.DATABASE_URL;

@@ -43,6 +43,10 @@ function emitOrderCreated() {
   window.dispatchEvent(new CustomEvent('pdf-app:order-created'));
 }
 
+function redirectToHome() {
+  navigateToTab('home', getShellRouteConfig().home);
+}
+
 function getErrorMessage(error, fallbackKey) {
   if (error instanceof Error && error.message) {
     return error.message;
@@ -256,6 +260,7 @@ async function generateReservedOrderPdf() {
       clearGenerationSession();
       notifyText(t('generation_token_completed'), 'success');
       emitOrderCreated();
+      redirectToHome();
     });
   } catch (error) {
     console.error('Token generation failed', error);
@@ -314,6 +319,7 @@ export function initContractDownload() {
 
         notifyText(t('order_saved'), 'success');
         emitOrderCreated();
+        redirectToHome();
       } catch (error) {
         console.error('Save order failed', error);
         notifyText(
