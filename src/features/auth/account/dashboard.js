@@ -360,10 +360,6 @@ export function renderAuthenticatedState({ resetTab = false } = {}) {
   if (!accountState.user) {
     applyWorkspacePlanTheme(null);
 
-    if (shellState.activeTab !== 'home') {
-      guestState.authMode = 'login';
-    }
-
     setGuestVisible(true);
     clearManagerState();
     renderOrderList(ordersRefs.ordersList, ordersRefs.ordersEmpty, [], {

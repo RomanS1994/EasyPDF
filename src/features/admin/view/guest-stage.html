@@ -2,11 +2,26 @@
     try {
       const rawLanguage = window.localStorage.getItem('pdf-app-language');
       const language = ['uk', 'en', 'cs'].includes(rawLanguage) ? rawLanguage : 'uk';
+      const hasStoredSession = Boolean(window.localStorage.getItem('pdf-app-session'));
+      const routeTab = document.body?.dataset?.appTab || 'home';
+      const defaultAuthMode =
+        routeTab === 'home' ? (hasStoredSession ? 'login' : 'register') : 'login';
 
       document.documentElement.lang = language;
       document.body.dataset.authState = 'booting';
+      window.__PDF_APP_BOOT__ = {
+        language,
+        routeTab,
+        defaultAuthMode,
+      };
     } catch {
+      const routeTab = document.body?.dataset?.appTab || 'home';
       document.body.dataset.authState = 'booting';
+      window.__PDF_APP_BOOT__ = {
+        language: 'uk',
+        routeTab,
+        defaultAuthMode: routeTab === 'home' ? 'register' : 'login',
+      };
     }
   </script>
 
@@ -24,13 +39,52 @@
         <section class="guestAuth">
           <div class="compactHeader">
             <h2 id="authHeadline" data-i18n="guest_login_headline">Увійти у свій простір</h2>
-            <p data-i18n="guest_login_note">
+            <p id="guestAuthNote" data-i18n="guest_login_note">
               Поверніться до замовлень, документів, статистики та нотаток без зайвих кроків.
             </p>
           </div>
 
+          <div
+            class="authModeSwitch"
+            role="tablist"
+            aria-label="Режим входу"
+            data-i18n-aria-label="auth_mode_switch"
+          >
+            <button
+              class="authModeSwitch-btn is-active"
+              type="button"
+              id="authModeTabLogin"
+              role="tab"
+              aria-controls="loginForm"
+              aria-selected="true"
+              tabindex="0"
+              data-auth-mode="login"
+            >
+              <span data-i18n="access">Вхід</span>
+            </button>
+            <button
+              class="authModeSwitch-btn"
+              type="button"
+              id="authModeTabRegister"
+              role="tab"
+              aria-controls="registerForm"
+              aria-selected="false"
+              tabindex="-1"
+              data-auth-mode="register"
+            >
+              <span data-i18n="new_account">Новий акаунт</span>
+            </button>
+          </div>
+
           <div class="authForms">
-            <form class="authForm" id="loginForm">
+            <form
+              class="authForm authForm-login is-active"
+              id="loginForm"
+              role="tabpanel"
+              aria-labelledby="authModeTabLogin"
+              aria-hidden="false"
+              data-auth-mode-panel="login"
+            >
               <h3 data-i18n="sign_in">Увійти</h3>
 
               <label class="authField">
@@ -43,21 +97,60 @@
                 />
               </label>
 
-              <label class="authField">
+              <label class="authField authPasswordField">
                 <span data-i18n="password">Пароль</span>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Ваш пароль"
-                  data-i18n-placeholder="your_password"
-                  autocomplete="current-password"
-                />
+                <div class="authPasswordControl">
+                  <input
+                    id="loginPassword"
+                    type="password"
+                    name="password"
+                    placeholder="Ваш пароль"
+                    data-i18n-placeholder="your_password"
+                    autocomplete="current-password"
+                  />
+                  <button
+                    class="authPasswordToggle"
+                    type="button"
+                    data-password-toggle
+                    data-password-target="loginPassword"
+                    aria-controls="loginPassword"
+                    aria-pressed="false"
+                    aria-label="Показати пароль"
+                  >
+                    <svg
+                      class="authPasswordToggleIcon"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path
+                        class="authPasswordToggleIcon-eye"
+                        d="M2.5 12C4.7 7.9 8 5.8 12 5.8S19.3 7.9 21.5 12C19.3 16.1 16 18.2 12 18.2S4.7 16.1 2.5 12Z"
+                      />
+                      <circle class="authPasswordToggleIcon-pupil" cx="12" cy="12" r="2.6" />
+                      <path
+                        class="authPasswordToggleIcon-slash"
+                        d="M5 19 19 5"
+                      />
+                    </svg>
+                  </button>
+                </div>
               </label>
 
-              <button class="secondary-btn" type="submit" data-i18n="sign_in">Увійти</button>
+              <button class="secondary-btn authLoginBtn" type="submit" data-i18n="sign_in">
+                Увійти
+              </button>
             </form>
 
-            <form class="authForm" id="registerForm">
+            <form
+              class="authForm authForm-register"
+              id="registerForm"
+              role="tabpanel"
+              aria-labelledby="authModeTabRegister"
+              aria-hidden="true"
+              data-auth-mode-panel="register"
+              hidden
+            >
               <h3 data-i18n="new_account">Новий акаунт</h3>
 
               <label class="authField">
@@ -80,15 +173,44 @@
                 />
               </label>
 
-              <label class="authField">
+              <label class="authField authPasswordField">
                 <span data-i18n="password">Пароль</span>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Щонайменше 8 символів"
-                  data-i18n-placeholder="password_min"
-                  autocomplete="new-password"
-                />
+                <div class="authPasswordControl">
+                  <input
+                    id="registerPassword"
+                    type="password"
+                    name="password"
+                    placeholder="Щонайменше 8 символів"
+                    data-i18n-placeholder="password_min"
+                    autocomplete="new-password"
+                  />
+                  <button
+                    class="authPasswordToggle"
+                    type="button"
+                    data-password-toggle
+                    data-password-target="registerPassword"
+                    aria-controls="registerPassword"
+                    aria-pressed="false"
+                    aria-label="Показати пароль"
+                  >
+                    <svg
+                      class="authPasswordToggleIcon"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path
+                        class="authPasswordToggleIcon-eye"
+                        d="M2.5 12C4.7 7.9 8 5.8 12 5.8S19.3 7.9 21.5 12C19.3 16.1 16 18.2 12 18.2S4.7 16.1 2.5 12Z"
+                      />
+                      <circle class="authPasswordToggleIcon-pupil" cx="12" cy="12" r="2.6" />
+                      <path
+                        class="authPasswordToggleIcon-slash"
+                        d="M5 19 19 5"
+                      />
+                    </svg>
+                  </button>
+                </div>
               </label>
 
               <label class="authField">

@@ -2,21 +2,25 @@
     try {
       const rawLanguage = window.localStorage.getItem('pdf-app-language');
       const language = ['uk', 'en', 'cs'].includes(rawLanguage) ? rawLanguage : 'uk';
+      const hasStoredSession = Boolean(window.localStorage.getItem('pdf-app-session'));
       const routeTab = document.body?.dataset?.appTab || 'home';
+      const defaultAuthMode =
+        routeTab === 'home' ? (hasStoredSession ? 'login' : 'register') : 'login';
 
       document.documentElement.lang = language;
       document.body.dataset.authState = 'booting';
       window.__PDF_APP_BOOT__ = {
         language,
         routeTab,
-        defaultAuthMode: 'login',
+        defaultAuthMode,
       };
     } catch {
+      const routeTab = document.body?.dataset?.appTab || 'home';
       document.body.dataset.authState = 'booting';
       window.__PDF_APP_BOOT__ = {
         language: 'uk',
-        routeTab: document.body?.dataset?.appTab || 'home',
-        defaultAuthMode: 'login',
+        routeTab,
+        defaultAuthMode: routeTab === 'home' ? 'register' : 'login',
       };
     }
   </script>

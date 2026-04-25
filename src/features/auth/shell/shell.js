@@ -1,4 +1,5 @@
 import { refs } from './refs.js';
+import { getStoredSession } from '../../../shared/lib/session-storage.js';
 import { TAB_NAMES } from './constants.js';
 
 export function isAdminShell() {
@@ -11,7 +12,15 @@ export function getRouteTab() {
 }
 
 export function getDefaultAuthMode() {
-  return 'login';
+  if (getRouteTab() !== 'home') {
+    return 'login';
+  }
+
+  try {
+    return getStoredSession()?.token ? 'login' : 'register';
+  } catch {
+    return 'register';
+  }
 }
 
 export function isManagerRole(role) {
