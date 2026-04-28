@@ -1,0 +1,106 @@
+import { createSlice } from '@reduxjs/toolkit';
+
+export function createDefaultContractState() {
+  return {
+    orderNumber: 'ORD-0013291093548-7FLQ',
+    today: '2025-10-14',
+    documentType: 'confirmation',
+    driver: {
+      name: 'Roman Stryzhka',
+      address: 'Nam. na Balabence 1437/3, 190 00 Praha 9',
+      spz: '1AF V087',
+      ico: '22319352',
+    },
+    provider: {
+      name: 'Roman Stryzhka',
+      address: 'Nam. na Balabence 1437/3, 190 00 Praha 9',
+      ico: '22319352',
+    },
+    customer: {
+      name: '',
+      email: '',
+    },
+    passengers: '',
+    trip: {
+      from: { address: '' },
+      to: { address: '' },
+      time: '',
+      paymentMethod: '',
+    },
+    totalPrice: '',
+  };
+}
+
+const contractSlice = createSlice({
+  name: 'contract',
+  initialState: createDefaultContractState(),
+  reducers: {
+    setOrderNumber(state, action) {
+      state.orderNumber = action.payload;
+    },
+    setToday(state, action) {
+      state.today = action.payload;
+    },
+    setDocumentType(state, action) {
+      state.documentType = action.payload;
+    },
+    updateDriverField(state, action) {
+      const field = action.payload.key || action.payload.field;
+      state.driver[field] = action.payload.value;
+    },
+    updateProviderField(state, action) {
+      const field = action.payload.key || action.payload.field;
+      state.provider[field] = action.payload.value;
+    },
+    updateCustomerField(state, action) {
+      const field = action.payload.key || action.payload.field;
+      state.customer[field] = action.payload.value;
+    },
+    updateTripField(state, action) {
+      const field = action.payload.key || action.payload.field;
+      const value = action.payload.value;
+
+      if (field === 'from' || field === 'to') {
+        state.trip[field] =
+          value && typeof value === 'object' ? value : { address: value || '' };
+        return;
+      }
+
+      state.trip[field] = value;
+    },
+    setPassengers(state, action) {
+      state.passengers = action.payload;
+    },
+    setTotalPrice(state, action) {
+      state.totalPrice = action.payload;
+    },
+    resetContract() {
+      return createDefaultContractState();
+    },
+    replaceContract(_state, action) {
+      return action.payload;
+    },
+  },
+});
+
+export const {
+  setOrderNumber,
+  setToday,
+  setDocumentType,
+  updateDriverField,
+  updateProviderField,
+  updateCustomerField,
+  updateTripField,
+  setPassengers,
+  setTotalPrice,
+  resetContract,
+  replaceContract,
+} = contractSlice.actions;
+
+export const selectContract = state => state.contract;
+export const selectDriver = state => state.contract.driver;
+export const selectProvider = state => state.contract.provider;
+export const selectCustomer = state => state.contract.customer;
+export const selectTrip = state => state.contract.trip;
+
+export default contractSlice.reducer;

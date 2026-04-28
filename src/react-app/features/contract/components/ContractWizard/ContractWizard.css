@@ -1,0 +1,70 @@
+.contractWizard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contractWizard-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.contractWizard-title {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.contractWizard-copy {
+  margin: 0;
+  color: #475467;
+}
+
+.contractWizard-error {
+  margin: 0;
+  color: #b91c1c;
+}
+
+.contractWizard-step {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.contractWizard-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.contractWizard-field input {
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font: inherit;
+}
+
+.contractWizard-nav {
+  display: flex;
+  gap: 10px;
+}
+
+.contractWizard-button {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  font: inherit;
+  cursor: pointer;
+}
+
+.contractWizard-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

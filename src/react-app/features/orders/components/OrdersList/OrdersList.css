@@ -1,0 +1,51 @@
+.ordersList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ordersList-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.ordersList-view {
+  align-self: flex-start;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ordersList-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ordersList-label {
+  color: #6b7280;
+}
+
+.ordersList-value {
+  text-align: right;
+}
+
+.ordersList-empty {
+  margin: 0;
+  padding: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: #fff;
+}

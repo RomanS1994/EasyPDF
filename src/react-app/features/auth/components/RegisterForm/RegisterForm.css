@@ -1,0 +1,48 @@
+.registerForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.registerForm-title {
+  margin: 0;
+}
+
+.registerForm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.registerForm-field input {
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font: inherit;
+}
+
+.registerForm-error {
+  margin: 0;
+  color: #b91c1c;
+}
+
+.registerForm-button {
+  align-self: flex-start;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  font: inherit;
+  cursor: pointer;
+}
+
+.registerForm-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

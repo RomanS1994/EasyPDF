@@ -1,0 +1,40 @@
+.managerUsersList {
+  display: grid;
+  gap: 0.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.managerUsersList-item {
+  margin: 0;
+  padding: 0;
+}
+
+.managerUsersList-button {
+  display: grid;
+  gap: 0.25rem;
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border: 1px solid #d7dee8;
+  border-radius: 0.75rem;
+  background: #ffffff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.managerUsersList-button.is-active {
+  border-color: #0f6cbd;
+  background: #f3f8fd;
+}
+
+.managerUsersList-name {
+  font-weight: 700;
+  color: #122033;
+}
+
+.managerUsersList-email,
+.managerUsersList-role {
+  color: #526173;
+  font-size: 0.95rem;
+}

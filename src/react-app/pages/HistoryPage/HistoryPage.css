@@ -1,0 +1,52 @@
+.historyPage {
+  display: grid;
+  gap: 1rem;
+}
+
+.historyPage-header {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.historyPage-title {
+  margin: 0;
+  color: #122033;
+}
+
+.historyPage-copy,
+.historyPage-state {
+  margin: 0;
+  color: #526173;
+}
+
+.historyPage-list {
+  display: grid;
+  gap: 0.9rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.historyPage-item {
+  display: grid;
+  gap: 0.45rem;
+  padding: 1rem;
+  border: 1px solid #d7dee8;
+  border-radius: 0.9rem;
+  background: #ffffff;
+}
+
+.historyPage-row {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.historyPage-label {
+  color: #526173;
+  font-size: 0.9rem;
+}
+
+.historyPage-value {
+  color: #122033;
+  font-weight: 600;
+}

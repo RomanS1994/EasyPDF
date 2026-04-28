@@ -1,0 +1,104 @@
+.managerPlansPanel {
+  display: grid;
+  gap: 1rem;
+}
+
+.managerPlansPanel-section,
+.managerPlansPanel-form {
+  padding: 1rem;
+  border: 1px solid #d7dee8;
+  border-radius: 0.9rem;
+  background: #ffffff;
+}
+
+.managerPlansPanel-title {
+  margin: 0 0 1rem;
+  color: #122033;
+}
+
+.managerPlansPanel-state,
+.managerPlansPanel-message,
+.managerPlansPanel-error {
+  margin: 0;
+}
+
+.managerPlansPanel-state {
+  color: #526173;
+}
+
+.managerPlansPanel-message {
+  color: #1f6b38;
+}
+
+.managerPlansPanel-error {
+  color: #b42318;
+}
+
+.managerPlansPanel-list {
+  display: grid;
+  gap: 0.9rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.managerPlansPanel-item {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #e3e8ef;
+  border-radius: 0.8rem;
+  background: #f9fbfd;
+}
+
+.managerPlansPanel-row,
+.managerPlansPanel-field {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.managerPlansPanel-label {
+  color: #526173;
+  font-size: 0.9rem;
+}
+
+.managerPlansPanel-value {
+  color: #122033;
+  font-weight: 600;
+}
+
+.managerPlansPanel-input,
+.managerPlansPanel-textarea {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #c8d2df;
+  border-radius: 0.65rem;
+  background: #ffffff;
+  color: #122033;
+}
+
+.managerPlansPanel-textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.managerPlansPanel-checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.managerPlansPanel-button {
+  width: fit-content;
+  padding: 0.7rem 1rem;
+  border: 1px solid #0f6cbd;
+  border-radius: 0.65rem;
+  background: #0f6cbd;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.managerPlansPanel-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

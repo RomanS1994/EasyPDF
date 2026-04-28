@@ -1,0 +1,34 @@
+.ordersPage {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ordersPage-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ordersPage-title {
+  margin: 0;
+  font-size: 24px;
+}
+
+.ordersPage-copy {
+  margin: 0;
+  color: #475467;
+}
+
+.ordersPage-count {
+  margin: 0;
+  color: #475467;
+}
+
+.ordersPage-state {
+  margin: 0;
+  padding: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: #fff;
+}

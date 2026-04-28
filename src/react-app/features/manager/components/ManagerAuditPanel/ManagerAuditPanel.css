@@ -1,0 +1,43 @@
+.managerAuditPanel {
+  padding: 1rem;
+  border: 1px solid #d7dee8;
+  border-radius: 0.9rem;
+  background: #ffffff;
+}
+
+.managerAuditPanel-state {
+  margin: 0;
+  color: #526173;
+}
+
+.managerAuditPanel-list {
+  display: grid;
+  gap: 0.9rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.managerAuditPanel-item {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #e3e8ef;
+  border-radius: 0.8rem;
+  background: #f9fbfd;
+}
+
+.managerAuditPanel-row {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.managerAuditPanel-label {
+  color: #526173;
+  font-size: 0.9rem;
+}
+
+.managerAuditPanel-value {
+  color: #122033;
+  font-weight: 600;
+}

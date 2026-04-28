@@ -58,20 +58,19 @@ dist/      production build output
 
 ## Frontend structure
 
-- `src/pages/*/page.js` contains the route entry shells for each page.
-- `src/app/bootstrap.js` contains the page-level bootstrap functions.
-- `src/features/auth` contains the auth workspace split into guest, account, orders, history, stats, and shell subfeatures.
-- `src/features/contracts` contains the contract editor, storage, bindings, validation, and PDF generation flow.
-- `src/features/manager` contains the manager/admin workspace logic.
-- `src/shared` contains shared infrastructure such as i18n, API client, storage helpers, formatting, download helpers, and UI utilities.
+- `src/react-app` contains the isolated React app.
+- `src/react-app/app` contains the shell, router, store, providers, and layout components.
+- `src/react-app/features` contains feature slices, RTK Query APIs, hooks, utilities, and UI components.
+- `src/react-app/pages` contains the React route pages.
+- `src/index.html` is the single React SPA entry point.
 
 ## Основні сторінки
 
 | Зона | Шляхи |
 | --- | --- |
 | User app | `/cz/pdf/`, `/cz/pdf/orders/`, `/cz/pdf/history/`, `/cz/pdf/stats/`, `/cz/pdf/account/`, `/cz/pdf/settings/` |
-| Manager/Admin app | `/cz/pdf/admin/accounts/`, `/cz/pdf/admin/subscriptions/`, `/cz/pdf/admin/orders/`, `/cz/pdf/admin/settings/` |
-| Додатковий вхід | `/cz/pdf/manager/` |
+| Manager app | `/cz/pdf/manager/` |
+| Admin app | `/cz/pdf/admin/`, `/cz/pdf/admin/accounts/`, `/cz/pdf/admin/subscriptions/`, `/cz/pdf/admin/orders/`, `/cz/pdf/admin/settings/`, `/cz/pdf/admin/settings/language/`, `/cz/pdf/admin/settings/plans/`, `/cz/pdf/admin/settings/audit/` |
 
 ## Локальний запуск
 

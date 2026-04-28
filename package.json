@@ -15,7 +15,7 @@
     "hooks:install": "node tools/install-git-hooks.js",
     "prepare": "node tools/install-git-hooks.js",
     "secrets:check": "node tools/check-secrets.js",
-    "build": "vite build --base=/ && node tools/postbuild-pages.js",
+    "build": "vite build --base=/",
     "preview": "vite preview",
     "start:server": "npm --prefix backend run start"
   },
@@ -27,7 +27,11 @@
   "author": "Roman Stryzhka rstrizhko1994@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "toastify-js": "^1.12.0",
+    "@reduxjs/toolkit": "^2.11.2",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^7.14.2",
     "vite-plugin-full-reload": "^1.2.0",
     "vite-plugin-html-inject": "^1.1.2"
   },

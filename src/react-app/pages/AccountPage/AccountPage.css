@@ -1,0 +1,63 @@
+.accountPage {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.accountPage-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.accountPage-title {
+  margin: 0;
+  font-size: 24px;
+}
+
+.accountPage-copy {
+  margin: 0;
+  color: #475467;
+}
+
+.accountPage-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.accountPage-user {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.accountPage-authForms {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.accountPage-line {
+  margin: 0;
+}
+
+.accountPage-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.accountPage-button {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  font: inherit;
+  cursor: pointer;
+}

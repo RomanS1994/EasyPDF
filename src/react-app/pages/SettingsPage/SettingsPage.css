@@ -1,0 +1,34 @@
+.settingsPage {
+  display: grid;
+  gap: 1rem;
+}
+
+.settingsPage-header {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.settingsPage-title {
+  margin: 0;
+  color: #122033;
+}
+
+.settingsPage-copy,
+.settingsPage-line {
+  margin: 0;
+  color: #526173;
+}
+
+.settingsPage-card {
+  padding: 1rem;
+  border: 1px solid #d7dee8;
+  border-radius: 0.9rem;
+  background: #ffffff;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.settingsPage-cardTitle {
+  margin: 0;
+  color: #122033;
+}

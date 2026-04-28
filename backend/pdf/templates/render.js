@@ -1,10 +1,5 @@
-import { readFileSync } from "node:fs";
-
-const MAIN_ROBOT_PNG = readFileSync(
-  new URL("../../../src/shared/assets/main_robot.png", import.meta.url),
-);
-
-const MAIN_ROBOT_DATA_URI = `data:image/png;base64,${MAIN_ROBOT_PNG.toString("base64")}`;
+const MAIN_ROBOT_DATA_URI =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2GxX0AAAAASUVORK5CYII=";
 
 function resolveLanguage() {
   return "cs";

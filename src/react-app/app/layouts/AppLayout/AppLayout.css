@@ -1,0 +1,22 @@
+.appLayout {
+  min-height: 100vh;
+  background: #f5f7fb;
+  color: #101828;
+}
+
+.appLayout-body {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 16px;
+  padding: 16px;
+}
+
+.appLayout-main {
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .appLayout-body {
+    grid-template-columns: 1fr;
+  }
+}
