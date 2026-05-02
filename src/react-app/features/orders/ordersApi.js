@@ -41,10 +41,13 @@ export const ordersApi = baseApi.injectEndpoints({
         body: payload,
         ...(options || {}),
       }),
-      invalidatesTags: (_result, _error, { orderId }) => [
-        { type: 'Orders', id: 'LIST' },
-        { type: 'Orders', id: orderId },
-      ],
+      invalidatesTags: (_result, _error, { orderId, skipInvalidation }) =>
+        skipInvalidation
+          ? []
+          : [
+              { type: 'Orders', id: 'LIST' },
+              { type: 'Orders', id: orderId },
+            ],
     }),
     archiveOrder: builder.mutation({
       query: orderId => ({

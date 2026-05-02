@@ -94,26 +94,6 @@ export function WorkspaceOverview({ user, orders }) {
           </Link>
         </div>
       </div>
-
-      <div className="screenCard workspaceOverview-actions">
-        <div className="compactHeader">
-          <h2>Start from the right screen</h2>
-          <p>
-            The primary order builder now lives on the Orders tab, while the first screen stays focused on workspace status.
-          </p>
-        </div>
-
-        <div className="workspaceOverview-links">
-          <Link className="workspaceOverview-linkCard" to="/cz/pdf/orders">
-            <span>Create order</span>
-            <strong>Open contract builder</strong>
-          </Link>
-          <Link className="workspaceOverview-linkCard" to="/cz/pdf/stats">
-            <span>Stats</span>
-            <strong>Review PDF activity</strong>
-          </Link>
-        </div>
-      </div>
     </div>
   );
 }

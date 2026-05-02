@@ -206,6 +206,7 @@ export function ContractActions() {
       try {
         await updateOrder({
           orderId,
+          skipInvalidation: true,
           payload: {
             status: 'pdf_generated',
             metadata: {
@@ -233,6 +234,7 @@ export function ContractActions() {
         try {
           await updateOrder({
             orderId,
+            skipInvalidation: true,
             payload: {
               status: 'pdf_failed',
               metadata: {

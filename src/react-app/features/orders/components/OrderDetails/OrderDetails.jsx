@@ -202,6 +202,7 @@ export function OrderDetails({ orderId, onClose }) {
       try {
         await updateOrder({
           orderId,
+          skipInvalidation: true,
           payload: {
             status: "pdf_generated",
             metadata: {

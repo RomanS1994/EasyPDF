@@ -137,66 +137,6 @@
   line-height: 1.35;
 }
 
-.workspaceOverview-actions {
-  gap: 14px;
-  padding: 15px;
-}
-
-.workspaceOverview-links {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 11px;
-}
-
-.workspaceOverview-linkCard {
-  display: grid;
-  gap: 4px;
-  min-height: 96px;
-  padding: 13px;
-  border: 1px solid rgba(15, 95, 215, 0.12);
-  border-radius: 21px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(239, 245, 255, 0.9));
-  text-decoration: none;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    0 12px 24px rgba(28, 32, 40, 0.04);
-}
-
-.workspaceOverview-linkCard span {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.workspaceOverview-linkCard strong {
-  font-size: 17px;
-  line-height: 1.15;
-  letter-spacing: -0.03em;
-  font-weight: 700;
-}
-
-.workspaceOverview .compactHeader {
-  gap: 6px;
-}
-
-.workspaceOverview .compactHeader h2 {
-  font-size: clamp(22px, 5vw, 25px);
-}
-
-.workspaceOverview-actions .compactHeader p {
-  max-width: 26rem;
-  font-size: 14px;
-}
-
-@media (max-width: 560px) {
-  .workspaceOverview-links {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 480px) {
   .workspaceOverview {
     gap: 13px;
@@ -251,8 +191,7 @@
     font-size: 13px;
   }
 
-  .workspaceOverview .screenCard-home,
-  .workspaceOverview-actions {
+  .workspaceOverview .screenCard-home {
     padding: 9px;
   }
 
@@ -278,35 +217,6 @@
     font-size: 9px;
   }
 
-  .workspaceOverview .compactHeader h2 {
-    font-size: clamp(18px, 5.3vw, 21px);
-  }
-
-  .workspaceOverview-actions .compactHeader p {
-    font-size: 10px;
-  }
-
-  .workspaceOverview-actions {
-    gap: 12px;
-  }
-
-  .workspaceOverview-links {
-    gap: 7px;
-  }
-
-  .workspaceOverview-linkCard {
-    min-height: 84px;
-    padding: 10px;
-    border-radius: 19px;
-  }
-
-  .workspaceOverview-linkCard span {
-    font-size: 9px;
-  }
-
-  .workspaceOverview-linkCard strong {
-    font-size: 14px;
-  }
 }
 
 @keyframes workspaceRobotFloat {
