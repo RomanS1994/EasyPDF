@@ -2,10 +2,6 @@ const EUR_RATE = 25;
 
 let currentCurrency = 'EUR';
 
-export function getCurrentCurrency() {
-  return currentCurrency;
-}
-
 export function setCurrentCurrency(value) {
   currentCurrency = value === 'CZK' ? 'CZK' : 'EUR';
 }

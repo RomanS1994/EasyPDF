@@ -102,14 +102,3 @@ export async function renderPdfFromHtml(html) {
     await page.close();
   }
 }
-
-export async function closePdfBrowser() {
-  if (!browserPromise) return;
-
-  const browser = await browserPromise.catch(() => null);
-  browserPromise = null;
-
-  if (browser) {
-    await browser.close();
-  }
-}

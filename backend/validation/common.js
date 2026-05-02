@@ -79,8 +79,3 @@ export function formatDateShort(isoDate) {
     year: 'numeric',
   });
 }
-
-export function isIsoWithinRange(targetIso, startIso, endIso) {
-  if (!targetIso || !startIso || !endIso) return false;
-  return targetIso >= startIso && targetIso <= endIso;
-}

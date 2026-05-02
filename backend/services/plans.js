@@ -59,10 +59,3 @@ export function getDatabasePlans(database, { includeInactive = true } = {}) {
     return left.name.localeCompare(right.name);
   });
 }
-
-export function getPlanRecord(database, planId, { includeInactive = true } = {}) {
-  return (
-    getDatabasePlans(database, { includeInactive }).find(plan => plan.id === planId) ||
-    null
-  );
-}
