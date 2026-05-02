@@ -26,7 +26,7 @@ export const PLANS = [
   },
   {
     id: 'plan-25',
-    name: 'Starter 25',
+    name: 'Silver',
     monthlyGenerationLimit: 25,
     priceCzk: 299,
     description: '25 tokens per month',
@@ -36,7 +36,7 @@ export const PLANS = [
   },
   {
     id: 'plan-50',
-    name: 'Growth 50',
+    name: 'Gold',
     monthlyGenerationLimit: 50,
     priceCzk: 499,
     description: '50 tokens per month',
@@ -46,7 +46,7 @@ export const PLANS = [
   },
   {
     id: 'plan-100',
-    name: 'Scale 100',
+    name: 'Platinum',
     monthlyGenerationLimit: 100,
     priceCzk: 899,
     description: '100 tokens per month',

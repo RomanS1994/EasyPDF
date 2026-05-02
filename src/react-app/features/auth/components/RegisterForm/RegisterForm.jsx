@@ -7,7 +7,7 @@ import { saveSession } from '../../authStorage.js';
 import { useGetPlansQuery } from '../../../plans/plansApi.js';
 import './RegisterForm.css';
 
-export function RegisterForm() {
+export function RegisterForm({ selectedPlanId = '', onPlanSelect }) {
   const dispatch = useDispatch();
   const [register, { isLoading }] = useRegisterMutation();
   const { data, isLoading: isPlansLoading } = useGetPlansQuery();
@@ -17,13 +17,22 @@ export function RegisterForm() {
   const [planId, setPlanId] = useState('');
   const [error, setError] = useState('');
   const plans = data?.plans || [];
+  const activePlanId = selectedPlanId || planId;
 
   useEffect(() => {
     // Ставимо перший доступний план за замовчуванням.
-    if (!planId && plans.length) {
-      setPlanId(plans[0].id || '');
+    if (!activePlanId && plans.length) {
+      const nextPlanId = plans[0].id || '';
+      setPlanId(nextPlanId);
+      onPlanSelect?.(nextPlanId);
     }
-  }, [planId, plans]);
+  }, [activePlanId, onPlanSelect, plans]);
+
+  useEffect(() => {
+    if (selectedPlanId) {
+      setPlanId(selectedPlanId);
+    }
+  }, [selectedPlanId]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -31,12 +40,12 @@ export function RegisterForm() {
 
     try {
       // Передаємо вибраний план у запит реєстрації.
-      const activePlanId = planId || plans[0]?.id || 'plan-free';
+      const nextPlanId = activePlanId || plans[0]?.id || 'plan-free';
       const data = await register({
         name,
         email,
         password,
-        planId: activePlanId,
+        planId: nextPlanId,
       }).unwrap();
       saveSession(data.token, data.user);
       dispatch(setSession({ token: data.token, user: data.user }));
@@ -75,8 +84,12 @@ export function RegisterForm() {
       <label className="registerForm-field">
         <span>Plan</span>
         <select
-          value={planId}
-          onChange={event => setPlanId(event.target.value)}
+          value={activePlanId}
+          onChange={event => {
+            const nextPlanId = event.target.value;
+            setPlanId(nextPlanId);
+            onPlanSelect?.(nextPlanId);
+          }}
           disabled={isPlansLoading || !plans.length}
         >
           {plans.map(plan => (

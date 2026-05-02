@@ -21,6 +21,7 @@ function getGuestText(mode) {
 
 export function GuestStage({ defaultMode = "login" }) {
   const [mode, setMode] = useState(() => defaultMode);
+  const [selectedPlanId, setSelectedPlanId] = useState("");
 
   useEffect(() => {
     setMode(defaultMode);
@@ -38,14 +39,16 @@ export function GuestStage({ defaultMode = "login" }) {
         </div>
       </div>
 
-      {mode === "register" ? <PlanCards /> : null}
+      {mode === "register" ? (
+        <PlanCards selectedPlanId={selectedPlanId} onPlanSelect={setSelectedPlanId} />
+      ) : null}
 
       <section className="guestAuth screenCard">
         <div className="compactHeader">
-          <h2>{mode === "login" ? "Welcome back" : "Create your workspace"}</h2>
+          <h2>{mode === "login" ? "Sign in to continue" : "Create your workspace"}</h2>
           <p>
             {mode === "login"
-              ? "Return to your orders, statistics and documents without extra steps."
+              ? "Use your email and password to get back into your workspace."
               : "Start with a free account and switch to a paid plan later if needed."}
           </p>
         </div>
@@ -53,7 +56,12 @@ export function GuestStage({ defaultMode = "login" }) {
         <AuthModeSwitch value={mode} onChange={setMode} />
 
         <div className="guestAuthForms">
-          {mode === "login" ? <LoginForm /> : <RegisterForm />}
+          {mode === "login" ? <LoginForm /> : (
+            <RegisterForm
+              selectedPlanId={selectedPlanId}
+              onPlanSelect={setSelectedPlanId}
+            />
+          )}
         </div>
       </section>
     </section>

@@ -1,49 +1,99 @@
 import './PlanCard.css';
 
 function getPriceLabel(plan) {
-  // Формуємо коротку ціну для стартової картки.
-  return Number(plan.priceCzk || 0) > 0 ? `${plan.priceCzk} Kc` : 'Free';
+  const price = Number(plan.priceCzk || 0);
+
+  return price > 0 ? `${price} CZK` : 'Free';
 }
 
-function getPlanClassName(plan) {
-  // Підбираємо простий колір за назвою плану.
-  const planName = String(plan.slug || plan.name || '').toLowerCase();
+function getPlanVariant(plan) {
+  const planName = String(plan.id || plan.slug || plan.name || '').toLowerCase();
+  const limit = Number(plan.monthlyGenerationLimit || 0);
 
-  if (planName.includes('trial')) {
-    return 'planCard--trial';
+  if (planName.includes('free') || planName.includes('trial')) {
+    return 'planCard--free';
   }
 
-  if (planName.includes('bronze')) {
-    return 'planCard--bronze';
-  }
-
-  if (planName.includes('silver')) {
+  if (planName.includes('silver') || planName.includes('25')) {
     return 'planCard--silver';
   }
 
-  if (planName.includes('gold')) {
+  if (planName.includes('gold') || planName.includes('50')) {
     return 'planCard--gold';
   }
 
-  return 'planCard--free';
+  if (planName.includes('platinum') || planName.includes('100')) {
+    return 'planCard--platinum';
+  }
+
+  if (limit <= 10) {
+    return 'planCard--free';
+  }
+
+  if (limit <= 25) {
+    return 'planCard--silver';
+  }
+
+  if (limit <= 50) {
+    return 'planCard--gold';
+  }
+
+  if (limit > 50) {
+    return 'planCard--platinum';
+  }
+
+  return 'planCard--silver';
 }
 
-export function PlanCard({ plan }) {
+function getPlanTokens(plan) {
+  const limit = Number(plan.monthlyGenerationLimit || 0);
+  const pdfCount = Array.isArray(plan.pdfDocuments) ? plan.pdfDocuments.length : 0;
+  const variant = getPlanVariant(plan);
+
+  const tokens = [`${limit} tokens`, `${pdfCount} PDF types`];
+
+  if (variant === 'planCard--free') {
+    tokens.push('Manual upgrade');
+  } else if (variant === 'planCard--silver') {
+    tokens.push('Sharp entry');
+  } else if (variant === 'planCard--gold') {
+    tokens.push('Best value');
+  } else if (variant === 'planCard--platinum') {
+    tokens.push('Priority access');
+  }
+
+  return tokens;
+}
+
+export function PlanCard({ plan, selected = false, onClick }) {
+  const tokens = getPlanTokens(plan);
+
   return (
-    <article className={`planCard ${getPlanClassName(plan)}`}>
-      <div className="planCard-tierRow">
+    <button
+      type="button"
+      className={`planCard ${getPlanVariant(plan)} ${selected ? 'is-selected' : ''}`}
+      aria-pressed={selected}
+      onClick={onClick}
+    >
+      {selected ? <span className="planCard-selectedBadge">Selected</span> : null}
+      <div className="planCard-topRow">
         <span className="planCard-tier">{plan.name || '-'}</span>
-        <span className="planCard-limit">{getPriceLabel(plan)}</span>
+        <span className="planCard-price">{getPriceLabel(plan)}</span>
       </div>
-      <div className="planCard-head">
-        <p>Monthly limit</p>
-        <strong>{plan.monthlyGenerationLimit || '-'}</strong>
+      <div className="planCard-hero">
+        <span className="planCard-heroLabel">Monthly tokens</span>
+        <strong className="planCard-heroValue">{plan.monthlyGenerationLimit || '-'}</strong>
       </div>
-      <span className="planCard-price">{plan.monthlyGenerationLimit || '-'} / month</span>
-      <p className="planCard-copy">{plan.description || '-'}</p>
+      <div className="planCard-tokens" aria-label="Plan tokens">
+        {tokens.map(token => (
+          <span className="planCard-token" key={token}>
+            {token}
+          </span>
+        ))}
+      </div>
       <div className="planCard-footer">
-        <span className="planCard-action">Choose plan</span>
+        <span className="planCard-action">{selected ? 'Selected plan' : 'Choose plan'}</span>
       </div>
-    </article>
+    </button>
   );
 }

@@ -2,7 +2,7 @@ import { useGetPlansQuery } from '../../../../features/plans/plansApi.js';
 import { PlanCard } from '../PlanCard/PlanCard.jsx';
 import './PlanCards.css';
 
-export function PlanCards() {
+export function PlanCards({ selectedPlanId, onPlanSelect }) {
   const { data, isLoading, isError } = useGetPlansQuery();
   const plans = data?.plans || [];
 
@@ -14,7 +14,12 @@ export function PlanCards() {
       {!isLoading && !isError && plans.length ? (
         <div className="planCardsGrid">
           {plans.map(plan => (
-            <PlanCard key={plan.id} plan={plan} />
+            <PlanCard
+              key={plan.id}
+              plan={plan}
+              selected={plan.id === selectedPlanId}
+              onClick={() => onPlanSelect?.(plan.id)}
+            />
           ))}
         </div>
       ) : null}
