@@ -8,6 +8,11 @@ export function CustomerFields() {
   const customer = useSelector(selectCustomer);
   const passengers = useSelector(selectContract).passengers;
 
+  function handlePassengersChange(event) {
+    const nextValue = event.target.value.replace(/[^\d]/g, '');
+    dispatch(setPassengers(nextValue));
+  }
+
   return (
     <div className="contractFieldsBlock">
       <label className="contractField">
@@ -64,13 +69,13 @@ export function CustomerFields() {
         <div className="contractFieldControl">
           <input
             className="contractField-input"
-            type="number"
-            min="1"
-            step="1"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             placeholder="Passengers *"
             required
             value={passengers}
-            onChange={event => dispatch(setPassengers(event.target.value))}
+            onChange={handlePassengersChange}
           />
           {passengers ? (
             <button

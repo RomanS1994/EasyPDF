@@ -82,6 +82,144 @@
   grid-column: 1 / -1;
 }
 
+.contractActionsModal {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  display: grid;
+  place-items: center;
+  padding: 14px;
+}
+
+.contractActionsModal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.26);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.contractActionsModal-sheet {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 14px;
+  width: min(100%, 360px);
+  padding: 18px;
+  border-radius: 24px;
+  border: 1px solid rgba(22, 163, 74, 0.14);
+  background:
+    radial-gradient(circle at top right, rgba(34, 197, 94, 0.14), transparent 34%),
+    radial-gradient(circle at top left, rgba(255, 243, 192, 0.16), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(244, 251, 245, 0.97));
+  box-shadow:
+    0 24px 48px rgba(17, 24, 39, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+.contractActionsModal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid rgba(15, 95, 215, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #596579;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.contractActionsModal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  padding: 6px 12px 6px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(22, 163, 74, 0.14);
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.72), transparent 35%),
+    linear-gradient(180deg, rgba(232, 247, 235, 0.98), rgba(214, 241, 221, 0.96));
+  color: #215f33;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 8px 16px rgba(46, 125, 50, 0.08);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.contractActionsModal-badgeIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(34, 197, 94, 1), rgba(22, 163, 74, 1));
+  color: #fff;
+  font-size: 0.8rem;
+}
+
+.contractActionsModal-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.contractActionsModal-copy h2 {
+  margin: 0;
+  font-size: clamp(1.45rem, 5vw, 1.75rem);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+.contractActionsModal-copy p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.contractActionsModal-card {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(60, 60, 67, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.contractActionsModal-card span {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.contractActionsModal-card strong {
+  font-size: 1.3rem;
+  letter-spacing: -0.03em;
+}
+
+.contractActionsModal-confirm {
+  min-height: 46px;
+  border: 1px solid rgba(22, 163, 74, 0.18);
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(34, 197, 94, 0.98), rgba(22, 163, 74, 0.96));
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.24) inset,
+    0 12px 26px rgba(22, 163, 74, 0.18);
+}
+
 @media (max-width: 480px) {
   .contractActions {
     gap: 8px;
@@ -93,5 +231,10 @@
     padding: 0 14px;
     border-radius: 16px;
     font-size: 0.96rem;
+  }
+
+  .contractActionsModal-sheet {
+    padding: 16px;
+    border-radius: 22px;
   }
 }

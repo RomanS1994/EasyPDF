@@ -74,6 +74,53 @@ function buildGenerationSessionPayload(session, order, contractData, documentTyp
   };
 }
 
+function OrderCreatedModal({ orderNumber, onClose }) {
+  if (!orderNumber) {
+    return null;
+  }
+
+  return (
+    <div className="contractActionsModal" role="presentation">
+      <div className="contractActionsModal-backdrop" onClick={onClose} />
+
+      <div
+        className="contractActionsModal-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="orderCreatedTitle"
+      >
+        <button
+          className="contractActionsModal-close"
+          type="button"
+          aria-label="Close"
+          onClick={onClose}
+        >
+          ×
+        </button>
+
+        <div className="contractActionsModal-badge" aria-hidden="true">
+          <span className="contractActionsModal-badgeIcon">✓</span>
+          <span>Success</span>
+        </div>
+
+        <div className="contractActionsModal-copy">
+          <h2 id="orderCreatedTitle">Order created</h2>
+          <p>Your order has been saved successfully.</p>
+        </div>
+
+        <div className="contractActionsModal-card">
+          <span>Order number</span>
+          <strong>{orderNumber}</strong>
+        </div>
+
+        <button className="contractActionsModal-confirm" type="button" onClick={onClose}>
+          Back to home
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function ContractActions() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -85,6 +132,7 @@ export function ContractActions() {
     useGenerateContractPdfMutation();
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [createdOrderNumber, setCreatedOrderNumber] = useState('');
   const [validationErrors, setValidationErrors] = useState(buildValidationState());
 
   function clearValidation() {
@@ -98,9 +146,16 @@ export function ContractActions() {
     });
   }
 
+  function closeCreatedModal() {
+    setCreatedOrderNumber('');
+    dispatch(clearSession());
+    navigate('/cz/pdf', { replace: true });
+  }
+
   async function handleCreate() {
     setMessage('');
     setError('');
+    setCreatedOrderNumber('');
     clearValidation();
 
     const payloadContract = buildContractPayload(contract);
@@ -137,9 +192,7 @@ export function ContractActions() {
         : await createOrder(payload).unwrap();
 
       const order = response?.order || response;
-      dispatch(clearSession());
-      setMessage(`Order created: ${order?.orderNumber || '-'}`);
-      navigate('/cz/pdf', { replace: true });
+      setCreatedOrderNumber(String(order?.orderNumber || 'Order saved'));
     } catch (error) {
       setError(resolveErrorMessage(error, 'Failed to create order.'));
     }
@@ -258,76 +311,80 @@ export function ContractActions() {
   }
 
   return (
-    <section className="contractActions">
-      {validationErrors.customerName ? (
-        <p className="contractActions-error contractActions-fullWidth">
-          {validationErrors.customerName}
-        </p>
-      ) : null}
-      {validationErrors.customerContact ? (
-        <p className="contractActions-error contractActions-fullWidth">
-          {validationErrors.customerContact}
-        </p>
-      ) : null}
-      {validationErrors.passengers ? (
-        <p className="contractActions-error contractActions-fullWidth">
-          {validationErrors.passengers}
-        </p>
-      ) : null}
-      {validationErrors.fromAddress ? (
-        <p className="contractActions-error contractActions-fullWidth">
-          {validationErrors.fromAddress}
-        </p>
-      ) : null}
-      {validationErrors.toAddress ? (
-        <p className="contractActions-error contractActions-fullWidth">
-          {validationErrors.toAddress}
-        </p>
-      ) : null}
-      {validationErrors.tripDate ? (
-        <p className="contractActions-error contractActions-fullWidth">
-          {validationErrors.tripDate}
-        </p>
-      ) : null}
-      {validationErrors.paymentMethod ? (
-        <p className="contractActions-error contractActions-fullWidth">
-          {validationErrors.paymentMethod}
-        </p>
-      ) : null}
-      {validationErrors.totalPrice ? (
-        <p className="contractActions-error contractActions-fullWidth">
-          {validationErrors.totalPrice}
-        </p>
-      ) : null}
+    <>
+      <section className="contractActions">
+        {validationErrors.customerName ? (
+          <p className="contractActions-error contractActions-fullWidth">
+            {validationErrors.customerName}
+          </p>
+        ) : null}
+        {validationErrors.customerContact ? (
+          <p className="contractActions-error contractActions-fullWidth">
+            {validationErrors.customerContact}
+          </p>
+        ) : null}
+        {validationErrors.passengers ? (
+          <p className="contractActions-error contractActions-fullWidth">
+            {validationErrors.passengers}
+          </p>
+        ) : null}
+        {validationErrors.fromAddress ? (
+          <p className="contractActions-error contractActions-fullWidth">
+            {validationErrors.fromAddress}
+          </p>
+        ) : null}
+        {validationErrors.toAddress ? (
+          <p className="contractActions-error contractActions-fullWidth">
+            {validationErrors.toAddress}
+          </p>
+        ) : null}
+        {validationErrors.tripDate ? (
+          <p className="contractActions-error contractActions-fullWidth">
+            {validationErrors.tripDate}
+          </p>
+        ) : null}
+        {validationErrors.paymentMethod ? (
+          <p className="contractActions-error contractActions-fullWidth">
+            {validationErrors.paymentMethod}
+          </p>
+        ) : null}
+        {validationErrors.totalPrice ? (
+          <p className="contractActions-error contractActions-fullWidth">
+            {validationErrors.totalPrice}
+          </p>
+        ) : null}
 
-      <button
-        className="contractActions-save"
-        type="button"
-        onClick={handleCreate}
-        disabled={isCreating || isCreatingNew}
-      >
-        {isCreating || isCreatingNew ? 'Creating...' : 'Save order'}
-      </button>
+        <button
+          className="contractActions-save"
+          type="button"
+          onClick={handleCreate}
+          disabled={isCreating || isCreatingNew}
+        >
+          {isCreating || isCreatingNew ? 'Creating...' : 'Save order'}
+        </button>
 
-      <button
-        className="contractActions-generate"
-        type="button"
-        onClick={handleDownload}
-        disabled={isGenerating || isCreating || isCreatingNew}
-      >
-        {isGenerating ? 'Downloading...' : 'Download PDF'}
-      </button>
+        <button
+          className="contractActions-generate"
+          type="button"
+          onClick={handleDownload}
+          disabled={isGenerating || isCreating || isCreatingNew}
+        >
+          {isGenerating ? 'Downloading...' : 'Download PDF'}
+        </button>
 
-      {generationSession.accessGranted ? (
-        <p className="contractActions-sessionLine">
-          {generationSession.orderNumber
-            ? `Reserved order: ${generationSession.orderNumber}`
-            : 'Token session active'}
-        </p>
-      ) : null}
+        {generationSession.accessGranted ? (
+          <p className="contractActions-sessionLine">
+            {generationSession.orderNumber
+              ? `Reserved order: ${generationSession.orderNumber}`
+              : 'Token session active'}
+          </p>
+        ) : null}
 
-      {message ? <p className="contractActions-message">{message}</p> : null}
-      {error ? <p className="contractActions-error">{error}</p> : null}
-    </section>
+        {message ? <p className="contractActions-message">{message}</p> : null}
+        {error ? <p className="contractActions-error">{error}</p> : null}
+      </section>
+
+      <OrderCreatedModal orderNumber={createdOrderNumber} onClose={closeCreatedModal} />
+    </>
   );
 }

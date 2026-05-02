@@ -32,7 +32,10 @@ export const ordersApi = baseApi.injectEndpoints({
         method: 'POST',
         body,
       }),
-      invalidatesTags: [{ type: 'Orders', id: 'LIST' }],
+      invalidatesTags: [
+        { type: 'Orders', id: 'LIST' },
+        { type: 'Usage', id: 'CURRENT' },
+      ],
     }),
     updateOrder: builder.mutation({
       query: ({ orderId, payload, options }) => ({
@@ -57,6 +60,7 @@ export const ordersApi = baseApi.injectEndpoints({
       invalidatesTags: (_result, _error, orderId) => [
         { type: 'Orders', id: 'LIST' },
         { type: 'Orders', id: orderId },
+        { type: 'Usage', id: 'CURRENT' },
       ],
     }),
     assignDriver: builder.mutation({

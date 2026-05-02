@@ -100,10 +100,11 @@ export function TripFields() {
         <div className="contractFieldControl">
           <input
             className="contractField-input contractField-input-date"
-            type="date"
-            aria-label="Pickup date"
+            type="datetime-local"
+            aria-label="Pickup date and time"
+            step="60"
             required
-            value={trip.time}
+            value={toDateTimeLocalValue(trip.time)}
             onChange={event =>
               dispatch(updateTripField({ key: 'time', value: event.target.value }))
             }
@@ -112,7 +113,7 @@ export function TripFields() {
             <button
               className="contractField-clear"
               type="button"
-              aria-label="Clear pickup date"
+              aria-label="Clear pickup date and time"
               onClick={() => dispatch(updateTripField({ key: 'time', value: '' }))}
             >
               ×
@@ -146,4 +147,33 @@ export function TripFields() {
       </div>
     </div>
   );
+}
+
+function toDateTimeLocalValue(value) {
+  const text = String(value ?? '').trim();
+
+  if (!text) {
+    return '';
+  }
+
+  const match = text.match(
+    /^(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}:\d{2})(?::\d{2})?(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?)?$/,
+  );
+
+  if (match) {
+    return `${match[1]}T${match[2] || '00:00'}`;
+  }
+
+  const parsed = new Date(text);
+  if (Number.isNaN(parsed.getTime())) {
+    return text;
+  }
+
+  const year = parsed.getFullYear();
+  const month = String(parsed.getMonth() + 1).padStart(2, '0');
+  const day = String(parsed.getDate()).padStart(2, '0');
+  const hours = String(parsed.getHours()).padStart(2, '0');
+  const minutes = String(parsed.getMinutes()).padStart(2, '0');
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
 }

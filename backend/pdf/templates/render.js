@@ -1,5 +1,7 @@
 const MAIN_ROBOT_DATA_URI =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2GxX0AAAAASUVORK5CYII=";
+const A4_WIDTH_PX = 794;
+const A4_HEIGHT_PX = 1123;
 
 function resolveLanguage() {
   return "cs";
@@ -203,8 +205,8 @@ export function renderContractPdfHtml({
           }
 
           body {
-            width: 800px;
-            height: 1145px;
+            width: ${A4_WIDTH_PX}px;
+            height: ${A4_HEIGHT_PX}px;
             margin: 0 auto;
             background-color: #fff;
             position: relative;

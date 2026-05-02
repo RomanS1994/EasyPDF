@@ -25,9 +25,16 @@ function getSafeUsage(usage) {
 
 export function StatsPage() {
   const [activeTab, setActiveTab] = useState('usage');
-  const { data: usageData, isLoading: isUsageLoading, isError: isUsageError } = useGetUsageQuery();
+  const { data: usageData, isLoading: isUsageLoading, isError: isUsageError } = useGetUsageQuery(
+    undefined,
+    {
+      refetchOnMountOrArgChange: true,
+    },
+  );
   const { data: ordersData, isLoading: isOrdersLoading, isError: isOrdersError } =
-    useGetOrdersQuery();
+    useGetOrdersQuery(undefined, {
+      refetchOnMountOrArgChange: true,
+    });
 
   const usage = getSafeUsage(usageData?.usage);
   const orders = ordersData?.orders || [];

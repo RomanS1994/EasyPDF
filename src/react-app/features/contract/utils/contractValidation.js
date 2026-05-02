@@ -54,7 +54,7 @@ export function validateContract(contract) {
   }
 
   if (isEmpty(contract?.trip?.time)) {
-    errors.tripDate = 'Pickup date is required.';
+    errors.tripDate = 'Pickup date and time is required.';
   }
 
   if (isEmpty(contract?.trip?.paymentMethod)) {

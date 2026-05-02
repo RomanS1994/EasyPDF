@@ -12,6 +12,7 @@ import {
   useGetOrderQuery,
   useUpdateOrderMutation,
 } from "../../ordersApi.js";
+import { formatDateTime, getOrderTripTime } from "../../../../pages/HistoryPage/historyUtils.js";
 import { resolveErrorMessage } from "../../../../app/utils/errorMessages.js";
 import "./OrderDetails.css";
 
@@ -88,6 +89,7 @@ export function OrderDetails({ orderId, onClose }) {
   const order = data?.order || data || {};
   const customer = order?.contractData?.customer || order?.customer || {};
   const trip = order?.contractData?.trip || order?.trip || {};
+  const tripTime = formatDateTime(getOrderTripTime(order));
   const orderOwner = order?.user || {};
   const orderOwnerId = String(orderOwner?.id || order.userId || "");
   const managerUsers = managerUsersData?.users || [];
@@ -366,7 +368,7 @@ export function OrderDetails({ orderId, onClose }) {
                 </div>
                 <div className="orderDrawer-row">
                   <span className="orderWindow-label">Trip time</span>
-                  <span className="orderWindow-value">{trip.time || "-"}</span>
+                  <span className="orderWindow-value">{tripTime}</span>
                 </div>
                 <div className="orderDrawer-row">
                   <span className="orderWindow-label">Payment</span>

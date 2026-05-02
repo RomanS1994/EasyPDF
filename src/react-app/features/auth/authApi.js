@@ -27,6 +27,7 @@ export const authApi = baseApi.injectEndpoints({
     }),
     getUsage: builder.query({
       query: () => '/me/usage',
+      providesTags: [{ type: 'Usage', id: 'CURRENT' }],
     }),
     updateProfile: builder.mutation({
       query: body => ({
