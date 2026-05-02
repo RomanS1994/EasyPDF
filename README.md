@@ -52,8 +52,9 @@ DocTra побудований як split-stack система:
 ```text
 backend/   API, Prisma schema, migrations, auth, orders, PDF renderer
 src/       frontend app
+public/    static manifest and shared icons copied into frontend build
 tools/     dev runner, build/postbuild helpers, hooks
-dist/      production build output
+dist/      generated production build output (ignored in git)
 ```
 
 ## Frontend structure

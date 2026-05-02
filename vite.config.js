@@ -7,7 +7,7 @@ export default defineConfig({
   base: "/",
   envDir: ".",
   root: "src",
-  publicDir: false,
+  publicDir: "../public",
   appType: "spa",
   resolve: {
     alias: {
