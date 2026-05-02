@@ -5,8 +5,10 @@ import './App.css';
 
 export function App() {
   return (
-    <AppLayout>
-      <Outlet />
-    </AppLayout>
+    <div className="appRoot">
+      <AppLayout>
+        <Outlet />
+      </AppLayout>
+    </div>
   );
 }

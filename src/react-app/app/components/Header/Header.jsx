@@ -14,8 +14,8 @@ export function Header() {
   return (
     <header className="appHeader">
       <div className="appHeader-brand">
-        <p className="appHeader-kicker">React test layer</p>
-        <h1 className="appHeader-title">Isolated React app</h1>
+        <p className="appHeader-kicker">DocTra</p>
+        <h1 className="appHeader-title">Control center</h1>
       </div>
 
       <div className="appHeader-user">

@@ -1,7 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-import { clearSession as clearStoredSession, getToken } from '../../features/auth/authStorage.js';
-import { clearSession as clearAuthSession } from '../../features/auth/authSlice.js';
+import { getToken } from '../../features/auth/authStorage.js';
 
 function resolveBaseUrl() {
   if (import.meta.env.DEV) {
@@ -39,13 +38,15 @@ export const baseApi = createApi({
 
     const result = await baseQuery(args, api, extraOptions);
 
-    if (result?.error?.status === 401) {
-      clearStoredSession();
-      api.dispatch(clearAuthSession());
-    }
-
     return result;
   },
-  tagTypes: ['Orders', 'ManagerUsers', 'ManagerPlans', 'ManagerOrders', 'AuditLogs'],
+  tagTypes: [
+    'Orders',
+    'ManagerUsers',
+    'ManagerPlans',
+    'ManagerOrders',
+    'AuditLogs',
+    'PublicPlans',
+  ],
   endpoints: () => ({}),
 });

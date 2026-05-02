@@ -1,72 +1,158 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
-import { useGetOrdersQuery } from '../../features/orders/ordersApi.js';
-import { OrderDetails } from '../../features/orders/components/OrderDetails/OrderDetails.jsx';
-import { OrderFilters } from '../../features/orders/components/OrderFilters/OrderFilters.jsx';
-import { OrdersList } from '../../features/orders/components/OrdersList/OrdersList.jsx';
+import { ContractForm } from '../../features/contract/components/ContractForm/ContractForm.jsx';
+import { selectContract } from '../../features/contract/contractSlice.js';
+import {
+  clearSession,
+  hasGenerationSession,
+  selectGenerationSession,
+  startSession,
+} from '../../features/contract/generationSessionSlice.js';
+import { useGenerationSessionPersistence } from '../../features/contract/useGenerationSessionPersistence.js';
+import { GenerationGateModal } from '../../features/contract/components/GenerationGateModal/GenerationGateModal.jsx';
+import { GenerationSessionBanner } from '../../features/contract/components/GenerationSessionBanner/GenerationSessionBanner.jsx';
+import sessionRobot from '../../assets/main_robot.png';
 import './OrdersPage.css';
 
+function buildGenerationSessionPayload(contract) {
+  return {
+    accessGranted: true,
+    orderId: '',
+    orderNumber: '',
+    documentType: String(contract?.documentType || 'confirmation'),
+    createdAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+  };
+}
+
 export function OrdersPage() {
-  const [selectedOrderId, setSelectedOrderId] = useState('');
-  const [searchText, setSearchText] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const { data, isLoading, isError } = useGetOrdersQuery();
-  const orders = data?.orders || [];
-  const filteredOrders = [];
+  const isGenerationReady = useGenerationSessionPersistence();
 
-  for (const order of orders) {
-    const orderNumber = String(order?.orderNumber || '').toLowerCase();
-    const customerName = String(
-      order?.contractData?.customer?.name || order?.customer?.name || ''
-    ).toLowerCase();
-    const search = String(searchText || '').toLowerCase().trim();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const contract = useSelector(selectContract);
+  const generationSession = useSelector(selectGenerationSession);
+  const [isGateOpen, setIsGateOpen] = useState(false);
+  const [isReserving, setIsReserving] = useState(false);
+  const [sessionError, setSessionError] = useState({
+    type: '',
+    message: '',
+  });
+  const hasActiveSession = hasGenerationSession(generationSession);
 
-    if (search) {
-      if (!orderNumber.includes(search) && !customerName.includes(search)) {
-        continue;
-      }
+  useEffect(() => {
+    if (!isGenerationReady) {
+      return;
     }
 
-    if (statusFilter !== 'all') {
-      if (String(order?.status || '') !== statusFilter) {
-        continue;
-      }
+    if (!hasActiveSession && !sessionError.message) {
+      setIsGateOpen(true);
+      return;
     }
 
-    filteredOrders.push(order);
+    if (hasActiveSession) {
+      setIsGateOpen(false);
+    }
+  }, [hasActiveSession, isGenerationReady, sessionError.message]);
+
+  async function handleConfirmGate() {
+    setIsReserving(true);
+    dispatch(startSession(buildGenerationSessionPayload(contract)));
+    setSessionError({ type: '', message: '' });
+    setIsGateOpen(false);
+    setIsReserving(false);
   }
 
-  function handleView(orderId) {
-    setSelectedOrderId(orderId);
+  function handleCloseGate() {
+    navigate('/cz/pdf', { replace: true });
   }
 
-  function handleClose() {
-    setSelectedOrderId('');
+  function handleExpiredSession() {
+    dispatch(clearSession());
+    setSessionError({
+      type: 'expired',
+      message: 'Time is up. Please try again later.',
+    });
+    setIsGateOpen(false);
+  }
+
+  function closeErrorModal() {
+    setSessionError({ type: '', message: '' });
+    navigate('/cz/pdf', { replace: true });
   }
 
   return (
-    <section className="ordersPage">
-      <div className="ordersPage-header">
-        <h2 className="ordersPage-title">Orders</h2>
-        <p className="ordersPage-copy">Simple React list backed by RTK Query.</p>
-      </div>
+    <section className="ordersPage pageStack">
+      {hasActiveSession ? (
+        <>
+          <GenerationSessionBanner
+            session={generationSession}
+            onExpired={handleExpiredSession}
+          />
+          <ContractForm />
+        </>
+      ) : null}
 
-      <OrderFilters
-        searchText={searchText}
-        statusFilter={statusFilter}
-        onSearchChange={setSearchText}
-        onStatusChange={setStatusFilter}
+      <GenerationGateModal
+        isOpen={isGateOpen && !hasActiveSession}
+        isBusy={isReserving}
+        onClose={handleCloseGate}
+        onConfirm={handleConfirmGate}
       />
 
-      <p className="ordersPage-count">Showing {filteredOrders.length} orders</p>
+      {sessionError.message ? (
+        <div
+          className={`ordersPage-errorModal ${sessionError.type === 'expired' ? 'ordersPage-errorModal--expired' : ''}`}
+          role="presentation"
+        >
+          <div className="ordersPage-errorBackdrop" />
+          <div
+            className="ordersPage-errorSheet"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="ordersErrorTitle"
+          >
+            {sessionError.type === 'expired' ? (
+              <>
+                <div className="ordersPage-errorArt" aria-hidden="true">
+                  <img src={sessionRobot} alt="" />
+                </div>
 
-      {isLoading ? <p className="ordersPage-state">Loading orders...</p> : null}
-      {isError ? <p className="ordersPage-state">Failed to load orders.</p> : null}
-      {!isLoading && !isError ? (
-        <OrdersList orders={filteredOrders} onView={handleView} />
-      ) : null}
-      {selectedOrderId ? (
-        <OrderDetails orderId={selectedOrderId} onClose={handleClose} />
+                <div className="ordersPage-errorCopy">
+                  <p className="ordersPage-errorEyebrow">Order session</p>
+                  <h2 id="ordersErrorTitle">Time is up</h2>
+                  <p>{sessionError.message}</p>
+                </div>
+
+                <button
+                  className="ordersPage-errorButton"
+                  type="button"
+                  onClick={closeErrorModal}
+                >
+                  Home
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="ordersPage-errorCopy">
+                  <p className="ordersPage-errorEyebrow">Order session</p>
+                  <h2 id="ordersErrorTitle">Something went wrong</h2>
+                  <p>{sessionError.message}</p>
+                </div>
+
+                <button
+                  className="ordersPage-errorButton"
+                  type="button"
+                  onClick={closeErrorModal}
+                >
+                  Go to start screen
+                </button>
+              </>
+            )}
+          </div>
+        </div>
       ) : null}
     </section>
   );

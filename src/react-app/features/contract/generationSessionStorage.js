@@ -1,10 +1,10 @@
-const GENERATION_SESSION_KEY = 'react-generation-session';
+const GENERATION_SESSION_KEY = 'pdf-app-generation-session';
 
 export function loadGenerationSession() {
   try {
-    if (typeof localStorage === 'undefined') return null;
+    if (typeof sessionStorage === 'undefined') return null;
 
-    const rawValue = localStorage.getItem(GENERATION_SESSION_KEY);
+    const rawValue = sessionStorage.getItem(GENERATION_SESSION_KEY);
     if (!rawValue) return null;
 
     const parsedValue = JSON.parse(rawValue);
@@ -18,9 +18,9 @@ export function loadGenerationSession() {
 
 export function saveGenerationSession(session) {
   try {
-    if (typeof localStorage === 'undefined') return;
+    if (typeof sessionStorage === 'undefined') return;
 
-    localStorage.setItem(GENERATION_SESSION_KEY, JSON.stringify(session));
+    sessionStorage.setItem(GENERATION_SESSION_KEY, JSON.stringify(session));
   } catch {
     // Ignore storage errors.
   }
@@ -28,9 +28,9 @@ export function saveGenerationSession(session) {
 
 export function clearGenerationSession() {
   try {
-    if (typeof localStorage === 'undefined') return;
+    if (typeof sessionStorage === 'undefined') return;
 
-    localStorage.removeItem(GENERATION_SESSION_KEY);
+    sessionStorage.removeItem(GENERATION_SESSION_KEY);
   } catch {
     // Ignore storage errors.
   }

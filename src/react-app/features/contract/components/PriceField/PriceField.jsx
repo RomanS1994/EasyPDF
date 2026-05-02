@@ -1,30 +1,115 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { selectContract, setTotalPrice } from '../../contractSlice.js';
-import { formatPrice, sanitizePriceInput } from '../../utils/priceUtils.js';
+import {
+  detectCurrency,
+  extractNumericPrice,
+  formatPrice,
+  sanitizePriceInput,
+  setCurrentCurrency,
+} from '../../utils/priceUtils.js';
 import './PriceField.css';
 
 export function PriceField() {
   const dispatch = useDispatch();
   const totalPrice = useSelector(selectContract).totalPrice;
+  const [priceInput, setPriceInput] = useState('');
+  const [currency, setCurrency] = useState('EUR');
+  const skipSyncRef = useRef(false);
+
+  const convertedPrice = useMemo(() => {
+    if (!priceInput) {
+      return '';
+    }
+
+    return formatPrice(priceInput, currency);
+  }, [currency, priceInput]);
+
+  useEffect(() => {
+    if (skipSyncRef.current) {
+      skipSyncRef.current = false;
+      return;
+    }
+
+    const currentValue = String(totalPrice || '').trim();
+    const nextCurrency = detectCurrency(currentValue);
+    const nextInput = extractNumericPrice(currentValue);
+
+    setCurrency(nextCurrency);
+    setCurrentCurrency(nextCurrency);
+    setPriceInput(nextInput);
+  }, [totalPrice]);
+
+  function syncPrice(nextInput, nextCurrency) {
+    const formatted = formatPrice(nextInput, nextCurrency);
+    const nextValue = formatted || nextInput;
+
+    skipSyncRef.current = true;
+    setCurrentCurrency(nextCurrency);
+    setCurrency(nextCurrency);
+    setPriceInput(nextInput);
+    dispatch(setTotalPrice(nextValue));
+  }
+
+  function handleInputChange(event) {
+    const nextInput = sanitizePriceInput(event.target.value);
+    syncPrice(nextInput, currency);
+  }
+
+  function handleCurrencyChange(nextCurrency) {
+    if (nextCurrency === currency) {
+      return;
+    }
+
+    syncPrice(priceInput, nextCurrency);
+  }
+
+  function clearPrice() {
+    skipSyncRef.current = true;
+    setPriceInput('');
+    dispatch(setTotalPrice(''));
+  }
 
   return (
-    <section className="contractSection">
+    <section className="contractSection contractSection-price">
       <h3 className="contractSection-title">Price</h3>
 
-      <label className="contractField">
-        <span className="contractField-label">Total price</span>
-        <input
-          className="contractField-input"
-          type="text"
-          value={totalPrice}
-          onChange={event => {
-            const sanitized = sanitizePriceInput(event.target.value);
-            const formatted = formatPrice(sanitized);
-            dispatch(setTotalPrice(formatted || sanitized));
-          }}
-        />
-      </label>
+      <div className="priceField">
+        <div className="priceField-row">
+          <div className="priceField-inputWrap">
+            <input
+              className="priceField-input"
+              type="text"
+              inputMode="decimal"
+              aria-label="Trip price"
+              placeholder="Trip price *"
+              required
+              value={priceInput}
+              onChange={handleInputChange}
+            />
+
+            {priceInput ? (
+              <button className="priceField-clear" type="button" onClick={clearPrice}>
+                ×
+              </button>
+            ) : null}
+          </div>
+
+          {['EUR', 'CZK'].map(item => (
+            <button
+              key={item}
+              className={`priceField-currencyButton ${currency === item ? 'is-active' : ''}`}
+              type="button"
+              onClick={() => handleCurrencyChange(item)}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+
+        {convertedPrice ? <p className="priceField-converted">{convertedPrice}</p> : null}
+      </div>
     </section>
   );
 }

@@ -7,7 +7,7 @@ export function AdminPage() {
     <section className="adminPage">
       <div className="adminPage-header">
         <h2 className="adminPage-title">Admin</h2>
-        <p className="adminPage-copy">Simple React admin area.</p>
+        <p className="adminPage-copy">Overview for the administrative sections of DocTra.</p>
       </div>
 
       <div className="adminPage-grid">

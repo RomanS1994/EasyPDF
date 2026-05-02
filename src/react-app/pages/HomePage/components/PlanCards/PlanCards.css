@@ -1,0 +1,37 @@
+.planCardsSection {
+  display: grid;
+  gap: 8px;
+}
+
+.planCardsGrid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(168px, calc(100% - 150px));
+  gap: 6px;
+  overflow-x: auto;
+  margin: 0 -4px;
+  padding: 2px 4px 4px;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.planCardsGrid::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 760px) {
+  .planCardsGrid {
+    grid-auto-columns: minmax(180px, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .planCardsGrid {
+    grid-auto-columns: minmax(146px, calc(100% - 140px));
+    gap: 5px;
+    margin: 0 -2px;
+    padding: 2px 2px 4px;
+  }
+}

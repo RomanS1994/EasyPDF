@@ -1,6 +1,5 @@
 .contractField {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: 6px;
 }
 
@@ -9,16 +8,18 @@
 }
 
 .contractField-label {
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 600;
+  color: var(--muted);
 }
 
 .contractField-input {
   width: 100%;
-  min-height: 40px;
-  padding: 0 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid rgba(15, 95, 215, 0.14);
+  border-radius: 14px;
   font: inherit;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text);
 }

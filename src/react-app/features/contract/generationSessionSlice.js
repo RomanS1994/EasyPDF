@@ -1,5 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const GENERATION_WINDOW_MS = 10 * 60 * 1000;
+
+export function getGenerationWindowMs() {
+  return GENERATION_WINDOW_MS;
+}
+
 export function isSessionExpired(expiresAt) {
   if (!expiresAt) {
     return false;
@@ -13,6 +19,14 @@ export function isSessionExpired(expiresAt) {
   return expiresTime <= Date.now();
 }
 
+export function hasGenerationSession(session) {
+  if (!session || typeof session !== 'object') {
+    return false;
+  }
+
+  return Boolean(session.accessGranted) && !isSessionExpired(session.expiresAt);
+}
+
 const generationSessionSlice = createSlice({
   name: 'generationSession',
   initialState: {
@@ -20,6 +34,8 @@ const generationSessionSlice = createSlice({
     orderNumber: '',
     documentType: '',
     expiresAt: '',
+    createdAt: '',
+    accessGranted: false,
     isGateOpen: false,
   },
   reducers: {
@@ -34,6 +50,8 @@ const generationSessionSlice = createSlice({
       state.orderNumber = action.payload.orderNumber || '';
       state.documentType = action.payload.documentType || '';
       state.expiresAt = action.payload.expiresAt || '';
+      state.createdAt = action.payload.createdAt || '';
+      state.accessGranted = Boolean(action.payload.accessGranted);
       state.isGateOpen = false;
     },
     clearSession(state) {
@@ -41,6 +59,8 @@ const generationSessionSlice = createSlice({
       state.orderNumber = '';
       state.documentType = '';
       state.expiresAt = '';
+      state.createdAt = '';
+      state.accessGranted = false;
       state.isGateOpen = false;
     },
   },

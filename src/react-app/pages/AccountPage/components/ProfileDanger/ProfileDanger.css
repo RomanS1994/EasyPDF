@@ -1,0 +1,88 @@
+.profileDanger {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 22px;
+}
+
+.profileDanger-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.profileDanger-button {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 95, 215, 0.14);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 247, 252, 0.92));
+  color: var(--accent);
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 10px 22px rgba(28, 32, 40, 0.05);
+}
+
+.profileDanger-button--danger {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 242, 242, 0.94));
+  border-color: rgba(180, 35, 24, 0.16);
+  color: var(--danger);
+}
+
+.profileDanger-message {
+  margin: 0;
+  color: var(--success);
+  font-size: 12px;
+}
+
+.profileDanger-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 12px;
+}
+
+.profileDanger--bare {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.profileDanger--bare .profileDanger-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.profileDanger--bare .profileDanger-button {
+  width: 100%;
+}
+
+@media (max-width: 480px) {
+  .profileDanger {
+    gap: 10px;
+    padding: 14px;
+    border-radius: 20px;
+  }
+
+  .profileDanger-actions {
+    gap: 8px;
+  }
+
+  .profileDanger-button {
+    min-height: 40px;
+    padding: 0 16px;
+    border-radius: 15px;
+    font-size: 12px;
+  }
+
+  .profileDanger--bare .profileDanger-actions {
+    gap: 8px;
+  }
+}

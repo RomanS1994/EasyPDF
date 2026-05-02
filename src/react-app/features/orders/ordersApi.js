@@ -56,6 +56,19 @@ export const ordersApi = baseApi.injectEndpoints({
         { type: 'Orders', id: orderId },
       ],
     }),
+    assignDriver: builder.mutation({
+      query: ({ orderId, userId }) => ({
+        url: `/orders/${orderId}/assign-driver`,
+        method: 'PATCH',
+        body: {
+          userId,
+        },
+      }),
+      invalidatesTags: (_result, _error, { orderId }) => [
+        { type: 'Orders', id: 'LIST' },
+        { type: 'Orders', id: orderId },
+      ],
+    }),
   }),
 });
 
@@ -65,4 +78,5 @@ export const {
   useCreateOrderMutation,
   useUpdateOrderMutation,
   useArchiveOrderMutation,
+  useAssignDriverMutation,
 } = ordersApi;

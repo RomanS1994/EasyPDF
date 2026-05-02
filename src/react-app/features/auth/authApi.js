@@ -25,6 +25,9 @@ export const authApi = baseApi.injectEndpoints({
     getMe: builder.query({
       query: () => '/me',
     }),
+    getUsage: builder.query({
+      query: () => '/me/usage',
+    }),
     updateProfile: builder.mutation({
       query: body => ({
         url: '/me/profile',
@@ -32,6 +35,20 @@ export const authApi = baseApi.injectEndpoints({
         body,
       }),
       transformResponse: response => response.user || response,
+    }),
+    requestSubscriptionUpgrade: builder.mutation({
+      query: body => ({
+        url: '/me/subscription/upgrade-request',
+        method: 'POST',
+        body,
+      }),
+      transformResponse: response => response.user || response,
+    }),
+    deleteMe: builder.mutation({
+      query: () => ({
+        url: '/me',
+        method: 'DELETE',
+      }),
     }),
   }),
 });
@@ -41,5 +58,8 @@ export const {
   useRegisterMutation,
   useLogoutMutation,
   useLazyGetMeQuery,
+  useGetUsageQuery,
   useUpdateProfileMutation,
+  useRequestSubscriptionUpgradeMutation,
+  useDeleteMeMutation,
 } = authApi;

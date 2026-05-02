@@ -1,36 +1,34 @@
-import { useDispatch } from 'react-redux';
-
-import { ContractWizard } from '../ContractWizard/ContractWizard.jsx';
-import { clearContractDraft } from '../../contractStorage.js';
-import { resetContract } from '../../contractSlice.js';
 import { useContractPersistence } from '../../useContractPersistence.js';
-import { useGenerationSessionPersistence } from '../../useGenerationSessionPersistence.js';
+import { CustomerFields } from '../CustomerFields/CustomerFields.jsx';
+import { TripFields } from '../TripFields/TripFields.jsx';
+import { ContractActions } from '../ContractActions/ContractActions.jsx';
+import { PriceField } from '../PriceField/PriceField.jsx';
 import './ContractForm.css';
 
 export function ContractForm() {
-  const dispatch = useDispatch();
-
   useContractPersistence();
-  useGenerationSessionPersistence();
-
-  function handleReset() {
-    clearContractDraft();
-    dispatch(resetContract());
-  }
 
   return (
     <section className="contractForm">
       <div className="contractForm-header">
         <h2 className="contractForm-title">Contract form</h2>
-        <p className="contractForm-copy">
-          Controlled React inputs wired to Redux Toolkit state.
-        </p>
-        <button className="contractForm-reset" type="button" onClick={handleReset}>
-          Reset draft
-        </button>
       </div>
 
-      <ContractWizard />
+      <div className="contractForm-grid">
+        <section className="contractSection">
+          <h3 className="contractSection-title">Passenger</h3>
+          <CustomerFields />
+        </section>
+
+        <section className="contractSection">
+          <h3 className="contractSection-title">Trip</h3>
+          <TripFields />
+        </section>
+
+        <PriceField />
+
+        <ContractActions />
+      </div>
     </section>
   );
 }

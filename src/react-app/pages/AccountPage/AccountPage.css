@@ -1,49 +1,31 @@
 .accountPage {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  display: grid;
+  gap: 12px;
 }
 
-.accountPage-header {
-  display: flex;
-  flex-direction: column;
+.accountPage-top {
+  padding-bottom: 18px;
+}
+
+.accountPage-backLink {
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
+  width: fit-content;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
 }
 
-.accountPage-title {
-  margin: 0;
-  font-size: 24px;
-}
-
-.accountPage-copy {
-  margin: 0;
-  color: #475467;
-}
-
-.accountPage-card {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 12px;
-  background: #fff;
-}
-
-.accountPage-user {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.accountPage-authForms {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.accountPage-line {
-  margin: 0;
+.accountPage-card,
+.accountPage-actionsCard {
+  display: grid;
+  gap: 14px;
 }
 
 .accountPage-actions {
@@ -55,9 +37,38 @@
 .accountPage-button {
   min-height: 36px;
   padding: 0 14px;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  background: #f8fafc;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(15, 95, 215, 0.1);
+  color: var(--accent);
   font: inherit;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+@media (max-width: 480px) {
+  .accountPage {
+    gap: 8px;
+  }
+
+  .accountPage-top {
+    padding-bottom: 12px;
+  }
+
+  .accountPage-card,
+  .accountPage-actionsCard {
+    gap: 10px;
+  }
+
+  .accountPage-actions {
+    gap: 8px;
+  }
+
+  .accountPage-button {
+    min-height: 32px;
+    padding: 0 12px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
 }

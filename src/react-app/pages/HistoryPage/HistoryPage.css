@@ -1,52 +1,25 @@
 .historyPage {
   display: grid;
-  gap: 1rem;
+  gap: 12px;
 }
 
-.historyPage-header {
-  display: grid;
-  gap: 0.35rem;
+.orderHistoryScreen {
+  gap: 12px;
 }
 
-.historyPage-title {
+.orderHistoryEmpty {
   margin: 0;
-  color: #122033;
+  padding: 16px 18px;
+  border: 1px dashed rgba(60, 60, 67, 0.14);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.45;
 }
 
-.historyPage-copy,
-.historyPage-state {
-  margin: 0;
-  color: #526173;
-}
-
-.historyPage-list {
-  display: grid;
-  gap: 0.9rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.historyPage-item {
-  display: grid;
-  gap: 0.45rem;
-  padding: 1rem;
-  border: 1px solid #d7dee8;
-  border-radius: 0.9rem;
-  background: #ffffff;
-}
-
-.historyPage-row {
-  display: grid;
-  gap: 0.2rem;
-}
-
-.historyPage-label {
-  color: #526173;
-  font-size: 0.9rem;
-}
-
-.historyPage-value {
-  color: #122033;
-  font-weight: 600;
+@media (max-width: 480px) {
+  .orderHistoryScreen {
+    gap: 10px;
+  }
 }

@@ -1,0 +1,10 @@
+.profileAuth {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+}
+
+.profileAuthForms {
+  display: grid;
+  gap: 16px;
+}

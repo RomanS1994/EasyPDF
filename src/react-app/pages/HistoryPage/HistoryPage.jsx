@@ -1,57 +1,101 @@
+import { useMemo, useState } from 'react';
+
+import { OrderDetails } from '../../features/orders/components/OrderDetails/OrderDetails.jsx';
 import { useGetOrdersQuery } from '../../features/orders/ordersApi.js';
+import { HistoryOrdersList } from './components/HistoryOrdersList/HistoryOrdersList.jsx';
+import { HistoryTabs } from './components/HistoryTabs/HistoryTabs.jsx';
+import { HistoryToolbar } from './components/HistoryToolbar/HistoryToolbar.jsx';
+import { buildTabCounts, compareOrders, getHistoryBucket, getHistoryDateKey } from './historyUtils.js';
 import './HistoryPage.css';
 
 export function HistoryPage() {
+  const [activeTab, setActiveTab] = useState('all');
+  const [dateFilter, setDateFilter] = useState('');
+  const [sortKey, setSortKey] = useState('newest');
+  const [selectedOrderId, setSelectedOrderId] = useState('');
   const { data, isLoading, isError } = useGetOrdersQuery();
   const orders = data?.orders || [];
-  const archivedOrders = [];
 
-  for (const order of orders) {
-    if (order.archivedAt || order.status === 'archived') {
-      archivedOrders.push(order);
+  const filteredByDate = useMemo(() => {
+    if (!dateFilter) {
+      return orders;
     }
+
+    const filteredOrders = [];
+
+    for (const order of orders) {
+      if (getHistoryDateKey(order) === dateFilter) {
+        filteredOrders.push(order);
+      }
+    }
+
+    return filteredOrders;
+  }, [dateFilter, orders]);
+
+  const tabCounts = useMemo(() => buildTabCounts(filteredByDate), [filteredByDate]);
+
+  const visibleOrders = useMemo(() => {
+    const list = [];
+
+    for (const order of filteredByDate) {
+      if (activeTab !== 'all') {
+        const bucket = getHistoryBucket(order).bucket;
+        if (bucket !== activeTab) {
+          continue;
+        }
+      }
+
+      list.push(order);
+    }
+
+    return [...list].sort((left, right) => compareOrders(left, right, sortKey));
+  }, [activeTab, filteredByDate, sortKey]);
+
+  function handleResetDate() {
+    setDateFilter('');
+  }
+
+  function handleCloseDetails() {
+    setSelectedOrderId('');
+  }
+
+  function handleOpenDetails(orderId) {
+    setSelectedOrderId(orderId);
   }
 
   return (
-    <section className="historyPage">
-      <div className="historyPage-header">
-        <h2 className="historyPage-title">History</h2>
-        <p className="historyPage-copy">Simple React history page.</p>
+    <section className="historyPage pageStack">
+      <div className="screenCard screenCard-stats orderHistoryScreen">
+        <div className="compactHeader">
+          <h2>Saved PDFs</h2>
+          <p>All generated orders in this workspace.</p>
+        </div>
+
+        <HistoryTabs activeTab={activeTab} counts={tabCounts} onChange={setActiveTab} />
+
+        <HistoryToolbar
+          dateFilter={dateFilter}
+          onDateChange={setDateFilter}
+          onResetDate={handleResetDate}
+          sortKey={sortKey}
+          onSortChange={setSortKey}
+        />
+
+        {isLoading ? <p className="orderHistoryEmpty">Loading saved orders...</p> : null}
+        {isError ? <p className="orderHistoryEmpty">Failed to load saved orders.</p> : null}
+
+        {!isLoading && !isError && !visibleOrders.length ? (
+          <p className="orderHistoryEmpty">
+            {orders.length ? 'No saved orders match the current filter.' : 'Saved orders have not appeared yet.'}
+          </p>
+        ) : null}
+
+        {!isLoading && !isError && visibleOrders.length ? (
+          <HistoryOrdersList orders={visibleOrders} onOpen={handleOpenDetails} />
+        ) : null}
       </div>
 
-      {isLoading ? <p className="historyPage-state">Loading history...</p> : null}
-      {isError ? <p className="historyPage-state">Failed to load history.</p> : null}
-
-      {!isLoading && !isError && !archivedOrders.length ? (
-        <p className="historyPage-state">
-          History will be available after archived orders are exposed to React.
-        </p>
-      ) : null}
-
-      {!isLoading && !isError && archivedOrders.length ? (
-        <ul className="historyPage-list">
-          {archivedOrders.map(order => (
-            <li className="historyPage-item" key={order.id}>
-              <div className="historyPage-row">
-                <span className="historyPage-label">Order</span>
-                <span className="historyPage-value">{order.orderNumber || '-'}</span>
-              </div>
-              <div className="historyPage-row">
-                <span className="historyPage-label">Status</span>
-                <span className="historyPage-value">{order.status || '-'}</span>
-              </div>
-              <div className="historyPage-row">
-                <span className="historyPage-label">Customer</span>
-                <span className="historyPage-value">{order.customer?.name || '-'}</span>
-              </div>
-              <div className="historyPage-row">
-                <span className="historyPage-label">Created</span>
-                <span className="historyPage-value">{order.createdAt || '-'}</span>
-              </div>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+      {selectedOrderId ? <OrderDetails orderId={selectedOrderId} onClose={handleCloseDetails} /> : null}
     </section>
   );
 }

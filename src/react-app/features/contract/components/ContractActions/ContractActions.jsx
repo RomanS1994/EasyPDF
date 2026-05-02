@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import { useGenerateContractPdfMutation } from '../../contractApi.js';
 import { selectContract } from '../../contractSlice.js';
 import {
   clearSession,
-  closeGate,
-  openGate,
+  getGenerationWindowMs,
   isSessionExpired,
   selectGenerationSession,
   startSession,
@@ -19,151 +19,219 @@ import {
 } from '../../../orders/ordersApi.js';
 import './ContractActions.css';
 
-const emptyValidationErrors = {
-  customerName: '',
-  fromAddress: '',
-  toAddress: '',
-  tripTime: '',
-  totalPrice: '',
-};
-
 function getSourcePage() {
   return '/cz/pdf';
 }
 
+function buildValidationState() {
+  return {
+    customerName: '',
+    customerContact: '',
+    passengers: '',
+    fromAddress: '',
+    toAddress: '',
+    tripDate: '',
+    paymentMethod: '',
+    totalPrice: '',
+  };
+}
+
+function buildContractPayload(contract) {
+  const passengersValue = String(contract?.passengers || '').trim();
+  const passengersCount = Number.parseInt(passengersValue, 10);
+  const safePassengers = Number.isFinite(passengersCount) && passengersCount > 0 ? passengersCount : 1;
+  const totalPrice = String(contract?.totalPrice || '').trim() || String(safePassengers * 100);
+
+  return {
+    ...contract,
+    totalPrice,
+  };
+}
+
+function getActiveSession(session) {
+  if (!session || isSessionExpired(session.expiresAt)) {
+    return null;
+  }
+
+  if (!session.accessGranted) {
+    return null;
+  }
+
+  return session;
+}
+
+function buildGenerationSessionPayload(session, order, contractData, documentType) {
+  return {
+    accessGranted: true,
+    orderId: String(order?.id || session?.orderId || ''),
+    orderNumber: String(order?.orderNumber || session?.orderNumber || ''),
+    documentType: String(documentType || session?.documentType || ''),
+    contractData,
+    createdAt: String(session?.createdAt || order?.createdAt || new Date().toISOString()),
+    expiresAt:
+      String(session?.expiresAt || new Date(Date.now() + getGenerationWindowMs()).toISOString()),
+  };
+}
+
 export function ContractActions() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const contract = useSelector(selectContract);
   const generationSession = useSelector(selectGenerationSession);
-  const [createOrder, { isLoading: isSaving }] = useCreateOrderMutation();
-  const [updateOrder] = useUpdateOrderMutation();
+  const [createOrder, { isLoading: isCreatingNew }] = useCreateOrderMutation();
+  const [updateOrder, { isLoading: isCreating }] = useUpdateOrderMutation();
   const [generateContractPdf, { isLoading: isGenerating }] =
     useGenerateContractPdfMutation();
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [validationErrors, setValidationErrors] = useState(emptyValidationErrors);
+  const [validationErrors, setValidationErrors] = useState(buildValidationState());
 
   function clearValidation() {
-    setValidationErrors(emptyValidationErrors);
+    setValidationErrors(buildValidationState());
   }
 
-  async function handleSave() {
+  function showValidation(result) {
+    setValidationErrors({
+      ...buildValidationState(),
+      ...result.errors,
+    });
+  }
+
+  async function handleCreate() {
     setMessage('');
     setError('');
     clearValidation();
 
-    const result = validateContract(contract);
+    const payloadContract = buildContractPayload(contract);
+    const result = validateContract(payloadContract);
     if (!result.isValid) {
-      setValidationErrors(result.errors);
-      return;
-    }
-
-    const payload = {
-      contractData: contract,
-      status: 'created',
-      metadata: {
-        sourcePage: getSourcePage(),
-        documentType: contract.documentType,
-        generationMode: 'manual',
-      },
-    };
-
-    try {
-      await createOrder(payload).unwrap();
-      setMessage('Order saved.');
-    } catch {
-      setError('Failed to save order.');
-    }
-  }
-
-  async function handleReserve() {
-    setMessage('');
-    setError('');
-    clearValidation();
-
-    const result = validateContract(contract);
-    if (!result.isValid) {
-      setValidationErrors(result.errors);
+      showValidation(result);
       return;
     }
 
     try {
-      const response = await createOrder({
-        contractData: contract,
-        status: 'pending_pdf',
+      const activeSession = getActiveSession(generationSession);
+      if (!activeSession) {
+        setError('Open Orders again to start a token session.');
+        return;
+      }
+
+      const documentType = activeSession.documentType || payloadContract.documentType;
+      const payload = {
+        contractData: payloadContract,
+        status: 'created',
         metadata: {
           sourcePage: getSourcePage(),
-          documentType: contract.documentType,
+          documentType,
           generationMode: 'token',
           tokenCost: 1,
         },
-      }).unwrap();
+      };
+
+      const response = activeSession.orderId
+        ? await updateOrder({
+            orderId: activeSession.orderId,
+            payload,
+          }).unwrap()
+        : await createOrder(payload).unwrap();
 
       const order = response?.order || response;
-      const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
-
-      dispatch(
-        startSession({
-          orderId: order?.id || '',
-          orderNumber: order?.orderNumber || '',
-          documentType: contract.documentType,
-          expiresAt,
-        }),
-      );
-      dispatch(closeGate());
-      setMessage('Generation token reserved.');
+      dispatch(clearSession());
+      setMessage(`Order created: ${order?.orderNumber || '-'}`);
+      navigate('/cz/pdf', { replace: true });
     } catch {
-      setError('Failed to reserve generation token.');
+      setError('Failed to create order.');
     }
   }
 
-  async function handleGeneratePdf() {
+  async function handleDownload() {
     setMessage('');
     setError('');
     clearValidation();
 
-    if (!generationSession.orderId) {
-      dispatch(openGate());
-      return;
-    }
-
-    if (isSessionExpired(generationSession.expiresAt)) {
-      dispatch(clearSession());
-      setMessage('Generation session expired. Please reserve again.');
-      return;
-    }
-
-    const result = validateContract(contract);
+    const activeSession = getActiveSession(generationSession);
+    const payloadContract = buildContractPayload(contract);
+    const result = validateContract(payloadContract);
     if (!result.isValid) {
-      setValidationErrors(result.errors);
+      showValidation(result);
       return;
+    }
+
+    let orderId = String(activeSession?.orderId || '');
+    let orderNumber = String(activeSession?.orderNumber || 'contract');
+
+    if (!orderId) {
+      try {
+        const response = await createOrder({
+          contractData: payloadContract,
+          status: 'pending_pdf',
+          metadata: {
+            sourcePage: getSourcePage(),
+            documentType: activeSession?.documentType || payloadContract.documentType,
+            generationMode: 'token',
+            tokenCost: 1,
+            generationWindowMs: getGenerationWindowMs(),
+          },
+        }).unwrap();
+
+        const order = response?.order || response;
+        orderId = String(order?.id || '');
+        orderNumber = String(order?.orderNumber || 'contract');
+        const nextSession = buildGenerationSessionPayload(
+          activeSession,
+          order,
+          payloadContract,
+          activeSession?.documentType || payloadContract.documentType,
+        );
+        dispatch(startSession(nextSession));
+      } catch {
+        setError('Failed to create order.');
+        return;
+      }
     }
 
     try {
       const blob = await generateContractPdf({
-        orderId: generationSession.orderId,
-        documentType: generationSession.documentType || contract.documentType,
-        contractData: contract,
+        orderId,
+        documentType: activeSession.documentType || payloadContract.documentType,
+        contractData: payloadContract,
       }).unwrap();
 
-      downloadFile(blob, 'contract.pdf');
+      const fileName = `${orderNumber}.pdf`;
+      downloadFile(blob, fileName);
 
       await updateOrder({
-        orderId: generationSession.orderId,
+        orderId,
         payload: {
           status: 'pdf_generated',
+          metadata: {
+            sourcePage: getSourcePage(),
+            documentType: activeSession.documentType || payloadContract.documentType,
+            generationMode: 'token',
+            tokenCost: 1,
+          },
+          pdf: {
+            documentType: activeSession.documentType || payloadContract.documentType,
+          },
         },
       }).unwrap();
 
       dispatch(clearSession());
       setMessage('PDF downloaded.');
+      navigate('/cz/pdf', { replace: true });
     } catch {
-      if (generationSession.orderId) {
+      if (activeSession.orderId) {
         try {
           await updateOrder({
-            orderId: generationSession.orderId,
+            orderId,
             payload: {
               status: 'pdf_failed',
+              metadata: {
+                sourcePage: getSourcePage(),
+                documentType: activeSession.documentType || payloadContract.documentType,
+                generationMode: 'token',
+                tokenCost: 1,
+              },
             },
           }).unwrap();
         } catch {
@@ -171,81 +239,78 @@ export function ContractActions() {
         }
       }
 
-      setError('Failed to generate PDF.');
+      setError('Failed to download PDF.');
     }
   }
 
   return (
     <section className="contractActions">
       {validationErrors.customerName ? (
-        <p className="contractActions-error">{validationErrors.customerName}</p>
+        <p className="contractActions-error contractActions-fullWidth">
+          {validationErrors.customerName}
+        </p>
+      ) : null}
+      {validationErrors.customerContact ? (
+        <p className="contractActions-error contractActions-fullWidth">
+          {validationErrors.customerContact}
+        </p>
+      ) : null}
+      {validationErrors.passengers ? (
+        <p className="contractActions-error contractActions-fullWidth">
+          {validationErrors.passengers}
+        </p>
       ) : null}
       {validationErrors.fromAddress ? (
-        <p className="contractActions-error">{validationErrors.fromAddress}</p>
+        <p className="contractActions-error contractActions-fullWidth">
+          {validationErrors.fromAddress}
+        </p>
       ) : null}
       {validationErrors.toAddress ? (
-        <p className="contractActions-error">{validationErrors.toAddress}</p>
+        <p className="contractActions-error contractActions-fullWidth">
+          {validationErrors.toAddress}
+        </p>
       ) : null}
-      {validationErrors.tripTime ? (
-        <p className="contractActions-error">{validationErrors.tripTime}</p>
+      {validationErrors.tripDate ? (
+        <p className="contractActions-error contractActions-fullWidth">
+          {validationErrors.tripDate}
+        </p>
+      ) : null}
+      {validationErrors.paymentMethod ? (
+        <p className="contractActions-error contractActions-fullWidth">
+          {validationErrors.paymentMethod}
+        </p>
       ) : null}
       {validationErrors.totalPrice ? (
-        <p className="contractActions-error">{validationErrors.totalPrice}</p>
+        <p className="contractActions-error contractActions-fullWidth">
+          {validationErrors.totalPrice}
+        </p>
       ) : null}
 
-      {generationSession.isGateOpen ? (
-        <section className="contractActions-gate">
-          <p className="contractActions-gateText">Reserve one generation token?</p>
-          <div className="contractActions-gateButtons">
-            <button
-              className="contractActions-gateButton"
-              type="button"
-              onClick={() => dispatch(closeGate())}
-            >
-              Cancel
-            </button>
-            <button
-              className="contractActions-gateButton"
-              type="button"
-              onClick={handleReserve}
-              disabled={isSaving}
-            >
-              {isSaving ? 'Reserving...' : 'Reserve'}
-            </button>
-          </div>
-        </section>
+      <button
+        className="contractActions-save"
+        type="button"
+        onClick={handleCreate}
+        disabled={isCreating || isCreatingNew}
+      >
+        {isCreating || isCreatingNew ? 'Creating...' : 'Save order'}
+      </button>
+
+      <button
+        className="contractActions-generate"
+        type="button"
+        onClick={handleDownload}
+        disabled={isGenerating || isCreating || isCreatingNew}
+      >
+        {isGenerating ? 'Downloading...' : 'Download PDF'}
+      </button>
+
+      {generationSession.accessGranted ? (
+        <p className="contractActions-sessionLine">
+          {generationSession.orderNumber
+            ? `Reserved order: ${generationSession.orderNumber}`
+            : 'Token session active'}
+        </p>
       ) : null}
-
-      {generationSession.orderId ? (
-        <section className="contractActions-session">
-          <p className="contractActions-sessionLine">
-            Reserved order: {generationSession.orderNumber || '-'}
-          </p>
-          <p className="contractActions-sessionLine">
-            Expires at: {generationSession.expiresAt || '-'}
-          </p>
-        </section>
-      ) : null}
-
-      <div className="contractActions-buttons">
-        <button
-          className="contractActions-save"
-          type="button"
-          onClick={handleSave}
-          disabled={isSaving}
-        >
-          {isSaving ? 'Saving...' : 'Save order'}
-        </button>
-
-        <button
-          className="contractActions-generate"
-          type="button"
-          onClick={handleGeneratePdf}
-          disabled={isGenerating}
-        >
-          {isGenerating ? 'Generating...' : 'Generate PDF'}
-        </button>
-      </div>
 
       {message ? <p className="contractActions-message">{message}</p> : null}
       {error ? <p className="contractActions-error">{error}</p> : null}

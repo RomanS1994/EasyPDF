@@ -7,22 +7,44 @@ const authSlice = createSlice({
   initialState: {
     user: getStoredUser(),
     token: getToken(),
+    sessionError: '',
+    sessionErrorType: '',
   },
   reducers: {
     setSession(state, action) {
       state.token = action.payload.token || '';
       state.user = action.payload.user || null;
+      state.sessionError = '';
+      state.sessionErrorType = '';
     },
     clearSession(state) {
       state.token = '';
       state.user = null;
+      state.sessionError = '';
+      state.sessionErrorType = '';
+    },
+    setSessionError(state, action) {
+      if (typeof action.payload === 'string') {
+        state.sessionError = action.payload;
+        state.sessionErrorType = '';
+        return;
+      }
+
+      state.sessionError = action.payload?.message || '';
+      state.sessionErrorType = action.payload?.type || '';
+    },
+    clearSessionError(state) {
+      state.sessionError = '';
+      state.sessionErrorType = '';
     },
   },
 });
 
-export const { setSession, clearSession } = authSlice.actions;
+export const { setSession, clearSession, setSessionError, clearSessionError } = authSlice.actions;
 
 export const selectUser = state => state.auth.user;
 export const selectToken = state => state.auth.token;
+export const selectSessionError = state => state.auth.sessionError;
+export const selectSessionErrorType = state => state.auth.sessionErrorType;
 
 export default authSlice.reducer;

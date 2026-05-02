@@ -1,0 +1,11 @@
+.historyDisplayPage {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  display: grid;
+  place-items: stretch;
+  background: var(--display-bg);
+  color: var(--display-text);
+  overflow: hidden;
+}
+

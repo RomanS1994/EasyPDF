@@ -1,11 +1,13 @@
-import { Link, useRouteError } from 'react-router-dom';
+import React from "react";
 
-import './RouterError.css';
+import { Link, useRouteError } from "react-router-dom";
+
+import "./RouterError.css";
 
 export function RouterError() {
   const error = useRouteError();
   const message =
-    error instanceof Error ? error.message : 'The page failed to load.';
+    error instanceof Error ? error.message : "The page failed to load.";
 
   return (
     <section className="routerError">

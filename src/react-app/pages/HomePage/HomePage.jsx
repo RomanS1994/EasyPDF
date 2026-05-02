@@ -1,17 +1,18 @@
-import { ContractForm } from '../../features/contract/components/ContractForm/ContractForm.jsx';
-import './HomePage.css';
+import { useSelector } from 'react-redux';
+
+import { selectUser } from '../../features/auth/authSlice.js';
+import { useGetOrdersQuery } from '../../features/orders/ordersApi.js';
+import { GuestStage } from './components/GuestStage/GuestStage.jsx';
+import { WorkspaceOverview } from './components/WorkspaceOverview/WorkspaceOverview.jsx';
 
 export function HomePage() {
-  return (
-    <div className="reactTestPage">
-      <section className="reactTestPage-intro">
-        <h2 className="reactTestPage-title">Contract editor</h2>
-        <p className="reactTestPage-copy">
-          This route uses controlled React inputs connected to Redux Toolkit.
-        </p>
-      </section>
+  const user = useSelector(selectUser);
+  const { data } = useGetOrdersQuery(undefined, { skip: !user });
+  const orders = data?.orders || [];
 
-      <ContractForm />
-    </div>
-  );
+  if (!user) {
+    return <GuestStage defaultMode="login" />;
+  }
+
+  return <WorkspaceOverview user={user} orders={orders} />;
 }

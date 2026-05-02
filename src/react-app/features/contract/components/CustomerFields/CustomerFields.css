@@ -1,24 +1,60 @@
+.contractFieldsBlock {
+  display: grid;
+  gap: 8px;
+}
+
 .contractField {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.contractField + .contractField {
-  margin-top: 12px;
-}
-
-.contractField-label {
-  font-size: 0.9rem;
-  font-weight: 600;
+  display: grid;
 }
 
 .contractField-input {
   width: 100%;
   min-height: 40px;
-  padding: 0 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
+  padding: 0 30px 0 12px;
+  border: 1px solid rgba(15, 95, 215, 0.14);
+  border-radius: 12px;
   font: inherit;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text);
+}
+
+.contractFieldControl {
+  position: relative;
+}
+
+.contractField-clear {
+  position: absolute;
+  top: 50%;
+  right: 7px;
+  width: 20px;
+  height: 20px;
+  min-height: 20px;
+  min-width: 20px;
+  padding: 0;
+  transform: translateY(-50%);
+  border: 1px solid rgba(15, 95, 215, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: rgba(100, 116, 139, 0.96);
+  font: inherit;
+  font-size: 0.78rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: none;
+  appearance: none;
+  display: grid;
+  place-items: center;
+}
+
+.contractField-clear:hover:not(:disabled),
+.contractField-clear:active:not(:disabled) {
+  transform: translateY(-50%);
+  box-shadow: none;
+  background: rgba(15, 95, 215, 0.08);
+  border-color: rgba(15, 95, 215, 0.2);
+}
+
+.contractField-clear:focus-visible {
+  outline: 2px solid rgba(15, 95, 215, 0.24);
+  outline-offset: 2px;
 }

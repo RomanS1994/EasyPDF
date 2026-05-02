@@ -1,41 +1,61 @@
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 
-import { selectUser } from '../../features/auth/authSlice.js';
-import './SettingsPage.css';
+import { hasAdminAccess } from "../../features/auth/authAccess.js";
+import { selectUser } from "../../features/auth/authSlice.js";
+import { BusinessProfileForm } from "../../features/auth/components/BusinessProfileForm/BusinessProfileForm.jsx";
+import { ProfileDanger } from "../AccountPage/components/ProfileDanger/ProfileDanger.jsx";
+import { ProfileUpgrade } from "../AccountPage/components/ProfileUpgrade/ProfileUpgrade.jsx";
+import { SettingsAccountSummary } from "./components/SettingsAccountSummary/SettingsAccountSummary.jsx";
+import { SettingsAdminAccess } from "./components/SettingsAdminAccess/SettingsAdminAccess.jsx";
+import { SettingsLanguageCard } from "./components/SettingsLanguageCard/SettingsLanguageCard.jsx";
+import "./SettingsPage.css";
 
 export function SettingsPage() {
   const user = useSelector(selectUser);
+  const canAdmin = hasAdminAccess(user);
 
   return (
-    <section className="settingsPage">
-      <div className="settingsPage-header">
-        <h2 className="settingsPage-title">Settings</h2>
-        <p className="settingsPage-copy">Simple React settings page.</p>
-      </div>
+    <section className="settingsPage pageStack">
+      <header className="appTop">
+        <div className="appTitleBlock">
+          <p className="sectionEyebrow">Settings</p>
+          <h1>Driver portal</h1>
+          <p>
+            Language, business profile, subscription and session are kept on one
+            screen.
+          </p>
+        </div>
+      </header>
 
-      <div className="settingsPage-card">
-        <h3 className="settingsPage-cardTitle">Current user</h3>
-        {user ? (
-          <>
-            <p className="settingsPage-line">
-              <strong>Name:</strong> {user.name || 'Unknown'}
-            </p>
-            <p className="settingsPage-line">
-              <strong>Email:</strong> {user.email || '-'}
-            </p>
-            <p className="settingsPage-line">
-              <strong>Role:</strong> {user.role || '-'}
-            </p>
-          </>
-        ) : (
-          <p className="settingsPage-line">Not logged in.</p>
-        )}
-      </div>
+      <SettingsLanguageCard />
+      <SettingsAccountSummary user={user} />
 
-      <div className="settingsPage-card">
-        <h3 className="settingsPage-cardTitle">App settings</h3>
-        <p className="settingsPage-line">Settings migration will be added later.</p>
-      </div>
+      {canAdmin ? <SettingsAdminAccess /> : null}
+
+      <section className="screenCard settingsPage-card">
+        <div className="compactHeader">
+          <h2>Business profile</h2>
+          <p>
+            Fill the company data that is reused in new contracts and orders.
+          </p>
+        </div>
+
+        <BusinessProfileForm />
+      </section>
+
+      <ProfileUpgrade user={user} />
+
+      <section className="screenCard settingsPage-card">
+        <div className="compactHeader">
+          <h2>Session</h2>
+          <p>
+            Logout signs you out, delete removes the account and local draft
+            data.
+          </p>
+        </div>
+
+        <ProfileDanger showHeader={false} bare />
+      </section>
     </section>
   );
 }
