@@ -22,13 +22,23 @@ export function downloadFile(blob, fileName = 'contract.pdf') {
   }
 
   const blobUrl = URL.createObjectURL(blob);
-  const link = document.createElement('a');
   const openInNewTab = shouldOpenInNewTab();
 
-  link.href = blobUrl;
-  if (!openInNewTab) {
-    link.download = fileName;
+  if (openInNewTab) {
+    const openedWindow = window.open(blobUrl, '_blank', 'noopener,noreferrer');
+
+    if (openedWindow) {
+      window.setTimeout(() => {
+        URL.revokeObjectURL(blobUrl);
+      }, 30000);
+      return;
+    }
   }
+
+  const link = document.createElement('a');
+
+  link.href = blobUrl;
+  link.download = fileName;
   link.target = openInNewTab ? '_blank' : '_self';
   link.rel = openInNewTab ? 'noopener noreferrer' : 'noopener';
   link.style.display = 'none';
