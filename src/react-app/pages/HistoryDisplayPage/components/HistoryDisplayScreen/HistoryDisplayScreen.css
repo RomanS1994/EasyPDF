@@ -31,7 +31,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 4px;
 }
 
 .historyDisplayScreen-control {
@@ -54,7 +54,7 @@
   align-items: center;
   min-width: 146px;
   min-height: 42px;
-  padding: 0 14px 0 12px;
+  padding: 0 4px 0 4px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.72);
@@ -134,7 +134,7 @@
   margin: 0;
   color: var(--display-text);
   text-transform: uppercase;
-  letter-spacing: -0.07em;
+  letter-spacing: 0.02em;
   line-height: 1.4;
   text-wrap: balance;
 }
@@ -177,7 +177,7 @@
 
   .historyDisplayScreen-controls {
     justify-content: flex-start;
-    gap: 8px;
+    gap: 4px;
   }
 
   .historyDisplayScreen-selectShell {
