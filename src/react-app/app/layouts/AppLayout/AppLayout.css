@@ -1,11 +1,10 @@
 .appLayout {
   min-height: 100vh;
   color: var(--text);
-  background: #fff;
 }
 
 .appLayout--dashboard {
-  background: #fff;
+  background: #f5f7fb;
 }
 
 .appLayout-body {

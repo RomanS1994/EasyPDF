@@ -1,7 +1,7 @@
 :root {
   color-scheme: light;
-  --bg-top: #ffffff;
-  --bg-bottom: #ffffff;
+  --bg-top: #f7faff;
+  --bg-bottom: #e9f0ff;
   --surface: rgba(255, 255, 255, 0.88);
   --surface-strong: rgba(255, 255, 255, 0.96);
   --surface-border: rgba(15, 95, 215, 0.12);
@@ -27,7 +27,6 @@ body,
 #react-root {
   width: 100%;
   min-height: 100%;
-  background: #fff;
 }
 
 body {
@@ -39,7 +38,18 @@ body {
   font-family:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
     "Helvetica Neue", Arial, sans-serif;
-  background: #fff;
+  background:
+    radial-gradient(
+      circle at 18% 22%,
+      rgba(15, 95, 215, 0.16),
+      transparent 26%
+    ),
+    radial-gradient(
+      circle at 82% 78%,
+      rgba(59, 130, 246, 0.12),
+      transparent 28%
+    ),
+    linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
 }
 
 body.no-scroll {
