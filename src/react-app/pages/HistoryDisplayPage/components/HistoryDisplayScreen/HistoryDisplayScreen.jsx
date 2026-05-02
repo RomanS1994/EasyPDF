@@ -1,9 +1,11 @@
 import './HistoryDisplayScreen.css';
 
 const TEXT_SIZES = {
+  compact: 'historyDisplayScreen-name--compact',
   small: 'historyDisplayScreen-name--small',
   medium: 'historyDisplayScreen-name--medium',
   large: 'historyDisplayScreen-name--large',
+  huge: 'historyDisplayScreen-name--huge',
 };
 
 function HistoryDisplayScreen({

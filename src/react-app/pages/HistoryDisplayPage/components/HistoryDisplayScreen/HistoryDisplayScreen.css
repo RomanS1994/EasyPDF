@@ -62,7 +62,7 @@
 }
 
 .historyDisplayScreen-selectShell::after {
-  content: '';
+  content: "";
   position: absolute;
   right: 16px;
   top: 50%;
@@ -120,7 +120,6 @@
 .historyDisplayScreen-body {
   display: grid;
   place-items: center;
-  padding: 48px 16px 28px;
   text-align: center;
 }
 
@@ -157,7 +156,8 @@
 }
 
 .historyDisplayScreen-name--huge {
-  font-size: clamp(82px, 18vw, 160px);
+  font-size: clamp(72px, 16vw, 148px);
+  line-height: 1.1;
 }
 
 .historyDisplayScreen-state {
@@ -183,10 +183,6 @@
   .historyDisplayScreen-selectShell {
     min-width: 132px;
     min-height: 40px;
-  }
-
-  .historyDisplayScreen-body {
-    padding-top: 32px;
   }
 
   .historyDisplayScreen-copy {

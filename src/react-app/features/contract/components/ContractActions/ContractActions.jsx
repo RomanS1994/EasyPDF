@@ -17,6 +17,7 @@ import {
   useCreateOrderMutation,
   useUpdateOrderMutation,
 } from '../../../orders/ordersApi.js';
+import { resolveErrorMessage } from '../../../../app/utils/errorMessages.js';
 import './ContractActions.css';
 
 function getSourcePage() {
@@ -139,8 +140,8 @@ export function ContractActions() {
       dispatch(clearSession());
       setMessage(`Order created: ${order?.orderNumber || '-'}`);
       navigate('/cz/pdf', { replace: true });
-    } catch {
-      setError('Failed to create order.');
+    } catch (error) {
+      setError(resolveErrorMessage(error, 'Failed to create order.'));
     }
   }
 
@@ -159,6 +160,7 @@ export function ContractActions() {
 
     let orderId = String(activeSession?.orderId || '');
     let orderNumber = String(activeSession?.orderNumber || 'contract');
+    const documentType = activeSession?.documentType || payloadContract.documentType;
 
     if (!orderId) {
       try {
@@ -167,7 +169,7 @@ export function ContractActions() {
           status: 'pending_pdf',
           metadata: {
             sourcePage: getSourcePage(),
-            documentType: activeSession?.documentType || payloadContract.documentType,
+            documentType,
             generationMode: 'token',
             tokenCost: 1,
             generationWindowMs: getGenerationWindowMs(),
@@ -181,11 +183,11 @@ export function ContractActions() {
           activeSession,
           order,
           payloadContract,
-          activeSession?.documentType || payloadContract.documentType,
+          documentType,
         );
         dispatch(startSession(nextSession));
-      } catch {
-        setError('Failed to create order.');
+      } catch (error) {
+        setError(resolveErrorMessage(error, 'Failed to create order.'));
         return;
       }
     }
@@ -193,34 +195,41 @@ export function ContractActions() {
     try {
       const blob = await generateContractPdf({
         orderId,
-        documentType: activeSession.documentType || payloadContract.documentType,
+        documentType,
         contractData: payloadContract,
       }).unwrap();
 
       const fileName = `${orderNumber}.pdf`;
       downloadFile(blob, fileName);
+      setMessage('PDF downloaded.');
 
-      await updateOrder({
-        orderId,
-        payload: {
-          status: 'pdf_generated',
-          metadata: {
-            sourcePage: getSourcePage(),
-            documentType: activeSession.documentType || payloadContract.documentType,
-            generationMode: 'token',
-            tokenCost: 1,
+      try {
+        await updateOrder({
+          orderId,
+          payload: {
+            status: 'pdf_generated',
+            metadata: {
+              sourcePage: getSourcePage(),
+              documentType,
+              generationMode: 'token',
+              tokenCost: 1,
+            },
+            pdf: {
+              documentType,
+            },
           },
-          pdf: {
-            documentType: activeSession.documentType || payloadContract.documentType,
-          },
-        },
-      }).unwrap();
+        }).unwrap();
+      } catch (updateError) {
+        console.error(
+          'Failed to update order status after PDF download:',
+          updateError,
+        );
+      }
 
       dispatch(clearSession());
-      setMessage('PDF downloaded.');
       navigate('/cz/pdf', { replace: true });
-    } catch {
-      if (activeSession.orderId) {
+    } catch (error) {
+      if (orderId) {
         try {
           await updateOrder({
             orderId,
@@ -228,18 +237,21 @@ export function ContractActions() {
               status: 'pdf_failed',
               metadata: {
                 sourcePage: getSourcePage(),
-                documentType: activeSession.documentType || payloadContract.documentType,
+                documentType,
                 generationMode: 'token',
                 tokenCost: 1,
               },
             },
           }).unwrap();
-        } catch {
-          // Ignore status update failures.
+        } catch (updateError) {
+          console.error(
+            'Failed to mark PDF generation as failed:',
+            updateError,
+          );
         }
       }
 
-      setError('Failed to download PDF.');
+      setError(resolveErrorMessage(error, 'Failed to generate PDF.'));
     }
   }
 

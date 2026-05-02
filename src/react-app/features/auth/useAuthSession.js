@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { useLazyGetMeQuery } from './authApi.js';
-import { clearSession, setSession, setSessionError } from './authSlice.js';
-import { clearSession as clearStoredSession, getStoredUser, getToken } from './authStorage.js';
+import { setSession, setSessionError } from './authSlice.js';
+import { getStoredUser, getToken } from './authStorage.js';
 
 function isConnectionError(error) {
   return (
@@ -32,16 +32,22 @@ export function useAuthSession() {
           const nextUser = response?.user || response;
           if (nextUser) {
             dispatch(setSession({ token, user: nextUser }));
+            dispatch(setSessionError({ type: '', message: '' }));
           }
         })
         .catch(error => {
+          const currentToken = getToken();
+          const currentUser = getStoredUser();
+
+          if (error?.status === 401 && (!currentToken || !currentUser)) {
+            return;
+          }
+
           if (isConnectionError(error)) {
-            clearStoredSession();
-            dispatch(clearSession());
             dispatch(
               setSessionError({
                 type: 'offline',
-                message: 'Connection lost. Please sign in again when the network is back.',
+                message: 'Connection lost. Your session is kept, so you can try again later.',
               }),
             );
             return;
@@ -50,7 +56,7 @@ export function useAuthSession() {
           dispatch(
             setSessionError({
               type: 'server',
-              message: 'Server session check failed. Please sign in again to continue online work.',
+              message: 'Server session check failed. Your session is kept, so you can try again later.',
             }),
           );
         });

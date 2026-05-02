@@ -20,7 +20,9 @@ export function AuthSessionErrorModal() {
 
   function handleClose() {
     dispatch(clearSessionError());
-    navigate('/cz/pdf/sign-in', { replace: true });
+    if (sessionErrorType === 'expired') {
+      navigate('/cz/pdf/sign-in', { replace: true });
+    }
   }
 
   return (
@@ -33,8 +35,18 @@ export function AuthSessionErrorModal() {
         aria-labelledby="authSessionErrorTitle"
       >
         <div className="authSessionErrorModal-copy">
-          <p className="authSessionErrorModal-eyebrow">Online state</p>
-          <h2 id="authSessionErrorTitle">Connection error</h2>
+          <p className="authSessionErrorModal-eyebrow">
+            {sessionErrorType === 'expired' || sessionErrorType === 'server'
+              ? 'Session state'
+              : 'Online state'}
+          </p>
+          <h2 id="authSessionErrorTitle">
+            {sessionErrorType === 'expired'
+              ? 'Session expired'
+              : sessionErrorType === 'server'
+                ? 'Session check failed'
+                : 'Connection error'}
+          </h2>
           <p>{sessionError}</p>
         </div>
 
@@ -43,7 +55,7 @@ export function AuthSessionErrorModal() {
           type="button"
           onClick={handleClose}
         >
-          Go to sign in
+          {sessionErrorType === 'expired' ? 'Go to sign in' : 'Try again later'}
         </button>
       </div>
     </div>

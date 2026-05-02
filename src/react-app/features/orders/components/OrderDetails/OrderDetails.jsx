@@ -12,6 +12,7 @@ import {
   useGetOrderQuery,
   useUpdateOrderMutation,
 } from "../../ordersApi.js";
+import { resolveErrorMessage } from "../../../../app/utils/errorMessages.js";
 import "./OrderDetails.css";
 
 function formatDate(value) {
@@ -175,8 +176,8 @@ export function OrderDetails({ orderId, onClose }) {
       await archiveOrder(orderId).unwrap();
       setMessage("Order archived.");
       onClose();
-    } catch {
-      setError("Failed to archive order.");
+    } catch (error) {
+      setError(resolveErrorMessage(error, "Failed to archive order."));
     }
   }
 
@@ -196,23 +197,31 @@ export function OrderDetails({ orderId, onClose }) {
         "-",
       );
       downloadFile(blob, `${safeNumber}-${documentType}.pdf`);
-
-      await updateOrder({
-        orderId,
-        payload: {
-          status: "pdf_generated",
-          metadata: {
-            documentType,
-          },
-          pdf: {
-            documentType,
-          },
-        },
-      }).unwrap();
-
       setMessage(`${documentType} PDF downloaded.`);
-    } catch {
-      setError("Failed to generate PDF.");
+
+      try {
+        await updateOrder({
+          orderId,
+          payload: {
+            status: "pdf_generated",
+            metadata: {
+              documentType,
+            },
+            pdf: {
+              documentType,
+            },
+          },
+        }).unwrap();
+      } catch (updateError) {
+        console.error(
+          "Failed to update order status after PDF download:",
+          updateError,
+        );
+      }
+    } catch (error) {
+      setError(
+        resolveErrorMessage(error, `Failed to generate ${documentType} PDF.`),
+      );
     }
   }
 
@@ -236,8 +245,8 @@ export function OrderDetails({ orderId, onClose }) {
       );
       setShowTransfer(false);
       setSelectedUserId("");
-    } catch {
-      setError("Failed to transfer order.");
+    } catch (error) {
+      setError(resolveErrorMessage(error, "Failed to transfer order."));
     }
   }
 
