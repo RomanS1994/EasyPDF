@@ -14,31 +14,40 @@ function getPlanVariant(plan) {
     return 'planCard--free';
   }
 
-  if (planName.includes('silver') || planName.includes('25')) {
+  if (
+    planName.includes('silver') ||
+    planName.includes('starter')
+  ) {
     return 'planCard--silver';
   }
 
-  if (planName.includes('gold') || planName.includes('50')) {
+  if (
+    planName.includes('gold') ||
+    planName.includes('growth')
+  ) {
     return 'planCard--gold';
   }
 
-  if (planName.includes('platinum') || planName.includes('100')) {
+  if (
+    planName.includes('platinum') ||
+    planName.includes('scale')
+  ) {
     return 'planCard--platinum';
   }
 
-  if (limit <= 10) {
+  if (limit <= 100) {
     return 'planCard--free';
   }
 
-  if (limit <= 25) {
+  if (limit <= 300) {
     return 'planCard--silver';
   }
 
-  if (limit <= 50) {
+  if (limit <= 500) {
     return 'planCard--gold';
   }
 
-  if (limit > 50) {
+  if (limit > 500) {
     return 'planCard--platinum';
   }
 

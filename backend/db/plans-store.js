@@ -15,17 +15,27 @@ const PLAN_ORDER_BY = [
 export async function ensureDefaultPlans(client) {
   const timestamp = nowIso();
 
-  await client.plan.createMany({
-    data: DEFAULT_PLANS.map(plan =>
-      serializePlanRecord({
-        ...plan,
-        isActive: true,
-        createdAt: timestamp,
-        updatedAt: timestamp,
+  await Promise.all(
+    DEFAULT_PLANS.map(plan =>
+      client.plan.upsert({
+        where: {
+          id: plan.id,
+        },
+        create: serializePlanRecord({
+          ...plan,
+          isActive: true,
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        }),
+        update: {
+          name: plan.name,
+          monthlyGenerationLimit: plan.monthlyGenerationLimit,
+          description: plan.description,
+          updatedAt: timestamp,
+        },
       })
-    ),
-    skipDuplicates: true,
-  });
+    )
+  );
 }
 
 export async function findStoredPlan(
