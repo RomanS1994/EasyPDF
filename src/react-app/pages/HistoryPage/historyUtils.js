@@ -121,7 +121,7 @@ function getHistoryBucket(order) {
     };
   }
 
-  if (status === 'pdf_generated' || status === 'completed' || status === 'archived') {
+  if (status === 'pdf_generated' || status === 'completed') {
     return {
       bucket: 'completed',
       label: 'Completed',

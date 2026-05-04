@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "deletedMessagesCount" INTEGER NOT NULL DEFAULT 0;

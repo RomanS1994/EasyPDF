@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { useGetOrdersQuery } from '../../features/orders/ordersApi.js';
 import { useGetUsageQuery } from '../../features/auth/authApi.js';
@@ -20,6 +20,7 @@ function getSafeUsage(usage) {
     limit: usage?.limit || 0,
     remaining: usage?.remaining || 0,
     percent: usage?.percent || 0,
+    deletedMessages: usage?.deletedMessages || 0,
   };
 }
 
@@ -28,11 +29,15 @@ export function StatsPage() {
   const { data: usageData, isLoading: isUsageLoading, isError: isUsageError } = useGetUsageQuery(
     undefined,
     {
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
       refetchOnMountOrArgChange: true,
     },
   );
   const { data: ordersData, isLoading: isOrdersLoading, isError: isOrdersError } =
     useGetOrdersQuery(undefined, {
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
       refetchOnMountOrArgChange: true,
     });
 
@@ -40,18 +45,6 @@ export function StatsPage() {
   const orders = ordersData?.orders || [];
   const isLoading = isUsageLoading || isOrdersLoading;
   const isError = isUsageError || isOrdersError;
-
-  const generatedCount = useMemo(() => {
-    let count = 0;
-
-    for (const order of orders) {
-      if (order.status === 'pdf_generated') {
-        count += 1;
-      }
-    }
-
-    return count;
-  }, [orders]);
 
   return (
     <section className="statsPage pageStack">
@@ -67,7 +60,7 @@ export function StatsPage() {
         {isError ? <p className="statusNote is-error">Failed to load stats.</p> : null}
 
         {!isLoading && !isError && activeTab === 'usage' ? (
-          <StatsUsagePanel usage={usage} orders={orders} generatedCount={generatedCount} />
+          <StatsUsagePanel usage={usage} orders={orders} />
         ) : null}
 
         {!isLoading && !isError && activeTab === 'salary' ? (

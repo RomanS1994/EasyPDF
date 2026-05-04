@@ -1,5 +1,7 @@
 import './StatsSalaryPanel.css';
 
+const EUR_RATE = 25;
+
 function parseDateValue(value) {
   // Перетворюємо рядок дати у Date для простого аналізу.
   if (!value) return null;
@@ -44,21 +46,60 @@ function getCycleOrders(orders, usage) {
   });
 }
 
-function parsePriceValue(value) {
-  // Дістаємо число із price-рядка без складних форматів.
+function parseMoneyValue(value) {
+  // Дістаємо число і валюту з текстового поля суми.
   if (value === null || value === undefined) {
-    return 0;
+    return {
+      amount: 0,
+      currency: 'EUR',
+    };
   }
 
-  const text = String(value).replace(',', '.');
-  const match = text.match(/-?\d+(?:\.\d+)?/);
-  const number = match ? Number(match[0]) : 0;
+  const text = String(value).trim();
+  const currencyMatch = text.match(/\b(EUR|CZK)\b/i);
+  const amountMatch = text.replace(',', '.').match(/-?\d+(?:\.\d+)?/);
+  const amount = amountMatch ? Number(amountMatch[0]) : 0;
+  const currency = currencyMatch ? currencyMatch[1].toUpperCase() : 'EUR';
 
-  if (!Number.isFinite(number)) {
-    return 0;
+  if (!Number.isFinite(amount)) {
+    return {
+      amount: 0,
+      currency,
+    };
   }
 
-  return number;
+  return {
+    amount,
+    currency,
+  };
+}
+
+function getOrderCommission(order) {
+  return parseMoneyValue(order?.metadata?.commission || order?.contractData?.commission);
+}
+
+function getOrderNetAmount(order) {
+  return parseMoneyValue(order?.totalPrice || order?.contractData?.totalPrice);
+}
+
+function convertAmount(amount, fromCurrency, toCurrency) {
+  if (fromCurrency === toCurrency) {
+    return amount;
+  }
+
+  if (fromCurrency === 'EUR' && toCurrency === 'CZK') {
+    return amount * EUR_RATE;
+  }
+
+  if (fromCurrency === 'CZK' && toCurrency === 'EUR') {
+    return amount / EUR_RATE;
+  }
+
+  return amount;
+}
+
+function toCzkAmount(value, currency) {
+  return convertAmount(value, currency, 'CZK');
 }
 
 function formatMoney(value) {
@@ -95,7 +136,9 @@ function getTopDays(orders) {
     }
 
     const key = getDayKey(date);
-    const amount = parsePriceValue(order?.totalPrice || order?.contractData?.totalPrice);
+    const gross = getOrderNetAmount(order);
+    const commission = getOrderCommission(order);
+    const amount = toCzkAmount(gross.amount, gross.currency) - toCzkAmount(commission.amount, commission.currency);
 
     if (!totals.has(key)) {
       totals.set(key, {
@@ -116,40 +159,51 @@ function getTopDays(orders) {
 
 export function StatsSalaryPanel({ orders, usage }) {
   const cycleOrders = getCycleOrders(orders, usage);
-  const grossTotal = cycleOrders.reduce(
-    (sum, order) => sum + parsePriceValue(order?.totalPrice || order?.contractData?.totalPrice),
-    0,
-  );
-  const estimatedSalary = grossTotal * 0.72;
-  const bonus = grossTotal * 0.08;
-  const takeHomeShare = grossTotal ? Math.min(100, Math.round((estimatedSalary / grossTotal) * 100)) : 0;
+  const grossTotal = cycleOrders.reduce((sum, order) => {
+    const gross = getOrderNetAmount(order);
+    return sum + toCzkAmount(gross.amount, gross.currency);
+  }, 0);
+  const commissionTotal = cycleOrders.reduce((sum, order) => {
+    const commission = getOrderCommission(order);
+    return sum + toCzkAmount(commission.amount, commission.currency);
+  }, 0);
+  const netSalary = grossTotal - commissionTotal;
+  const takeHomeShare = grossTotal
+    ? Math.min(100, Math.round((netSalary / grossTotal) * 100))
+    : 0;
   const bestDays = getTopDays(cycleOrders);
   const topDay = bestDays[0];
   const cycleCount = cycleOrders.length;
-  const avgRide = cycleCount ? estimatedSalary / cycleCount : 0;
+  const avgRide = cycleCount ? netSalary / cycleCount : 0;
 
   return (
     <section className="statsPanel is-active statsSalaryPanel">
       <div className="salaryHeroCard">
         <div className="salaryHeroMain">
           <p className="sectionEyebrow">Salary</p>
-          <h3>Estimated payout</h3>
-          <strong>{formatMoney(estimatedSalary)} CZK</strong>
-          <p>Approximate driver salary for the active cycle.</p>
+          <h3>Net payout</h3>
+          <strong>{formatMoney(netSalary)} CZK</strong>
+          <p>
+            Total earnings minus commission for the active cycle across {cycleCount} orders.
+          </p>
         </div>
 
         <div className="salaryHeroAside">
           <div className="salaryHeroStat">
             <span>Gross</span>
-            <strong>{formatMoney(grossTotal)}</strong>
+            <strong>
+              {formatMoney(grossTotal)} CZK
+            </strong>
           </div>
           <div className="salaryHeroStat">
-            <span>Share</span>
+            <span>Commission</span>
+            <strong>
+              {formatMoney(commissionTotal)} CZK
+            </strong>
+          </div>
+          <div className="salaryHeroStat">
+            <span>Net share</span>
             <strong>{takeHomeShare}%</strong>
-          </div>
-          <div className="salaryHeroStat">
-            <span>Orders</span>
-            <strong>{cycleCount}</strong>
           </div>
         </div>
       </div>
@@ -163,22 +217,22 @@ export function StatsSalaryPanel({ orders, usage }) {
         <div className="salaryLedger">
           <article className="salaryLedgerRow">
             <div className="salaryLedgerRow-copy">
-              <span>Driver payout</span>
-              <p>Main salary estimate from all completed rides.</p>
+              <span>Net salary</span>
+              <p>Main payout after subtracting commission.</p>
             </div>
-            <strong>{formatMoney(estimatedSalary)} CZK</strong>
+            <strong>{formatMoney(netSalary)} CZK</strong>
           </article>
           <article className="salaryLedgerRow">
             <div className="salaryLedgerRow-copy">
-              <span>Cycle bonus</span>
-              <p>Soft bonus estimate from strong activity.</p>
+              <span>Total commission</span>
+              <p>All commission values entered for the cycle.</p>
             </div>
-            <strong>{formatMoney(bonus)} CZK</strong>
+            <strong>{formatMoney(commissionTotal)} CZK</strong>
           </article>
           <article className="salaryLedgerRow">
             <div className="salaryLedgerRow-copy">
               <span>Average ride</span>
-              <p>Estimated payout per order in this cycle.</p>
+              <p>Average net payout per order in this cycle.</p>
             </div>
             <strong>{formatMoney(avgRide)} CZK</strong>
           </article>

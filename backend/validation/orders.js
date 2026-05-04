@@ -15,19 +15,6 @@ function resolveAddress(value) {
   return value;
 }
 
-function isValidEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeText(value));
-}
-
-function isValidPhone(value) {
-  const normalized = normalizeText(value).replace(/[\s().-]/g, '');
-  return /^\+?\d{6,15}$/.test(normalized);
-}
-
-function isValidContact(value) {
-  return isValidEmail(value) || isValidPhone(value);
-}
-
 export function validateOrderCreateInput(body = {}) {
   const contractData =
     body.contractData && typeof body.contractData === 'object'
@@ -70,7 +57,6 @@ export function validateOrderCreateInput(body = {}) {
 
   if (
     !hasAllRequiredFields ||
-    !isValidContact(customerContact) ||
     passengers < 1 ||
     !hasPositivePrice(contractData.totalPrice || body.totalPrice)
   ) {

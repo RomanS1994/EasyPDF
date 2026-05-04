@@ -2,7 +2,6 @@ import { requireManager } from '../../auth/context.js';
 import {
   buildManagerUserSummaries,
   buildSanitizedUser,
-  ACTIVE_ORDER_WHERE,
   ORDER_LIST_SELECT,
   sanitizeAuditLogs,
   sanitizeOrderListRecord,
@@ -120,7 +119,6 @@ export async function handleManagerUserDetail(request, response, userId) {
     prisma.order.findMany({
       where: {
         userId: target.id,
-        ...ACTIVE_ORDER_WHERE,
       },
       select: ORDER_LIST_SELECT,
       orderBy: {

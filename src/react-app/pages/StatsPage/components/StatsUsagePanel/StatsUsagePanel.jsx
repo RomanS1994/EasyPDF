@@ -123,14 +123,14 @@ function getPlanForecast(usage) {
   };
 }
 
-export function StatsUsagePanel({ usage, orders, generatedCount }) {
+export function StatsUsagePanel({ usage, orders }) {
   const percent = usage.percent || 0;
   const forecast = getPlanForecast(usage);
   const cycleLabel = getCycleLabel(usage);
   const planLimitLabel = usage.limit ? `${usage.used} / ${usage.limit} docs` : 'No active limit';
   const remainingLabel = String(usage.remaining || 0);
   const totalOrders = String(orders.length || 0);
-
+  const deletedMessagesLabel = String(usage.deletedMessages || 0);
   return (
     <section className="statsPanel is-active">
       <div className="statsHero">
@@ -155,8 +155,8 @@ export function StatsUsagePanel({ usage, orders, generatedCount }) {
             <strong>{remainingLabel}</strong>
           </article>
           <article className="statsMiniCard">
-            <span>PDF</span>
-            <strong>{generatedCount}</strong>
+            <span>Deleted</span>
+            <strong>{deletedMessagesLabel}</strong>
           </article>
         </div>
       </div>

@@ -77,7 +77,7 @@ function getStatusBucket(status) {
     return 'failed';
   }
 
-  if (value === 'pdf_generated' || value === 'completed' || value === 'archived') {
+  if (value === 'pdf_generated' || value === 'completed') {
     return 'generated';
   }
 
@@ -89,7 +89,6 @@ function buildStatusBreakdown(orders) {
   const counts = {
     generated: 0,
     pending: 0,
-    failed: 0,
   };
 
   for (const order of orders) {
@@ -115,9 +114,10 @@ export function StatsActivityPanel({ usage, orders }) {
   const series = buildActivitySeries(orders, usage);
   const maxCount = Math.max(1, ...series.map(item => item.count));
   const statusCounts = buildStatusBreakdown(orders);
-  const statusTotal = Math.max(1, statusCounts.generated + statusCounts.pending + statusCounts.failed);
+  const deletedMessagesCount = Number(usage?.deletedMessages || 0);
+  const statusTotal = Math.max(1, statusCounts.generated + statusCounts.pending + deletedMessagesCount);
   const summaryLabel = getSummaryLabel(series);
-
+  const deletedMessagesLabel = String(deletedMessagesCount);
   return (
     <section className="statsPanel is-active statsActivityPanel">
       <div className="statsVizCard">
@@ -145,7 +145,9 @@ export function StatsActivityPanel({ usage, orders }) {
       <div className="statsVizCard">
         <div className="usageCard-head">
           <h3>Status mix</h3>
-          <span>{orders.length} total</span>
+          <span>
+            {orders.length} total · {deletedMessagesLabel} deleted
+          </span>
         </div>
         <div className="statusStack">
           {orders.length ? (
@@ -159,12 +161,12 @@ export function StatsActivityPanel({ usage, orders }) {
                 style={{ width: `${(statusCounts.pending / statusTotal) * 100}%` }}
               />
               <span
-                className="statusSegment statusSegment-failed"
-                style={{ width: `${(statusCounts.failed / statusTotal) * 100}%` }}
+                className="statusSegment statusSegment-deleted"
+                style={{ width: `${(deletedMessagesCount / statusTotal) * 100}%` }}
               />
             </>
           ) : (
-            <span className="statusSegment statusSegment-pending" style={{ width: '100%' }} />
+            <span className="statusSegment statusSegment-deleted" style={{ width: '100%' }} />
           )}
         </div>
         <div className="statusLegend">
@@ -179,9 +181,9 @@ export function StatsActivityPanel({ usage, orders }) {
             <strong>{statusCounts.pending}</strong>
           </div>
           <div className="statusLegendItem">
-            <span className="statusLegendDot statusLegendDot-failed" />
-            <span>Failed</span>
-            <strong>{statusCounts.failed}</strong>
+            <span className="statusLegendDot statusLegendDot-deleted" />
+            <span>Deleted</span>
+            <strong>{deletedMessagesCount}</strong>
           </div>
         </div>
       </div>

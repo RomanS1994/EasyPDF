@@ -52,10 +52,10 @@ export const ordersApi = baseApi.injectEndpoints({
               { type: 'Orders', id: orderId },
             ],
     }),
-    archiveOrder: builder.mutation({
+    deleteOrder: builder.mutation({
       query: orderId => ({
-        url: `/orders/${orderId}/archive`,
-        method: 'PATCH',
+        url: `/orders/${orderId}`,
+        method: 'DELETE',
       }),
       invalidatesTags: (_result, _error, orderId) => [
         { type: 'Orders', id: 'LIST' },
@@ -84,6 +84,6 @@ export const {
   useGetOrderQuery,
   useCreateOrderMutation,
   useUpdateOrderMutation,
-  useArchiveOrderMutation,
+  useDeleteOrderMutation,
   useAssignDriverMutation,
 } = ordersApi;

@@ -79,7 +79,7 @@
   background: linear-gradient(180deg, #ffd54f, #f4b400);
 }
 
-.statusSegment-failed {
+.statusSegment-deleted {
   background: linear-gradient(180deg, #ff7b72, #d92d20);
 }
 
@@ -119,7 +119,7 @@
   background: #d78b00;
 }
 
-.statusLegendDot-failed {
+.statusLegendDot-deleted {
   background: #d92d20;
 }
 

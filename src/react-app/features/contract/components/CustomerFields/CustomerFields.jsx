@@ -45,7 +45,7 @@ export function CustomerFields() {
           <input
             className="contractField-input"
             type="text"
-            placeholder="Email or phone *"
+            placeholder="Contact *"
             required
             value={customer.email}
             onChange={event =>
@@ -56,7 +56,7 @@ export function CustomerFields() {
             <button
               className="contractField-clear"
               type="button"
-              aria-label="Clear email or phone"
+              aria-label="Clear contact"
               onClick={() => dispatch(updateCustomerField({ key: 'email', value: '' }))}
             >
               ×

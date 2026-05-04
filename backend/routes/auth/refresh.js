@@ -49,7 +49,7 @@ export async function handleRefresh(request, response) {
 
       if (!currentSession?.user) {
         if (currentSession) {
-          await tx.session.delete({
+          await tx.session.deleteMany({
             where: {
               id: currentSession.id,
             },
@@ -58,7 +58,7 @@ export async function handleRefresh(request, response) {
         return null;
       }
 
-      await tx.session.delete({
+      await tx.session.deleteMany({
         where: {
           id: currentSession.id,
         },

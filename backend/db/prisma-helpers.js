@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 import {
   buildManagerUserSummaryFromRecords,
+  countDeletedMessages,
   resolveSubscriptionView,
   sanitizeAuditLogFromRecords,
   sanitizeOrderFromRecords,
@@ -57,6 +58,7 @@ export const ORDER_LIST_SELECT = {
   customer: true,
   trip: true,
   totalPrice: true,
+  metadata: true,
   createdAt: true,
   updatedAt: true,
 };
@@ -71,10 +73,6 @@ export const ORDER_LIST_WITH_OWNER_SELECT = {
     },
   },
 };
-
-export const ACTIVE_ORDER_WHERE = Object.freeze({
-  archivedAt: null,
-});
 
 export async function createAuditLog(client, payload) {
   return client.auditLog.create({
@@ -97,7 +95,6 @@ export async function countOrdersForWindow(client, userId, subscriptionView) {
   return client.order.count({
     where: {
       userId,
-      ...ACTIVE_ORDER_WHERE,
       createdAt: {
         gte: new Date(subscriptionView.currentPeriodStart),
         lte: new Date(subscriptionView.currentPeriodEnd),
@@ -113,13 +110,17 @@ export async function buildSanitizedUser(client, user) {
     plan: user.subscription?.plan,
     fallbackStartMode: user.subscription ? 'now' : 'month',
   });
-  const usedOrders = await countOrdersForWindow(client, user.id, subscriptionView);
+  const [usedOrders, deletedMessages] = await Promise.all([
+    countOrdersForWindow(client, user.id, subscriptionView),
+    countDeletedMessages(client, user.id),
+  ]);
 
   return sanitizeUserFromRecords({
     user,
     subscription: user.subscription,
     plan: user.subscription?.plan,
-    usedOrders,
+    usedOrders: usedOrders + deletedMessages,
+    deletedMessages,
   });
 }
 
@@ -149,14 +150,28 @@ export async function buildSanitizedUsers(client, users) {
     return !current || item.currentPeriodEnd > current ? item.currentPeriodEnd : current;
   }, '');
 
-  const [totalOrdersGrouped, windowOrders] = await Promise.all([
+  const [totalOrdersGrouped, deletedMessagesGrouped, windowOrders] = await Promise.all([
     client.order.groupBy({
       by: ['userId'],
       where: {
         userId: {
           in: userIds,
         },
-        ...ACTIVE_ORDER_WHERE,
+      },
+      _count: {
+        _all: true,
+      },
+    }),
+    client.auditLog.groupBy({
+      by: ['targetUserId'],
+      where: {
+        targetUserId: {
+          in: userIds,
+        },
+        entityType: 'order',
+        action: {
+          in: ['order.deleted', 'order.archived'],
+        },
       },
       _count: {
         _all: true,
@@ -168,7 +183,6 @@ export async function buildSanitizedUsers(client, users) {
             userId: {
               in: userIds,
             },
-            ...ACTIVE_ORDER_WHERE,
             createdAt: {
               gte: new Date(minStart),
               lte: new Date(maxEnd),
@@ -184,6 +198,11 @@ export async function buildSanitizedUsers(client, users) {
 
   const totalOrdersByUserId = new Map(
     totalOrdersGrouped.map(item => [item.userId, item._count._all])
+  );
+  const deletedMessagesByUserId = new Map(
+    deletedMessagesGrouped
+      .filter(item => item.targetUserId)
+      .map(item => [item.targetUserId, item._count._all])
   );
   const usedOrdersByUserId = new Map(userIds.map(userId => [userId, 0]));
 
@@ -208,7 +227,8 @@ export async function buildSanitizedUsers(client, users) {
       user,
       subscription: user.subscription,
       plan: user.subscription?.plan,
-      usedOrders: usedOrdersByUserId.get(user.id) || 0,
+      usedOrders: (usedOrdersByUserId.get(user.id) || 0) + (deletedMessagesByUserId.get(user.id) || 0),
+      deletedMessages: deletedMessagesByUserId.get(user.id) || 0,
     }),
     totalOrders: totalOrdersByUserId.get(user.id) || 0,
   }));
@@ -223,6 +243,7 @@ export async function buildManagerUserSummaries(client, users) {
       subscription: user.subscription,
       plan: user.subscription?.plan,
       usedOrders: enrichedUsers[index]?.sanitized?.usage?.used || 0,
+      deletedMessages: enrichedUsers[index]?.sanitized?.usage?.deletedMessages || 0,
       totalOrders: enrichedUsers[index]?.totalOrders || 0,
     })
   );
@@ -247,6 +268,7 @@ export function sanitizeOrderListRecord(order) {
       time: pickTextValue(order.trip?.time),
     },
     totalPrice: pickTextValue(order.totalPrice),
+    metadata: order.metadata || {},
     createdAt: toIsoString(order.createdAt),
     updatedAt: toIsoString(order.updatedAt),
     ...(order.user

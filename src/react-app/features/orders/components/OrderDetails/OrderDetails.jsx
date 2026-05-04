@@ -1,14 +1,21 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { selectUser } from "../../../../features/auth/authSlice.js";
 import { hasManagerAccess } from "../../../../features/auth/authAccess.js";
 import { useGenerateContractPdfMutation } from "../../../contract/contractApi.js";
 import { downloadFile } from "../../../contract/utils/downloadFile.js";
+import {
+  detectCurrency,
+  extractNumericPrice,
+  formatPrice,
+  sanitizePriceInput,
+  setCurrentCurrency,
+} from "../../../contract/utils/priceUtils.js";
 import { useGetManagerUsersQuery } from "../../../manager/managerApi.js";
 import {
-  useArchiveOrderMutation,
   useAssignDriverMutation,
+  useDeleteOrderMutation,
   useGetOrderQuery,
   useUpdateOrderMutation,
 } from "../../ordersApi.js";
@@ -55,16 +62,23 @@ function getTransferLabel(user) {
   return `${user.name || "-"} · ${user.email || "-"}`;
 }
 
+function getCommissionValue(order) {
+  return String(order?.metadata?.commission ?? order?.contractData?.commission ?? "").trim();
+}
+
 export function OrderDetails({ orderId, onClose }) {
   const currentUser = useSelector(selectUser);
   const canTransfer = hasManagerAccess(currentUser?.role);
   const [isClosing, setIsClosing] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [commissionInput, setCommissionInput] = useState("");
+  const [commissionCurrency, setCommissionCurrency] = useState("EUR");
+  const skipCommissionSyncRef = useRef(false);
   const [showTransfer, setShowTransfer] = useState(false);
   const [transferSearch, setTransferSearch] = useState("");
   const [selectedUserId, setSelectedUserId] = useState("");
-  const [archiveOrder, { isLoading: isArchiving }] = useArchiveOrderMutation();
+  const [deleteOrder, { isLoading: isDeleting }] = useDeleteOrderMutation();
   const [assignDriver, { isLoading: isTransferring }] =
     useAssignDriverMutation();
   const [updateOrder] = useUpdateOrderMutation();
@@ -90,6 +104,14 @@ export function OrderDetails({ orderId, onClose }) {
   const customer = order?.contractData?.customer || order?.customer || {};
   const trip = order?.contractData?.trip || order?.trip || {};
   const tripTime = formatDateTime(getOrderTripTime(order));
+  const storedCommission = getCommissionValue(order);
+  const commissionConverted = useMemo(() => {
+    if (!commissionInput) {
+      return "";
+    }
+
+    return formatPrice(commissionInput, commissionCurrency);
+  }, [commissionCurrency, commissionInput]);
   const orderOwner = order?.user || {};
   const orderOwnerId = String(orderOwner?.id || order.userId || "");
   const managerUsers = managerUsersData?.users || [];
@@ -112,6 +134,25 @@ export function OrderDetails({ orderId, onClose }) {
     setTransferSearch("");
     setSelectedUserId("");
   }, [orderId]);
+
+  useEffect(() => {
+    if (!orderId) {
+      return;
+    }
+
+    if (skipCommissionSyncRef.current) {
+      skipCommissionSyncRef.current = false;
+      return;
+    }
+
+    const currentValue = String(storedCommission || "").trim();
+    const nextCurrency = detectCurrency(currentValue);
+    const nextInput = extractNumericPrice(currentValue);
+
+    setCommissionCurrency(nextCurrency);
+    setCurrentCurrency(nextCurrency);
+    setCommissionInput(nextInput);
+  }, [orderId, storedCommission]);
 
   useEffect(() => {
     if (!isClosing) {
@@ -138,7 +179,7 @@ export function OrderDetails({ orderId, onClose }) {
     function handleKeyDown(event) {
       if (
         event.key === "Escape" &&
-        !isArchiving &&
+        !isDeleting &&
         !isTransferring &&
         !isGenerating
       ) {
@@ -160,26 +201,26 @@ export function OrderDetails({ orderId, onClose }) {
   }, [
     orderId,
     showTransfer,
-    isArchiving,
+    isDeleting,
     isTransferring,
     isGenerating,
     onClose,
   ]);
 
-  async function handleArchive() {
+  async function handleDelete() {
     setMessage("");
     setError("");
 
-    if (!window.confirm("Archive this order?")) {
+    if (!window.confirm("Delete this order permanently?")) {
       return;
     }
 
     try {
-      await archiveOrder(orderId).unwrap();
-      setMessage("Order archived.");
+      await deleteOrder(orderId).unwrap();
+      setMessage("Order deleted.");
       onClose();
     } catch (error) {
-      setError(resolveErrorMessage(error, "Failed to archive order."));
+      setError(resolveErrorMessage(error, "Failed to delete order."));
     }
   }
 
@@ -253,6 +294,72 @@ export function OrderDetails({ orderId, onClose }) {
     }
   }
 
+  async function saveCommission(nextValue = commissionInput, nextCurrency = commissionCurrency) {
+    const formatted = formatPrice(nextValue, nextCurrency);
+    const normalized = formatted || sanitizePriceInput(nextValue);
+
+    if (normalized === storedCommission) {
+      setCommissionInput(extractNumericPrice(storedCommission));
+      return true;
+    }
+
+    setMessage("");
+    setError("");
+
+    try {
+      await updateOrder({
+        orderId,
+        payload: {
+          metadata: {
+            ...(order.metadata || {}),
+            commission: normalized,
+          },
+        },
+      }).unwrap();
+
+      setCommissionInput(extractNumericPrice(normalized));
+      setMessage(normalized ? "Commission saved." : "Commission cleared.");
+      return true;
+    } catch (error) {
+      setError(resolveErrorMessage(error, "Failed to save commission."));
+      setCommissionInput(extractNumericPrice(storedCommission));
+      return false;
+    }
+  }
+
+  function handleCommissionInputChange(event) {
+    const nextInput = sanitizePriceInput(event.target.value);
+    setCommissionInput(nextInput);
+  }
+
+  function handleCommissionCurrencyChange(nextCurrency) {
+    if (nextCurrency === commissionCurrency) {
+      return;
+    }
+
+    setCurrentCurrency(nextCurrency);
+    setCommissionCurrency(nextCurrency);
+    void saveCommission(commissionInput, nextCurrency);
+  }
+
+  function clearCommission() {
+    skipCommissionSyncRef.current = true;
+    setCommissionInput("");
+    setCommissionCurrency("EUR");
+    setCurrentCurrency("EUR");
+    void updateOrder({
+      orderId,
+      payload: {
+        metadata: {
+          ...(order.metadata || {}),
+          commission: "",
+        },
+      },
+    }).unwrap().catch((error) => {
+      setError(resolveErrorMessage(error, "Failed to save commission."));
+    });
+  }
+
   function handleCloseRequest() {
     if (showTransfer) {
       setShowTransfer(false);
@@ -260,6 +367,14 @@ export function OrderDetails({ orderId, onClose }) {
     }
 
     setIsClosing(true);
+  }
+
+  async function handleSaveAndClose() {
+    const saved = await saveCommission();
+
+    if (saved) {
+      handleCloseRequest();
+    }
   }
 
   function handleBackdropClick(event) {
@@ -388,6 +503,57 @@ export function OrderDetails({ orderId, onClose }) {
                     {order.totalPrice || "-"}
                   </span>
                 </div>
+                <div className="orderDrawer-row orderDrawer-row--input">
+                  <span className="orderWindow-label">Commission</span>
+                  <div className="orderCommissionField">
+                    <div className="orderCommissionField-row">
+                      <div className="orderCommissionField-inputWrap">
+                        <input
+                          className="orderWindow-input orderCommissionField-input"
+                          type="text"
+                          inputMode="decimal"
+                          aria-label="Commission"
+                          placeholder="Commission amount"
+                          value={commissionInput}
+                          onChange={handleCommissionInputChange}
+                          onBlur={() => saveCommission()}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.preventDefault();
+                              event.currentTarget.blur();
+                            }
+                          }}
+                        />
+
+                        {commissionInput ? (
+                          <button
+                            className="orderCommissionField-clear"
+                            type="button"
+                            onClick={clearCommission}
+                            aria-label="Clear commission"
+                          >
+                            ×
+                          </button>
+                        ) : null}
+                      </div>
+
+                      {["EUR", "CZK"].map((item) => (
+                        <button
+                          key={item}
+                          className={`orderCommissionField-currencyButton ${commissionCurrency === item ? "is-active" : ""}`}
+                          type="button"
+                          onClick={() => handleCommissionCurrencyChange(item)}
+                        >
+                          {item}
+                        </button>
+                      ))}
+                    </div>
+
+                    {commissionConverted ? (
+                      <p className="orderCommissionField-converted">{commissionConverted}</p>
+                    ) : null}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -414,10 +580,10 @@ export function OrderDetails({ orderId, onClose }) {
               <button
                 className="orderWindow-button orderWindow-button--accent"
                 type="button"
-                onClick={handleArchive}
-                disabled={isArchiving}
+                onClick={handleDelete}
+                disabled={isDeleting}
               >
-                {isArchiving ? "Archiving..." : "Archive order"}
+                {isDeleting ? "Deleting..." : "Delete order"}
               </button>
               {canTransfer ? (
                 <button
@@ -431,9 +597,9 @@ export function OrderDetails({ orderId, onClose }) {
               <button
                 className="orderWindow-button"
                 type="button"
-                onClick={handleCloseRequest}
+                onClick={handleSaveAndClose}
               >
-                Close
+                Save changes
               </button>
             </div>
 

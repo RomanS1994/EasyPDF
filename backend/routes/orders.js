@@ -1,6 +1,5 @@
 import { getAuthContext, hasManagerAccess } from '../auth/context.js';
 import {
-  ACTIVE_ORDER_WHERE,
   buildSanitizedUser,
   createAuditLog,
   ORDER_LIST_SELECT,
@@ -105,7 +104,6 @@ async function handleUpdateOrder(request, response, orderId) {
       const order = await tx.order.findFirst({
         where: {
           id: orderId,
-          ...ACTIVE_ORDER_WHERE,
         },
         include: ORDER_WITH_OWNER_INCLUDE,
       });
@@ -183,16 +181,15 @@ async function handleUpdateOrder(request, response, orderId) {
   sendJson(response, 200, { order: updatedOrder });
 }
 
-async function handleArchiveOrder(request, response, orderId) {
+async function handleDeleteOrder(request, response, orderId) {
   const context = await getAuthContext(request, response);
   if (!context) return;
 
-  const archivedOrder = await runStoreTransaction({
+  await runStoreTransaction({
     prisma: async tx => {
       const order = await tx.order.findFirst({
         where: {
           id: orderId,
-          ...ACTIVE_ORDER_WHERE,
         },
         include: ORDER_WITH_OWNER_INCLUDE,
       });
@@ -208,41 +205,30 @@ async function handleArchiveOrder(request, response, orderId) {
         throw new Error('You do not have access to this order');
       }
 
-      const archivedAt = nowIso();
-      const updated = await tx.order.update({
+      await createAuditLog(tx, {
+        action: 'order.deleted',
+        actorUserId: context.user.id,
+        targetUserId: order.userId,
+        entityType: 'order',
+        entityId: order.id,
+        before: {
+          orderNumber: order.orderNumber,
+          status: order.status,
+          userId: order.userId,
+          totalPrice: order.totalPrice,
+        },
+        after: null,
+      });
+
+      await tx.order.delete({
         where: {
           id: orderId,
         },
-        data: {
-          archivedAt: new Date(archivedAt),
-          updatedAt: new Date(archivedAt),
-        },
-        include: ORDER_WITH_OWNER_INCLUDE,
       });
-
-      await createAuditLog(tx, {
-        action: 'order.archived',
-        actorUserId: context.user.id,
-        targetUserId: updated.userId,
-        entityType: 'order',
-        entityId: updated.id,
-        before: {
-          archivedAt: order.archivedAt || null,
-          status: order.status,
-          userId: order.userId,
-        },
-        after: {
-          archivedAt: archivedAt,
-          status: updated.status,
-          userId: updated.userId,
-        },
-      });
-
-      return sanitizeOrderRecord(updated);
     },
   });
 
-  sendJson(response, 200, { order: archivedOrder });
+  sendJson(response, 200, { ok: true });
 }
 
 async function handleAssignDriver(request, response, orderId) {
@@ -261,7 +247,6 @@ async function handleAssignDriver(request, response, orderId) {
       const order = await tx.order.findFirst({
         where: {
           id: orderId,
-          ...ACTIVE_ORDER_WHERE,
         },
         include: ORDER_WITH_OWNER_INCLUDE,
       });
@@ -342,7 +327,6 @@ export async function handleOrderRoutes(request, response, { pathName, url }) {
     const orders = await prisma.order.findMany({
       where: {
         userId: context.user.id,
-        ...ACTIVE_ORDER_WHERE,
       },
       select: ORDER_LIST_SELECT,
       orderBy: {
@@ -381,7 +365,6 @@ export async function handleOrderRoutes(request, response, { pathName, url }) {
     const order = await prisma.order.findFirst({
       where: {
         id: orderId,
-        ...ACTIVE_ORDER_WHERE,
       },
       include: ORDER_WITH_OWNER_INCLUDE,
     });
@@ -405,11 +388,6 @@ export async function handleOrderRoutes(request, response, { pathName, url }) {
     return true;
   }
 
-  if (action === 'archive' && request.method === 'PATCH') {
-    await handleArchiveOrder(request, response, orderId);
-    return true;
-  }
-
   if (action === 'assign-driver' && request.method === 'PATCH') {
     await handleAssignDriver(request, response, orderId);
     return true;
@@ -421,6 +399,11 @@ export async function handleOrderRoutes(request, response, { pathName, url }) {
 
   if (request.method === 'PATCH') {
     await handleUpdateOrder(request, response, orderId);
+    return true;
+  }
+
+  if (request.method === 'DELETE') {
+    await handleDeleteOrder(request, response, orderId);
     return true;
   }
 

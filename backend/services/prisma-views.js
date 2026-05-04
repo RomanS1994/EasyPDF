@@ -2,6 +2,7 @@ export {
   buildManagerUserSummaryFromRecords,
   buildSubscriptionWriteData,
   buildUsageView,
+  countDeletedMessages,
   normalizePlanView,
   resolveSubscriptionView,
   sanitizeAuditLogFromRecords,

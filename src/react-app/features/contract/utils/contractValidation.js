@@ -2,22 +2,6 @@ export function isEmpty(value) {
   return String(value || '').trim() === '';
 }
 
-function isValidEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim());
-}
-
-function isValidPhone(value) {
-  const normalized = String(value || '')
-    .trim()
-    .replace(/[\s().-]/g, '');
-
-  return /^\+?\d{6,15}$/.test(normalized);
-}
-
-function isValidContact(value) {
-  return isValidEmail(value) || isValidPhone(value);
-}
-
 export function validateContract(contract) {
   const errors = {
     customerName: '',
@@ -37,8 +21,6 @@ export function validateContract(contract) {
   const customerContact = contract?.customer?.email || contract?.customer?.phone || '';
   if (isEmpty(customerContact)) {
     errors.customerContact = 'Customer contact is required.';
-  } else if (!isValidContact(customerContact)) {
-    errors.customerContact = 'Customer contact is invalid.';
   }
 
   if (isEmpty(contract?.passengers)) {

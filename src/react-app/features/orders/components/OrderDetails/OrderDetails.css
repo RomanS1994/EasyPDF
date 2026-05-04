@@ -207,6 +207,79 @@
   padding-top: 18px;
 }
 
+.orderDrawer-row--input {
+  align-items: stretch;
+}
+
+.orderCommissionField {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.orderCommissionField-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr) minmax(0, 0.85fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.orderCommissionField-inputWrap {
+  position: relative;
+  min-width: 0;
+}
+
+.orderCommissionField-input {
+  padding-right: 42px;
+}
+
+.orderCommissionField-clear {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  transform: translateY(-50%);
+  border: 1px solid rgba(15, 95, 215, 0.12);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1;
+  box-shadow: 0 8px 20px rgba(15, 95, 215, 0.08);
+  appearance: none;
+  display: grid;
+  place-items: center;
+}
+
+.orderCommissionField-currencyButton {
+  min-height: 42px;
+  padding: 0 8px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 12px 12px 0 0;
+  background: transparent;
+  color: rgba(100, 116, 139, 0.96);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: none;
+}
+
+.orderCommissionField-currencyButton.is-active {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(245, 248, 255, 0.96));
+  border-bottom-color: rgba(15, 95, 215, 0.88);
+  color: #0f5fd7;
+}
+
+.orderCommissionField-converted {
+  margin: 0;
+  color: rgba(82, 84, 90, 0.9);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
 .orderWindow-label {
   color: rgba(82, 84, 90, 0.9);
   font-size: 11px;
@@ -222,6 +295,19 @@
   font-weight: 500;
   overflow-wrap: anywhere;
   text-align: left;
+}
+
+.orderWindow-input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  color: rgba(17, 24, 39, 0.98);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .orderDrawer-actions {
@@ -402,6 +488,21 @@
     grid-template-columns: minmax(0, 0.95fr) minmax(0, 2.05fr);
     gap: 12px;
     padding: 6px 0;
+  }
+
+  .orderWindow-input {
+    min-height: 40px;
+    font-size: 15px;
+  }
+
+  .orderCommissionField-row {
+    grid-template-columns: minmax(0, 1fr) minmax(56px, 0.72fr) minmax(56px, 0.72fr);
+    gap: 6px;
+  }
+
+  .orderCommissionField-currencyButton {
+    min-height: 40px;
+    border-radius: 10px 10px 0 0;
   }
 
   .orderWindow-label {

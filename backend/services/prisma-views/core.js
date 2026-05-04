@@ -176,6 +176,18 @@ export function buildUsageView(subscription, used = 0) {
   };
 }
 
+export async function countDeletedMessages(client, userId) {
+  return client.auditLog.count({
+    where: {
+      targetUserId: userId,
+      entityType: 'order',
+      action: {
+        in: ['order.deleted', 'order.archived'],
+      },
+    },
+  });
+}
+
 export function buildSubscriptionWriteData({ plan, payload = {}, before = null, actorUserId = null } = {}) {
   const resolvedPlan = normalizePlanView(plan || getFallbackPlan(before?.planId));
   const requestedStart = toIsoDate(payload.currentPeriodStart) || before?.currentPeriodStart || nowIso();
@@ -232,7 +244,13 @@ export function buildSubscriptionWriteData({ plan, payload = {}, before = null, 
   };
 }
 
-export function sanitizeUserFromRecords({ user, subscription, plan, usedOrders = 0 } = {}) {
+export function sanitizeUserFromRecords({
+  user,
+  subscription,
+  plan,
+  usedOrders = 0,
+  deletedMessages = 0,
+} = {}) {
   const resolvedSubscription = resolveSubscriptionView({
     user,
     subscription,
@@ -265,7 +283,10 @@ export function sanitizeUserFromRecords({ user, subscription, plan, usedOrders =
       pendingRequestedAt: resolvedSubscription.pendingRequestedAt,
       pendingSource: resolvedSubscription.pendingSource,
     },
-    usage: buildUsageView(resolvedSubscription, usedOrders),
+    usage: {
+      ...buildUsageView(resolvedSubscription, usedOrders),
+      deletedMessages,
+    },
     createdAt: toIsoString(user.createdAt),
     updatedAt: toIsoString(user.updatedAt),
   };
@@ -305,6 +326,7 @@ export function buildManagerUserSummaryFromRecords({
   subscription,
   plan,
   usedOrders = 0,
+  deletedMessages = 0,
   totalOrders = 0,
 } = {}) {
   return {
@@ -313,6 +335,7 @@ export function buildManagerUserSummaryFromRecords({
       subscription,
       plan,
       usedOrders,
+      deletedMessages,
     }),
     totalOrders,
   };
