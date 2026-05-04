@@ -74,6 +74,19 @@ const contractSlice = createSlice({
     setTotalPrice(state, action) {
       state.totalPrice = action.payload;
     },
+    syncBusinessProfile(state, action) {
+      const driver = action.payload?.driver || {};
+      const provider = action.payload?.provider || {};
+
+      state.driver = {
+        ...state.driver,
+        ...driver,
+      };
+      state.provider = {
+        ...state.provider,
+        ...provider,
+      };
+    },
     resetContract() {
       return createDefaultContractState();
     },
@@ -93,6 +106,7 @@ export const {
   updateTripField,
   setPassengers,
   setTotalPrice,
+  syncBusinessProfile,
   resetContract,
   replaceContract,
 } = contractSlice.actions;
