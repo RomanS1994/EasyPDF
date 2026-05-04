@@ -169,9 +169,11 @@ export function renderContractPdfHtml({
   const customerEmail = normalizeText(
     contractData?.customer?.email || contractData?.customer?.phone,
   );
-  const customers = normalizeText(
-    contractData?.customers ??
+  const passengers = normalizeText(
+    contractData?.passengers ??
+      contractData?.customers ??
       contractData?.customersCount ??
+      contractData?.trip?.passengers ??
       contractData?.trip?.customers ??
       contractData?.trip?.customersCount,
   );
@@ -434,7 +436,7 @@ export function renderContractPdfHtml({
                 ${renderRows([
                   { label: "Jméno:", value: customerName },
                   { label: "E-mail, phone:", value: customerEmail },
-                  { label: "Počet klientů:", value: customers },
+                  { label: "Počet klientů:", value: passengers },
                 ])}
               </div>
             </section>
