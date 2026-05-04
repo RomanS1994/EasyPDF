@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import { getGenerationWindowMs } from '../../generationSessionSlice.js';
 import './GenerationSessionBanner.css';
 
@@ -20,6 +21,7 @@ function getRemainingMs(expiresAt) {
 }
 
 export function GenerationSessionBanner({ session, onExpired }) {
+  const { t } = useI18n();
   const [remainingMs, setRemainingMs] = useState(() => getRemainingMs(session?.expiresAt));
 
   useEffect(() => {
@@ -56,12 +58,12 @@ export function GenerationSessionBanner({ session, onExpired }) {
   return (
     <section className="generationSessionBanner">
       <div className="generationSessionBannerCopy">
-        <p className="sectionEyebrow">Order</p>
-        <h2>{session?.orderId ? 'Order reserved' : 'Token session active'}</h2>
+        <p className="sectionEyebrow">{t('contract.orderWindow')}</p>
+        <h2>{session?.orderId ? t('contract.orderReserved') : t('contract.tokenSessionActive')}</h2>
         <p>
           {session?.orderId
-            ? 'You have 10 minutes to finish this order.'
-            : 'You have 10 minutes to fill in the order details.'}
+            ? t('contract.finishOrder')
+            : t('contract.fillOrderDetails')}
         </p>
       </div>
 

@@ -1,5 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 
+import { useI18n } from '../../../../app/i18n/useI18n.js';
+import { AddressAutocompleteField } from '../../../addressAutocomplete/index.js';
 import { selectTrip, updateTripField } from '../../contractSlice.js';
 import './TripFields.css';
 
@@ -36,64 +38,40 @@ function getPaymentIcon(key) {
 }
 
 export function TripFields() {
+  const { t } = useI18n();
   const dispatch = useDispatch();
   const trip = useSelector(selectTrip);
+  const mapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
   const paymentMethods = [
-    { key: 'card', label: 'Card' },
-    { key: 'cash', label: 'Cash' },
-    { key: 'invoice', label: 'Invoice' },
+    { key: 'card', label: t('contract.card') },
+    { key: 'cash', label: t('contract.cash') },
+    { key: 'invoice', label: t('contract.invoice') },
   ];
 
   return (
     <div className="contractFieldsBlock">
       <label className="contractField">
-        <div className="contractFieldControl">
-          <input
-            className="contractField-input"
-            type="text"
-            placeholder="Pickup address *"
-            required
-            value={trip.from?.address || ''}
-            onChange={event =>
-              dispatch(updateTripField({ key: 'from', value: event.target.value }))
-            }
-          />
-          {trip.from?.address ? (
-            <button
-              className="contractField-clear"
-              type="button"
-              aria-label="Clear pickup address"
-              onClick={() => dispatch(updateTripField({ key: 'from', value: '' }))}
-            >
-              ×
-            </button>
-          ) : null}
-        </div>
+        <AddressAutocompleteField
+          apiKey={mapsApiKey}
+          ariaLabel={t('contract.pickupAddress')}
+          clearLabel={t('contract.clearPickupAddress')}
+          placeholder={`${t('contract.pickupAddress')} *`}
+          value={trip.from?.address || ''}
+          onChange={value => dispatch(updateTripField({ key: 'from', value }))}
+          onClear={() => dispatch(updateTripField({ key: 'from', value: '' }))}
+        />
       </label>
 
       <label className="contractField">
-        <div className="contractFieldControl">
-          <input
-            className="contractField-input"
-            type="text"
-            placeholder="Dropoff address *"
-            required
-            value={trip.to?.address || ''}
-            onChange={event =>
-              dispatch(updateTripField({ key: 'to', value: event.target.value }))
-            }
-          />
-          {trip.to?.address ? (
-            <button
-              className="contractField-clear"
-              type="button"
-              aria-label="Clear dropoff address"
-              onClick={() => dispatch(updateTripField({ key: 'to', value: '' }))}
-            >
-              ×
-            </button>
-          ) : null}
-        </div>
+        <AddressAutocompleteField
+          apiKey={mapsApiKey}
+          ariaLabel={t('contract.dropoffAddress')}
+          clearLabel={t('contract.clearDropoffAddress')}
+          placeholder={`${t('contract.dropoffAddress')} *`}
+          value={trip.to?.address || ''}
+          onChange={value => dispatch(updateTripField({ key: 'to', value }))}
+          onClear={() => dispatch(updateTripField({ key: 'to', value: '' }))}
+        />
       </label>
 
       <label className="contractField">
@@ -101,7 +79,7 @@ export function TripFields() {
           <input
             className="contractField-input contractField-input-date"
             type="datetime-local"
-            aria-label="Pickup date and time"
+            aria-label={t('contract.pickupDateTime')}
             step="60"
             required
             value={toDateTimeLocalValue(trip.time)}
@@ -113,7 +91,7 @@ export function TripFields() {
             <button
               className="contractField-clear"
               type="button"
-              aria-label="Clear pickup date and time"
+              aria-label={t('contract.clearPickupDateTime')}
               onClick={() => dispatch(updateTripField({ key: 'time', value: '' }))}
             >
               ×
@@ -124,7 +102,7 @@ export function TripFields() {
 
       <div className="paymentMethodBlock">
         <div className="paymentMethodLabel">
-          <span>Payment method</span>
+          <span>{t('contract.paymentMethod')}</span>
           <span aria-hidden="true" className="paymentMethodRequired">
             *
           </span>

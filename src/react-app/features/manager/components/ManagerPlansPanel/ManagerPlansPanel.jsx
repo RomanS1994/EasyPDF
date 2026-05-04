@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import {
   useCreatePlanMutation,
   useGetManagerPlansQuery,
@@ -7,6 +8,7 @@ import {
 import './ManagerPlansPanel.css';
 
 export function ManagerPlansPanel() {
+  const { t } = useI18n();
   const { data, isLoading, isError } = useGetManagerPlansQuery();
   const [createPlan, { isLoading: isSaving }] = useCreatePlanMutation();
   const [name, setName] = useState('');
@@ -34,21 +36,21 @@ export function ManagerPlansPanel() {
       setMonthlyGenerationLimit('');
       setDescription('');
       setIsActive(true);
-      setMessage('Plan saved.');
+      setMessage(t('manager.planSaved'));
     } catch {
-      setError('Failed to save plan.');
+      setError(t('manager.failedToSavePlan'));
     }
   }
 
   return (
     <section className="managerPlansPanel">
       <div className="managerPlansPanel-section">
-        <h3 className="managerPlansPanel-title">Plans</h3>
+        <h3 className="managerPlansPanel-title">{t('manager.plans')}</h3>
 
-        {isLoading ? <p className="managerPlansPanel-state">Loading plans...</p> : null}
-        {isError ? <p className="managerPlansPanel-state">Failed to load plans.</p> : null}
+        {isLoading ? <p className="managerPlansPanel-state">{t('common.loadingPlans')}</p> : null}
+        {isError ? <p className="managerPlansPanel-state">{t('manager.failedPlans')}</p> : null}
         {!isLoading && !isError && !plans.length ? (
-          <p className="managerPlansPanel-state">No plans found.</p>
+          <p className="managerPlansPanel-state">{t('manager.noPlans')}</p>
         ) : null}
 
         {!isLoading && !isError && plans.length ? (
@@ -56,23 +58,23 @@ export function ManagerPlansPanel() {
             {plans.map(plan => (
               <li className="managerPlansPanel-item" key={plan.id}>
                 <div className="managerPlansPanel-row">
-                  <span className="managerPlansPanel-label">Name</span>
+                  <span className="managerPlansPanel-label">{t('common.name')}</span>
                   <span className="managerPlansPanel-value">{plan.name || '-'}</span>
                 </div>
                 <div className="managerPlansPanel-row">
-                  <span className="managerPlansPanel-label">Monthly limit</span>
+                  <span className="managerPlansPanel-label">{t('manager.monthlyLimit')}</span>
                   <span className="managerPlansPanel-value">
                     {plan.monthlyGenerationLimit || '-'}
                   </span>
                 </div>
                 <div className="managerPlansPanel-row">
-                  <span className="managerPlansPanel-label">Description</span>
+                  <span className="managerPlansPanel-label">{t('manager.description')}</span>
                   <span className="managerPlansPanel-value">{plan.description || '-'}</span>
                 </div>
                 <div className="managerPlansPanel-row">
-                  <span className="managerPlansPanel-label">Active</span>
+                  <span className="managerPlansPanel-label">{t('manager.active')}</span>
                   <span className="managerPlansPanel-value">
-                    {plan.isActive ? 'Yes' : 'No'}
+                    {plan.isActive ? t('common.yes') : t('common.no')}
                   </span>
                 </div>
               </li>
@@ -82,10 +84,10 @@ export function ManagerPlansPanel() {
       </div>
 
       <form className="managerPlansPanel-form" onSubmit={handleSubmit}>
-        <h3 className="managerPlansPanel-title">Create plan</h3>
+        <h3 className="managerPlansPanel-title">{t('manager.createPlan')}</h3>
 
         <label className="managerPlansPanel-field">
-          <span className="managerPlansPanel-label">Name</span>
+          <span className="managerPlansPanel-label">{t('common.name')}</span>
           <input
             className="managerPlansPanel-input"
             type="text"
@@ -95,7 +97,7 @@ export function ManagerPlansPanel() {
         </label>
 
         <label className="managerPlansPanel-field">
-          <span className="managerPlansPanel-label">Monthly limit</span>
+          <span className="managerPlansPanel-label">{t('manager.monthlyLimit')}</span>
           <input
             className="managerPlansPanel-input"
             type="number"
@@ -105,7 +107,7 @@ export function ManagerPlansPanel() {
         </label>
 
         <label className="managerPlansPanel-field">
-          <span className="managerPlansPanel-label">Description</span>
+          <span className="managerPlansPanel-label">{t('manager.description')}</span>
           <textarea
             className="managerPlansPanel-textarea"
             value={description}
@@ -119,7 +121,7 @@ export function ManagerPlansPanel() {
             checked={isActive}
             onChange={event => setIsActive(event.target.checked)}
           />
-          <span className="managerPlansPanel-label">Active</span>
+          <span className="managerPlansPanel-label">{t('manager.active')}</span>
         </label>
 
         {message ? <p className="managerPlansPanel-message">{message}</p> : null}
@@ -130,7 +132,7 @@ export function ManagerPlansPanel() {
           type="submit"
           disabled={isSaving}
         >
-          {isSaving ? 'Saving...' : 'Save plan'}
+          {isSaving ? t('manager.savingPlan') : t('manager.savePlan')}
         </button>
       </form>
     </section>

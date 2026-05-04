@@ -1,17 +1,20 @@
 import { Link } from 'react-router-dom';
 
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import './SettingsAdminAccess.css';
 
 export function SettingsAdminAccess() {
+  const { t } = useI18n();
+
   return (
     <section className="screenCard settingsAdminAccess">
       <div className="compactHeader">
-        <h2>Admin workspace</h2>
-        <p>Manage accounts, subscriptions, plans and audit logs.</p>
+        <h2>{t('settings.adminAccess.title')}</h2>
+        <p>{t('settings.adminAccess.copy')}</p>
       </div>
 
       <Link className="settingsAdminAccess-link" to="/cz/pdf/admin/accounts">
-        Open admin workspace
+        {t('settings.adminAccess.title')}
       </Link>
     </section>
   );

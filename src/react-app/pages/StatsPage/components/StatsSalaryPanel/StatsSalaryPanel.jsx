@@ -1,3 +1,4 @@
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import './StatsSalaryPanel.css';
 
 const EUR_RATE = 25;
@@ -158,6 +159,7 @@ function getTopDays(orders) {
 }
 
 export function StatsSalaryPanel({ orders, usage }) {
+  const { t } = useI18n();
   const cycleOrders = getCycleOrders(orders, usage);
   const grossTotal = cycleOrders.reduce((sum, order) => {
     const gross = getOrderNetAmount(order);
@@ -180,29 +182,29 @@ export function StatsSalaryPanel({ orders, usage }) {
     <section className="statsPanel is-active statsSalaryPanel">
       <div className="salaryHeroCard">
         <div className="salaryHeroMain">
-          <p className="sectionEyebrow">Salary</p>
-          <h3>Net payout</h3>
+          <p className="sectionEyebrow">{t('stats.salary')}</p>
+          <h3>{t('stats.salaryTitle')}</h3>
           <strong>{formatMoney(netSalary)} CZK</strong>
           <p>
-            Total earnings minus commission for the active cycle across {cycleCount} orders.
+            {t('stats.mainPayout')} {cycleCount} orders.
           </p>
         </div>
 
         <div className="salaryHeroAside">
           <div className="salaryHeroStat">
-            <span>Gross</span>
+            <span>{t('stats.gross')}</span>
             <strong>
               {formatMoney(grossTotal)} CZK
             </strong>
           </div>
           <div className="salaryHeroStat">
-            <span>Commission</span>
+            <span>{t('stats.commission')}</span>
             <strong>
               {formatMoney(commissionTotal)} CZK
             </strong>
           </div>
           <div className="salaryHeroStat">
-            <span>Net share</span>
+            <span>{t('stats.netShare')}</span>
             <strong>{takeHomeShare}%</strong>
           </div>
         </div>
@@ -210,29 +212,29 @@ export function StatsSalaryPanel({ orders, usage }) {
 
       <div className="salaryLedgerCard">
         <div className="usageCard-head">
-          <h3>Payout breakdown</h3>
-          <span>{usage?.cycleLabel || 'Current cycle'}</span>
+          <h3>{t('stats.payoutBreakdown')}</h3>
+          <span>{usage?.cycleLabel || t('stats.currentCycle')}</span>
         </div>
 
         <div className="salaryLedger">
           <article className="salaryLedgerRow">
             <div className="salaryLedgerRow-copy">
-              <span>Net salary</span>
-              <p>Main payout after subtracting commission.</p>
+              <span>{t('stats.netSalary')}</span>
+              <p>{t('stats.mainPayout')}</p>
             </div>
             <strong>{formatMoney(netSalary)} CZK</strong>
           </article>
           <article className="salaryLedgerRow">
             <div className="salaryLedgerRow-copy">
-              <span>Total commission</span>
-              <p>All commission values entered for the cycle.</p>
+              <span>{t('stats.totalCommission')}</span>
+              <p>{t('stats.commissionValues')}</p>
             </div>
             <strong>{formatMoney(commissionTotal)} CZK</strong>
           </article>
           <article className="salaryLedgerRow">
             <div className="salaryLedgerRow-copy">
-              <span>Average ride</span>
-              <p>Average net payout per order in this cycle.</p>
+              <span>{t('stats.averageRide')}</span>
+              <p>{t('stats.averageNet')}</p>
             </div>
             <strong>{formatMoney(avgRide)} CZK</strong>
           </article>
@@ -241,8 +243,8 @@ export function StatsSalaryPanel({ orders, usage }) {
 
       <div className="salaryTrendCard">
         <div className="usageCard-head">
-          <h3>Top earning days</h3>
-          <span>{topDay ? topDay.label : 'No data'}</span>
+          <h3>{t('stats.topEarningDays')}</h3>
+          <span>{topDay ? topDay.label : t('stats.noData')}</span>
         </div>
 
         <div className="salaryTrendList">

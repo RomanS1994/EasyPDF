@@ -8,6 +8,8 @@ import {
   setSessionError,
 } from '../../features/auth/authSlice.js';
 import { getToken } from '../../features/auth/authStorage.js';
+import { getMessage } from '../i18n/messages.js';
+import { readStoredLanguage } from '../i18n/languageStorage.js';
 
 function resolveBaseUrl() {
   if (import.meta.env.DEV) {
@@ -55,6 +57,10 @@ export const baseApi = createApi({
       return getRequestUrl(requestArgs).startsWith('/auth/');
     }
 
+    function t(key) {
+      return getMessage(readStoredLanguage(), key);
+    }
+
     async function refreshSession() {
       const refreshResult = await baseQuery(
         {
@@ -84,7 +90,7 @@ export const baseApi = createApi({
         api.dispatch(
           setSessionError({
             type: 'expired',
-            message: 'Session expired. Please sign in again.',
+            message: t('auth.sessionExpiredSignIn'),
           }),
         );
         return false;
@@ -101,8 +107,8 @@ export const baseApi = createApi({
           setSessionError({
             type: isOffline ? 'offline' : 'server',
             message: isOffline
-              ? 'Connection lost. Your session is kept, so you can try again later.'
-              : 'Session check failed. Your session is kept, so you can try again later.',
+              ? t('auth.connectionLostKeepSession')
+              : t('auth.sessionCheckFailedKeepSession'),
           }),
         );
       }

@@ -1,9 +1,10 @@
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import './PlanCard.css';
 
-function getPriceLabel(plan) {
+function getPriceLabel(plan, t) {
   const price = Number(plan.priceCzk || 0);
 
-  return price > 0 ? `${price} CZK` : 'Free';
+  return price > 0 ? `${price} CZK` : t('home.free');
 }
 
 function getPlanVariant(plan) {
@@ -54,28 +55,29 @@ function getPlanVariant(plan) {
   return 'planCard--silver';
 }
 
-function getPlanTokens(plan) {
+function getPlanTokens(plan, t) {
   const limit = Number(plan.monthlyGenerationLimit || 0);
   const pdfCount = Array.isArray(plan.pdfDocuments) ? plan.pdfDocuments.length : 0;
   const variant = getPlanVariant(plan);
 
-  const tokens = [`${limit} tokens`, `${pdfCount} PDF types`];
+  const tokens = [t('contract.planTokensShort', { count: limit }), t('contract.pdfTypes', { count: pdfCount })];
 
   if (variant === 'planCard--free') {
-    tokens.push('Manual upgrade');
+    tokens.push(t('home.manualUpgrade'));
   } else if (variant === 'planCard--silver') {
-    tokens.push('Sharp entry');
+    tokens.push(t('home.sharpEntry'));
   } else if (variant === 'planCard--gold') {
-    tokens.push('Best value');
+    tokens.push(t('home.bestValue'));
   } else if (variant === 'planCard--platinum') {
-    tokens.push('Priority access');
+    tokens.push(t('home.priorityAccess'));
   }
 
   return tokens;
 }
 
 export function PlanCard({ plan, selected = false, onClick }) {
-  const tokens = getPlanTokens(plan);
+  const { t } = useI18n();
+  const tokens = getPlanTokens(plan, t);
 
   return (
     <button
@@ -84,16 +86,16 @@ export function PlanCard({ plan, selected = false, onClick }) {
       aria-pressed={selected}
       onClick={onClick}
     >
-      {selected ? <span className="planCard-selectedBadge">Selected</span> : null}
+      {selected ? <span className="planCard-selectedBadge">{t('common.yes')}</span> : null}
       <div className="planCard-topRow">
         <span className="planCard-tier">{plan.name || '-'}</span>
-        <span className="planCard-price">{getPriceLabel(plan)}</span>
+        <span className="planCard-price">{getPriceLabel(plan, t)}</span>
       </div>
       <div className="planCard-hero">
-        <span className="planCard-heroLabel">Monthly tokens</span>
+        <span className="planCard-heroLabel">{t('home.monthlyTokens')}</span>
         <strong className="planCard-heroValue">{plan.monthlyGenerationLimit || '-'}</strong>
       </div>
-      <div className="planCard-tokens" aria-label="Plan tokens">
+      <div className="planCard-tokens" aria-label={t('home.planTokens')}>
         {tokens.map(token => (
           <span className="planCard-token" key={token}>
             {token}
@@ -101,7 +103,7 @@ export function PlanCard({ plan, selected = false, onClick }) {
         ))}
       </div>
       <div className="planCard-footer">
-        <span className="planCard-action">{selected ? 'Selected plan' : 'Choose plan'}</span>
+        <span className="planCard-action">{selected ? t('home.selectedPlan') : t('home.choosePlan')}</span>
       </div>
     </button>
   );

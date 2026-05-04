@@ -6,11 +6,13 @@ import {
   selectSessionError,
   selectSessionErrorType,
 } from '../../../features/auth/authSlice.js';
+import { useI18n } from '../../i18n/useI18n.js';
 import './AuthSessionErrorModal.css';
 
 export function AuthSessionErrorModal() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t } = useI18n();
   const sessionError = useSelector(selectSessionError);
   const sessionErrorType = useSelector(selectSessionErrorType);
 
@@ -37,15 +39,15 @@ export function AuthSessionErrorModal() {
         <div className="authSessionErrorModal-copy">
           <p className="authSessionErrorModal-eyebrow">
             {sessionErrorType === 'expired' || sessionErrorType === 'server'
-              ? 'Session state'
-              : 'Online state'}
+              ? t('auth.sessionState')
+              : t('auth.onlineState')}
           </p>
           <h2 id="authSessionErrorTitle">
             {sessionErrorType === 'expired'
-              ? 'Session expired'
+              ? t('auth.sessionExpired')
               : sessionErrorType === 'server'
-                ? 'Session check failed'
-                : 'Connection error'}
+                ? t('auth.sessionCheckFailed')
+                : t('auth.connectionError')}
           </h2>
           <p>{sessionError}</p>
         </div>
@@ -55,7 +57,7 @@ export function AuthSessionErrorModal() {
           type="button"
           onClick={handleClose}
         >
-          {sessionErrorType === 'expired' ? 'Go to sign in' : 'Try again later'}
+          {sessionErrorType === 'expired' ? t('auth.goToSignIn') : t('auth.tryAgainLater')}
         </button>
       </div>
     </div>

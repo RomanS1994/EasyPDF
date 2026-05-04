@@ -28,5 +28,5 @@ export const RUNTIME_ENV_GROUPS = {
   auth: ['AUTH_TOKEN_SECRET', 'ACCESS_TOKEN_TTL_MINUTES', 'REFRESH_*'],
   api: ['API_KEY'],
   database: ['DATABASE_URL', 'DIRECT_DATABASE_URL'],
-  frontend: ['VITE_API_BASE_URL', 'VITE_API_KEY'],
+  frontend: ['VITE_API_BASE_URL', 'VITE_API_KEY', 'VITE_GOOGLE_MAPS_API_KEY'],
 };

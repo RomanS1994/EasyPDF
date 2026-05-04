@@ -103,6 +103,7 @@ npm run dev
 | --- | --- | --- |
 | `VITE_API_BASE_URL` | так | Базовий URL API, наприклад `http://localhost:3001/api` |
 | `VITE_API_KEY` | ні | Публічний ключ заголовка `X-API-KEY`, якщо він увімкнений на backend |
+| `VITE_GOOGLE_MAPS_API_KEY` | ні | Публічний ключ Google Maps Places для автокомпліту адрес |
 | `VITE_SUPPORT_WHATSAPP_URL` | ні | Посилання для ручного підтвердження оплати |
 | `VITE_SUPPORT_TELEGRAM_URL` | ні | Додаткове посилання підтримки |
 
@@ -199,7 +200,7 @@ npm run dev
 - build command: `npm run build`
 - publish directory: `dist`
 - required env: `VITE_API_BASE_URL`
-- optional env: `VITE_API_KEY`, `VITE_SUPPORT_WHATSAPP_URL`, `VITE_SUPPORT_TELEGRAM_URL`
+- optional env: `VITE_API_KEY`, `VITE_GOOGLE_MAPS_API_KEY`, `VITE_SUPPORT_WHATSAPP_URL`, `VITE_SUPPORT_TELEGRAM_URL`
 
 ### Backend на Render або іншому Node-host
 

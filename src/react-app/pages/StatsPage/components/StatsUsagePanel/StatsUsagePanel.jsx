@@ -1,3 +1,4 @@
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import './StatsUsagePanel.css';
 
 function parseDateValue(value) {
@@ -124,10 +125,11 @@ function getPlanForecast(usage) {
 }
 
 export function StatsUsagePanel({ usage, orders }) {
+  const { t } = useI18n();
   const percent = usage.percent || 0;
   const forecast = getPlanForecast(usage);
   const cycleLabel = getCycleLabel(usage);
-  const planLimitLabel = usage.limit ? `${usage.used} / ${usage.limit} docs` : 'No active limit';
+  const planLimitLabel = usage.limit ? `${usage.used} / ${usage.limit} docs` : t('stats.noDataLabel');
   const remainingLabel = String(usage.remaining || 0);
   const totalOrders = String(orders.length || 0);
   const deletedMessagesLabel = String(usage.deletedMessages || 0);
@@ -137,25 +139,25 @@ export function StatsUsagePanel({ usage, orders }) {
         <div className="statsRing" style={{ '--progress': `${percent}%` }}>
           <div className="statsRing-inner">
             <strong>{percent}%</strong>
-            <span>{percent}% used</span>
+            <span>{t('stats.percentUsed', { percent })}</span>
           </div>
         </div>
 
         <div className="statsMiniGrid">
           <article className="statsMiniCard">
-            <span>Cycle</span>
+            <span>{t('stats.cycle')}</span>
             <strong>{cycleLabel}</strong>
           </article>
           <article className="statsMiniCard">
-            <span>Used</span>
+            <span>{t('stats.used')}</span>
             <strong>{usage.used}</strong>
           </article>
           <article className="statsMiniCard">
-            <span>Remaining</span>
+            <span>{t('stats.remaining')}</span>
             <strong>{remainingLabel}</strong>
           </article>
           <article className="statsMiniCard">
-            <span>Deleted</span>
+            <span>{t('stats.deleted')}</span>
             <strong>{deletedMessagesLabel}</strong>
           </article>
         </div>
@@ -163,7 +165,7 @@ export function StatsUsagePanel({ usage, orders }) {
 
       <div className="usageCard usageCard-stats">
         <div className="usageCard-head">
-          <h3>Cycle limit</h3>
+          <h3>{t('stats.cycleLimit')}</h3>
           <span>{planLimitLabel}</span>
         </div>
         <div className="usageBar">
@@ -171,19 +173,19 @@ export function StatsUsagePanel({ usage, orders }) {
         </div>
         <div className="usageForecast">
           <article className="usageForecast-card">
-            <span>Forecast</span>
+            <span>{t('stats.forecast')}</span>
             <strong>{forecast.projectedVolume}</strong>
-            <p>Projected count for this cycle.</p>
+            <p>{t('stats.projectedCount')}</p>
           </article>
           <article className="usageForecast-card">
-            <span>Limit date</span>
+            <span>{t('stats.limitDate')}</span>
             <strong>{forecast.label}</strong>
-            <p>Limit date or activity status.</p>
+            <p>{t('stats.limitDateOrStatus')}</p>
           </article>
           <article className="usageForecast-card">
-            <span>Total</span>
+            <span>{t('stats.total')}</span>
             <strong>{totalOrders}</strong>
-            <p>Stored orders in this workspace.</p>
+            <p>{t('stats.storedOrders')}</p>
           </article>
         </div>
       </div>

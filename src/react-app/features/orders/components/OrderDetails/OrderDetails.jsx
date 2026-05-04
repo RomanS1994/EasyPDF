@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
+import { useI18n } from "../../../../app/i18n/useI18n.js";
 import { selectUser } from "../../../../features/auth/authSlice.js";
 import { hasManagerAccess } from "../../../../features/auth/authAccess.js";
 import { useGenerateContractPdfMutation } from "../../../contract/contractApi.js";
@@ -68,6 +69,7 @@ function getCommissionValue(order) {
 
 export function OrderDetails({ orderId, onClose }) {
   const currentUser = useSelector(selectUser);
+  const { language, t } = useI18n();
   const canTransfer = hasManagerAccess(currentUser?.role);
   const [isClosing, setIsClosing] = useState(false);
   const [message, setMessage] = useState("");
@@ -211,16 +213,16 @@ export function OrderDetails({ orderId, onClose }) {
     setMessage("");
     setError("");
 
-    if (!window.confirm("Delete this order permanently?")) {
+    if (!window.confirm(t('contract.deleteOrderConfirm'))) {
       return;
     }
 
     try {
       await deleteOrder(orderId).unwrap();
-      setMessage("Order deleted.");
+      setMessage(t('contract.orderDeleted'));
       onClose();
     } catch (error) {
-      setError(resolveErrorMessage(error, "Failed to delete order."));
+      setError(resolveErrorMessage(error, t('contract.failedToDeleteOrder')));
     }
   }
 
@@ -233,6 +235,7 @@ export function OrderDetails({ orderId, onClose }) {
         orderId,
         documentType,
         contractData: order.contractData || {},
+        language,
       }).unwrap();
 
       const safeNumber = String(order.orderNumber || orderId).replace(
@@ -240,7 +243,7 @@ export function OrderDetails({ orderId, onClose }) {
         "-",
       );
       downloadFile(blob, `${safeNumber}-${documentType}.pdf`);
-      setMessage(`${documentType} PDF downloaded.`);
+      setMessage(t('contract.pdfDownloaded'));
 
       try {
         await updateOrder({
@@ -264,7 +267,7 @@ export function OrderDetails({ orderId, onClose }) {
       }
     } catch (error) {
       setError(
-        resolveErrorMessage(error, `Failed to generate ${documentType} PDF.`),
+        resolveErrorMessage(error, t('contract.failedGeneratePdf')),
       );
     }
   }
@@ -274,7 +277,7 @@ export function OrderDetails({ orderId, onClose }) {
     setError("");
 
     if (!selectedUserId) {
-      setError("Select a driver first.");
+      setError(t('contract.selectDriverFirst'));
       return;
     }
 
@@ -285,12 +288,14 @@ export function OrderDetails({ orderId, onClose }) {
       }).unwrap();
 
       setMessage(
-        `Transferred to ${response?.order?.user?.name || selectedTransferUser?.name || "driver"}.`,
+        t('contract.transferredTo', {
+          name: response?.order?.user?.name || selectedTransferUser?.name || t('common.unknownUser'),
+        }),
       );
       setShowTransfer(false);
       setSelectedUserId("");
     } catch (error) {
-      setError(resolveErrorMessage(error, "Failed to transfer order."));
+      setError(resolveErrorMessage(error, t('contract.failedToTransferOrder')));
     }
   }
 
@@ -318,10 +323,10 @@ export function OrderDetails({ orderId, onClose }) {
       }).unwrap();
 
       setCommissionInput(extractNumericPrice(normalized));
-      setMessage(normalized ? "Commission saved." : "Commission cleared.");
+      setMessage(normalized ? t('contract.commissionSaved') : t('contract.commissionCleared'));
       return true;
     } catch (error) {
-      setError(resolveErrorMessage(error, "Failed to save commission."));
+      setError(resolveErrorMessage(error, t('contract.failedToSaveCommission')));
       setCommissionInput(extractNumericPrice(storedCommission));
       return false;
     }
@@ -356,7 +361,7 @@ export function OrderDetails({ orderId, onClose }) {
         },
       },
     }).unwrap().catch((error) => {
-      setError(resolveErrorMessage(error, "Failed to save commission."));
+      setError(resolveErrorMessage(error, t('contract.failedToSaveCommission')));
     });
   }
 
@@ -404,17 +409,17 @@ export function OrderDetails({ orderId, onClose }) {
         className="orderDrawer-panel"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="orderWindowTitle"
+        aria-label={t('contract.currentOrder')}
       >
         <div className="orderDrawer-header">
           <button
             className="orderDrawer-backBtn"
             type="button"
             onClick={handleCloseRequest}
-            aria-label="Back"
+            aria-label={t('common.back')}
           >
             <span aria-hidden="true">←</span>
-            <span>Back</span>
+            <span>{t('common.back')}</span>
           </button>
         </div>
 
@@ -422,43 +427,43 @@ export function OrderDetails({ orderId, onClose }) {
         {error ? <p className="orderWindow-error">{error}</p> : null}
 
         {isLoading ? (
-          <p className="orderWindow-state">Loading order...</p>
+          <p className="orderWindow-state">{t('common.loadingOrder')}</p>
         ) : null}
         {isError ? (
-          <p className="orderWindow-state">Failed to load order.</p>
+          <p className="orderWindow-state">{t('contract.failedLoadOrder')}</p>
         ) : null}
 
         {!isLoading && !isError ? (
           <>
             <div className="orderDrawer-section">
-              <h4 className="orderDrawer-sectionTitle">Order information</h4>
+              <h4 className="orderDrawer-sectionTitle">{t('contract.orderInfo')}</h4>
               <div className="orderDrawer-rows">
                 <div className="orderDrawer-row orderDrawer-row--featured">
-                  <span className="orderWindow-label">Order id</span>
+                  <span className="orderWindow-label">{t('contract.orderId')}</span>
                   <span className="orderWindow-value">
                     {order.orderNumber || "-"}
                   </span>
                 </div>
                 <div className="orderDrawer-row">
-                  <span className="orderWindow-label">Status</span>
+                  <span className="orderWindow-label">{t('common.status')}</span>
                   <span className="orderWindow-value">
                     {order.status || "-"}
                   </span>
                 </div>
                 <div className="orderDrawer-row">
-                  <span className="orderWindow-label">Customer</span>
+                  <span className="orderWindow-label">{t('contract.customer')}</span>
                   <span className="orderWindow-value">
                     {customer.name || "-"}
                   </span>
                 </div>
                 <div className="orderDrawer-row">
-                  <span className="orderWindow-label">Customer email</span>
+                  <span className="orderWindow-label">{t('contract.customerEmail')}</span>
                   <span className="orderWindow-value">
                     {customer.email || "-"}
                   </span>
                 </div>
                 <div className="orderDrawer-row">
-                  <span className="orderWindow-label">Created</span>
+                  <span className="orderWindow-label">{t('contract.createdAt')}</span>
                   <span className="orderWindow-value">
                     {formatDate(order.createdAt)}
                   </span>
@@ -467,26 +472,26 @@ export function OrderDetails({ orderId, onClose }) {
             </div>
 
             <div className="orderDrawer-section">
-              <h4 className="orderDrawer-sectionTitle">Trip information</h4>
+              <h4 className="orderDrawer-sectionTitle">{t('contract.tripInfo')}</h4>
               <div className="orderDrawer-rows">
                 <div className="orderDrawer-row">
-                  <span className="orderWindow-label">From</span>
+                  <span className="orderWindow-label">{t('contract.from')}</span>
                   <span className="orderWindow-value">
                     {getLocation(trip.from)}
                   </span>
                 </div>
                 <div className="orderDrawer-row">
-                  <span className="orderWindow-label">To</span>
+                  <span className="orderWindow-label">{t('contract.to')}</span>
                   <span className="orderWindow-value">
                     {getLocation(trip.to)}
                   </span>
                 </div>
                 <div className="orderDrawer-row">
-                  <span className="orderWindow-label">Trip time</span>
+                  <span className="orderWindow-label">{t('contract.tripTime')}</span>
                   <span className="orderWindow-value">{tripTime}</span>
                 </div>
                 <div className="orderDrawer-row">
-                  <span className="orderWindow-label">Payment</span>
+                  <span className="orderWindow-label">{t('contract.payment')}</span>
                   <span className="orderWindow-value">
                     {trip.paymentMethod || "-"}
                   </span>
@@ -495,16 +500,16 @@ export function OrderDetails({ orderId, onClose }) {
             </div>
 
             <div className="orderDrawer-section">
-              <h4 className="orderDrawer-sectionTitle">Document details</h4>
+              <h4 className="orderDrawer-sectionTitle">{t('contract.documentDetails')}</h4>
               <div className="orderDrawer-rows">
                 <div className="orderDrawer-row">
-                  <span className="orderWindow-label">Price</span>
+                  <span className="orderWindow-label">{t('contract.priceValue')}</span>
                   <span className="orderWindow-value">
                     {order.totalPrice || "-"}
                   </span>
                 </div>
                 <div className="orderDrawer-row orderDrawer-row--input">
-                  <span className="orderWindow-label">Commission</span>
+                  <span className="orderWindow-label">{t('contract.commission')}</span>
                   <div className="orderCommissionField">
                     <div className="orderCommissionField-row">
                       <div className="orderCommissionField-inputWrap">
@@ -512,8 +517,8 @@ export function OrderDetails({ orderId, onClose }) {
                           className="orderWindow-input orderCommissionField-input"
                           type="text"
                           inputMode="decimal"
-                          aria-label="Commission"
-                          placeholder="Commission amount"
+                          aria-label={t('contract.commission')}
+                          placeholder={t('contract.commission')}
                           value={commissionInput}
                           onChange={handleCommissionInputChange}
                           onBlur={() => saveCommission()}
@@ -530,7 +535,7 @@ export function OrderDetails({ orderId, onClose }) {
                             className="orderCommissionField-clear"
                             type="button"
                             onClick={clearCommission}
-                            aria-label="Clear commission"
+                            aria-label={t('common.clear')}
                           >
                             ×
                           </button>
@@ -564,7 +569,7 @@ export function OrderDetails({ orderId, onClose }) {
                 onClick={() => handleDownloadPdf("offer")}
                 disabled={isGenerating}
               >
-                {isGenerating ? "Generating..." : "Contract"}
+                {isGenerating ? t('common.generating') : t('contract.offerPdf')}
               </button>
               <button
                 className="orderWindow-button orderWindow-button--doc"
@@ -572,18 +577,18 @@ export function OrderDetails({ orderId, onClose }) {
                 onClick={() => handleDownloadPdf("confirmation")}
                 disabled={isGenerating}
               >
-                {isGenerating ? "Generating..." : "Invoice"}
+                {isGenerating ? t('common.generating') : t('contract.confirmationPdf')}
               </button>
             </div>
 
             <div className="orderDrawer-actions orderDrawer-actions--stacked">
               <button
-                className="orderWindow-button orderWindow-button--accent"
+                className="orderWindow-button orderWindow-button--danger"
                 type="button"
                 onClick={handleDelete}
                 disabled={isDeleting}
               >
-                {isDeleting ? "Deleting..." : "Delete order"}
+                {isDeleting ? t('common.deleting') : t('common.delete')}
               </button>
               {canTransfer ? (
                 <button
@@ -591,7 +596,7 @@ export function OrderDetails({ orderId, onClose }) {
                   type="button"
                   onClick={() => setShowTransfer(true)}
                 >
-                  Transfer order
+                  {t('contract.transferOrder')}
                 </button>
               ) : null}
               <button
@@ -599,31 +604,27 @@ export function OrderDetails({ orderId, onClose }) {
                 type="button"
                 onClick={handleSaveAndClose}
               >
-                Save changes
+                {t('common.save')}
               </button>
             </div>
 
             {showTransfer ? (
               <section className="orderDrawer-transfer">
                 <div className="orderDrawer-sectionTitleRow">
-                  <h4 className="orderDrawer-sectionTitle">
-                    Transfer to another driver
-                  </h4>
-                  <p className="orderDrawer-transferCopy">
-                    Choose a driver or manager and confirm the reassignment.
-                  </p>
+                  <h4 className="orderDrawer-sectionTitle">{t('contract.transferToAnotherDriver')}</h4>
+                  <p className="orderDrawer-transferCopy">{t('contract.chooseDriverHint')}</p>
                 </div>
 
                 <div className="orderDrawer-transferControls">
                   <label className="orderWindow-field">
-                    <span>Search</span>
+                    <span>{t('common.search')}</span>
                     <input
                       type="text"
                       value={transferSearch}
                       onChange={(event) =>
                         setTransferSearch(event.target.value)
                       }
-                      placeholder="Search by name or email"
+                      placeholder={t('contract.searchByNameOrEmail')}
                     />
                   </label>
                   <button
@@ -632,12 +633,12 @@ export function OrderDetails({ orderId, onClose }) {
                     onClick={() => setTransferSearch("")}
                     disabled={!transferSearch || isUsersFetching}
                   >
-                    Reset
+                    {t('common.reset')}
                   </button>
                 </div>
 
                 {isUsersFetching ? (
-                  <p className="orderWindow-state">Loading drivers...</p>
+                  <p className="orderWindow-state">{t('contract.loadingDrivers')}</p>
                 ) : null}
 
                 {!isUsersFetching && transferUsers.length ? (
@@ -657,11 +658,11 @@ export function OrderDetails({ orderId, onClose }) {
                             disabled={isCurrentOwner}
                           >
                             <span className="orderWindow-userName">
-                              {user.name || "No name"}
+                              {user.name || t('common.noName')}
                             </span>
                             <span className="orderWindow-userMeta">
                               {isCurrentOwner
-                                ? "Current driver"
+                                ? t('contract.currentDriver')
                                 : getTransferLabel(user)}
                             </span>
                           </button>
@@ -672,12 +673,12 @@ export function OrderDetails({ orderId, onClose }) {
                 ) : null}
 
                 {!isUsersFetching && !transferUsers.length ? (
-                  <p className="orderWindow-state">No drivers found.</p>
+                  <p className="orderWindow-state">{t('contract.noDrivers')}</p>
                 ) : null}
 
                 {selectedTransferUser ? (
                   <div className="orderDrawer-selected">
-                    <p className="orderWindow-label">Selected driver</p>
+                    <p className="orderWindow-label">{t('contract.selectedDriver')}</p>
                     <strong>{getTransferLabel(selectedTransferUser)}</strong>
                   </div>
                 ) : null}
@@ -689,14 +690,14 @@ export function OrderDetails({ orderId, onClose }) {
                     onClick={handleTransfer}
                     disabled={isTransferring || !selectedUserId}
                   >
-                    {isTransferring ? "Transferring..." : "Confirm transfer"}
+                    {isTransferring ? t('common.transferring') : t('contract.confirmTransfer')}
                   </button>
                   <button
                     className="orderWindow-button"
                     type="button"
                     onClick={() => setShowTransfer(false)}
                   >
-                    Back
+                    {t('common.back')}
                   </button>
                 </div>
               </section>

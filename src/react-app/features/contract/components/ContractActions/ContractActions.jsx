@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import { useGenerateContractPdfMutation } from '../../contractApi.js';
 import { selectContract } from '../../contractSlice.js';
 import {
@@ -74,7 +75,7 @@ function buildGenerationSessionPayload(session, order, contractData, documentTyp
   };
 }
 
-function OrderCreatedModal({ orderNumber, onClose }) {
+function OrderCreatedModal({ orderNumber, onClose, t }) {
   if (!orderNumber) {
     return null;
   }
@@ -92,7 +93,7 @@ function OrderCreatedModal({ orderNumber, onClose }) {
         <button
           className="contractActionsModal-close"
           type="button"
-          aria-label="Close"
+          aria-label={t('contract.close')}
           onClick={onClose}
         >
           ×
@@ -100,21 +101,21 @@ function OrderCreatedModal({ orderNumber, onClose }) {
 
         <div className="contractActionsModal-badge" aria-hidden="true">
           <span className="contractActionsModal-badgeIcon">✓</span>
-          <span>Success</span>
+          <span>{t('contract.success')}</span>
         </div>
 
         <div className="contractActionsModal-copy">
-          <h2 id="orderCreatedTitle">Order created</h2>
-          <p>Your order has been saved successfully.</p>
+          <h2 id="orderCreatedTitle">{t('contract.orderCreated')}</h2>
+          <p>{t('contract.orderSaved')}</p>
         </div>
 
         <div className="contractActionsModal-card">
-          <span>Order number</span>
+          <span>{t('contract.orderNumber')}</span>
           <strong>{orderNumber}</strong>
         </div>
 
         <button className="contractActionsModal-confirm" type="button" onClick={onClose}>
-          Back to home
+          {t('contract.backToHome')}
         </button>
       </div>
     </div>
@@ -126,6 +127,7 @@ export function ContractActions() {
   const navigate = useNavigate();
   const contract = useSelector(selectContract);
   const generationSession = useSelector(selectGenerationSession);
+  const { language, t } = useI18n();
   const [createOrder, { isLoading: isCreatingNew }] = useCreateOrderMutation();
   const [updateOrder, { isLoading: isCreating }] = useUpdateOrderMutation();
   const [generateContractPdf, { isLoading: isGenerating }] =
@@ -168,7 +170,7 @@ export function ContractActions() {
     try {
       const activeSession = getActiveSession(generationSession);
       if (!activeSession) {
-        setError('Open Orders again to start a token session.');
+        setError(t('contract.openOrdersAgain'));
         return;
       }
 
@@ -192,9 +194,9 @@ export function ContractActions() {
         : await createOrder(payload).unwrap();
 
       const order = response?.order || response;
-      setCreatedOrderNumber(String(order?.orderNumber || 'Order saved'));
+      setCreatedOrderNumber(String(order?.orderNumber || ''));
     } catch (error) {
-      setError(resolveErrorMessage(error, 'Failed to create order.'));
+      setError(resolveErrorMessage(error, t('contract.failedCreateOrder')));
     }
   }
 
@@ -229,9 +231,9 @@ export function ContractActions() {
           },
         }).unwrap();
 
-        const order = response?.order || response;
-        orderId = String(order?.id || '');
-        orderNumber = String(order?.orderNumber || 'contract');
+      const order = response?.order || response;
+      orderId = String(order?.id || '');
+      orderNumber = String(order?.orderNumber || 'contract');
         const nextSession = buildGenerationSessionPayload(
           activeSession,
           order,
@@ -240,7 +242,7 @@ export function ContractActions() {
         );
         dispatch(startSession(nextSession));
       } catch (error) {
-        setError(resolveErrorMessage(error, 'Failed to create order.'));
+        setError(resolveErrorMessage(error, t('contract.failedCreateOrder')));
         return;
       }
     }
@@ -250,11 +252,12 @@ export function ContractActions() {
         orderId,
         documentType,
         contractData: payloadContract,
+        language,
       }).unwrap();
 
       const fileName = `${orderNumber}.pdf`;
       downloadFile(blob, fileName);
-      setMessage('PDF downloaded.');
+      setMessage(t('contract.pdfDownloaded'));
 
       try {
         await updateOrder({
@@ -306,7 +309,7 @@ export function ContractActions() {
         }
       }
 
-      setError(resolveErrorMessage(error, 'Failed to generate PDF.'));
+      setError(resolveErrorMessage(error, t('contract.failedGeneratePdf')));
     }
   }
 
@@ -360,7 +363,7 @@ export function ContractActions() {
           onClick={handleCreate}
           disabled={isCreating || isCreatingNew}
         >
-          {isCreating || isCreatingNew ? 'Creating...' : 'Save order'}
+          {isCreating || isCreatingNew ? t('common.creating') : t('contract.saveOrder')}
         </button>
 
         <button
@@ -369,14 +372,14 @@ export function ContractActions() {
           onClick={handleDownload}
           disabled={isGenerating || isCreating || isCreatingNew}
         >
-          {isGenerating ? 'Downloading...' : 'Download PDF'}
+          {isGenerating ? t('common.downloading') : t('contract.downloadPdf')}
         </button>
 
         {generationSession.accessGranted ? (
           <p className="contractActions-sessionLine">
             {generationSession.orderNumber
-              ? `Reserved order: ${generationSession.orderNumber}`
-              : 'Token session active'}
+              ? `${t('contract.orderReserved')}: ${generationSession.orderNumber}`
+              : t('contract.tokenSessionActive')}
           </p>
         ) : null}
 
@@ -384,7 +387,7 @@ export function ContractActions() {
         {error ? <p className="contractActions-error">{error}</p> : null}
       </section>
 
-      <OrderCreatedModal orderNumber={createdOrderNumber} onClose={closeCreatedModal} />
+      <OrderCreatedModal orderNumber={createdOrderNumber} onClose={closeCreatedModal} t={t} />
     </>
   );
 }

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
+import { useI18n } from '../../app/i18n/useI18n.js';
 import { useGetOrderQuery } from '../../features/orders/ordersApi.js';
 import { HistoryDisplayScreen } from './components/HistoryDisplayScreen/HistoryDisplayScreen.jsx';
 import './HistoryDisplayPage.css';
@@ -64,6 +65,7 @@ const TEXT_SIZES = {
 export function HistoryDisplayPage() {
   const navigate = useNavigate();
   const { orderId } = useParams();
+  const { t } = useI18n();
   const [themeId, setThemeId] = useState('clean');
   const [textSize, setTextSize] = useState('large');
   const { data, isLoading, isError } = useGetOrderQuery(orderId, {
@@ -71,7 +73,7 @@ export function HistoryDisplayPage() {
   });
 
   const order = data?.order || data || {};
-  const customerName = order?.contractData?.customer?.name || order?.customer?.name || 'Guest';
+  const customerName = order?.contractData?.customer?.name || order?.customer?.name || t('history.guest');
 
   const theme = useMemo(() => {
     return THEME_PRESETS.find(item => item.id === themeId) || THEME_PRESETS[0];
@@ -95,11 +97,11 @@ export function HistoryDisplayPage() {
         themeOptions={THEME_PRESETS}
         textSize={TEXT_SIZES[textSize]}
         textSizeOptions={[
-          { id: 'compact', label: 'Compact' },
-          { id: 'small', label: 'Small' },
-          { id: 'medium', label: 'Medium' },
-          { id: 'large', label: 'Large' },
-          { id: 'huge', label: 'Huge' },
+          { id: 'compact', label: t('history.compact') },
+          { id: 'small', label: t('history.small') },
+          { id: 'medium', label: t('history.medium') },
+          { id: 'large', label: t('history.large') },
+          { id: 'huge', label: t('history.huge') },
         ]}
         onThemeChange={setThemeId}
         onTextSizeChange={setTextSize}

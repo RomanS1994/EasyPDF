@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import { useRequestSubscriptionUpgradeMutation } from '../../../../features/auth/authApi.js';
 import { selectToken, setSession } from '../../../../features/auth/authSlice.js';
 import { saveSession } from '../../../../features/auth/authStorage.js';
@@ -15,6 +16,7 @@ function getPaidPlans(plans) {
 export function ProfileUpgrade({ user }) {
   const dispatch = useDispatch();
   const token = useSelector(selectToken);
+  const { t } = useI18n();
   const { data, isLoading: isPlansLoading } = useGetPlansQuery();
   const [requestUpgrade, { isLoading }] = useRequestSubscriptionUpgradeMutation();
   const [planId, setPlanId] = useState('');
@@ -32,7 +34,7 @@ export function ProfileUpgrade({ user }) {
 
     const nextPlanId = planId || upgradePlans[0]?.id || '';
     if (!nextPlanId) {
-      setError('Choose a paid plan.');
+      setError(t('auth.choosePaidPlan'));
       return;
     }
 
@@ -41,9 +43,9 @@ export function ProfileUpgrade({ user }) {
       const updatedUser = await requestUpgrade({ planId: nextPlanId }).unwrap();
       saveSession(token, updatedUser);
       dispatch(setSession({ token, user: updatedUser }));
-      setMessage('Upgrade request sent.');
+      setMessage(t('auth.upgradeSent'));
     } catch {
-      setError('Failed to request upgrade.');
+      setError(t('auth.failedToRequestUpgrade'));
     }
   }
 
@@ -54,12 +56,12 @@ export function ProfileUpgrade({ user }) {
   return (
     <form className="screenCard profileUpgrade" onSubmit={handleSubmit}>
       <div className="compactHeader">
-        <h2>Upgrade</h2>
-        <p>Pick a paid plan and send a manual upgrade request.</p>
+        <h2>{t('account.upgrade')}</h2>
+        <p>{t('account.upgradeCopy')}</p>
       </div>
 
       <label className="profileUpgrade-field">
-        <span>Plan</span>
+        <span>{t('auth.plan')}</span>
         <select
           value={planId}
           onChange={event => setPlanId(event.target.value)}
@@ -77,7 +79,7 @@ export function ProfileUpgrade({ user }) {
       {error ? <p className="profileUpgrade-error">{error}</p> : null}
 
       <button className="profileUpgrade-button" type="submit" disabled={isLoading}>
-        {isLoading ? 'Sending...' : 'Request upgrade'}
+        {isLoading ? t('auth.sendingUpgrade') : t('auth.requestUpgrade')}
       </button>
     </form>
   );

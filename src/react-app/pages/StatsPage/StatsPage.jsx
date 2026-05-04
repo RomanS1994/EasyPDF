@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { useI18n } from '../../app/i18n/useI18n.js';
 import { useGetOrdersQuery } from '../../features/orders/ordersApi.js';
 import { useGetUsageQuery } from '../../features/auth/authApi.js';
 import { StatsActivityPanel } from './components/StatsActivityPanel/StatsActivityPanel.jsx';
@@ -26,6 +27,7 @@ function getSafeUsage(usage) {
 
 export function StatsPage() {
   const [activeTab, setActiveTab] = useState('usage');
+  const { t } = useI18n();
   const { data: usageData, isLoading: isUsageLoading, isError: isUsageError } = useGetUsageQuery(
     undefined,
     {
@@ -50,14 +52,14 @@ export function StatsPage() {
     <section className="statsPage pageStack">
       <div className="screenCard screenCard-stats">
         <div className="compactHeader">
-          <h2>Statistics</h2>
-          <p>Current cycle and generated PDF output.</p>
+          <h2>{t('stats.title')}</h2>
+          <p>{t('stats.subtitle')}</p>
         </div>
 
         <StatsTabs value={activeTab} onChange={setActiveTab} />
 
-        {isLoading ? <p className="statusNote">Loading stats...</p> : null}
-        {isError ? <p className="statusNote is-error">Failed to load stats.</p> : null}
+        {isLoading ? <p className="statusNote">{t('stats.loading')}</p> : null}
+        {isError ? <p className="statusNote is-error">{t('stats.failed')}</p> : null}
 
         {!isLoading && !isError && activeTab === 'usage' ? (
           <StatsUsagePanel usage={usage} orders={orders} />

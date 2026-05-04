@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import { useRegisterMutation } from '../../authApi.js';
 import { setSession } from '../../authSlice.js';
 import { saveSession } from '../../authStorage.js';
@@ -9,6 +10,7 @@ import './RegisterForm.css';
 
 export function RegisterForm({ selectedPlanId = '', onPlanSelect }) {
   const dispatch = useDispatch();
+  const { t } = useI18n();
   const [register, { isLoading }] = useRegisterMutation();
   const { data, isLoading: isPlansLoading } = useGetPlansQuery();
   const [name, setName] = useState('');
@@ -50,21 +52,21 @@ export function RegisterForm({ selectedPlanId = '', onPlanSelect }) {
       saveSession(data.token, data.user);
       dispatch(setSession({ token: data.token, user: data.user }));
     } catch {
-      setError('Register failed.');
+      setError(t('auth.registerFailed'));
     }
   }
 
   return (
     <form className="registerForm" onSubmit={handleSubmit}>
-      <h3 className="registerForm-title">Register</h3>
+      <h3 className="registerForm-title">{t('auth.registerTitle')}</h3>
 
       <label className="registerForm-field">
-        <span>Name</span>
+        <span>{t('auth.name')}</span>
         <input type="text" value={name} onChange={event => setName(event.target.value)} />
       </label>
 
       <label className="registerForm-field">
-        <span>Email</span>
+        <span>{t('auth.email')}</span>
         <input
           type="email"
           value={email}
@@ -73,7 +75,7 @@ export function RegisterForm({ selectedPlanId = '', onPlanSelect }) {
       </label>
 
       <label className="registerForm-field">
-        <span>Password</span>
+        <span>{t('auth.password')}</span>
         <input
           type="password"
           value={password}
@@ -82,7 +84,7 @@ export function RegisterForm({ selectedPlanId = '', onPlanSelect }) {
       </label>
 
       <label className="registerForm-field">
-        <span>Plan</span>
+        <span>{t('auth.plan')}</span>
         <select
           value={activePlanId}
           onChange={event => {
@@ -103,7 +105,7 @@ export function RegisterForm({ selectedPlanId = '', onPlanSelect }) {
       {error ? <p className="registerForm-error">{error}</p> : null}
 
       <button className="registerForm-button" type="submit" disabled={isLoading}>
-        {isLoading ? 'Registering...' : 'Register'}
+        {isLoading ? t('auth.registering') : t('auth.register')}
       </button>
     </form>
   );

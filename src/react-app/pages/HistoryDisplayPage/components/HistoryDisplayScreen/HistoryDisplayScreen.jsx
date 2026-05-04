@@ -1,3 +1,4 @@
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import './HistoryDisplayScreen.css';
 
 const TEXT_SIZES = {
@@ -20,24 +21,25 @@ function HistoryDisplayScreen({
   onTextSizeChange,
   onBack,
 }) {
+  const { t } = useI18n();
   return (
     <div className="historyDisplayScreen">
       <header className="historyDisplayScreen-top">
         <button className="historyDisplayScreen-back" type="button" onClick={onBack}>
           <span aria-hidden="true">←</span>
-          <span>Back</span>
+          <span>{t('history.back')}</span>
         </button>
 
         <div className="historyDisplayScreen-controls">
           <div className="historyDisplayScreen-control">
-            <span className="historyDisplayScreen-controlLabel">Text</span>
+            <span className="historyDisplayScreen-controlLabel">{t('history.text')}</span>
             <label className="historyDisplayScreen-selectShell">
               <span className="historyDisplayScreen-selectIcon" aria-hidden="true">
                 Aa
               </span>
               <select
                 className="historyDisplayScreen-select"
-                aria-label="Text size"
+                aria-label={t('history.text')}
                 value={textSize}
                 onChange={event => onTextSizeChange(event.target.value)}
               >
@@ -51,12 +53,12 @@ function HistoryDisplayScreen({
           </div>
 
           <div className="historyDisplayScreen-control">
-            <span className="historyDisplayScreen-controlLabel">Bg</span>
+            <span className="historyDisplayScreen-controlLabel">{t('history.background')}</span>
             <label className="historyDisplayScreen-selectShell">
               <span className="historyDisplayScreen-selectSwatch" style={{ '--swatch-color': themeOptions.find(option => option.id === themeId)?.swatch || '#eef3ff' }} aria-hidden="true" />
               <select
                 className="historyDisplayScreen-select"
-                aria-label="Background preset"
+                aria-label={t('history.background')}
                 value={themeId}
                 onChange={event => onThemeChange(event.target.value)}
               >
@@ -72,8 +74,8 @@ function HistoryDisplayScreen({
       </header>
 
       <main className="historyDisplayScreen-body">
-        {isLoading ? <p className="historyDisplayScreen-state">Loading order...</p> : null}
-        {isError ? <p className="historyDisplayScreen-state">Failed to load order.</p> : null}
+        {isLoading ? <p className="historyDisplayScreen-state">{t('history.loadingOrder')}</p> : null}
+        {isError ? <p className="historyDisplayScreen-state">{t('history.failedToLoadOrder')}</p> : null}
 
         {!isLoading && !isError ? (
           <div className="historyDisplayScreen-copy">

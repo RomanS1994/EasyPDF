@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 
 import heroRobotImage from '../../../../assets/main_robot.png';
 import './WorkspaceOverview.css';
@@ -32,6 +33,7 @@ function getUsageText(orders) {
 }
 
 export function WorkspaceOverview({ user, orders }) {
+  const { t } = useI18n();
   const userName = getUserName(user);
   const planName = getPlanName(user);
   const usageText = getUsageText(orders);
@@ -42,10 +44,8 @@ export function WorkspaceOverview({ user, orders }) {
       <header className="appTop">
         <div className="appTitleBlock">
           <p className="sectionEyebrow">DocTra</p>
-          <h1>Workspace</h1>
-          <p>
-            Welcome back, {userName}. Keep contracts, orders and PDF output in one place.
-          </p>
+          <h1>{t('home.title')}</h1>
+          <p>{t('home.welcome', { name: userName })}</p>
         </div>
 
         <div className="workspaceOverview-mark" aria-hidden="true">
@@ -57,11 +57,11 @@ export function WorkspaceOverview({ user, orders }) {
 
         <div className="topMetrics">
           <article className="topMetric">
-            <span>Plan</span>
+            <span>{t('home.plan')}</span>
             <strong>{planName}</strong>
           </article>
           <article className="topMetric">
-            <span>Usage</span>
+            <span>{t('home.usage')}</span>
             <strong>{usageText}</strong>
           </article>
         </div>
@@ -70,27 +70,27 @@ export function WorkspaceOverview({ user, orders }) {
       <div className="screenCard screenCard-home">
         <div className="homeOverviewGrid">
           <article className="homeOverviewCard">
-            <span>Cycle</span>
-            <strong>Current</strong>
-            <p>Track your current working cycle.</p>
+            <span>{t('home.cycle')}</span>
+            <strong>{t('home.current')}</strong>
+            <p>{t('home.trackCycle')}</p>
           </article>
 
           <article className="homeOverviewCard">
-            <span>Usage</span>
+            <span>{t('home.usage')}</span>
             <strong>{usageText}</strong>
-            <p>Generated PDF output for the active account.</p>
+            <p>{t('home.pdfOutput')}</p>
           </article>
 
           <Link className="homeOverviewCard homeOverviewCard-link" to="/cz/pdf/orders">
-            <span>Orders</span>
+            <span>{t('home.orders')}</span>
             <strong>{orderCount}</strong>
-            <p>Create a new order and review saved records.</p>
+            <p>{t('home.createOrder')}</p>
           </Link>
 
           <Link className="homeOverviewCard homeOverviewCard-link" to="/cz/pdf/account">
-            <span>Account</span>
+            <span>{t('home.account')}</span>
             <strong>{userName}</strong>
-            <p>Profile, business details and access settings.</p>
+            <p>{t('home.profileData')}</p>
           </Link>
         </div>
       </div>

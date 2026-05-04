@@ -1,3 +1,4 @@
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import './GenerationGateModal.css';
 
 export function GenerationGateModal({
@@ -6,6 +7,8 @@ export function GenerationGateModal({
   onClose,
   onConfirm,
 }) {
+  const { t } = useI18n();
+
   if (!isOpen) {
     return null;
   }
@@ -24,16 +27,16 @@ export function GenerationGateModal({
           <div className="generationGateHeading">
             <span className="generationTokenBadge">
               <span className="generationTokenBadgeIcon" aria-hidden="true" />
-              <span>Tokens</span>
+              <span>{t('contract.tokens')}</span>
             </span>
-            <h2 id="generationGateTitle">10 minutes to finish the order</h2>
-            <p>1 token will be used. After confirmation the order form opens.</p>
+            <h2 id="generationGateTitle">{t('contract.tenMinutes')}</h2>
+            <p>{t('contract.oneTokenUsed')}</p>
           </div>
 
           <button
             className="generationGateCloseBtn"
             type="button"
-            aria-label="Close"
+            aria-label={t('contract.closeModal')}
             onClick={onClose}
           >
             ×
@@ -42,7 +45,7 @@ export function GenerationGateModal({
 
         <div className="generationGateStats">
           <article className="generationGateStat">
-            <span>Token cost</span>
+            <span>{t('contract.tokenCost')}</span>
             <strong className="generationGateTokenValue">
               <span className="generationGateTokenValueIcon" aria-hidden="true" />
               <span>1T</span>
@@ -50,14 +53,12 @@ export function GenerationGateModal({
           </article>
 
           <article className="generationGateStat">
-            <span>Window</span>
-            <strong>10 minutes</strong>
+            <span>{t('contract.window')}</span>
+            <strong>{t('contract.tenMinutes')}</strong>
           </article>
         </div>
 
-        <p className="generationGateHint">
-          Confirm once to start the token session and open the form.
-        </p>
+        <p className="generationGateHint">{t('contract.confirmStart')}</p>
 
         <div className="generationGateActions">
           <button
@@ -66,7 +67,7 @@ export function GenerationGateModal({
             onClick={onConfirm}
             disabled={isBusy}
           >
-            {isBusy ? 'Starting...' : 'Start order'}
+            {isBusy ? t('contract.starting') : t('contract.startOrder')}
           </button>
 
           <button
@@ -75,7 +76,7 @@ export function GenerationGateModal({
             onClick={onClose}
             disabled={isBusy}
           >
-            Not now
+            {t('contract.startLater')}
           </button>
         </div>
       </div>

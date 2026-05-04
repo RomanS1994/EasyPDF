@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import {
   formatDateTime,
   getCustomerName,
@@ -12,6 +13,7 @@ import './HistoryOrderCard.css';
 
 function HistoryOrderCard({ order, onOpen }) {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const status = getHistoryBucket(order);
   const customerName = getCustomerName(order);
   const route = getRouteLabel(order);
@@ -47,7 +49,7 @@ function HistoryOrderCard({ order, onOpen }) {
           <div className="orderItemIdentity">
             <div className="orderItemIdentityRow">
               <strong
-                className={`orderItemCustomer ${customerName === 'Client not specified' ? 'is-placeholder' : ''}`}
+                className={`orderItemCustomer ${customerName === t('history.customerNotSpecified') ? 'is-placeholder' : ''}`}
               >
                 {customerName}
               </strong>
@@ -55,8 +57,8 @@ function HistoryOrderCard({ order, onOpen }) {
                 className="orderItemMeetButton"
                 type="button"
                 onClick={handleOpenDisplay}
-                aria-label={`Open display screen for ${customerName}`}
-                title="Open display screen"
+                aria-label={`${t('history.openDisplay')} ${customerName}`}
+                title={t('history.openDisplay')}
               >
                 <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
                   <rect x="3.5" y="5" width="17" height="12.5" rx="2.5" />
@@ -64,14 +66,14 @@ function HistoryOrderCard({ order, onOpen }) {
                 </svg>
               </button>
             </div>
-            <p className={`orderItemRoute ${route === 'Route not added' ? 'is-placeholder' : ''}`}>
+            <p className={`orderItemRoute ${route === t('history.routeNotAdded') ? 'is-placeholder' : ''}`}>
               {route}
             </p>
           </div>
           <span className="orderStatusBadge">{status.label}</span>
         </div>
         <div className="orderItemMetaRow">
-          <strong className={`orderItemPrice ${totalPrice === 'No price' ? 'is-placeholder' : ''}`}>
+          <strong className={`orderItemPrice ${totalPrice === t('history.noPrice') ? 'is-placeholder' : ''}`}>
             {totalPrice}
           </strong>
           <span className="orderItemDate">{dateTime}</span>

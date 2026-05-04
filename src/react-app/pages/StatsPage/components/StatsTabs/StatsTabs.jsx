@@ -1,28 +1,30 @@
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import './StatsTabs.css';
 
 export function StatsTabs({ value, onChange }) {
+  const { t } = useI18n();
   return (
-    <div className="statsTabs" role="tablist" aria-label="Statistics views">
+    <div className="statsTabs" role="tablist" aria-label={t('stats.title')}>
       <button
         className={`statsTab ${value === 'usage' ? 'is-active' : ''}`}
         type="button"
         onClick={() => onChange('usage')}
       >
-        Usage
+        {t('stats.usage')}
       </button>
       <button
         className={`statsTab ${value === 'salary' ? 'is-active' : ''}`}
         type="button"
         onClick={() => onChange('salary')}
       >
-        Salary
+        {t('stats.salary')}
       </button>
       <button
         className={`statsTab ${value === 'activity' ? 'is-active' : ''}`}
         type="button"
         onClick={() => onChange('activity')}
       >
-        Activity
+        {t('stats.activity')}
       </button>
     </div>
   );

@@ -1,3 +1,4 @@
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import './ProfileWorkspace.css';
 
 function getPlanName(user) {
@@ -57,6 +58,7 @@ function getOrderCount(orders) {
 }
 
 export function ProfileWorkspace({ user, orders }) {
+  const { t } = useI18n();
   const planName = getPlanName(user);
   const statusName = getStatusName(user);
   const usageText = getUsageText(orders);
@@ -67,45 +69,45 @@ export function ProfileWorkspace({ user, orders }) {
   return (
     <section className="screenCard profileWorkspace">
       <div className="compactHeader">
-        <h2>Workspace</h2>
-        <p>Keep your profile, subscription and order activity in one compact place.</p>
+        <h2>{t('account.workspace')}</h2>
+        <p>{t('home.profileData')}</p>
       </div>
 
       <div className="profileWorkspace-grid">
         <article className="profileWorkspace-card">
-          <span>Role</span>
+          <span>{t('account.role')}</span>
           <strong>{roleName}</strong>
-          <p>Current access level.</p>
+          <p>{t('account.accessLevel')}</p>
         </article>
 
         <article className="profileWorkspace-card">
-          <span>Plan</span>
+          <span>{t('account.selectedPlan')}</span>
           <strong>{planName}</strong>
-          <p>Selected workspace plan.</p>
+          <p>{t('account.selectedPlan')}</p>
         </article>
 
         <article className="profileWorkspace-card">
-          <span>Status</span>
+          <span>{t('account.status')}</span>
           <strong>{statusName}</strong>
-          <p>Subscription state.</p>
+          <p>{t('account.subscriptionState')}</p>
         </article>
 
         <article className="profileWorkspace-card">
-          <span>Cycle</span>
+          <span>{t('account.cycle')}</span>
           <strong>{cycleText}</strong>
-          <p>Current billing cycle.</p>
+          <p>{t('account.billingCycle')}</p>
         </article>
 
         <article className="profileWorkspace-card">
-          <span>Usage</span>
+          <span>{t('account.usage')}</span>
           <strong>{usageText}</strong>
-          <p>Generated PDF output.</p>
+          <p>{t('account.generatedOutput')}</p>
         </article>
 
         <article className="profileWorkspace-card">
-          <span>Orders</span>
+          <span>{t('account.orders')}</span>
           <strong>{orderCount}</strong>
-          <p>Saved records in the workspace.</p>
+          <p>{t('account.savedRecords')}</p>
         </article>
       </div>
     </section>

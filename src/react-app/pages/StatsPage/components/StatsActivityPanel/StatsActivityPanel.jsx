@@ -1,3 +1,4 @@
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import './StatsActivityPanel.css';
 
 function parseDateValue(value) {
@@ -99,7 +100,7 @@ function buildStatusBreakdown(orders) {
   return counts;
 }
 
-function getSummaryLabel(series) {
+function getSummaryLabel(series, t) {
   // Складаємо короткий підсумок за тиждень.
   let total = 0;
 
@@ -107,22 +108,23 @@ function getSummaryLabel(series) {
     total += item.count;
   }
 
-  return `${total} orders in 7 days`;
+  return `${total} ${t('stats.ordersIn7Days')}`;
 }
 
 export function StatsActivityPanel({ usage, orders }) {
+  const { t } = useI18n();
   const series = buildActivitySeries(orders, usage);
   const maxCount = Math.max(1, ...series.map(item => item.count));
   const statusCounts = buildStatusBreakdown(orders);
   const deletedMessagesCount = Number(usage?.deletedMessages || 0);
   const statusTotal = Math.max(1, statusCounts.generated + statusCounts.pending + deletedMessagesCount);
-  const summaryLabel = getSummaryLabel(series);
+  const summaryLabel = getSummaryLabel(series, t);
   const deletedMessagesLabel = String(deletedMessagesCount);
   return (
     <section className="statsPanel is-active statsActivityPanel">
       <div className="statsVizCard">
         <div className="usageCard-head">
-          <h3>Last 7 days</h3>
+          <h3>{t('stats.last7Days')}</h3>
           <span>{summaryLabel}</span>
         </div>
         <div className="activityBars">
@@ -144,7 +146,7 @@ export function StatsActivityPanel({ usage, orders }) {
 
       <div className="statsVizCard">
         <div className="usageCard-head">
-          <h3>Status mix</h3>
+          <h3>{t('stats.statusMix')}</h3>
           <span>
             {orders.length} total · {deletedMessagesLabel} deleted
           </span>
@@ -172,17 +174,17 @@ export function StatsActivityPanel({ usage, orders }) {
         <div className="statusLegend">
           <div className="statusLegendItem">
             <span className="statusLegendDot statusLegendDot-generated" />
-            <span>Generated</span>
+            <span>{t('stats.generated')}</span>
             <strong>{statusCounts.generated}</strong>
           </div>
           <div className="statusLegendItem">
             <span className="statusLegendDot statusLegendDot-pending" />
-            <span>Pending</span>
+            <span>{t('stats.pending')}</span>
             <strong>{statusCounts.pending}</strong>
           </div>
           <div className="statusLegendItem">
             <span className="statusLegendDot statusLegendDot-deleted" />
-            <span>Deleted</span>
+            <span>{t('stats.deleted')}</span>
             <strong>{deletedMessagesCount}</strong>
           </div>
         </div>

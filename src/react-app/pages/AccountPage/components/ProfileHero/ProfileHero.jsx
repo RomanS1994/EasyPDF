@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import { useUpdateProfileMutation } from '../../../../features/auth/authApi.js';
 import { selectToken, setSession } from '../../../../features/auth/authSlice.js';
 import { saveSession } from '../../../../features/auth/authStorage.js';
@@ -12,9 +13,9 @@ function getInitial(user) {
   return String(value).trim().charAt(0).toUpperCase() || 'D';
 }
 
-function getDisplayName(user) {
+function getDisplayName(user, t) {
   // Показуємо коротке ім'я для профілю.
-  return user?.name || 'Unknown';
+  return user?.name || t('common.unknownUser');
 }
 
 function getDisplayEmail(user) {
@@ -35,6 +36,7 @@ function readFileAsDataUrl(file) {
 export function ProfileHero({ user }) {
   const dispatch = useDispatch();
   const token = useSelector(selectToken);
+  const { t } = useI18n();
   const [updateProfile, { isLoading }] = useUpdateProfileMutation();
   const fileInputRef = useRef(null);
   const [message, setMessage] = useState('');
@@ -68,7 +70,7 @@ export function ProfileHero({ user }) {
     setError('');
 
     if (!file.type.startsWith('image/')) {
-      setError('Please choose an image file.');
+      setError(t('account.chooseImage'));
       return;
     }
 
@@ -78,9 +80,9 @@ export function ProfileHero({ user }) {
       saveSession(token, updatedUser);
       dispatch(setSession({ token, user: updatedUser }));
       setImageFailed(false);
-      setMessage('Photo saved.');
+      setMessage(t('account.photoSaved'));
     } catch {
-      setError('Failed to save photo.');
+      setError(t('account.photoRemoved'));
     }
   }
 
@@ -94,16 +96,21 @@ export function ProfileHero({ user }) {
       saveSession(token, updatedUser);
       dispatch(setSession({ token, user: updatedUser }));
       setImageFailed(false);
-      setMessage('Photo removed.');
+      setMessage(t('account.photoRemoved'));
     } catch {
-      setError('Failed to remove photo.');
+      setError(t('account.photoRemoved'));
     }
   }
 
   return (
     <section className="screenCard profileHero">
       <div className="profileHero-main">
-        <button className="profileHero-avatarButton" type="button" onClick={handlePickPhoto}>
+        <button
+          className="profileHero-avatarButton"
+          type="button"
+          onClick={handlePickPhoto}
+          aria-label={t('account.changePhoto')}
+        >
           <span className="profileHero-avatarFrame" aria-hidden="true">
             {hasAvatar && !imageFailed ? (
               <img
@@ -127,10 +134,10 @@ export function ProfileHero({ user }) {
         />
 
         <div className="profileHero-copy">
-          <strong>{getDisplayName(user)}</strong>
+          <strong>{getDisplayName(user, t)}</strong>
           <p>{getDisplayEmail(user)}</p>
           <p className="statusNote">
-            Photo is saved right away. Name is edited in the profile form below.
+            {t('account.photoHint')}
           </p>
 
           <div className="profileHero-actions">
@@ -140,7 +147,7 @@ export function ProfileHero({ user }) {
               onClick={handlePickPhoto}
               disabled={isLoading}
             >
-              Change photo
+              {t('account.changePhoto')}
             </button>
 
             {hasAvatar ? (
@@ -150,7 +157,7 @@ export function ProfileHero({ user }) {
                 onClick={handleRemovePhoto}
                 disabled={isLoading}
               >
-                Remove photo
+                {t('account.removePhoto')}
               </button>
             ) : null}
           </div>

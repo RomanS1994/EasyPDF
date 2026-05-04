@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+import { useI18n } from '../../app/i18n/useI18n.js';
 import { ContractForm } from '../../features/contract/components/ContractForm/ContractForm.jsx';
 import { selectContract } from '../../features/contract/contractSlice.js';
 import {
@@ -28,6 +29,7 @@ function buildGenerationSessionPayload(contract) {
 }
 
 export function OrdersPage() {
+  const { t } = useI18n();
   const isGenerationReady = useGenerationSessionPersistence();
 
   const dispatch = useDispatch();
@@ -73,7 +75,7 @@ export function OrdersPage() {
     dispatch(clearSession());
     setSessionError({
       type: 'expired',
-      message: 'Time is up. Please try again later.',
+      message: t('contract.sessionExpired'),
     });
     setIsGateOpen(false);
   }
@@ -121,8 +123,8 @@ export function OrdersPage() {
                 </div>
 
                 <div className="ordersPage-errorCopy">
-                  <p className="ordersPage-errorEyebrow">Order session</p>
-                  <h2 id="ordersErrorTitle">Time is up</h2>
+                  <p className="ordersPage-errorEyebrow">{t('contract.orderWindow')}</p>
+                  <h2 id="ordersErrorTitle">{t('contract.sessionExpired')}</h2>
                   <p>{sessionError.message}</p>
                 </div>
 
@@ -131,14 +133,14 @@ export function OrdersPage() {
                   type="button"
                   onClick={closeErrorModal}
                 >
-                  Home
+                  {t('app.home')}
                 </button>
               </>
             ) : (
               <>
                 <div className="ordersPage-errorCopy">
-                  <p className="ordersPage-errorEyebrow">Order session</p>
-                  <h2 id="ordersErrorTitle">Something went wrong</h2>
+                  <p className="ordersPage-errorEyebrow">{t('contract.orderWindow')}</p>
+                  <h2 id="ordersErrorTitle">{t('common.failed')}</h2>
                   <p>{sessionError.message}</p>
                 </div>
 
@@ -147,7 +149,7 @@ export function OrdersPage() {
                   type="button"
                   onClick={closeErrorModal}
                 >
-                  Go to start screen
+                  {t('common.backToHome')}
                 </button>
               </>
             )}

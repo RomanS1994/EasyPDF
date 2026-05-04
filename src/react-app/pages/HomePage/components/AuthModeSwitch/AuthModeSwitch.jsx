@@ -1,8 +1,11 @@
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import './AuthModeSwitch.css';
 
 export function AuthModeSwitch({ value, onChange }) {
+  const { t } = useI18n();
+
   return (
-    <div className="authModeSwitch" role="tablist" aria-label="Auth mode">
+    <div className="authModeSwitch" role="tablist" aria-label={t('guest.docTra')}>
       <button
         className={`authModeSwitch-btn ${value === 'login' ? 'is-active' : ''}`}
         type="button"
@@ -10,7 +13,7 @@ export function AuthModeSwitch({ value, onChange }) {
         aria-selected={value === 'login'}
         onClick={() => onChange('login')}
       >
-        Login
+        {t('auth.login')}
       </button>
       <button
         className={`authModeSwitch-btn ${value === 'register' ? 'is-active' : ''}`}
@@ -19,7 +22,7 @@ export function AuthModeSwitch({ value, onChange }) {
         aria-selected={value === 'register'}
         onClick={() => onChange('register')}
       >
-        Register
+        {t('auth.register')}
       </button>
     </div>
   );

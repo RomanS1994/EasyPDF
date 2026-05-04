@@ -1,11 +1,9 @@
+import { getPdfMessage, normalizePdfLanguage } from "../i18n.js";
+
 const MAIN_ROBOT_DATA_URI =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2GxX0AAAAASUVORK5CYII=";
 const A4_WIDTH_PX = 794;
 const A4_HEIGHT_PX = 1123;
-
-function resolveLanguage() {
-  return "cs";
-}
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -87,16 +85,6 @@ function normalizeDateTime(value) {
   return text;
 }
 
-function buildDocumentHeading(documentType) {
-  return documentType === "offer"
-    ? "Nabídka přepravy osob"
-    : "Smlouva o přepravě osob";
-}
-
-function buildDocumentTitle(documentType) {
-  return documentType === "offer" ? "Přepravní nabídka" : "Přepravní smlouva";
-}
-
 function renderRows(rows) {
   return rows
     .map(
@@ -125,19 +113,19 @@ function buildContractCompany(contractData = {}) {
   };
 }
 
-function buildTripPaymentMethod(contractData = {}) {
+function buildTripPaymentMethod(contractData = {}, fallback = "hotovost / kartou na místě") {
   return normalizeText(
     contractData?.trip?.paymentMethod ||
       contractData?.paymentMethod ||
-      "hotovost / kartou na místě",
-    "hotovost / kartou na místě",
+      fallback,
+    fallback,
   );
 }
 
-function buildHeaderSubtitle(orderNumber, today) {
+function buildHeaderSubtitle(orderNumber, today, t) {
   return `
     <div class="muted">#<strong>${renderText(orderNumber, "—")}</strong></div>
-    <div class="muted">Datum vystavení: <strong>${renderText(today)}</strong></div>
+    <div class="muted">${escapeHtml(t("header.issued"))}: <strong>${renderText(today)}</strong></div>
   `;
 }
 
@@ -147,14 +135,22 @@ export function renderContractPdfHtml({
   documentType,
   language = "uk",
 }) {
-  const resolvedLanguage = resolveLanguage(language);
+  const resolvedLanguage = normalizePdfLanguage(language);
+  const t = (key, values) => {
+    const template = getPdfMessage(resolvedLanguage, key);
+
+    return String(template).replace(/\{(\w+)\}/g, (_, placeholder) => {
+      const value = values?.[placeholder];
+      return value == null ? "" : String(value);
+    });
+  };
   const resolvedDocumentType =
     documentType === "offer" ? "offer" : "confirmation";
   const orderNumber = normalizeText(contractData?.orderNumber || "—");
   const issueDate = normalizeDateOnly(contractData?.today || new Date());
   const company = buildContractCompany(contractData);
-  const fullTitle = buildDocumentHeading(resolvedDocumentType);
-  const pageTitle = buildDocumentTitle(resolvedDocumentType);
+  const fullTitle = t(`document.${resolvedDocumentType}Heading`);
+  const pageTitle = t(`document.${resolvedDocumentType}Title`);
 
   const driverName = normalizeText(contractData?.driver?.name);
   const driverAddress = normalizeText(contractData?.driver?.address);
@@ -182,7 +178,7 @@ export function renderContractPdfHtml({
   const dropoffAddress = getTripAddress(contractData?.trip?.to);
   const tripTime = normalizeDateTime(contractData?.trip?.time);
   const totalPrice = normalizeText(contractData?.totalPrice);
-  const paymentMethod = buildTripPaymentMethod(contractData);
+  const paymentMethod = buildTripPaymentMethod(contractData, t("paymentMethod"));
 
   return `
     <!doctype html>
@@ -404,87 +400,87 @@ export function renderContractPdfHtml({
           <div class="left-container">
             <div class="header">
               <h1 class="title">${escapeHtml(fullTitle)}</h1>
-              ${buildHeaderSubtitle(orderNumber, issueDate)}
+              ${buildHeaderSubtitle(orderNumber, issueDate, t)}
             </div>
 
             <section class="driver">
-              <h2 class="subtitle">Přepravce / Řidič:</h2>
+              <h2 class="subtitle">${escapeHtml(t("subtitle.carrier"))}</h2>
               <div class="grid-1">
                 ${renderRows([
-                  { label: "Jméno:", value: driverName },
-                  { label: "Adresa:", value: driverAddress },
-                  { label: "SPZ vozidla:", value: driverSpz },
-                  { label: "IČ:", value: driverIco },
+                  { label: t("labels.name"), value: driverName },
+                  { label: t("labels.address"), value: driverAddress },
+                  { label: t("labels.vehiclePlate"), value: driverSpz },
+                  { label: t("labels.ico"), value: driverIco },
                 ])}
               </div>
             </section>
 
             <section class="provider">
-              <h2 class="subtitle">Zprostředkovatel (Poskytovatel služby):</h2>
+              <h2 class="subtitle">${escapeHtml(t("subtitle.provider"))}</h2>
               <div class="grid-1">
                 ${renderRows([
-                  { label: "Jméno / Název firmy:", value: providerName },
-                  { label: "Adresa:", value: providerAddress },
-                  { label: "IČ:", value: providerIco },
+                  { label: t("labels.companyName"), value: providerName },
+                  { label: t("labels.address"), value: providerAddress },
+                  { label: t("labels.ico"), value: providerIco },
                 ])}
               </div>
             </section>
 
             <section class="customer">
-              <h2 class="subtitle">Objednatel / Cestující:</h2>
+              <h2 class="subtitle">${escapeHtml(t("subtitle.customer"))}</h2>
               <div class="grid-1">
                 ${renderRows([
-                  { label: "Jméno:", value: customerName },
-                  { label: "E-mail, phone:", value: customerEmail },
-                  { label: "Počet klientů:", value: passengers },
+                  { label: t("labels.name"), value: customerName },
+                  { label: t("labels.emailPhone"), value: customerEmail },
+                  { label: t("labels.passengers"), value: passengers },
                 ])}
               </div>
             </section>
 
             <section class="trip">
-              <h2 class="subtitle">Údaje o přepravě:</h2>
+              <h2 class="subtitle">${escapeHtml(t("subtitle.trip"))}</h2>
               <div class="grid-1">
                 ${renderRows([
                   {
-                    label: "Místo nástupu:",
+                    label: t("labels.pickup"),
                     value: pickupAddress,
                     multiline: true,
                   },
                   {
-                    label: "Místo ukončení:",
+                    label: t("labels.dropoff"),
                     value: dropoffAddress,
                     multiline: true,
                   },
-                  { label: "Datum a čas:", value: tripTime },
+                  { label: t("labels.datetime"), value: tripTime },
                 ])}
               </div>
 
               <div class="grid-1 grid-2" style="margin-top: 20px;">
                 ${renderRows([
-                  { label: "Cena:", value: totalPrice },
-                  { label: "Způsob platby:", value: paymentMethod },
+                  { label: t("labels.price"), value: totalPrice },
+                  { label: t("labels.payment"), value: paymentMethod },
                 ])}
               </div>
             </section>
           </div>
 
           <div class="bottomArea">
-            <p class="contract-notice">Smlouva uzavřena dle § 21 odst. 5 zákona č. 111/1994 Sb., o silniční dopravě</p>
+            <p class="contract-notice">${escapeHtml(t("notice"))}</p>
 
             <div class="date">
               <div class="dateRow">
-                <p class="contract-notice">V Praze dne</p>
+                <p class="contract-notice">${escapeHtml(t("issuedIn"))}</p>
                 <p class="value">${escapeHtml(issueDate)}</p>
               </div>
             </div>
 
             <div class="signatures">
               <div class="signature">
-                <p class="contract-notice">Podpis přepravce:</p>
+                <p class="contract-notice">${escapeHtml(t("carrierSignature"))}</p>
                 <p class="value">${renderText(driverName)}</p>
               </div>
               <div class="signature">
-                <p class="contract-notice">Podpis objednatele:</p>
+                <p class="contract-notice">${escapeHtml(t("customerSignature"))}</p>
                 <p class="value">${renderText(customerName)}</p>
               </div>
             </div>

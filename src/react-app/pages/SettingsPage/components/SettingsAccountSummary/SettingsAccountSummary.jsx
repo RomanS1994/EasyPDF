@@ -1,3 +1,4 @@
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -10,26 +11,27 @@ function getInitial(user) {
 }
 
 export function SettingsAccountSummary({ user }) {
+  const { t } = useI18n();
   const [imageFailed, setImageFailed] = useState(false);
   const avatarUrl = user?.profile?.avatarUrl || user?.profile?.avatar || user?.avatarUrl || '';
   const hasAvatar = Boolean(avatarUrl);
 
   if (!user) {
-    return (
-      <section className="screenCard settingsAccountSummary">
-        <div className="compactHeader">
-          <h2>Current user</h2>
-          <p>Not logged in.</p>
-        </div>
-      </section>
-    );
+      return (
+        <section className="screenCard settingsAccountSummary">
+          <div className="compactHeader">
+          <h2>{t('settings.accountSummary.title')}</h2>
+          <p>{t('settings.accountSummary.notLoggedIn')}</p>
+          </div>
+        </section>
+      );
   }
 
   return (
     <section className="screenCard settingsAccountSummary">
       <div className="compactHeader">
-        <h2>Current user</h2>
-        <p>Open the account screen for the full profile editor.</p>
+        <h2>{t('settings.accountSummary.title')}</h2>
+        <p>{t('settings.accountSummary.copy')}</p>
       </div>
 
       <Link className="settingsAccountSummary-link" to="/cz/pdf/account">
@@ -47,9 +49,9 @@ export function SettingsAccountSummary({ user }) {
         </span>
 
         <span className="settingsAccountSummary-copy">
-          <strong>{user.name || 'Unknown'}</strong>
+          <strong>{user.name || t('common.unknownUser')}</strong>
           <span>{user.email || '-'}</span>
-          <span>Role: {user.role || '-'}</span>
+          <span>{t('auth.role')}: {user.role || '-'}</span>
         </span>
 
         <span className="settingsAccountSummary-chevron" aria-hidden="true">

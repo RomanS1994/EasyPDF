@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import { selectToken, selectUser, setSession } from '../../../auth/authSlice.js';
 import { saveSession } from '../../../auth/authStorage.js';
 import {
@@ -12,6 +13,7 @@ import {
 import './ManagerUserDetails.css';
 
 export function ManagerUserDetails({ userId }) {
+  const { t } = useI18n();
   const dispatch = useDispatch();
   const currentUser = useSelector(selectUser);
   const token = useSelector(selectToken);
@@ -89,7 +91,7 @@ export function ManagerUserDetails({ userId }) {
   if (!userId) {
     return (
       <section className="managerUserDetails">
-        <p className="managerUserDetails-state">Select a user to view details.</p>
+        <p className="managerUserDetails-state">{t('manager.selectUser')}</p>
       </section>
     );
   }
@@ -97,7 +99,7 @@ export function ManagerUserDetails({ userId }) {
   if (isLoading) {
     return (
       <section className="managerUserDetails">
-        <p className="managerUserDetails-state">Loading user...</p>
+        <p className="managerUserDetails-state">{t('manager.loadingUser')}</p>
       </section>
     );
   }
@@ -105,7 +107,7 @@ export function ManagerUserDetails({ userId }) {
   if (isError) {
     return (
       <section className="managerUserDetails">
-        <p className="managerUserDetails-state">Failed to load user.</p>
+        <p className="managerUserDetails-state">{t('manager.failedUser')}</p>
       </section>
     );
   }
@@ -120,9 +122,9 @@ export function ManagerUserDetails({ userId }) {
         role: roleValue,
       }).unwrap();
       syncCurrentSession(response?.user || response);
-      setRoleMessage('Role saved.');
+      setRoleMessage(t('manager.roleSaved'));
     } catch {
-      setRoleError('Failed to save role.');
+      setRoleError(t('manager.failedToSaveRole'));
     }
   }
 
@@ -139,48 +141,48 @@ export function ManagerUserDetails({ userId }) {
         },
       }).unwrap();
       syncCurrentSession(response?.user || response);
-      setSubscriptionMessage('Subscription saved.');
+      setSubscriptionMessage(t('manager.subscriptionSaved'));
     } catch {
-      setSubscriptionError('Failed to save subscription.');
+      setSubscriptionError(t('manager.failedToSaveSubscription'));
     }
   }
 
   return (
     <section className="managerUserDetails">
-      <h3 className="managerUserDetails-title">User details</h3>
+      <h3 className="managerUserDetails-title">{t('manager.userDetails')}</h3>
 
       <div className="managerUserDetails-grid">
         <div className="managerUserDetails-row">
-          <span className="managerUserDetails-label">Name</span>
+          <span className="managerUserDetails-label">{t('common.name')}</span>
           <span className="managerUserDetails-value">{user.name || '-'}</span>
         </div>
         <div className="managerUserDetails-row">
-          <span className="managerUserDetails-label">Email</span>
+          <span className="managerUserDetails-label">{t('common.email')}</span>
           <span className="managerUserDetails-value">{user.email || '-'}</span>
         </div>
         <div className="managerUserDetails-row">
-          <span className="managerUserDetails-label">Role</span>
+          <span className="managerUserDetails-label">{t('common.role')}</span>
           <span className="managerUserDetails-value">{user.role || '-'}</span>
         </div>
         <div className="managerUserDetails-row">
-          <span className="managerUserDetails-label">Subscription</span>
+          <span className="managerUserDetails-label">{t('manager.subscription')}</span>
           <span className="managerUserDetails-value">{user.subscription?.status || '-'}</span>
         </div>
         <div className="managerUserDetails-row">
-          <span className="managerUserDetails-label">Plan</span>
+          <span className="managerUserDetails-label">{t('common.plan')}</span>
           <span className="managerUserDetails-value">{user.plan?.name || '-'}</span>
         </div>
         <div className="managerUserDetails-row">
-          <span className="managerUserDetails-label">Created</span>
+          <span className="managerUserDetails-label">{t('common.created')}</span>
           <span className="managerUserDetails-value">{user.createdAt || '-'}</span>
         </div>
       </div>
 
       <section className="managerUserDetails-section">
-        <h4 className="managerUserDetails-sectionTitle">Role</h4>
+        <h4 className="managerUserDetails-sectionTitle">{t('common.role')}</h4>
 
         <label className="managerUserDetails-field">
-          <span className="managerUserDetails-label">Role</span>
+          <span className="managerUserDetails-label">{t('common.role')}</span>
           <select
             className="managerUserDetails-select"
             value={roleValue}
@@ -193,7 +195,7 @@ export function ManagerUserDetails({ userId }) {
         </label>
 
         {!canSaveRole ? (
-          <p className="managerUserDetails-note">Only admins can change roles.</p>
+          <p className="managerUserDetails-note">{t('manager.onlyAdmins')}</p>
         ) : null}
         {roleMessage ? <p className="managerUserDetails-message">{roleMessage}</p> : null}
         {roleError ? <p className="managerUserDetails-error">{roleError}</p> : null}
@@ -204,15 +206,15 @@ export function ManagerUserDetails({ userId }) {
           onClick={handleSaveRole}
           disabled={isSavingRole || !canSaveRole}
         >
-          {isSavingRole ? 'Saving role...' : 'Save role'}
+          {isSavingRole ? t('manager.savingRole') : t('manager.saveRole')}
         </button>
       </section>
 
       <section className="managerUserDetails-section">
-        <h4 className="managerUserDetails-sectionTitle">Subscription</h4>
+        <h4 className="managerUserDetails-sectionTitle">{t('manager.subscription')}</h4>
 
         <label className="managerUserDetails-field">
-          <span className="managerUserDetails-label">Status</span>
+          <span className="managerUserDetails-label">{t('common.status')}</span>
           <select
             className="managerUserDetails-select"
             value={statusValue}
@@ -228,14 +230,14 @@ export function ManagerUserDetails({ userId }) {
         </label>
 
         <label className="managerUserDetails-field">
-          <span className="managerUserDetails-label">Plan</span>
+          <span className="managerUserDetails-label">{t('common.plan')}</span>
           <select
             className="managerUserDetails-select"
             value={planId}
             onChange={event => setPlanId(event.target.value)}
             disabled={isPlansLoading || !plans.length}
           >
-            {!plans.length ? <option value="">No plans</option> : null}
+            {!plans.length ? <option value="">{t('common.noPlans')}</option> : null}
             {plans.map(plan => (
               <option key={plan.id} value={plan.id}>
                 {plan.name}
@@ -244,8 +246,8 @@ export function ManagerUserDetails({ userId }) {
           </select>
         </label>
 
-        {isPlansLoading ? <p className="managerUserDetails-note">Loading plans...</p> : null}
-        {isPlansError ? <p className="managerUserDetails-error">Failed to load plans.</p> : null}
+        {isPlansLoading ? <p className="managerUserDetails-note">{t('common.loadingPlans')}</p> : null}
+        {isPlansError ? <p className="managerUserDetails-error">{t('manager.failedPlans')}</p> : null}
         {subscriptionMessage ? (
           <p className="managerUserDetails-message">{subscriptionMessage}</p>
         ) : null}
@@ -259,7 +261,7 @@ export function ManagerUserDetails({ userId }) {
           onClick={handleSaveSubscription}
           disabled={isSavingSubscription || isPlansLoading || !planId}
         >
-          {isSavingSubscription ? 'Saving subscription...' : 'Save subscription'}
+          {isSavingSubscription ? t('manager.savingSubscription') : t('manager.saveSubscription')}
         </button>
       </section>
     </section>

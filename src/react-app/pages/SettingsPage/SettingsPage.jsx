@@ -8,22 +8,21 @@ import { ProfileUpgrade } from "../AccountPage/components/ProfileUpgrade/Profile
 import { SettingsAccountSummary } from "./components/SettingsAccountSummary/SettingsAccountSummary.jsx";
 import { SettingsAdminAccess } from "./components/SettingsAdminAccess/SettingsAdminAccess.jsx";
 import { SettingsLanguageCard } from "./components/SettingsLanguageCard/SettingsLanguageCard.jsx";
+import { useI18n } from "../../app/i18n/useI18n.js";
 import "./SettingsPage.css";
 
 export function SettingsPage() {
   const user = useSelector(selectUser);
   const canAdmin = hasAdminAccess(user);
+  const { t } = useI18n();
 
   return (
     <section className="settingsPage pageStack">
       <header className="appTop">
         <div className="appTitleBlock">
-          <p className="sectionEyebrow">Settings</p>
-          <h1>Driver portal</h1>
-          <p>
-            Language, business profile, subscription and session are kept on one
-            screen.
-          </p>
+          <p className="sectionEyebrow">{t('settings.eyebrow')}</p>
+          <h1>{t('settings.title')}</h1>
+          <p>{t('settings.subtitle')}</p>
         </div>
       </header>
 
@@ -34,10 +33,8 @@ export function SettingsPage() {
 
       <section className="screenCard settingsPage-card">
         <div className="compactHeader">
-          <h2>Business profile</h2>
-          <p>
-            Fill the company data that is reused in new contracts and orders.
-          </p>
+          <h2>{t('settings.businessProfile.title')}</h2>
+          <p>{t('settings.businessProfile.subtitle')}</p>
         </div>
 
         <BusinessProfileForm />
@@ -47,11 +44,8 @@ export function SettingsPage() {
 
       <section className="screenCard settingsPage-card">
         <div className="compactHeader">
-          <h2>Session</h2>
-          <p>
-            Logout signs you out, delete removes the account and local draft
-            data.
-          </p>
+          <h2>{t('settings.session.title')}</h2>
+          <p>{t('settings.session.subtitle')}</p>
         </div>
 
         <ProfileDanger showHeader={false} bare />

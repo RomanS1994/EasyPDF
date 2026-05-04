@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import { useUpdateProfileMutation } from '../../authApi.js';
 import { selectToken, selectUser, setSession } from '../../authSlice.js';
 import { saveSession } from '../../authStorage.js';
@@ -10,6 +11,7 @@ export function BusinessProfileForm() {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const token = useSelector(selectToken);
+  const { t } = useI18n();
   const [updateProfile, { isLoading }] = useUpdateProfileMutation();
   const [driverName, setDriverName] = useState('');
   const [driverAddress, setDriverAddress] = useState('');
@@ -57,62 +59,64 @@ export function BusinessProfileForm() {
 
       saveSession(token, updatedUser);
       dispatch(setSession({ token, user: updatedUser }));
-      setMessage('Business profile saved.');
+      setMessage(t('auth.profileSaved'));
     } catch {
-      setError('Failed to save business profile.');
+      setError(t('auth.failedToSaveProfile'));
     }
   }
 
   return (
     <form className="businessProfileForm" onSubmit={handleSubmit}>
-      <h3 className="businessProfileForm-title">Business profile</h3>
-
-      <div className="businessProfileForm-columns">
-        <div className="businessProfileForm-group">
-          <h4 className="businessProfileForm-subtitle">Driver</h4>
+      <div className="businessProfileForm-sections">
+        <section className="businessProfileForm-card">
+          <h4 className="businessProfileForm-subtitle">{t('auth.driverLabel')}</h4>
 
           <label className="businessProfileForm-field">
-            <span>Name</span>
+            <span>{t('auth.name')}</span>
             <input
               type="text"
+              placeholder={`Введіть ${t('auth.name').toLowerCase()} *`}
               value={driverName}
               onChange={event => setDriverName(event.target.value)}
             />
           </label>
 
           <label className="businessProfileForm-field">
-            <span>Address</span>
+            <span>{t('auth.address')}</span>
             <input
               type="text"
+              placeholder={`Введіть ${t('auth.address').toLowerCase()} *`}
               value={driverAddress}
               onChange={event => setDriverAddress(event.target.value)}
             />
           </label>
 
           <label className="businessProfileForm-field">
-            <span>SPZ</span>
+            <span>{t('auth.spz')}</span>
             <input
               type="text"
+              placeholder={`Введіть ${t('auth.spz').toLowerCase()} *`}
               value={driverSpz}
               onChange={event => setDriverSpz(event.target.value)}
             />
           </label>
 
           <label className="businessProfileForm-field">
-            <span>ICO</span>
+            <span>{t('auth.ico')}</span>
             <input
               type="text"
+              placeholder={`Введіть ${t('auth.ico').toLowerCase()} *`}
               value={driverIco}
               onChange={event => setDriverIco(event.target.value)}
             />
           </label>
-        </div>
+        </section>
 
-        <div className="businessProfileForm-group">
-          <h4 className="businessProfileForm-subtitle">Provider</h4>
+        <section className="businessProfileForm-card">
+          <h4 className="businessProfileForm-subtitle">{t('auth.providerLabel')}</h4>
 
           <label className="businessProfileForm-field">
-            <span>Name</span>
+            <span>{t('auth.name')}</span>
             <input
               type="text"
               value={providerName}
@@ -121,7 +125,7 @@ export function BusinessProfileForm() {
           </label>
 
           <label className="businessProfileForm-field">
-            <span>Address</span>
+            <span>{t('auth.address')}</span>
             <input
               type="text"
               value={providerAddress}
@@ -130,21 +134,21 @@ export function BusinessProfileForm() {
           </label>
 
           <label className="businessProfileForm-field">
-            <span>ICO</span>
+            <span>{t('auth.ico')}</span>
             <input
               type="text"
               value={providerIco}
               onChange={event => setProviderIco(event.target.value)}
             />
           </label>
-        </div>
+        </section>
       </div>
 
       {message ? <p className="businessProfileForm-message">{message}</p> : null}
       {error ? <p className="businessProfileForm-error">{error}</p> : null}
 
       <button className="businessProfileForm-button" type="submit" disabled={isLoading}>
-        {isLoading ? 'Saving...' : 'Save business profile'}
+        {isLoading ? t('auth.savingProfile') : t('auth.saveBusinessProfile')}
       </button>
     </form>
   );

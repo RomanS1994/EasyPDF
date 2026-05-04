@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
+import { useI18n } from "../../../../app/i18n/useI18n.js";
 import {
   useDeleteMeMutation,
   useLogoutMutation,
@@ -15,6 +16,7 @@ import "./ProfileDanger.css";
 export function ProfileDanger({ showHeader = true, bare = false }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [logout] = useLogoutMutation();
   const [deleteMe, { isLoading: isDeleting }] = useDeleteMeMutation();
   const [message, setMessage] = useState("");
@@ -33,12 +35,12 @@ export function ProfileDanger({ showHeader = true, bare = false }) {
     clearGenerationSession();
     dispatch(clearSession());
     navigate('/cz/pdf', { replace: true });
-    setMessage("Signed out.");
+    setMessage(t('common.backToHome'));
   }
 
   async function handleDelete() {
     // Видаляємо акаунт і одразу скидаємо локальний стан.
-    if (!window.confirm("Видалити акаунт?")) return;
+    if (!window.confirm(t('account.sessionCopy'))) return;
 
     setMessage("");
     setError("");
@@ -50,9 +52,9 @@ export function ProfileDanger({ showHeader = true, bare = false }) {
       clearGenerationSession();
       dispatch(clearSession());
       navigate('/cz/pdf', { replace: true });
-      setMessage("Account deleted.");
+      setMessage(t('account.notLoggedIn'));
     } catch {
-      setError("Failed to delete account.");
+      setError(t('common.failed'));
     }
   }
 
@@ -60,8 +62,8 @@ export function ProfileDanger({ showHeader = true, bare = false }) {
     <section className={` profileDanger${bare ? " profileDanger--bare" : ""}`}>
       {showHeader ? (
         <div className="compactHeader">
-          <h2>Session</h2>
-          <p>Use logout or delete if you need to reset the current account.</p>
+          <h2>{t('account.session')}</h2>
+          <p>{t('account.sessionCopy')}</p>
         </div>
       ) : null}
 
@@ -71,7 +73,7 @@ export function ProfileDanger({ showHeader = true, bare = false }) {
           type="button"
           onClick={handleLogout}
         >
-          Logout
+          {t('account.logout')}
         </button>
 
         <button
@@ -80,7 +82,7 @@ export function ProfileDanger({ showHeader = true, bare = false }) {
           onClick={handleDelete}
           disabled={isDeleting}
         >
-          {isDeleting ? "Deleting..." : "Delete account"}
+          {isDeleting ? t('common.deleting') : t('account.deleteAccount')}
         </button>
       </div>
 

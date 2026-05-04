@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 
+import { useI18n } from '../../app/i18n/useI18n.js';
 import { OrderDetails } from '../../features/orders/components/OrderDetails/OrderDetails.jsx';
 import { useGetOrdersQuery } from '../../features/orders/ordersApi.js';
 import { HistoryOrdersList } from './components/HistoryOrdersList/HistoryOrdersList.jsx';
@@ -14,6 +15,7 @@ export function HistoryPage() {
   const [sortKey, setSortKey] = useState('newest');
   const [selectedOrderId, setSelectedOrderId] = useState('');
   const { data, isLoading, isError } = useGetOrdersQuery();
+  const { t } = useI18n();
   const orders = data?.orders || [];
 
   const filteredByDate = useMemo(() => {
@@ -67,8 +69,8 @@ export function HistoryPage() {
     <section className="historyPage pageStack">
       <div className="screenCard screenCard-stats orderHistoryScreen">
         <div className="compactHeader">
-          <h2>Saved PDFs</h2>
-          <p>All generated orders in this workspace.</p>
+          <h2>{t('history.savedPdfs')}</h2>
+          <p>{t('history.subtitle')}</p>
         </div>
 
         <HistoryTabs activeTab={activeTab} counts={tabCounts} onChange={setActiveTab} />
@@ -81,12 +83,12 @@ export function HistoryPage() {
           onSortChange={setSortKey}
         />
 
-        {isLoading ? <p className="orderHistoryEmpty">Loading saved orders...</p> : null}
-        {isError ? <p className="orderHistoryEmpty">Failed to load saved orders.</p> : null}
+        {isLoading ? <p className="orderHistoryEmpty">{t('history.loading')}</p> : null}
+        {isError ? <p className="orderHistoryEmpty">{t('history.failed')}</p> : null}
 
         {!isLoading && !isError && !visibleOrders.length ? (
           <p className="orderHistoryEmpty">
-            {orders.length ? 'No saved orders match the current filter.' : 'Saved orders have not appeared yet.'}
+            {orders.length ? t('history.noMatch') : t('history.empty')}
           </p>
         ) : null}
 

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import { selectContract, setTotalPrice } from '../../contractSlice.js';
 import {
   detectCurrency,
@@ -12,6 +13,7 @@ import {
 import './PriceField.css';
 
 export function PriceField() {
+  const { t } = useI18n();
   const dispatch = useDispatch();
   const totalPrice = useSelector(selectContract).totalPrice;
   const [priceInput, setPriceInput] = useState('');
@@ -73,7 +75,7 @@ export function PriceField() {
 
   return (
     <section className="contractSection contractSection-price">
-      <h3 className="contractSection-title">Price</h3>
+      <h3 className="contractSection-title">{t('contract.price')}</h3>
 
       <div className="priceField">
         <div className="priceField-row">
@@ -82,15 +84,15 @@ export function PriceField() {
               className="priceField-input"
               type="text"
               inputMode="decimal"
-              aria-label="Trip price"
-              placeholder="Trip price *"
+              aria-label={t('contract.tripPrice')}
+              placeholder={`${t('contract.tripPrice')} *`}
               required
               value={priceInput}
               onChange={handleInputChange}
             />
 
             {priceInput ? (
-              <button className="priceField-clear" type="button" onClick={clearPrice}>
+              <button className="priceField-clear" type="button" aria-label={t('common.clear')} onClick={clearPrice}>
                 ×
               </button>
             ) : null}

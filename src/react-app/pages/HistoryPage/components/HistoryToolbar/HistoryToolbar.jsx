@@ -1,6 +1,8 @@
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import './HistoryToolbar.css';
 
 function HistoryToolbar({ dateFilter, onDateChange, onResetDate, sortKey, onSortChange }) {
+  const { t } = useI18n();
   return (
     <div className="orderHistoryToolbar">
       <div className="orderHistoryToolbarLeft">
@@ -13,7 +15,7 @@ function HistoryToolbar({ dateFilter, onDateChange, onResetDate, sortKey, onSort
                 <path d="M6 2.75v3" />
                 <path d="M14 2.75v3" />
               </svg>
-              <span className="orderHistoryLabelText">Date</span>
+              <span className="orderHistoryLabelText">{t('history.date')}</span>
             </span>
           </span>
           <input type="date" value={dateFilter} onChange={event => onDateChange(event.target.value)} />
@@ -31,15 +33,15 @@ function HistoryToolbar({ dateFilter, onDateChange, onResetDate, sortKey, onSort
 
       <div className="orderHistoryToolbarRight">
         <label className="orderHistorySortField">
-          <span className="visuallyHidden">Sort</span>
+          <span className="visuallyHidden">{t('history.sort')}</span>
           <select
             className="orderHistorySortSelect"
             value={sortKey}
             onChange={event => onSortChange(event.target.value)}
           >
-            <option value="newest">Newest first</option>
-            <option value="oldest">Oldest first</option>
-            <option value="trip-date">Trip date</option>
+            <option value="newest">{t('history.newest')}</option>
+            <option value="oldest">{t('history.oldest')}</option>
+            <option value="trip-date">{t('history.tripDate')}</option>
           </select>
         </label>
       </div>

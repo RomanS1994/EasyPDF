@@ -361,6 +361,16 @@
   color: #fff;
 }
 
+.orderWindow-button--danger {
+  background: linear-gradient(180deg, rgba(239, 68, 68, 0.98), rgba(185, 28, 28, 0.98));
+  color: #fff;
+}
+
+.orderWindow-button--danger:hover:not(:disabled),
+.orderWindow-button--danger:focus-visible {
+  background: linear-gradient(180deg, rgba(220, 38, 38, 0.98), rgba(153, 27, 27, 0.98));
+}
+
 .orderWindow-button--transfer {
   background: rgba(15, 95, 215, 0.08);
   color: var(--accent);

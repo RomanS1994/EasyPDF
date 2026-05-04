@@ -1,12 +1,14 @@
+import { useI18n } from '../../../../app/i18n/useI18n.js';
 import './HistoryTabs.css';
 
 function HistoryTabs({ activeTab, counts, onChange }) {
+  const { t } = useI18n();
   function isActive(tab) {
     return activeTab === tab;
   }
 
   return (
-    <div className="orderHistoryTabs" role="tablist" aria-label="Order status tabs">
+    <div className="orderHistoryTabs" role="tablist" aria-label={t('history.orderStatusTabs')}>
       <button
         className={`orderHistoryTab ${isActive('all') ? 'is-active' : ''}`}
         type="button"
@@ -24,7 +26,7 @@ function HistoryTabs({ activeTab, counts, onChange }) {
             <path d="M8.5 17h6.5" />
           </svg>
         </span>
-        <span className="orderHistoryTabLabel">All</span>
+        <span className="orderHistoryTabLabel">{t('history.all')}</span>
         <span className="orderHistoryTabCount" aria-hidden="true">{counts.all}</span>
       </button>
 
@@ -44,7 +46,7 @@ function HistoryTabs({ activeTab, counts, onChange }) {
             <circle cx="12" cy="13.4" r="1.4" />
           </svg>
         </span>
-        <span className="orderHistoryTabLabel">Today</span>
+        <span className="orderHistoryTabLabel">{t('history.today')}</span>
         <span className="orderHistoryTabCount" aria-hidden="true">{counts.today}</span>
       </button>
 
@@ -66,7 +68,7 @@ function HistoryTabs({ activeTab, counts, onChange }) {
             <path d="M16.5 15.2l1.1.9" />
           </svg>
         </span>
-        <span className="orderHistoryTabLabel">Planned</span>
+        <span className="orderHistoryTabLabel">{t('history.planned')}</span>
         <span className="orderHistoryTabCount" aria-hidden="true">{counts.planned}</span>
       </button>
 
@@ -83,7 +85,7 @@ function HistoryTabs({ activeTab, counts, onChange }) {
             <path d="M9.2 12.2 11 14l3.9-4" />
           </svg>
         </span>
-        <span className="orderHistoryTabLabel">Completed</span>
+        <span className="orderHistoryTabLabel">{t('history.completed')}</span>
         <span className="orderHistoryTabCount" aria-hidden="true">{counts.completed}</span>
       </button>
     </div>

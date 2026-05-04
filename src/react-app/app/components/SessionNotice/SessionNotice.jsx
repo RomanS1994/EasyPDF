@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { useI18n } from '../../i18n/useI18n.js';
 import {
   clearSessionError,
   selectSessionError,
@@ -10,6 +11,7 @@ import './SessionNotice.css';
 
 export function SessionNotice() {
   const dispatch = useDispatch();
+  const { t } = useI18n();
   const sessionError = useSelector(selectSessionError);
   const sessionErrorType = useSelector(selectSessionErrorType);
   const [visible, setVisible] = useState(false);
@@ -36,7 +38,7 @@ export function SessionNotice() {
 
   return (
     <div className="sessionNotice" role="status" aria-live="polite">
-      <strong className="sessionNotice-title">Offline</strong>
+      <strong className="sessionNotice-title">{t('common.failed')}</strong>
       <p className="sessionNotice-text">{sessionError}</p>
     </div>
   );
