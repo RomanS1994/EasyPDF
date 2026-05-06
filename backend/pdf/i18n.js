@@ -1,79 +1,7 @@
-export const SUPPORTED_PDF_LANGUAGES = ['uk', 'en', 'cs'];
-export const DEFAULT_PDF_LANGUAGE = 'uk';
+export const SUPPORTED_PDF_LANGUAGES = ['cs'];
+export const DEFAULT_PDF_LANGUAGE = 'cs';
 
 const PDF_MESSAGES = {
-  uk: {
-    document: {
-      offerHeading: 'Пропозиція перевезення пасажирів',
-      confirmationHeading: 'Договір перевезення пасажирів',
-      offerTitle: 'Пропозиція перевезення',
-      confirmationTitle: 'Договір перевезення',
-    },
-    paymentMethod: 'готівкою / карткою на місці',
-    subtitle: {
-      carrier: 'Перевізник / Водій:',
-      provider: 'Посередник (Постачальник послуги):',
-      customer: 'Замовник / Пасажир:',
-      trip: 'Дані про перевезення:',
-    },
-    labels: {
-      name: 'Ім’я:',
-      companyName: 'Ім’я / Назва компанії:',
-      address: 'Адреса:',
-      vehiclePlate: 'Номерний знак:',
-      ico: 'ЄДРПОУ / ІПН:',
-      emailPhone: 'E-mail, телефон:',
-      passengers: 'Кількість клієнтів:',
-      pickup: 'Місце посадки:',
-      dropoff: 'Місце висадки:',
-      datetime: 'Дата та час:',
-      price: 'Ціна:',
-      payment: 'Спосіб оплати:',
-    },
-    notice: 'Договір укладено відповідно до чинного законодавства про автомобільні перевезення',
-    header: {
-      issued: 'Дата видачі:',
-    },
-    issuedIn: 'У Празі',
-    carrierSignature: 'Підпис перевізника:',
-    customerSignature: 'Підпис замовника:',
-  },
-  en: {
-    document: {
-      offerHeading: 'Passenger transport offer',
-      confirmationHeading: 'Passenger transport agreement',
-      offerTitle: 'Transport offer',
-      confirmationTitle: 'Transport agreement',
-    },
-    paymentMethod: 'cash / card on site',
-    subtitle: {
-      carrier: 'Carrier / Driver:',
-      provider: 'Intermediary (Service provider):',
-      customer: 'Customer / Passenger:',
-      trip: 'Transport details:',
-    },
-    labels: {
-      name: 'Name:',
-      companyName: 'Name / Company name:',
-      address: 'Address:',
-      vehiclePlate: 'Vehicle plate:',
-      ico: 'Company ID:',
-      emailPhone: 'E-mail, phone:',
-      passengers: 'Number of passengers:',
-      pickup: 'Pickup point:',
-      dropoff: 'Drop-off point:',
-      datetime: 'Date and time:',
-      price: 'Price:',
-      payment: 'Payment method:',
-    },
-    notice: 'The agreement was concluded in accordance with the applicable road transport legislation',
-    header: {
-      issued: 'Issued on:',
-    },
-    issuedIn: 'In Prague',
-    carrierSignature: 'Carrier signature:',
-    customerSignature: 'Customer signature:',
-  },
   cs: {
     document: {
       offerHeading: 'Nabídka přepravy osob',
@@ -113,7 +41,9 @@ const PDF_MESSAGES = {
 };
 
 export function normalizePdfLanguage(value) {
-  return SUPPORTED_PDF_LANGUAGES.includes(value) ? value : DEFAULT_PDF_LANGUAGE;
+  return SUPPORTED_PDF_LANGUAGES.includes(String(value || '').toLowerCase())
+    ? 'cs'
+    : DEFAULT_PDF_LANGUAGE;
 }
 
 export function getPdfMessage(language, key) {

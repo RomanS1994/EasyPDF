@@ -74,6 +74,11 @@ async function handleUpdateMyProfile(request, response) {
           incomingProfile.avatar ??
           currentProfile.avatarUrl
       );
+
+      if (nextAvatarUrl && nextAvatarUrl.length > 120000) {
+        throw new Error('Avatar image is too large. Please upload a smaller image.');
+      }
+
       const nextProfile = normalizeUserProfile(
         {
           ...currentProfile,

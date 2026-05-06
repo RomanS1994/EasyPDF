@@ -1,0 +1,72 @@
+.appLayout {
+  min-height: 100vh;
+  color: var(--text);
+}
+
+.pageContainer {
+  width: 100%;
+  max-width: 404px;
+  margin: 0 auto;
+  padding: 0 10px 24px;
+}
+
+.appLayout--workspace .pageContainer {
+  max-width: 404px;
+}
+
+.appLayout--dashboard {
+  background: #f5f7fb;
+}
+
+.appLayout-body {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 16px;
+  padding: 16px;
+}
+
+.appLayout--workspace {
+  position: relative;
+}
+
+.appLayout-workspaceBody {
+  padding: 12px 0 calc(92px + env(safe-area-inset-bottom));
+}
+
+.appLayout-main {
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .appLayout-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 761px) {
+  .pageContainer {
+    padding: 0 12px 24px;
+  }
+
+  .appLayout--workspace .pageContainer {
+    max-width: 404px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .appLayout--workspace .pageContainer {
+    max-width: 428px;
+    padding: 0 14px 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .appLayout-workspaceBody {
+    padding: 8px 0 calc(88px + env(safe-area-inset-bottom));
+  }
+
+  .pageContainer {
+    max-width: 100%;
+    padding: 0 8px 12px;
+  }
+}

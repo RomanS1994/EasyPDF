@@ -133,7 +133,7 @@ export function renderContractPdfHtml({
   contractData = {},
   plan,
   documentType,
-  language = "uk",
+  language = "cs",
 }) {
   const resolvedLanguage = normalizePdfLanguage(language);
   const t = (key, values) => {

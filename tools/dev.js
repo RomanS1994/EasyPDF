@@ -32,4 +32,5 @@ process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
 
 run('client', 'dev:client');
+run('admin', 'dev:admin');
 run('server', 'dev:server');

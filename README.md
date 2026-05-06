@@ -8,7 +8,7 @@ DocTra побудований як split-stack система:
 
 | Частина | Що робить |
 | --- | --- |
-| Frontend | Мультисторінковий Vite-застосунок у `src/`, який працює під `/cz/pdf/` |
+| Frontend | Мультисторінкові Vite-застосунки у `frontend/driverApp/` і `frontend/adminApp/` |
 | Backend | Node HTTP API з Prisma та PostgreSQL |
 | PDF | HTML-first шаблони, що рендеряться через Puppeteer/Chromium |
 | Auth | `Authorization: Bearer <token>` + rotating refresh cookie |
@@ -22,7 +22,7 @@ DocTra побудований як split-stack система:
 - облік місячного ліміту генерацій і статистики використання
 - редагування профілю, фото, бізнес-даних і мови інтерфейсу
 - ручний запит paid-апгрейду з підтвердженням менеджером
-- manager/admin workspace для користувачів, підписок, планів, замовлень і аудиту
+- окремий admin workspace у `frontend/adminApp/`
 - PWA-обгортка зі splash screen, manifest та іконками
 
 ## Ролі
@@ -51,34 +51,40 @@ DocTra побудований як split-stack система:
 
 ```text
 backend/   API, Prisma schema, migrations, auth, orders, PDF renderer
-src/       frontend app
-public/    static manifest and shared icons copied into frontend build
+frontend/  client apps
+  driverApp/      current driver-facing app
+  adminApp/       back-office admin app
+  dispatcherApp/  future dispatcher app
 tools/     dev runner, build/postbuild helpers, hooks
 dist/      generated production build output (ignored in git)
 ```
 
 ## Frontend structure
 
-- `src/react-app` contains the isolated React app.
-- `src/react-app/app` contains the shell, router, store, providers, and layout components.
-- `src/react-app/features` contains feature slices, RTK Query APIs, hooks, utilities, and UI components.
-- `src/react-app/pages` contains the React route pages.
-- `src/index.html` is the single React SPA entry point.
+- `frontend/driverApp/src/react-app` contains the isolated driver React app.
+- `frontend/driverApp/src/react-app/app` contains the shell, router, store, providers, and layout components.
+- `frontend/driverApp/src/react-app/features` contains driver feature slices, RTK Query APIs, hooks, utilities, and UI components.
+- `frontend/driverApp/src/react-app/pages` contains the driver route pages.
+- `frontend/driverApp/index.html` is the current driver SPA entry point.
+- `frontend/adminApp/src/react-app` contains the isolated back-office app.
+- `frontend/adminApp/src/react-app/pages` contains the admin route pages.
+- `frontend/adminApp/src/react-app/features/admin` contains the back-office admin UI components.
+- `frontend/shared/src/react-app/features/admin` contains the shared admin data API used by both apps.
+- `frontend/dispatcherApp` is reserved for the future dispatcher app.
 
 ## Основні сторінки
 
 | Зона | Шляхи |
 | --- | --- |
-| User app | `/cz/pdf/`, `/cz/pdf/orders/`, `/cz/pdf/history/`, `/cz/pdf/stats/`, `/cz/pdf/account/`, `/cz/pdf/settings/` |
-| Manager app | `/cz/pdf/manager/` |
-| Admin app | `/cz/pdf/admin/`, `/cz/pdf/admin/accounts/`, `/cz/pdf/admin/subscriptions/`, `/cz/pdf/admin/orders/`, `/cz/pdf/admin/settings/`, `/cz/pdf/admin/settings/language/`, `/cz/pdf/admin/settings/plans/`, `/cz/pdf/admin/settings/audit/` |
+| Driver app | `/`, `/orders/`, `/history/`, `/stats/`, `/account/`, `/settings/` |
+| Admin app | `/admin/`, `/admin/accounts/`, `/admin/subscriptions/`, `/admin/orders/`, `/admin/settings/`, `/admin/settings/language/`, `/admin/settings/plans/`, `/admin/settings/audit/` |
 
 ## Локальний запуск
 
 Потрібні Node.js і PostgreSQL.
 
 ```bash
-cp .env.example .env
+cp frontend/driverApp/.env.example frontend/driverApp/.env
 cp backend/.env.example backend/.env
 npm install
 npm --prefix backend install
@@ -91,7 +97,7 @@ npm run dev
 
 - frontend: `http://localhost:5173`
 - backend: `http://localhost:3001`
-- основний mount-point застосунку: `/cz/pdf/`
+- основний mount-point застосунку: `/`
 
 `npm install` на корені також підключає git hooks. Якщо потрібно запустити їх окремо, використовуйте `npm run hooks:install`.
 
@@ -106,6 +112,10 @@ npm run dev
 | `VITE_GOOGLE_MAPS_API_KEY` | ні | Публічний ключ Google Maps Places для автокомпліту адрес |
 | `VITE_SUPPORT_WHATSAPP_URL` | ні | Посилання для ручного підтвердження оплати |
 | `VITE_SUPPORT_TELEGRAM_URL` | ні | Додаткове посилання підтримки |
+| `VITE_ADMIN_APP_URL` | ні | Повний URL або path до admin app, якщо вона окремо від driver app |
+
+Фронтенд-env файли зберігаються в `frontend/driverApp/.env` та `frontend/driverApp/.env.example`.
+Для локальної admin app використовуйте `npm run dev:admin` і окремий `VITE_ADMIN_APP_URL`, наприклад `http://localhost:4174/admin/accounts`.
 
 ### Backend (`backend/.env`)
 
@@ -115,7 +125,7 @@ npm run dev
 | `DATABASE_URL` | так | Runtime connection до PostgreSQL через Prisma |
 | `DIRECT_DATABASE_URL` | ні | Direct DB connection для Prisma CLI та runtime fallback |
 | `API_KEY` | ні | Перевірка `X-API-KEY` на backend |
-| `CLIENT_ORIGIN` | ні | CORS origin override |
+| `CLIENT_ORIGIN` | ні | CORS origin override, can be a comma-separated list for local apps |
 | `BACKEND_PORT` | ні | Порт сервера, за замовчуванням `3001` |
 
 Додаткові параметри cookie, auth windows і rate limits описані у `backend/.env.example`.
@@ -124,10 +134,12 @@ npm run dev
 
 | Команда | Що робить |
 | --- | --- |
-| `npm run dev` | Запускає frontend і backend одночасно |
+| `npm run dev` | Запускає driver app, admin app і backend одночасно |
 | `npm run dev:client` | Запускає лише Vite frontend |
+| `npm run dev:admin` | Запускає лише Vite admin frontend на окремому порті |
 | `npm run dev:server` | Запускає лише backend |
 | `npm run build` | Збирає production build у `dist/` |
+| `npm run build:admin` | Збирає production build admin app у `dist-admin/` |
 | `npm run preview` | Локальний preview зібраного frontend |
 | `npm run db:generate` | `prisma generate` у `backend/` |
 | `npm run db:migrate` | Локальна Prisma migration |
@@ -195,12 +207,12 @@ npm run dev
 
 ### Frontend на Netlify
 
-- base directory: repo root
+- base directory: `frontend/driverApp`
 - install command: `npm install`
 - build command: `npm run build`
 - publish directory: `dist`
 - required env: `VITE_API_BASE_URL`
-- optional env: `VITE_API_KEY`, `VITE_GOOGLE_MAPS_API_KEY`, `VITE_SUPPORT_WHATSAPP_URL`, `VITE_SUPPORT_TELEGRAM_URL`
+- optional env: `VITE_API_KEY`, `VITE_GOOGLE_MAPS_API_KEY`, `VITE_SUPPORT_WHATSAPP_URL`, `VITE_SUPPORT_TELEGRAM_URL`, `VITE_ADMIN_APP_URL`
 
 ### Backend на Render або іншому Node-host
 

@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "node tools/dev.js",
     "dev:client": "vite",
+    "dev:admin": "vite --config frontend/adminApp/vite.config.js",
     "dev:server": "npm --prefix backend run dev",
     "db:generate": "npm --prefix backend run db:generate",
     "db:migrate": "npm --prefix backend run db:migrate",
@@ -16,6 +17,7 @@
     "prepare": "node tools/install-git-hooks.js",
     "secrets:check": "node tools/check-secrets.js",
     "build": "vite build --base=/",
+    "build:admin": "vite build --config frontend/adminApp/vite.config.js",
     "preview": "vite preview",
     "start:server": "npm --prefix backend run start"
   },

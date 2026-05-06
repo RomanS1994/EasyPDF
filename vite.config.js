@@ -1,17 +1,21 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import path from "node:path";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [react()],
-  base: "/",
-  envDir: ".",
-  root: "src",
-  publicDir: "../public",
-  appType: "spa",
+  base: '/',
+  envDir: 'frontend/driverApp',
+  root: 'frontend/driverApp',
+  publicDir: 'public',
+  appType: 'spa',
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "src"),
+      '@': path.resolve(__dirname, 'frontend/driverApp/src'),
+      '@shared': path.resolve(__dirname, 'frontend/shared/src/react-app'),
     },
   },
   optimizeDeps: {
@@ -22,15 +26,15 @@ export default defineConfig({
     rollupOptions: {
       onwarn(warning, warn) {
         if (
-          warning.code === "MODULE_LEVEL_DIRECTIVE" &&
-          warning.id?.includes("react-router") &&
+          warning.code === 'MODULE_LEVEL_DIRECTIVE' &&
+          warning.id?.includes('react-router') &&
           String(warning.message || "").includes('"use client"')
         ) {
           return;
         }
 
         if (
-          warning.id?.includes("react-router") &&
+          warning.id?.includes('react-router') &&
           String(warning.message || "").includes(
             "Can't resolve original location of error",
           )
@@ -43,12 +47,12 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes("node_modules")) {
-            return "vendor";
+            return 'vendor';
           }
         },
       },
     },
-    outDir: "../dist",
+    outDir: '../../dist',
     emptyOutDir: true,
   },
 });

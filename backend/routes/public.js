@@ -94,7 +94,7 @@ export async function handlePublicRoutes(request, response, { pathName }) {
       contractData,
       plan: resolvePdfPlan(context),
       documentType: requestedDocumentType,
-      language: String(body.language || body.order?.language || body.contractData?.language || 'uk'),
+      language: 'cs',
     });
 
     sendPdf(response, 200, pdfDocument.buffer, pdfDocument.fileName);

@@ -45,7 +45,7 @@ export async function createContractPdf({
   contractData = {},
   plan,
   documentType = 'confirmation',
-  language = 'uk',
+  language = 'cs',
 } = {}) {
   const resolvedPlan = normalizePlan(plan);
   const resolvedDocumentType = normalizeDocumentType(documentType);

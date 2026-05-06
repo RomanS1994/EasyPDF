@@ -1,7 +1,9 @@
 import { requireManager } from '../../auth/context.js';
 import {
+  ORDER_WITH_OWNER_INCLUDE,
   ORDER_LIST_WITH_OWNER_SELECT,
   sanitizeOrderListRecord,
+  sanitizeOrderRecord,
 } from '../../db/prisma-helpers.js';
 import { prisma } from '../../db/prisma.js';
 import { sendJson } from '../../lib/http.js';
@@ -10,6 +12,7 @@ import {
   matchesManagerOrderStatus,
 } from '../../services/orders.js';
 import { normalizePaginationParams, normalizeText } from '../../validation/common.js';
+
 export async function handleManagerOrders(request, response, url) {
   const context = await requireManager(request, response);
   if (!context) return;
@@ -61,4 +64,32 @@ export async function handleManagerOrders(request, response, url) {
     .map(sanitizeOrderListRecord);
 
   sendJson(response, 200, { orders, summary });
+}
+
+export async function handleManagerOrderDetail(request, response, orderId) {
+  const context = await requireManager(request, response);
+  if (!context) return;
+
+  const resolvedOrderId = normalizeText(orderId);
+
+  if (!resolvedOrderId) {
+    sendJson(response, 400, { error: 'Order ID is required' });
+    return;
+  }
+
+  const order = await prisma.order.findUnique({
+    where: {
+      id: resolvedOrderId,
+    },
+    include: ORDER_WITH_OWNER_INCLUDE,
+  });
+
+  if (!order) {
+    sendJson(response, 404, { error: 'Order not found' });
+    return;
+  }
+
+  sendJson(response, 200, {
+    order: sanitizeOrderRecord(order),
+  });
 }

@@ -1,0 +1,666 @@
+.orderDrawer {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(9, 15, 28, 0.34);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.orderDrawer.is-open {
+  animation: orderDrawerBackdropIn 220ms ease-out;
+}
+
+.orderDrawer.is-closing {
+  animation: orderDrawerBackdropOut 220ms ease-in forwards;
+}
+
+.orderDrawer-backdrop {
+  position: absolute;
+  inset: 0;
+}
+
+.orderDrawer-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(100vw, 480px);
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  padding: 24px 28px 24px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.995),
+    rgba(247, 249, 252, 0.98)
+  );
+  border-left: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: -24px 0 40px rgba(15, 23, 42, 0.14);
+  animation: orderDrawerIn 220ms ease-out;
+}
+
+@keyframes orderDrawerBackdropIn {
+  from {
+    background: rgba(9, 15, 28, 0);
+  }
+  to {
+    background: rgba(9, 15, 28, 0.34);
+  }
+}
+
+@keyframes orderDrawerBackdropOut {
+  from {
+    background: rgba(9, 15, 28, 0.34);
+  }
+  to {
+    background: rgba(9, 15, 28, 0);
+  }
+}
+
+@keyframes orderDrawerIn {
+  from {
+    transform: translateX(16px);
+    opacity: 0.9;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.orderDrawer.is-closing .orderDrawer-panel {
+  animation: orderDrawerOut 220ms ease-in forwards;
+}
+
+@keyframes orderDrawerOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(16px);
+    opacity: 0;
+  }
+}
+
+.orderDrawer.is-closing .orderDrawer-backdrop {
+  animation: orderDrawerBackdropLayerOut 220ms ease-in forwards;
+}
+
+@keyframes orderDrawerBackdropLayerOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.orderDrawer-header {
+  display: grid;
+  gap: 22px;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 2px solid rgba(15, 23, 42, 0.88);
+}
+
+.orderDrawer-backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  min-height: 28px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(17, 24, 39, 0.82);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  box-shadow: none;
+}
+
+.orderDrawer-backBtn span:first-child {
+  font-size: 17px;
+  line-height: 1;
+}
+
+.orderDrawer-hero {
+  display: grid;
+  gap: 12px;
+}
+
+.orderWindow-title {
+  margin: 0;
+  font-size: clamp(42px, 9vw, 58px);
+  line-height: 0.9;
+  letter-spacing: -0.07em;
+  font-weight: 900;
+  max-width: 100%;
+  text-transform: uppercase;
+  word-break: break-word;
+}
+
+.orderWindow-copy {
+  margin: 0;
+  color: rgba(15, 23, 42, 0.62);
+  font-size: 18px;
+  line-height: 1.25;
+  max-width: 35ch;
+  letter-spacing: -0.02em;
+}
+
+.orderWindow-message,
+.orderWindow-error,
+.orderWindow-state {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.orderWindow-message {
+  color: var(--success);
+}
+
+.orderWindow-error {
+  color: var(--danger);
+}
+
+.orderWindow-state {
+  color: var(--muted);
+}
+
+.orderDrawer-section {
+  padding-top: 32px;
+}
+
+.orderDrawer-sectionTitle {
+  margin: 0 0 22px;
+  font-size: 12px;
+  line-height: 1.2;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(82, 84, 90, 0.96);
+}
+
+.orderDrawer-rows {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+.orderDrawer-row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 2.2fr);
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+.orderDrawer-row--featured {
+  display: grid;
+  padding-top: 18px;
+}
+
+.orderDrawer-row--input {
+  align-items: stretch;
+}
+
+.orderCommissionField {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.orderCommissionField-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr) minmax(0, 0.85fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.orderCommissionField-inputWrap {
+  position: relative;
+  min-width: 0;
+}
+
+.orderCommissionField-input {
+  padding-right: 42px;
+}
+
+.orderCommissionField-clear {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  transform: translateY(-50%);
+  border: 1px solid rgba(15, 95, 215, 0.12);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1;
+  box-shadow: 0 8px 20px rgba(15, 95, 215, 0.08);
+  appearance: none;
+  display: grid;
+  place-items: center;
+}
+
+.orderCommissionField-currencyButton {
+  min-height: 42px;
+  padding: 0 8px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 12px 12px 0 0;
+  background: transparent;
+  color: rgba(100, 116, 139, 0.96);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: none;
+}
+
+.orderCommissionField-currencyButton.is-active {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(245, 248, 255, 0.96));
+  border-bottom-color: rgba(15, 95, 215, 0.88);
+  color: #0f5fd7;
+}
+
+.orderCommissionField-converted {
+  margin: 0;
+  color: rgba(82, 84, 90, 0.9);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.orderWindow-label {
+  color: rgba(82, 84, 90, 0.9);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+}
+
+.orderWindow-value {
+  color: rgba(17, 24, 39, 0.98);
+  font-size: 18px;
+  line-height: 1.15;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+
+.orderWindow-value--actionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.orderWindow-iconButton {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(100, 116, 139, 0.96);
+  box-shadow: none;
+}
+
+.orderWindow-iconButton svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.orderWindow-iconButton:hover:not(:disabled),
+.orderWindow-iconButton:focus-visible {
+  background: transparent;
+  color: rgba(71, 85, 105, 1);
+  transform: none;
+  box-shadow: none;
+}
+
+.orderWindow-input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  color: rgba(17, 24, 39, 0.98);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.orderDrawer-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.orderDrawer-actions--doc {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.orderDrawer-actions--stacked {
+  grid-template-columns: 1fr;
+  margin-top: 14px;
+}
+
+.orderWindow-button {
+  width: 100%;
+  min-height: 54px;
+  border-radius: 18px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.orderWindow-button--doc {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  min-height: 58px;
+  padding: 8px 12px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.995),
+    rgba(248, 250, 252, 0.95)
+  );
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+  color: rgba(17, 24, 39, 0.98);
+}
+
+.orderWindow-button--accent {
+  background: linear-gradient(
+    180deg,
+    rgba(31, 111, 255, 0.98),
+    rgba(15, 95, 215, 0.96)
+  );
+  color: #fff;
+}
+
+.orderWindow-button--success {
+  background: linear-gradient(
+    180deg,
+    rgba(34, 197, 94, 0.98),
+    rgba(22, 163, 74, 0.98)
+  );
+  color: #fff;
+}
+
+.orderWindow-button--success:hover:not(:disabled),
+.orderWindow-button--success:focus-visible {
+  background: linear-gradient(
+    180deg,
+    rgba(22, 163, 74, 0.98),
+    rgba(21, 128, 61, 0.98)
+  );
+}
+
+.orderWindow-button--danger {
+  background: linear-gradient(180deg, rgba(239, 68, 68, 0.98), rgba(185, 28, 28, 0.98));
+  color: #fff;
+}
+
+.orderWindow-button--danger:hover:not(:disabled),
+.orderWindow-button--danger:focus-visible {
+  background: linear-gradient(180deg, rgba(220, 38, 38, 0.98), rgba(153, 27, 27, 0.98));
+}
+
+.orderWindow-button--transfer {
+  background: rgba(15, 95, 215, 0.08);
+  color: var(--accent);
+}
+
+.orderWindow-button--secondary {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.orderDrawer-transfer {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+.orderDrawer-sectionTitleRow {
+  display: grid;
+  gap: 4px;
+}
+
+.orderDrawer-transferCopy {
+  margin: 0;
+  color: rgba(82, 84, 90, 0.9);
+  font-size: 13px;
+  line-height: 1.32;
+}
+
+.orderDrawer-transferControls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.orderWindow-field {
+  display: grid;
+  gap: 6px;
+  color: rgba(82, 84, 90, 0.9);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.orderWindow-field input {
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.orderWindow-userList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  max-height: 260px;
+  overflow: auto;
+}
+
+.orderWindow-userButton {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 12px 0;
+  text-align: left;
+  border-radius: 0;
+  border: 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+  background: transparent;
+  box-shadow: none;
+}
+
+.orderWindow-userButton.is-active {
+  color: var(--accent);
+}
+
+.orderWindow-userButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.orderWindow-userName {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.orderWindow-userMeta {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.orderDrawer-selected {
+  display: grid;
+  gap: 4px;
+  padding-top: 6px;
+}
+
+.orderPriceEditor {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(9, 15, 28, 0.36);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.orderPriceEditor-panel {
+  width: min(100%, 420px);
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+  border: 1px solid rgba(15, 95, 215, 0.12);
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.995), rgba(247, 249, 252, 0.98));
+  box-shadow: 0 26px 60px rgba(15, 23, 42, 0.18);
+}
+
+.orderPriceEditor-header {
+  display: grid;
+  gap: 6px;
+}
+
+.orderPriceEditor-title {
+  margin: 0;
+  color: rgba(17, 24, 39, 0.98);
+  font-size: 22px;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.orderPriceEditor-copy {
+  margin: 0;
+  color: rgba(82, 84, 90, 0.9);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.orderPriceEditor-field {
+  display: grid;
+  gap: 10px;
+}
+
+.orderPriceEditor-actions {
+  display: grid;
+  gap: 10px;
+}
+
+@media (max-width: 480px) {
+  .orderDrawer-panel {
+    width: 100%;
+    padding: 18px 18px 16px;
+  }
+
+  .orderDrawer-header {
+    gap: 18px;
+  }
+
+  .orderWindow-title {
+    font-size: clamp(34px, 12vw, 44px);
+  }
+
+  .orderWindow-copy {
+    font-size: 15px;
+    max-width: 100%;
+  }
+
+  .orderDrawer-section {
+    padding-top: 24px;
+  }
+
+  .orderDrawer-row {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 2.05fr);
+    gap: 12px;
+    padding: 6px 0;
+  }
+
+  .orderWindow-input {
+    min-height: 40px;
+    font-size: 15px;
+  }
+
+  .orderCommissionField-row {
+    grid-template-columns: minmax(0, 1fr) minmax(56px, 0.72fr) minmax(56px, 0.72fr);
+    gap: 6px;
+  }
+
+  .orderCommissionField-currencyButton {
+    min-height: 40px;
+    border-radius: 10px 10px 0 0;
+  }
+
+  .orderWindow-label {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+  }
+
+  .orderWindow-value {
+    font-size: 15px;
+  }
+
+  .orderWindow-iconButton {
+    width: 26px;
+    height: 26px;
+    flex-basis: 26px;
+  }
+
+  .orderPriceEditor {
+    padding: 14px;
+  }
+
+  .orderPriceEditor-panel {
+    width: 100%;
+    padding: 18px;
+    gap: 16px;
+    border-radius: 20px;
+  }
+
+  .orderPriceEditor-title {
+    font-size: 19px;
+  }
+
+  .orderDrawer-actions--stacked,
+  .orderDrawer-transferControls {
+    grid-template-columns: 1fr;
+  }
+
+  .orderDrawer-actions--doc {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .orderWindow-button {
+    min-height: 46px;
+  }
+}

@@ -1,0 +1,124 @@
+.adminUserOrdersPage {
+  display: grid;
+  gap: 10px;
+}
+
+.adminUserOrdersPage-header {
+  display: grid;
+  gap: 8px;
+}
+
+.adminUserOrdersPage-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  padding: 7px 10px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #334155;
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-decoration: none;
+  box-shadow:
+    0 10px 18px rgba(15, 23, 42, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.adminUserOrdersPage-backIcon {
+  width: 7px;
+  height: 7px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.adminUserOrdersPage-copyBlock {
+  display: grid;
+  gap: 4px;
+}
+
+.adminUserOrdersPage-title {
+  margin: 0;
+  color: #10203a;
+  font-size: 1.18rem;
+  line-height: 1.05;
+  font-weight: 900;
+}
+
+.adminUserOrdersPage-copy {
+  margin: 0;
+  color: #667085;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.adminUserOrdersPage-user {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 12px 24px rgba(15, 23, 42, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86);
+}
+
+.adminUserOrdersPage-userMain {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.adminUserOrdersPage-userName {
+  color: #122033;
+  font-size: 0.94rem;
+  font-weight: 900;
+}
+
+.adminUserOrdersPage-userEmail {
+  color: #667085;
+  font-size: 0.78rem;
+  word-break: break-word;
+}
+
+.adminUserOrdersPage-userMeta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.adminUserOrdersPage-userMetaItem {
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(51, 65, 85, 0.08);
+  color: #334155;
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.adminUserOrdersPage-state {
+  margin: 0;
+  color: #526173;
+}
+
+@media (max-width: 720px) {
+  .adminUserOrdersPage {
+    gap: 10px;
+  }
+
+  .adminUserOrdersPage-user {
+    padding: 11px 12px;
+    border-radius: 14px;
+  }
+
+  .adminUserOrdersPage-title {
+    font-size: 1.08rem;
+  }
+}

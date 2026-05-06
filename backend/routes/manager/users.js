@@ -1,4 +1,5 @@
 import { requireManager } from '../../auth/context.js';
+import { Prisma } from '@prisma/client';
 import {
   buildManagerUserSummaries,
   buildSanitizedUser,
@@ -37,6 +38,30 @@ const MANAGER_USER_SELECT = {
     },
   },
 };
+
+async function loadAvatarUrls(prismaClient, userIds) {
+  const ids = Array.isArray(userIds) ? userIds.filter(Boolean) : [];
+
+  if (!ids.length) {
+    return new Map();
+  }
+
+  const rows = await prismaClient.$queryRaw`
+    SELECT
+      id,
+      CASE
+        WHEN char_length(COALESCE(profile->>'avatarUrl', '')) <= 120000
+          THEN COALESCE(profile->>'avatarUrl', '')
+        ELSE ''
+      END AS "avatarUrl"
+    FROM users
+    WHERE id IN (${Prisma.join(ids)})
+  `;
+
+  return new Map(
+    rows.map(row => [row.id, typeof row.avatarUrl === 'string' ? row.avatarUrl : ''])
+  );
+}
 
 export async function handleManagerUserList(request, response, url) {
   const context = await requireManager(request, response);
@@ -87,6 +112,23 @@ export async function handleManagerUserList(request, response, url) {
   });
 
   let users = await buildManagerUserSummaries(prisma, rawUsers);
+  const avatarUrls = await loadAvatarUrls(
+    prisma,
+    users.map(user => user.id)
+  );
+
+  users = users.map(user => {
+    const avatarUrl = avatarUrls.get(user.id) || '';
+
+    return {
+      ...user,
+      avatarUrl,
+      profile: {
+        ...(user.profile || {}),
+        avatarUrl,
+      },
+    };
+  });
 
   if (status && status !== 'all') {
     users = users.filter(user =>

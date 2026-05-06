@@ -1,0 +1,39 @@
+.contractForm {
+  display: grid;
+  gap: 16px;
+}
+
+.contractForm-header {
+  display: grid;
+}
+
+.contractForm-title {
+  margin: 0;
+  font-size: 1.2rem;
+  letter-spacing: -0.03em;
+}
+
+.contractForm-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.contractSection {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid rgba(15, 95, 215, 0.12);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 248, 255, 0.92));
+}
+
+.contractSection-title {
+  margin: 0;
+  font-size: 0.95rem;
+  letter-spacing: -0.02em;
+}
+
+.contractSection-price {
+  padding-bottom: 14px;
+}

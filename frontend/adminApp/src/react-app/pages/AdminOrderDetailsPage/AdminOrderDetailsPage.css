@@ -1,0 +1,186 @@
+.adminOrderDetailsPage {
+  display: grid;
+  gap: 10px;
+}
+
+.adminOrderDetailsPage-header {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 12px 24px rgba(15, 23, 42, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86);
+}
+
+.adminOrderDetailsPage-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  min-height: 30px;
+  padding: 0 10px 0 8px;
+  border: 1px solid rgba(15, 95, 215, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #1d4ed8;
+  text-decoration: none;
+  font-size: 0.76rem;
+  font-weight: 800;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 8px 16px rgba(15, 23, 42, 0.04);
+}
+
+.adminOrderDetailsPage-backIcon {
+  width: 8px;
+  height: 8px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  margin-top: -1px;
+}
+
+.adminOrderDetailsPage-summary {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.adminOrderDetailsPage-summaryItem,
+.adminOrderDetailsPage-card,
+.adminOrderDetailsPage-panel {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 12px 24px rgba(15, 23, 42, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86);
+}
+
+.adminOrderDetailsPage-summaryItem {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+}
+
+.adminOrderDetailsPage-label {
+  color: #64748b;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 800;
+}
+
+.adminOrderDetailsPage-value {
+  color: #122033;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.adminOrderDetailsPage-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.adminOrderDetailsPage-card {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+}
+
+.adminOrderDetailsPage-cardTitle {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 800;
+}
+
+.adminOrderDetailsPage-cardValue {
+  margin: 0;
+  color: #122033;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.adminOrderDetailsPage-cardMeta {
+  margin: 0;
+  color: #526173;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.adminOrderDetailsPage-panel {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+}
+
+.adminOrderDetailsPage-panelTitle {
+  margin: 0;
+  color: #122033;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.adminOrderDetailsPage-json {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #334155;
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+
+.adminOrderDetailsPage-state {
+  margin: 0;
+  color: #526173;
+}
+
+@media (max-width: 720px) {
+  .adminOrderDetailsPage-header,
+  .adminOrderDetailsPage-card,
+  .adminOrderDetailsPage-panel,
+  .adminOrderDetailsPage-summaryItem {
+    border-radius: 12px;
+  }
+
+  .adminOrderDetailsPage-summary,
+  .adminOrderDetailsPage-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .adminOrderDetailsPage {
+    gap: 8px;
+  }
+
+  .adminOrderDetailsPage-header {
+    padding: 8px;
+  }
+
+  .adminOrderDetailsPage-back {
+    min-height: 28px;
+    font-size: 0.72rem;
+  }
+
+  .adminOrderDetailsPage-summaryItem,
+  .adminOrderDetailsPage-card,
+  .adminOrderDetailsPage-panel {
+    padding: 9px 10px;
+  }
+
+  .adminOrderDetailsPage-value,
+  .adminOrderDetailsPage-cardValue {
+    font-size: 0.84rem;
+  }
+
+  .adminOrderDetailsPage-cardMeta,
+  .adminOrderDetailsPage-json {
+    font-size: 0.72rem;
+  }
+}

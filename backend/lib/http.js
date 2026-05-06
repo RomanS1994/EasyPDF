@@ -1,5 +1,53 @@
 const REQUEST_CONTEXT = Symbol('requestContext');
 
+function parseOrigin(value) {
+  try {
+    return new URL(value);
+  } catch {
+    return null;
+  }
+}
+
+function isLocalhostOrigin(value) {
+  const parsed = parseOrigin(value);
+  if (!parsed) return false;
+
+  return parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1';
+}
+
+function resolveAllowedOrigin(requestOrigin, configuredOrigin) {
+  if (!requestOrigin) {
+    return configuredOrigin || '*';
+  }
+
+  if (!configuredOrigin) {
+    return requestOrigin;
+  }
+
+  const configuredOrigins = configuredOrigin
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean);
+
+  if (configuredOrigins.includes(requestOrigin)) {
+    return requestOrigin;
+  }
+
+  if (configuredOrigins.length === 1) {
+    const allowedOrigin = configuredOrigins[0];
+    const allowedParsed = parseOrigin(allowedOrigin);
+    const requestParsed = parseOrigin(requestOrigin);
+
+    if (allowedParsed && requestParsed && allowedParsed.hostname === requestParsed.hostname) {
+      if (isLocalhostOrigin(allowedOrigin) && isLocalhostOrigin(requestOrigin)) {
+        return requestOrigin;
+      }
+    }
+  }
+
+  return configuredOrigins[0] || requestOrigin;
+}
+
 function appendVaryHeader(response, value) {
   const current = response.getHeader('Vary');
   const values = new Set(
@@ -25,7 +73,7 @@ export function setCorsHeaders(response) {
   const request = getBoundRequest(response);
   const configuredOrigin = process.env.CLIENT_ORIGIN || '';
   const requestOrigin = request?.headers.origin || '';
-  const origin = configuredOrigin || requestOrigin || '*';
+  const origin = resolveAllowedOrigin(requestOrigin, configuredOrigin);
 
   response.setHeader('Access-Control-Allow-Origin', origin);
   response.setHeader(

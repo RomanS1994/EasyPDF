@@ -1,5 +1,5 @@
 import { handleManagerAudit } from './audit.js';
-import { handleManagerOrders } from './orders.js';
+import { handleManagerOrderDetail, handleManagerOrders } from './orders.js';
 import {
   handleManagerPlanCreate,
   handleManagerPlansList,
@@ -74,6 +74,12 @@ export async function handleManagerRoutes(request, response, { pathName, url }) 
 
   if (request.method === 'GET' && pathName === '/api/manager/orders') {
     await handleManagerOrders(request, response, url);
+    return true;
+  }
+
+  const managerOrderMatch = pathName.match(/^\/api\/manager\/orders\/([^/]+)$/);
+  if (request.method === 'GET' && managerOrderMatch) {
+    await handleManagerOrderDetail(request, response, managerOrderMatch[1]);
     return true;
   }
 
