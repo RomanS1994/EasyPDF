@@ -7,7 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [react()],
-  base: '/',
+  base: '/admin/',
   envDir: __dirname,
   root: __dirname,
   publicDir: path.resolve(__dirname, '../driverApp/public'),
@@ -40,7 +40,7 @@ export default defineConfig({
         },
       },
     },
-    outDir: path.resolve(__dirname, '../../dist-admin'),
+    outDir: path.resolve(__dirname, '../../dist/admin'),
     emptyOutDir: true,
   },
 });

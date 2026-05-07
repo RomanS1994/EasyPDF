@@ -4,7 +4,10 @@ import './SettingsAdminAccess.css';
 export function SettingsAdminAccess() {
   const { t } = useI18n();
   const adminAppUrl =
-    import.meta.env.VITE_ADMIN_APP_URL || 'http://localhost:4174/admin/accounts';
+    import.meta.env.VITE_ADMIN_APP_URL ||
+    (import.meta.env.DEV
+      ? 'http://localhost:4174/admin/accounts'
+      : '/admin/accounts');
 
   return (
     <section className="screenCard settingsAdminAccess">

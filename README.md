@@ -8,7 +8,7 @@ DocTra побудований як split-stack система:
 
 | Частина | Що робить |
 | --- | --- |
-| Frontend | Мультисторінкові Vite-застосунки у `frontend/driverApp/` і `frontend/adminApp/` |
+| Frontend | Мультисторінкові Vite-застосунки у `frontend/driverApp/`, `frontend/adminApp/` і `frontend/dispatcherApp/` |
 | Backend | Node HTTP API з Prisma та PostgreSQL |
 | PDF | HTML-first шаблони, що рендеряться через Puppeteer/Chromium |
 | Auth | `Authorization: Bearer <token>` + rotating refresh cookie |
@@ -70,14 +70,15 @@ dist/      generated production build output (ignored in git)
 - `frontend/adminApp/src/react-app/pages` contains the admin route pages.
 - `frontend/adminApp/src/react-app/features/admin` contains the back-office admin UI components.
 - `frontend/shared/src/react-app/features/admin` contains the shared admin data API used by both apps.
-- `frontend/dispatcherApp` is reserved for the future dispatcher app.
+- `frontend/dispatcherApp` is reserved for the future dispatcher app and is built into `/dispatcher/` in the shared Netlify deploy.
 
 ## Основні сторінки
 
 | Зона | Шляхи |
 | --- | --- |
 | Driver app | `/`, `/orders/`, `/history/`, `/stats/`, `/account/`, `/settings/` |
-| Admin app | `/admin/`, `/admin/accounts/`, `/admin/subscriptions/`, `/admin/orders/`, `/admin/settings/`, `/admin/settings/language/`, `/admin/settings/plans/`, `/admin/settings/audit/` |
+| Admin app | `/admin/`, `/admin/accounts/`, `/admin/accounts/:userId`, `/admin/orders/`, `/admin/orders/users/:userId`, `/admin/orders/view/:orderId`, `/admin/settings/`, `/admin/settings/language/`, `/admin/settings/audit/` |
+| Dispatcher app | `/dispatcher/` |
 
 ## Локальний запуск
 
@@ -96,6 +97,8 @@ npm run dev
 Після старту:
 
 - frontend: `http://localhost:5173`
+- admin: `http://localhost:4174/admin/`
+- dispatcher: `http://localhost:4175/dispatcher/`
 - backend: `http://localhost:3001`
 - основний mount-point застосунку: `/`
 
@@ -113,9 +116,10 @@ npm run dev
 | `VITE_SUPPORT_WHATSAPP_URL` | ні | Посилання для ручного підтвердження оплати |
 | `VITE_SUPPORT_TELEGRAM_URL` | ні | Додаткове посилання підтримки |
 | `VITE_ADMIN_APP_URL` | ні | Повний URL або path до admin app, якщо вона окремо від driver app |
+| `VITE_DRIVER_APP_URL` | ні | Повний URL або path до driver app, якщо вона відкривається з admin app |
 
 Фронтенд-env файли зберігаються в `frontend/driverApp/.env` та `frontend/driverApp/.env.example`.
-Для локальної admin app використовуйте `npm run dev:admin` і окремий `VITE_ADMIN_APP_URL`, наприклад `http://localhost:4174/admin/accounts`.
+Для локальної admin app використовуйте `npm run dev:admin` і окремий `VITE_ADMIN_APP_URL`, наприклад `http://localhost:4174/admin/accounts`. У production на одному домені краще використовувати same-origin path на кшталт `/admin/accounts`.
 
 ### Backend (`backend/.env`)
 
@@ -134,12 +138,15 @@ npm run dev
 
 | Команда | Що робить |
 | --- | --- |
-| `npm run dev` | Запускає driver app, admin app і backend одночасно |
+| `npm run dev` | Запускає driver app, admin app, dispatcher app і backend одночасно |
 | `npm run dev:client` | Запускає лише Vite frontend |
 | `npm run dev:admin` | Запускає лише Vite admin frontend на окремому порті |
+| `npm run dev:dispatcher` | Запускає лише Vite dispatcher frontend на окремому порті |
 | `npm run dev:server` | Запускає лише backend |
-| `npm run build` | Збирає production build у `dist/` |
-| `npm run build:admin` | Збирає production build admin app у `dist-admin/` |
+| `npm run build` | Збирає production build driver, admin і dispatcher у `dist/` |
+| `npm run build:driver` | Збирає production build driver app у `dist/` |
+| `npm run build:admin` | Збирає production build admin app у `dist/admin/` |
+| `npm run build:dispatcher` | Збирає production build dispatcher app у `dist/dispatcher/` |
 | `npm run preview` | Локальний preview зібраного frontend |
 | `npm run db:generate` | `prisma generate` у `backend/` |
 | `npm run db:migrate` | Локальна Prisma migration |
@@ -207,12 +214,23 @@ npm run dev
 
 ### Frontend на Netlify
 
-- base directory: `frontend/driverApp`
+Один Netlify site:
+
+- `/` -> driver app
+- `/admin/` -> admin app
+- `/dispatcher/` -> dispatcher app
+
 - install command: `npm install`
 - build command: `npm run build`
 - publish directory: `dist`
 - required env: `VITE_API_BASE_URL`
-- optional env: `VITE_API_KEY`, `VITE_GOOGLE_MAPS_API_KEY`, `VITE_SUPPORT_WHATSAPP_URL`, `VITE_SUPPORT_TELEGRAM_URL`, `VITE_ADMIN_APP_URL`
+- optional env: `VITE_API_KEY`, `VITE_GOOGLE_MAPS_API_KEY`, `VITE_SUPPORT_WHATSAPP_URL`, `VITE_SUPPORT_TELEGRAM_URL`, `VITE_ADMIN_APP_URL`, `VITE_DRIVER_APP_URL`
+
+Netlify rewrites:
+
+- `/admin/*` -> `/admin/index.html`
+- `/dispatcher/*` -> `/dispatcher/index.html`
+- `/*` -> `/index.html`
 
 ### Backend на Render або іншому Node-host
 

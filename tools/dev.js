@@ -33,4 +33,5 @@ process.on('SIGTERM', shutdown);
 
 run('client', 'dev:client');
 run('admin', 'dev:admin');
+run('dispatcher', 'dev:dispatcher');
 run('server', 'dev:server');

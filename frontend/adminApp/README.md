@@ -10,3 +10,8 @@ Back-office frontend for admin and manager flows.
 ## Entry point
 
 - `frontend/adminApp/index.html`
+
+## Deploy
+
+- Production base path: `/admin/`
+- Netlify output folder: `dist/admin/`

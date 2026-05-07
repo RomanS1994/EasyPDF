@@ -4,7 +4,7 @@ This directory now holds the client-side apps.
 
 - `driverApp/` - current production app for drivers
 - `adminApp/` - future admin UI
-- `dispatcherApp/` - future dispatcher UI
+- `dispatcherApp/` - future dispatcher UI, deployed under `/dispatcher/`
 
 ## Status
 

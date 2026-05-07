@@ -6,7 +6,8 @@ import './AdminSettingsPage.css';
 export function AdminSettingsPage() {
   const { t } = useI18n();
   const driverAccountUrl =
-    import.meta.env.VITE_DRIVER_ACCOUNT_URL || 'http://localhost:5173/account';
+    import.meta.env.VITE_DRIVER_APP_URL ||
+    (import.meta.env.DEV ? 'http://localhost:5173/account' : '/account');
 
   function handleOpenDriverAccount() {
     window.open(driverAccountUrl, '_blank', 'noopener,noreferrer');
