@@ -2,20 +2,67 @@ import { randomUUID } from 'node:crypto';
 
 import { nowIso } from '../validation/common.js';
 
-export function generateOrderNumber() {
-  const suffix = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `ORD-${Date.now()}-${suffix}`;
+function stripAccents(value) {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
 }
 
-export function buildOrderRecord(body, user) {
+function getUserOrderCode(user) {
+  const source = stripAccents([user?.name, user?.email].filter(Boolean).join(' ')).toUpperCase();
+  const parts = source.match(/[A-Z0-9]+/g) || [];
+
+  if (parts.length >= 2) {
+    return `${parts[0][0] || 'X'}${parts[parts.length - 1][0] || 'X'}`;
+  }
+
+  if (parts.length === 1) {
+    return (parts[0].slice(0, 2) || 'XX').padEnd(2, 'X');
+  }
+
+  return 'XX';
+}
+
+function formatOrderDate(createdAt) {
+  const date = createdAt instanceof Date ? createdAt : new Date(createdAt);
+
+  if (Number.isNaN(date.getTime())) {
+    return nowIso().slice(0, 10).replace(/-/g, '');
+  }
+
+  const year = String(date.getUTCFullYear());
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  return `${year}${month}${day}`;
+}
+
+function formatOrderSequence(sequence) {
+  const value = Number.parseInt(sequence, 10);
+  if (!Number.isFinite(value) || value < 1) {
+    return '01';
+  }
+
+  return String(value).padStart(2, '0');
+}
+
+function generateOrderNumber(user, createdAt, sequence = 1) {
+  const initials = getUserOrderCode(user);
+  const datePart = formatOrderDate(createdAt);
+  const sequencePart = formatOrderSequence(sequence);
+  const suffix = Math.random().toString(36).slice(2, 6).toUpperCase();
+
+  return `ORD-${initials}-${datePart}-${sequencePart}-${suffix}`;
+}
+
+export function buildOrderRecord(body, user, options = {}) {
   const contractData = body.contractData || body.order || {};
-  const createdAt = nowIso();
+  const createdAt = options.createdAt || nowIso();
+  const orderSequence = options.orderSequence || 1;
 
   return {
     id: randomUUID(),
     userId: user.id,
-    orderNumber:
-      contractData.orderNumber || body.orderNumber || generateOrderNumber(),
+    orderNumber: generateOrderNumber(user, createdAt, orderSequence),
     status: body.status || 'created',
     source: body.source || 'pdf-app',
     customer: {

@@ -15,6 +15,23 @@ import { buildOrderRecord } from '../services/orders.js';
 import { validateOrderCreateInput } from '../validation/orders.js';
 import { nowIso, normalizePaginationParams, normalizeText } from '../validation/common.js';
 
+function getUtcDayBounds(isoValue) {
+  const date = new Date(isoValue);
+  if (Number.isNaN(date.getTime())) {
+    const fallback = new Date();
+    fallback.setUTCHours(0, 0, 0, 0);
+    const next = new Date(fallback);
+    next.setUTCDate(next.getUTCDate() + 1);
+    return { start: fallback, end: next };
+  }
+
+  const start = new Date(date);
+  start.setUTCHours(0, 0, 0, 0);
+  const end = new Date(start);
+  end.setUTCDate(end.getUTCDate() + 1);
+  return { start, end };
+}
+
 async function handleCreateOrder(request, response) {
   const context = await getAuthContext(request, response);
   if (!context) return;
@@ -54,7 +71,21 @@ async function handleCreateOrder(request, response) {
         throw new Error('Subscription limit reached');
       }
 
-      const nextOrder = buildOrderRecord(body, freshUser);
+      const createdAt = nowIso();
+      const { start, end } = getUtcDayBounds(createdAt);
+      const orderSequence = (await tx.order.count({
+        where: {
+          userId: freshUser.id,
+          createdAt: {
+            gte: start,
+            lt: end,
+          },
+        },
+      })) + 1;
+      const nextOrder = buildOrderRecord(body, freshUser, {
+        createdAt,
+        orderSequence,
+      });
       const createdOrder = await tx.order.create({
         data: {
           id: nextOrder.id,
