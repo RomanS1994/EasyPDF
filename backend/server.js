@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import { requireApiKey } from './auth/api-key.js';
 import { assertRuntimeEnv } from './config/runtime-env.js';
 import { ensureDefaultPlans } from './db/plans-store.js';
+import { syncSubscriptionPlanLimits } from './db/subscription-limits-store.js';
 import { bindRequestContext, handleCors } from './lib/http.js';
 import { sendHttpError } from './lib/errors.js';
 import { routeRequest } from './routes/index.js';
@@ -37,10 +38,26 @@ const server = http.createServer(async (request, response) => {
   }
 });
 
-async function startServer() {
+async function synchronizeSubscriptionLimits() {
+  try {
+    const updatedCount = await syncSubscriptionPlanLimits(prisma);
+    if (updatedCount > 0) {
+      console.info(`Synchronized ${updatedCount} subscription limits with their assigned plans.`);
+    }
+  } catch (error) {
+    console.warn(
+      `Failed to synchronize subscription limits: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
+  }
+}
+
+async function initializeDatabase() {
   try {
     await prisma.$connect();
     await ensureDefaultPlans(prisma);
+    await synchronizeSubscriptionLimits();
   } catch (error) {
     throw new Error(
       `Failed to start backend against PostgreSQL via Prisma: ${
@@ -48,6 +65,10 @@ async function startServer() {
       }`
     );
   }
+}
+
+async function startServer() {
+  await initializeDatabase();
 
   server.listen(PORT, () => {
     console.log(`pdf.app backend is running on http://localhost:${PORT}`);

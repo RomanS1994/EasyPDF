@@ -124,11 +124,15 @@ export function resolveSubscriptionView({
   const periodEnded = currentPeriodEnd < nowIso();
   const resolvedStatus =
     periodEnded && normalizedStatus === 'active' ? 'expired' : normalizedStatus;
-  const monthlyGenerationLimit = normalizeInteger(
+  const storedMonthlyGenerationLimit = normalizeInteger(
     source.monthlyGenerationLimit,
     resolvedPlan.monthlyGenerationLimit
   );
   const quotaOverride = normalizeInteger(source.quotaOverride, null);
+  const monthlyGenerationLimit =
+    quotaOverride === null
+      ? normalizeInteger(resolvedPlan.monthlyGenerationLimit, storedMonthlyGenerationLimit)
+      : storedMonthlyGenerationLimit;
   const effectiveLimit =
     quotaOverride !== null ? quotaOverride : monthlyGenerationLimit || resolvedPlan.monthlyGenerationLimit || 0;
 

@@ -131,6 +131,7 @@ export const baseApi = createApi({
   tagTypes: [
     'Orders',
     'Usage',
+    'Me',
     'AdminUsers',
     'AdminPlans',
     'AdminOrders',

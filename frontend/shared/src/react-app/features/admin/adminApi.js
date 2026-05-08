@@ -47,6 +47,8 @@ export const adminApi = baseApi.injectEndpoints({
       invalidatesTags: (_result, _error, { userId }) => [
         { type: 'AdminUsers', id: 'LIST' },
         { type: 'AdminUsers', id: userId },
+        { type: 'Usage', id: 'CURRENT' },
+        { type: 'Me', id: 'CURRENT' },
         { type: 'AuditLogs', id: 'LIST' },
       ],
     }),

@@ -30,6 +30,7 @@ export const authApi = baseApi.injectEndpoints({
     }),
     getMe: builder.query({
       query: () => '/me',
+      providesTags: [{ type: 'Me', id: 'CURRENT' }],
     }),
     getUsage: builder.query({
       query: () => '/me/usage',
@@ -49,6 +50,10 @@ export const authApi = baseApi.injectEndpoints({
         method: 'POST',
         body,
       }),
+      invalidatesTags: [
+        { type: 'Usage', id: 'CURRENT' },
+        { type: 'Me', id: 'CURRENT' },
+      ],
       transformResponse: response => response.user || response,
     }),
     deleteMe: builder.mutation({

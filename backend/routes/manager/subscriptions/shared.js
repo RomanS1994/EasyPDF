@@ -1,9 +1,20 @@
-export function resolveNextMonthlyGenerationLimit(body, before, nextPlanId) {
-  return body.monthlyGenerationLimit !== undefined &&
+export function resolveNextMonthlyGenerationLimit(
+  body,
+  before,
+  nextPlanId,
+  nextPlanMonthlyGenerationLimit
+) {
+  if (
+    body.monthlyGenerationLimit !== undefined &&
     body.monthlyGenerationLimit !== null &&
     body.monthlyGenerationLimit !== ''
-    ? body.monthlyGenerationLimit
-    : nextPlanId === before.planId
-      ? before.monthlyGenerationLimit
-      : undefined;
+  ) {
+    return body.monthlyGenerationLimit;
+  }
+
+  if (nextPlanId === before.planId) {
+    return before.monthlyGenerationLimit;
+  }
+
+  return nextPlanMonthlyGenerationLimit;
 }

@@ -14,6 +14,29 @@ import {
 import { nowIso } from '../../../validation/common.js';
 import { resolveNextMonthlyGenerationLimit } from './shared.js';
 
+function toDateOrNull(value) {
+  return value ? new Date(value) : null;
+}
+
+function buildSubscriptionPersistenceData(subscriptionData) {
+  return {
+    planId: subscriptionData.planId,
+    status: subscriptionData.status,
+    source: subscriptionData.source,
+    currentPeriodStart: new Date(subscriptionData.currentPeriodStart),
+    currentPeriodEnd: new Date(subscriptionData.currentPeriodEnd),
+    monthlyGenerationLimit: subscriptionData.monthlyGenerationLimit,
+    quotaOverride: subscriptionData.quotaOverride,
+    assignedByUserId: subscriptionData.assignedByUserId,
+    assignedAt: new Date(subscriptionData.assignedAt),
+    notes: subscriptionData.notes,
+    canceledAt: toDateOrNull(subscriptionData.canceledAt),
+    pendingPlanId: subscriptionData.pendingPlanId,
+    pendingRequestedAt: toDateOrNull(subscriptionData.pendingRequestedAt),
+    pendingSource: subscriptionData.pendingSource,
+  };
+}
+
 export async function handleManagerUserSubscription(request, response, userId) {
   const context = await requireManager(request, response);
   if (!context) return;
@@ -56,57 +79,23 @@ export async function handleManagerUserSubscription(request, response, userId) {
           monthlyGenerationLimit: resolveNextMonthlyGenerationLimit(
             body,
             before,
-            nextPlanId
+            nextPlanId,
+            selectedPlan.monthlyGenerationLimit
           ),
         },
         actorUserId: context.user.id,
       });
+      const subscriptionRecord = buildSubscriptionPersistenceData(subscriptionData);
 
       await tx.subscription.upsert({
         where: {
           userId: target.id,
         },
-        update: {
-          planId: subscriptionData.planId,
-          status: subscriptionData.status,
-          source: subscriptionData.source,
-          currentPeriodStart: new Date(subscriptionData.currentPeriodStart),
-          currentPeriodEnd: new Date(subscriptionData.currentPeriodEnd),
-          monthlyGenerationLimit: subscriptionData.monthlyGenerationLimit,
-          quotaOverride: subscriptionData.quotaOverride,
-          assignedByUserId: subscriptionData.assignedByUserId,
-          assignedAt: new Date(subscriptionData.assignedAt),
-          notes: subscriptionData.notes,
-          canceledAt: subscriptionData.canceledAt
-            ? new Date(subscriptionData.canceledAt)
-            : null,
-          pendingPlanId: subscriptionData.pendingPlanId,
-          pendingRequestedAt: subscriptionData.pendingRequestedAt
-            ? new Date(subscriptionData.pendingRequestedAt)
-            : null,
-          pendingSource: subscriptionData.pendingSource,
-        },
+        update: subscriptionRecord,
         create: {
           id: target.id,
           userId: target.id,
-          planId: subscriptionData.planId,
-          status: subscriptionData.status,
-          source: subscriptionData.source,
-          currentPeriodStart: new Date(subscriptionData.currentPeriodStart),
-          currentPeriodEnd: new Date(subscriptionData.currentPeriodEnd),
-          monthlyGenerationLimit: subscriptionData.monthlyGenerationLimit,
-          quotaOverride: subscriptionData.quotaOverride,
-          assignedByUserId: subscriptionData.assignedByUserId,
-          assignedAt: new Date(subscriptionData.assignedAt),
-          notes: subscriptionData.notes,
-          canceledAt: subscriptionData.canceledAt
-            ? new Date(subscriptionData.canceledAt)
-            : null,
-          pendingPlanId: subscriptionData.pendingPlanId,
-          pendingRequestedAt: subscriptionData.pendingRequestedAt
-            ? new Date(subscriptionData.pendingRequestedAt)
-            : null,
-          pendingSource: subscriptionData.pendingSource,
+          ...subscriptionRecord,
         },
       });
 
