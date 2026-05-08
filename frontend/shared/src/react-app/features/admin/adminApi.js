@@ -99,8 +99,30 @@ export const adminApi = baseApi.injectEndpoints({
       },
     }),
     getAdminOrder: builder.query({
-      query: orderId => buildAdminPath(`/orders/${orderId}`),
-      providesTags: (_result, _error, orderId) => [
+      query: queryArg => {
+        if (typeof queryArg === 'string') {
+          return buildAdminPath(`/orders/${queryArg}`);
+        }
+
+        const orderId = queryArg?.orderId || '';
+        const state = queryArg?.state || '';
+
+        return {
+          url: buildAdminPath(`/orders/${orderId}`),
+          params: state ? { state } : undefined,
+        };
+      },
+      providesTags: (_result, _error, queryArg) => [
+        { type: 'AdminOrders', id: typeof queryArg === 'string' ? queryArg : queryArg?.orderId },
+      ],
+    }),
+    restoreOrder: builder.mutation({
+      query: ({ orderId }) => ({
+        url: buildAdminPath(`/orders/${orderId}/restore`),
+        method: 'POST',
+      }),
+      invalidatesTags: (_result, _error, { orderId }) => [
+        { type: 'AdminOrders', id: 'LIST' },
         { type: 'AdminOrders', id: orderId },
       ],
     }),
@@ -131,5 +153,6 @@ export const {
   useUpdatePlanMutation,
   useGetAdminOrdersQuery,
   useGetAdminOrderQuery,
+  useRestoreOrderMutation,
   useGetAuditLogsQuery,
 } = adminApi;

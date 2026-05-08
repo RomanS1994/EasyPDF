@@ -51,6 +51,14 @@ export const ORDER_WITH_OWNER_INCLUDE = {
   },
 };
 
+export const ARCHIVED_ORDER_WITH_OWNER_INCLUDE = {
+  user: {
+    include: {
+      subscription: true,
+    },
+  },
+};
+
 export const ORDER_LIST_SELECT = {
   id: true,
   orderNumber: true,
@@ -65,6 +73,22 @@ export const ORDER_LIST_SELECT = {
 
 export const ORDER_LIST_WITH_OWNER_SELECT = {
   ...ORDER_LIST_SELECT,
+  user: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+    },
+  },
+};
+
+export const ARCHIVED_ORDER_LIST_SELECT = {
+  ...ORDER_LIST_SELECT,
+  deletedAt: true,
+};
+
+export const ARCHIVED_ORDER_LIST_WITH_OWNER_SELECT = {
+  ...ARCHIVED_ORDER_LIST_SELECT,
   user: {
     select: {
       id: true,
@@ -271,6 +295,7 @@ export function sanitizeOrderListRecord(order) {
     metadata: order.metadata || {},
     createdAt: toIsoString(order.createdAt),
     updatedAt: toIsoString(order.updatedAt),
+    deletedAt: toIsoString(order.deletedAt),
     ...(order.user
       ? {
           user: {

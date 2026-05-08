@@ -1,9 +1,13 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
 
 import { getApiErrorMessage } from '@shared/app/api/getApiErrorMessage.js';
 import { formatDateTime } from '@shared/app/utils/dateFormat.js';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
-import { useGetAdminOrderQuery } from '@shared/features/admin/adminApi.js';
+import {
+  useGetAdminOrderQuery,
+  useRestoreOrderMutation,
+} from '@shared/features/admin/adminApi.js';
 import './AdminOrderDetailsPage.css';
 
 function getFieldValue(value) {
@@ -24,14 +28,25 @@ function getFieldValue(value) {
 
 export function AdminOrderDetailsPage() {
   const { t } = useI18n();
+  const navigate = useNavigate();
+  const [restoreError, setRestoreError] = useState('');
+  const [searchParams] = useSearchParams();
   const { orderId } = useParams();
-  const { data, isLoading, isError, error } = useGetAdminOrderQuery(orderId, {
-    skip: !orderId,
-  });
+  const state = searchParams.get('state') === 'deleted' ? 'deleted' : 'active';
+  const [restoreOrder, { isLoading: isRestoring }] = useRestoreOrderMutation();
+  const { data, isLoading, isError, error } = useGetAdminOrderQuery(
+    { orderId, state },
+    {
+      skip: !orderId,
+    }
+  );
   const order = data?.order || data || {};
   const createdAt = formatDateTime(order.createdAt, 'uk');
   const updatedAt = formatDateTime(order.updatedAt, 'uk');
-  const backToUserOrders = order.user?.id ? `/admin/orders/users/${order.user.id}` : '/admin/orders';
+  const isDeleted = state === 'deleted' || Boolean(order.deletedAt);
+  const backToUserOrders = order.user?.id
+    ? `/admin/orders/users/${order.user.id}?state=${state}`
+    : '/admin/orders';
 
   if (isLoading) {
     return (
@@ -56,6 +71,10 @@ export function AdminOrderDetailsPage() {
           <span className="adminOrderDetailsPage-backIcon" aria-hidden="true" />
           {t('common.back')}
         </Link>
+
+        {isDeleted ? (
+          <span className="adminOrderDetailsPage-badge">{t('common.deleted')}</span>
+        ) : null}
 
         <div className="adminOrderDetailsPage-summary">
           <div className="adminOrderDetailsPage-summaryItem">
@@ -92,6 +111,35 @@ export function AdminOrderDetailsPage() {
           <p className="adminOrderDetailsPage-cardMeta">{updatedAt}</p>
         </section>
       </div>
+
+      {isDeleted ? (
+        <section className="adminOrderDetailsPage-restorePanel">
+          <div className="adminOrderDetailsPage-restoreCopy">
+            <h3 className="adminOrderDetailsPage-panelTitle">{t('adminOrderDetails.restoreTitle')}</h3>
+            <p className="adminOrderDetailsPage-restoreText">
+              {t('adminOrderDetails.restoreCopy')}
+            </p>
+            {restoreError ? <p className="adminOrderDetailsPage-restoreError">{restoreError}</p> : null}
+          </div>
+          <button
+            className="adminOrderDetailsPage-restoreButton"
+            type="button"
+            onClick={async () => {
+              setRestoreError('');
+
+              try {
+                await restoreOrder({ orderId }).unwrap();
+                navigate(order.user?.id ? `/admin/orders/users/${order.user.id}?state=active` : '/admin/orders');
+              } catch (error) {
+                setRestoreError(getApiErrorMessage(error, t('adminOrderDetails.failedRestoreOrder')));
+              }
+            }}
+            disabled={isRestoring}
+          >
+            {isRestoring ? t('common.restoring') : t('common.restore')}
+          </button>
+        </section>
+      ) : null}
 
       <section className="adminOrderDetailsPage-panel">
         <h3 className="adminOrderDetailsPage-panelTitle">{t('admin.orderDetails')}</h3>

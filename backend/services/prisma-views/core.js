@@ -309,6 +309,7 @@ export function sanitizeOrderFromRecords(order, owner = null) {
     metadata: order.metadata || {},
     createdAt: toIsoString(order.createdAt),
     updatedAt: toIsoString(order.updatedAt),
+    deletedAt: toIsoString(order.deletedAt),
     user: owner
       ? {
           id: owner.id,

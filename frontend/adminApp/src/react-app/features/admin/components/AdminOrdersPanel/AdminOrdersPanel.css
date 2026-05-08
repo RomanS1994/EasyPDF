@@ -22,6 +22,25 @@
   gap: 10px;
 }
 
+.adminOrdersPanel-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.adminOrdersPanel-count {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(51, 65, 85, 0.06);
+  color: #526173;
+  font-size: 0.68rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 .adminOrdersPanel-title {
   margin: 0;
   color: #122033;
@@ -93,6 +112,10 @@
 
   .adminOrdersPanel-header {
     gap: 8px;
+  }
+
+  .adminOrdersPanel-counts {
+    gap: 4px;
   }
 
   .adminOrdersPanel-title {

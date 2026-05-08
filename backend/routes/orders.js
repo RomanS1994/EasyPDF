@@ -251,6 +251,25 @@ async function handleDeleteOrder(request, response, orderId) {
         after: null,
       });
 
+      await tx.archivedOrder.create({
+        data: {
+          id: order.id,
+          userId: order.userId,
+          orderNumber: order.orderNumber,
+          status: order.status,
+          source: order.source,
+          customer: order.customer,
+          trip: order.trip,
+          totalPrice: order.totalPrice,
+          pdf: order.pdf,
+          contractData: order.contractData,
+          metadata: order.metadata,
+          createdAt: order.createdAt,
+          updatedAt: order.updatedAt,
+          deletedAt: new Date(nowIso()),
+        },
+      });
+
       await tx.order.delete({
         where: {
           id: orderId,

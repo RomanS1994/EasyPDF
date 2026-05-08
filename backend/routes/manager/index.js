@@ -1,5 +1,9 @@
 import { handleManagerAudit } from './audit.js';
-import { handleManagerOrderDetail, handleManagerOrders } from './orders.js';
+import {
+  handleManagerOrderDetail,
+  handleManagerOrders,
+  handleManagerOrderRestore,
+} from './orders.js';
 import {
   handleManagerPlanCreate,
   handleManagerPlansList,
@@ -79,7 +83,15 @@ export async function handleManagerRoutes(request, response, { pathName, url }) 
 
   const managerOrderMatch = pathName.match(/^\/api\/manager\/orders\/([^/]+)$/);
   if (request.method === 'GET' && managerOrderMatch) {
-    await handleManagerOrderDetail(request, response, managerOrderMatch[1]);
+    await handleManagerOrderDetail(request, response, managerOrderMatch[1], url);
+    return true;
+  }
+
+  const managerOrderRestoreMatch = pathName.match(
+    /^\/api\/manager\/orders\/([^/]+)\/restore$/
+  );
+  if (request.method === 'POST' && managerOrderRestoreMatch) {
+    await handleManagerOrderRestore(request, response, managerOrderRestoreMatch[1]);
     return true;
   }
 
