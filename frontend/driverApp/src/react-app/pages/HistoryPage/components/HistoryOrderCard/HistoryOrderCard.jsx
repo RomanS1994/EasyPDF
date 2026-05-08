@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useI18n } from '@shared/app/i18n/useI18n.js';
@@ -8,11 +9,31 @@ import {
   getOrderTripTime,
   getTotalPrice,
 } from '../../historyUtils.js';
+import { HistoryRouteModal } from '../HistoryRouteModal/HistoryRouteModal.jsx';
 import './HistoryOrderCard.css';
+
+function RouteOpenIcon() {
+  return (
+    <svg viewBox="0 0 20 20" focusable="false" aria-hidden="true">
+      <path
+        d="M7 4.5 12.5 10 7 15.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 function HistoryOrderCard({ order, onOpen }) {
   const navigate = useNavigate();
   const { t } = useI18n();
+  const [routeModal, setRouteModal] = useState({
+    address: '',
+    label: '',
+  });
   const status = getHistoryBucket(order);
   const customerName = getCustomerName(order);
   const totalPrice = getTotalPrice(order);
@@ -28,6 +49,26 @@ function HistoryOrderCard({ order, onOpen }) {
     order?.trip?.to ||
     '';
   const hasRoute = Boolean(routeFrom && routeTo);
+
+  function handleOpenRouteModal(event, address, label) {
+    event.stopPropagation();
+
+    if (!address) {
+      return;
+    }
+
+    setRouteModal({
+      address,
+      label,
+    });
+  }
+
+  function handleCloseRouteModal() {
+    setRouteModal({
+      address: '',
+      label: '',
+    });
+  }
 
   function handleOpenDisplay(event) {
     event.stopPropagation();
@@ -78,8 +119,26 @@ function HistoryOrderCard({ order, onOpen }) {
             <p className={`orderItemRoute ${hasRoute ? '' : 'is-placeholder'}`}>
               {hasRoute ? (
                 <>
-                  <span className="orderItemRouteLine">{routeFrom}</span>
-                  <span className="orderItemRouteLine">{routeTo}</span>
+                  <button
+                    className="orderItemRouteLineButton"
+                    type="button"
+                    onClick={(event) => handleOpenRouteModal(event, routeFrom, t('history.routeFrom'))}
+                  >
+                    <span className="orderItemRouteLine">{routeFrom}</span>
+                    <span className="orderItemRouteLineArrow" aria-hidden="true">
+                      <RouteOpenIcon />
+                    </span>
+                  </button>
+                  <button
+                    className="orderItemRouteLineButton"
+                    type="button"
+                    onClick={(event) => handleOpenRouteModal(event, routeTo, t('history.routeTo'))}
+                  >
+                    <span className="orderItemRouteLine">{routeTo}</span>
+                    <span className="orderItemRouteLineArrow" aria-hidden="true">
+                      <RouteOpenIcon />
+                    </span>
+                  </button>
                 </>
               ) : (
                 t('history.routeNotAdded')
@@ -100,6 +159,15 @@ function HistoryOrderCard({ order, onOpen }) {
           </span>
         </div>
       </article>
+
+      {routeModal.address ? (
+        <HistoryRouteModal
+          address={routeModal.address}
+          label={routeModal.label}
+          onClose={handleCloseRouteModal}
+          t={t}
+        />
+      ) : null}
     </li>
   );
 }

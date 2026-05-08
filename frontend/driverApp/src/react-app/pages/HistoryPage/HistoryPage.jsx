@@ -12,34 +12,26 @@ import './HistoryPage.css';
 export function HistoryPage() {
   const [activeTab, setActiveTab] = useState('today');
   const [dateFilter, setDateFilter] = useState('');
-  const [sortKey, setSortKey] = useState('newest');
+  const [sortKey, setSortKey] = useState('oldest');
   const [selectedOrderId, setSelectedOrderId] = useState('');
   const { data, isLoading, isError } = useGetOrdersQuery();
   const { t } = useI18n();
   const orders = data?.orders || [];
 
-  const filteredByDate = useMemo(() => {
+  const filteredOrders = useMemo(() => {
     if (!dateFilter) {
       return orders;
     }
 
-    const filteredOrders = [];
-
-    for (const order of orders) {
-      if (getHistoryDateKey(order) === dateFilter) {
-        filteredOrders.push(order);
-      }
-    }
-
-    return filteredOrders;
+    return orders.filter(order => getHistoryDateKey(order) === dateFilter);
   }, [dateFilter, orders]);
 
-  const tabCounts = useMemo(() => buildTabCounts(filteredByDate), [filteredByDate]);
+  const tabCounts = useMemo(() => buildTabCounts(orders), [orders]);
 
   const visibleOrders = useMemo(() => {
     const list = [];
 
-    for (const order of filteredByDate) {
+    for (const order of filteredOrders) {
       const bucket = getHistoryBucket(order).bucket;
       if (bucket !== activeTab) {
         continue;
@@ -49,11 +41,7 @@ export function HistoryPage() {
     }
 
     return [...list].sort((left, right) => compareOrders(left, right, sortKey));
-  }, [activeTab, filteredByDate, sortKey]);
-
-  function handleResetDate() {
-    setDateFilter('');
-  }
+  }, [activeTab, filteredOrders, sortKey]);
 
   function handleCloseDetails() {
     setSelectedOrderId('');
@@ -76,7 +64,7 @@ export function HistoryPage() {
         <HistoryToolbar
           dateFilter={dateFilter}
           onDateChange={setDateFilter}
-          onResetDate={handleResetDate}
+          onResetDate={() => setDateFilter('')}
           sortKey={sortKey}
           onSortChange={setSortKey}
         />
@@ -86,7 +74,7 @@ export function HistoryPage() {
 
         {!isLoading && !isError && !visibleOrders.length ? (
           <p className="orderHistoryEmpty">
-            {orders.length ? t('history.noMatch') : t('history.empty')}
+            {dateFilter ? t('history.noMatch') : orders.length ? t('history.emptyTab') : t('history.empty')}
           </p>
         ) : null}
 

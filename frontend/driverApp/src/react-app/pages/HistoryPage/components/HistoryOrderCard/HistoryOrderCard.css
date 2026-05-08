@@ -213,11 +213,66 @@
   font-size: 13px;
   line-height: 1.25;
   display: grid;
-  gap: 2px;
+  gap: 10px;
   min-width: 0;
 }
 
+.orderItemRouteLineButton {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 2px 0;
+  border: 0;
+  border-bottom: 1px solid rgba(87, 96, 116, 0.14);
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    color 150ms ease,
+    border-color 150ms ease,
+    transform 150ms ease;
+}
+
+.orderItemRouteLineButton:last-child {
+  border-bottom-color: transparent;
+}
+
+.orderItemRouteLineButton:focus-visible {
+  outline: none;
+}
+
+.orderItemRouteLineButton:hover,
+.orderItemRouteLineButton:focus-visible {
+  color: #0f5fd7;
+  border-bottom-color: rgba(15, 95, 215, 0.3);
+  transform: translateX(2px);
+}
+
+.orderItemRouteLineButton:hover .orderItemRouteLine,
+.orderItemRouteLineButton:focus-visible .orderItemRouteLine,
+.orderItemRouteLineButton:hover .orderItemRouteLineArrow,
+.orderItemRouteLineButton:focus-visible .orderItemRouteLineArrow {
+  color: #0f5fd7;
+}
+
+.orderItemRouteLineArrow {
+  display: grid;
+  place-items: center;
+  color: #7b8798;
+}
+
+.orderItemRouteLineArrow svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
 .orderItemRouteLine {
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -274,8 +329,9 @@
 
 .orderItemDate {
   font-variant-numeric: tabular-nums;
-  font-size: 12px;
-  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  color: #5f6f86;
   text-align: right;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -344,6 +400,7 @@
 
   .orderItemRoute {
     font-size: 12px;
+    gap: 5px;
   }
 
   .orderItemPrice {
@@ -351,6 +408,6 @@
   }
 
   .orderItemDate {
-    font-size: 11px;
+    font-size: 12px;
   }
 }

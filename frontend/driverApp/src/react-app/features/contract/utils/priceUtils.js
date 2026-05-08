@@ -6,16 +6,15 @@ export function setCurrentCurrency(value) {
   currentCurrency = value === 'CZK' ? 'CZK' : 'EUR';
 }
 
+// Визначає валюту за першою згаданою валютою в тексті.
 export function detectCurrency(value) {
   const text = String(value || '').toLowerCase();
-  if (text.includes('czk')) {
-    setCurrentCurrency('CZK');
-    return 'CZK';
-  }
 
-  if (text.includes('eur')) {
-    setCurrentCurrency('EUR');
-    return 'EUR';
+  const currencyMatch = text.match(/\b(eur|czk)\b/);
+  if (currencyMatch) {
+    const detected = currencyMatch[1].toUpperCase();
+    setCurrentCurrency(detected);
+    return detected;
   }
 
   return currentCurrency;

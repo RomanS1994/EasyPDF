@@ -1,5 +1,57 @@
 import { formatDateTime, getDateKey, parseDateValue } from '../shared/dateUtils.js';
 
+const EUR_RATE = 25;
+
+// Дістаємо суму й валюту з текстового поля.
+function parseMoneyValue(value) {
+  if (value === null || value === undefined) {
+    return { amount: 0, currency: 'EUR' };
+  }
+
+  const text = String(value).trim();
+  const currencyMatch = text.match(/\b(EUR|CZK)\b/i);
+  const amountMatch = text.replace(',', '.').match(/-?\d+(?:\.\d+)?/);
+  const amount = amountMatch ? Number(amountMatch[0]) : 0;
+  const currency = currencyMatch ? currencyMatch[1].toUpperCase() : 'EUR';
+
+  if (!Number.isFinite(amount)) {
+    return { amount: 0, currency };
+  }
+
+  return { amount, currency };
+}
+
+// Переводимо суму між EUR і CZK.
+function convertAmount(amount, fromCurrency, toCurrency) {
+  if (fromCurrency === toCurrency) {
+    return amount;
+  }
+
+  if (fromCurrency === 'EUR' && toCurrency === 'CZK') {
+    return amount * EUR_RATE;
+  }
+
+  if (fromCurrency === 'CZK' && toCurrency === 'EUR') {
+    return amount / EUR_RATE;
+  }
+
+  return amount;
+}
+
+// Форматуємо суму без зайвих нулів після коми.
+function formatAmount(value, fractionDigits = 2) {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return '0';
+  }
+
+  return new Intl.NumberFormat('en-GB', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: fractionDigits,
+  }).format(number);
+}
+
 function getOrderTripTime(order) {
   return order?.contractData?.trip?.time || order?.trip?.time || '';
 }
@@ -12,8 +64,19 @@ function getCustomerName(order) {
   );
 }
 
+// Показуємо чисту суму замовлення без комісії.
 function getTotalPrice(order) {
-  return order?.contractData?.totalPrice || order?.totalPrice || 'No price';
+  const gross = parseMoneyValue(order?.contractData?.totalPrice || order?.totalPrice);
+  const commission = parseMoneyValue(order?.metadata?.commission || order?.contractData?.commission);
+  const netCzk = convertAmount(gross.amount, gross.currency, 'CZK') - convertAmount(commission.amount, commission.currency, 'CZK');
+
+  if (!Number.isFinite(netCzk) || netCzk <= 0) {
+    return 'No price';
+  }
+
+  const netEur = netCzk / EUR_RATE;
+
+  return `${formatAmount(netEur)} EUR / ${formatAmount(Math.round(netCzk), 0)} CZK`;
 }
 
 function getRouteLabel(order) {

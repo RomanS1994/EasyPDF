@@ -98,6 +98,78 @@ function buildDefaultSubscriptionView(
   };
 }
 
+function normalizeSubscriptionStatus(value) {
+  const status = SUBSCRIPTION_STATUS_VALUES.includes(value) ? value : 'active';
+
+  return status === 'trial' ? 'active' : status;
+}
+
+function resolveSubscriptionWindow(source) {
+  const requestedStart = toIsoDate(source.currentPeriodStart);
+  const requestedEnd = toIsoDate(source.currentPeriodEnd);
+  const defaultCycle =
+    requestedStart && requestedEnd ? null : buildCycleWindow(requestedStart || nowIso());
+
+  return {
+    currentPeriodStart: requestedStart || defaultCycle.currentPeriodStart,
+    currentPeriodEnd: requestedEnd || defaultCycle.currentPeriodEnd,
+  };
+}
+
+function resolveSubscriptionLimit(source, resolvedPlan) {
+  const storedMonthlyGenerationLimit = normalizeInteger(
+    source.monthlyGenerationLimit,
+    resolvedPlan.monthlyGenerationLimit
+  );
+  const quotaOverride = normalizeInteger(source.quotaOverride, null);
+  const monthlyGenerationLimit =
+    quotaOverride === null
+      ? normalizeInteger(resolvedPlan.monthlyGenerationLimit, storedMonthlyGenerationLimit)
+      : storedMonthlyGenerationLimit;
+  const effectiveLimit =
+    quotaOverride !== null
+      ? quotaOverride
+      : monthlyGenerationLimit || resolvedPlan.monthlyGenerationLimit || 0;
+
+  return {
+    monthlyGenerationLimit,
+    quotaOverride,
+    effectiveLimit,
+  };
+}
+
+function resolvePendingSubscriptionFields(source) {
+  const pendingPlanId = normalizeText(source.pendingPlanId) || null;
+
+  return {
+    pendingPlanId,
+    pendingRequestedAt: pendingPlanId
+      ? toIsoDate(source.pendingRequestedAt) || toIsoDate(source.assignedAt) || nowIso()
+      : null,
+    pendingSource: pendingPlanId ? normalizeText(source.pendingSource) || null : null,
+  };
+}
+
+function buildSanitizedSubscription(resolvedSubscription) {
+  return {
+    planId: resolvedSubscription.planId,
+    status: resolvedSubscription.status,
+    source: resolvedSubscription.source,
+    currentPeriodStart: resolvedSubscription.currentPeriodStart,
+    currentPeriodEnd: resolvedSubscription.currentPeriodEnd,
+    monthlyGenerationLimit: resolvedSubscription.effectiveLimit,
+    quotaOverride: resolvedSubscription.quotaOverride,
+    assignedByUserId: resolvedSubscription.assignedByUserId,
+    assignedAt: resolvedSubscription.assignedAt,
+    notes: resolvedSubscription.notes,
+    canceledAt: resolvedSubscription.canceledAt,
+    isAccessActive: resolvedSubscription.isAccessActive,
+    pendingPlanId: resolvedSubscription.pendingPlanId,
+    pendingRequestedAt: resolvedSubscription.pendingRequestedAt,
+    pendingSource: resolvedSubscription.pendingSource,
+  };
+}
+
 export function resolveSubscriptionView({
   user,
   subscription,
@@ -111,30 +183,17 @@ export function resolveSubscriptionView({
       : buildDefaultSubscriptionView(user, resolvedPlan, {
           startMode: fallbackStartMode,
         });
-
-  const status = SUBSCRIPTION_STATUS_VALUES.includes(source.status)
-    ? source.status
-    : 'active';
-  const normalizedStatus = status === 'trial' ? 'active' : status;
-  const requestedStart = toIsoDate(source.currentPeriodStart);
-  const requestedEnd = toIsoDate(source.currentPeriodEnd);
-  const defaultCycle = requestedStart && requestedEnd ? null : buildCycleWindow(requestedStart || nowIso());
-  const currentPeriodStart = requestedStart || defaultCycle.currentPeriodStart;
-  const currentPeriodEnd = requestedEnd || defaultCycle.currentPeriodEnd;
+  const normalizedStatus = normalizeSubscriptionStatus(source.status);
+  const { currentPeriodStart, currentPeriodEnd } = resolveSubscriptionWindow(source);
   const periodEnded = currentPeriodEnd < nowIso();
   const resolvedStatus =
     periodEnded && normalizedStatus === 'active' ? 'expired' : normalizedStatus;
-  const storedMonthlyGenerationLimit = normalizeInteger(
-    source.monthlyGenerationLimit,
-    resolvedPlan.monthlyGenerationLimit
+  const { monthlyGenerationLimit, quotaOverride, effectiveLimit } = resolveSubscriptionLimit(
+    source,
+    resolvedPlan
   );
-  const quotaOverride = normalizeInteger(source.quotaOverride, null);
-  const monthlyGenerationLimit =
-    quotaOverride === null
-      ? normalizeInteger(resolvedPlan.monthlyGenerationLimit, storedMonthlyGenerationLimit)
-      : storedMonthlyGenerationLimit;
-  const effectiveLimit =
-    quotaOverride !== null ? quotaOverride : monthlyGenerationLimit || resolvedPlan.monthlyGenerationLimit || 0;
+  const { pendingPlanId, pendingRequestedAt, pendingSource } =
+    resolvePendingSubscriptionFields(source);
 
   return {
     planId: normalizeText(source.planId) || resolvedPlan.id,
@@ -148,12 +207,9 @@ export function resolveSubscriptionView({
     assignedAt: toIsoDate(source.assignedAt) || nowIso(),
     notes: normalizeText(source.notes),
     canceledAt: toIsoDate(source.canceledAt) || null,
-    pendingPlanId: normalizeText(source.pendingPlanId) || null,
-    pendingRequestedAt:
-      normalizeText(source.pendingPlanId)
-        ? toIsoDate(source.pendingRequestedAt) || toIsoDate(source.assignedAt) || nowIso()
-        : null,
-    pendingSource: normalizeText(source.pendingSource) || null,
+    pendingPlanId,
+    pendingRequestedAt,
+    pendingSource,
     plan: resolvedPlan,
     effectiveLimit,
     isAccessActive: resolvedStatus === 'active',
@@ -206,9 +262,7 @@ export function buildSubscriptionWriteData({ plan, payload = {}, before = null, 
   }
 
   const requestedStatus = normalizeText(payload.status || before?.status).toLowerCase();
-  const status = SUBSCRIPTION_STATUS_VALUES.includes(requestedStatus)
-    ? (requestedStatus === 'trial' ? 'active' : requestedStatus)
-    : 'active';
+  const status = normalizeSubscriptionStatus(requestedStatus);
   const quotaOverride = normalizeInteger(payload.quotaOverride, before?.quotaOverride ?? null);
 
   const nextPendingPlanId =
@@ -270,23 +324,7 @@ export function sanitizeUserFromRecords({
     planId: resolvedSubscription.planId || DEFAULT_PLAN_ID,
     plan: resolvedSubscription.plan,
     profile: normalizeUserProfile(user.profile, user.name),
-    subscription: {
-      planId: resolvedSubscription.planId,
-      status: resolvedSubscription.status,
-      source: resolvedSubscription.source,
-      currentPeriodStart: resolvedSubscription.currentPeriodStart,
-      currentPeriodEnd: resolvedSubscription.currentPeriodEnd,
-      monthlyGenerationLimit: resolvedSubscription.effectiveLimit,
-      quotaOverride: resolvedSubscription.quotaOverride,
-      assignedByUserId: resolvedSubscription.assignedByUserId,
-      assignedAt: resolvedSubscription.assignedAt,
-      notes: resolvedSubscription.notes,
-      canceledAt: resolvedSubscription.canceledAt,
-      isAccessActive: resolvedSubscription.isAccessActive,
-      pendingPlanId: resolvedSubscription.pendingPlanId,
-      pendingRequestedAt: resolvedSubscription.pendingRequestedAt,
-      pendingSource: resolvedSubscription.pendingSource,
-    },
+    subscription: buildSanitizedSubscription(resolvedSubscription),
     usage: {
       ...buildUsageView(resolvedSubscription, usedOrders),
       deletedMessages,

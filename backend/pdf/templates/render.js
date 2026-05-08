@@ -1,7 +1,5 @@
 import { getPdfMessage, normalizePdfLanguage } from "../i18n.js";
 
-const MAIN_ROBOT_DATA_URI =
-  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2GxX0AAAAASUVORK5CYII=";
 const A4_WIDTH_PX = 794;
 const A4_HEIGHT_PX = 1123;
 
@@ -225,31 +223,6 @@ export function renderContractPdfHtml({
             margin: 0;
           }
 
-          .logo {
-            position: absolute;
-            right: 50px;
-            top: 20px;
-          }
-
-          .logoMark {
-            width: 156px;
-            height: 156px;
-            border-radius: 50%;
-            border: 2px solid #d8cb72;
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-          }
-
-          .logoMark img {
-            width: 112px;
-            height: 112px;
-            display: block;
-          }
-
           .contract {
             flex: 1;
             display: flex;
@@ -390,12 +363,6 @@ export function renderContractPdfHtml({
         </style>
       </head>
       <body>
-        <div class="logo">
-          <div class="logoMark" aria-label="DocTra">
-            <img src="${MAIN_ROBOT_DATA_URI}" alt="DocTra" />
-          </div>
-        </div>
-
         <main class="contract">
           <div class="left-container">
             <div class="header">

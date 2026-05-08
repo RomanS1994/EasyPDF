@@ -64,6 +64,27 @@ function getSubscriptionErrorMessage(error, t) {
   return resolveErrorMessage(error, t('contract.failedCreateOrder'));
 }
 
+// Визначає, чи потрібно замість inline-помилки показати модалку оновлення плану.
+function getSubscriptionErrorState(error, t) {
+  const message = resolveErrorMessage(error, '');
+
+  if (message === 'Subscription is not active') {
+    return {
+      type: 'inactive',
+      message: t('contract.subscriptionInactive'),
+    };
+  }
+
+  if (message === 'Subscription limit reached') {
+    return {
+      type: 'limit',
+      message: t('contract.subscriptionLimitReached'),
+    };
+  }
+
+  return null;
+}
+
 function getActiveSession(session) {
   if (!session || isSessionExpired(session.expiresAt)) {
     return null;
@@ -136,6 +157,69 @@ function OrderCreatedModal({ orderNumber, onClose, t }) {
   );
 }
 
+// Пояснює, що створення замовлень заблоковане до оновлення плану.
+function PlanUpgradeRequiredModal({ errorState, onClose, onOpenAccount, t }) {
+  if (!errorState?.type) {
+    return null;
+  }
+
+  const title =
+    errorState.type === 'inactive'
+      ? t('contract.planExpiredTitle')
+      : t('contract.planLimitTitle');
+
+  const eyebrow =
+    errorState.type === 'inactive'
+      ? t('account.planExpiredEyebrow')
+      : t('contract.planLimitEyebrow');
+
+  const copy =
+    errorState.type === 'inactive'
+      ? t('contract.planExpiredOrderCopy')
+      : t('contract.planLimitCopy');
+
+  return (
+    <div className="contractActionsModal" role="presentation">
+      <div className="contractActionsModal-backdrop" onClick={onClose} />
+
+      <div
+        className="contractActionsModal-sheet contractActionsModal-sheet--warning"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="planUpgradeRequiredTitle"
+      >
+        <button
+          className="contractActionsModal-close"
+          type="button"
+          aria-label={t('contract.close')}
+          onClick={onClose}
+        >
+          ×
+        </button>
+
+        <div className="contractActionsModal-badge contractActionsModal-badge--warning" aria-hidden="true">
+          <span className="contractActionsModal-badgeIcon contractActionsModal-badgeIcon--warning">!</span>
+          <span>{eyebrow}</span>
+        </div>
+
+        <div className="contractActionsModal-copy">
+          <h2 id="planUpgradeRequiredTitle">{title}</h2>
+          <p>{copy}</p>
+          <p>{errorState.message}</p>
+        </div>
+
+        <button className="contractActionsModal-confirm contractActionsModal-confirm--warning" type="button" onClick={onOpenAccount}>
+          {t('contract.openAccountForUpgrade')}
+        </button>
+
+        <button className="contractActionsModal-secondary" type="button" onClick={onClose}>
+          {t('common.close')}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function ContractActions() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -148,6 +232,7 @@ export function ContractActions() {
     useGenerateContractPdfMutation();
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [subscriptionErrorState, setSubscriptionErrorState] = useState(null);
   const [createdOrderNumber, setCreatedOrderNumber] = useState('');
   const [validationErrors, setValidationErrors] = useState(buildValidationState());
 
@@ -168,9 +253,19 @@ export function ContractActions() {
     navigate('/', { replace: true });
   }
 
+  function closeSubscriptionModal() {
+    setSubscriptionErrorState(null);
+  }
+
+  function openAccountUpgrade() {
+    setSubscriptionErrorState(null);
+    navigate('/account');
+  }
+
   async function handleCreate() {
     setMessage('');
     setError('');
+    setSubscriptionErrorState(null);
     setCreatedOrderNumber('');
     clearValidation();
 
@@ -210,6 +305,12 @@ export function ContractActions() {
       const order = response?.order || response;
       setCreatedOrderNumber(String(order?.orderNumber || ''));
     } catch (error) {
+      const nextSubscriptionErrorState = getSubscriptionErrorState(error, t);
+      if (nextSubscriptionErrorState) {
+        setSubscriptionErrorState(nextSubscriptionErrorState);
+        return;
+      }
+
       setError(getSubscriptionErrorMessage(error, t));
     }
   }
@@ -217,6 +318,7 @@ export function ContractActions() {
   async function handleDownload() {
     setMessage('');
     setError('');
+    setSubscriptionErrorState(null);
     clearValidation();
 
     const activeSession = getActiveSession(generationSession);
@@ -256,6 +358,12 @@ export function ContractActions() {
         );
         dispatch(startSession(nextSession));
       } catch (error) {
+        const nextSubscriptionErrorState = getSubscriptionErrorState(error, t);
+        if (nextSubscriptionErrorState) {
+          setSubscriptionErrorState(nextSubscriptionErrorState);
+          return;
+        }
+
         setError(getSubscriptionErrorMessage(error, t));
         return;
       }
@@ -401,6 +509,12 @@ export function ContractActions() {
       </section>
 
       <OrderCreatedModal orderNumber={createdOrderNumber} onClose={closeCreatedModal} t={t} />
+      <PlanUpgradeRequiredModal
+        errorState={subscriptionErrorState}
+        onClose={closeSubscriptionModal}
+        onOpenAccount={openAccountUpgrade}
+        t={t}
+      />
     </>
   );
 }

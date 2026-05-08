@@ -23,6 +23,47 @@ function resolveBaseUrl() {
   return import.meta.env.VITE_API_BASE_URL || '/api';
 }
 
+// Дає коротку паузу перед повторною спробою refresh-запиту.
+function sleep(ms) {
+  return new Promise(resolve => window.setTimeout(resolve, ms));
+}
+
+// Відрізняє мережеві refresh-помилки від server-side відповіді.
+function isNetworkRefreshError(error) {
+  return (
+    error?.status === 'FETCH_ERROR' ||
+    error?.status === 'TIMEOUT_ERROR' ||
+    !error?.status
+  );
+}
+
+// Оновлює локальну сесію після вдалого refresh.
+function applySuccessfulRefresh(api, refreshResult) {
+  const nextToken = refreshResult?.data?.token || '';
+  const nextUser = refreshResult?.data?.user || null;
+
+  if (!nextToken || !nextUser) {
+    return false;
+  }
+
+  saveSession(nextToken, nextUser);
+  api.dispatch(setSession({ token: nextToken, user: nextUser }));
+  api.dispatch(clearSessionError());
+  return true;
+}
+
+// Повністю скидає сесію, якщо refresh підтвердив її завершення.
+function clearExpiredSession(api, t) {
+  clearStoredSession();
+  api.dispatch(clearSession());
+  api.dispatch(
+    setSessionError({
+      type: 'expired',
+      message: t('auth.sessionExpiredSignIn'),
+    }),
+  );
+}
+
 export const baseApi = createApi({
   reducerPath: 'baseApi',
   baseQuery: async (args, api, extraOptions) => {
@@ -61,47 +102,49 @@ export const baseApi = createApi({
       return getMessage(readStoredLanguage(), key);
     }
 
+    // Пробує оновити сесію й не показує offline, поки не провалиться retry.
     async function refreshSession() {
-      const refreshResult = await baseQuery(
-        {
-          url: '/auth/refresh',
-          method: 'POST',
-        },
-        api,
-        extraOptions,
-      );
+      // Виконує один refresh-запит без побічних ефектів.
+      async function runRefreshRequest() {
+        return baseQuery(
+          {
+            url: '/auth/refresh',
+            method: 'POST',
+          },
+          api,
+          extraOptions,
+        );
+      }
 
-      if (refreshResult.data) {
-        const nextToken = refreshResult.data.token || '';
-        const nextUser = refreshResult.data.user || null;
+      let refreshResult = await runRefreshRequest();
 
-        if (nextToken && nextUser) {
-          saveSession(nextToken, nextUser);
-          api.dispatch(setSession({ token: nextToken, user: nextUser }));
-          api.dispatch(clearSessionError());
-          return true;
-        }
+      if (applySuccessfulRefresh(api, refreshResult)) {
+        return true;
       }
 
       const refreshError = refreshResult.error;
       if (refreshError?.status === 401) {
-        clearStoredSession();
-        api.dispatch(clearSession());
-        api.dispatch(
-          setSessionError({
-            type: 'expired',
-            message: t('auth.sessionExpiredSignIn'),
-          }),
-        );
+        clearExpiredSession(api, t);
         return false;
       }
 
-      if (refreshError) {
-        const isOffline =
-          refreshError.status === 'FETCH_ERROR' ||
-          refreshError.status === 'TIMEOUT_ERROR' ||
-          refreshError.status === 'PARSING_ERROR' ||
-          !refreshError.status;
+      if (isNetworkRefreshError(refreshError)) {
+        await sleep(350);
+        refreshResult = await runRefreshRequest();
+
+        if (applySuccessfulRefresh(api, refreshResult)) {
+          return true;
+        }
+      }
+
+      const finalRefreshError = refreshResult.error;
+      if (finalRefreshError?.status === 401) {
+        clearExpiredSession(api, t);
+        return false;
+      }
+
+      if (finalRefreshError) {
+        const isOffline = isNetworkRefreshError(finalRefreshError);
 
         api.dispatch(
           setSessionError({

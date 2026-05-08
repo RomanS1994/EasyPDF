@@ -1,4 +1,4 @@
-export const DEFAULT_ACCESS_TOKEN_TTL_MINUTES = 60;
+export const DEFAULT_ACCESS_TOKEN_TTL_MINUTES = 300;
 
 export const EXACT_PLACEHOLDER_VALUES = new Set([
   '',
