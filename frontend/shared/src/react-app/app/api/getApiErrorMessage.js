@@ -1,6 +1,14 @@
 import { getMessage } from '../i18n/messages.js';
 import { readStoredLanguage } from '../i18n/languageStorage.js';
 
+const TRANSLATED_BACKEND_ERRORS = {
+  'User with this email already exists': 'auth.emailAlreadyExists',
+  'Invalid plan': 'auth.invalidPlan',
+  'Name is required': 'auth.nameRequired',
+  'Email is required': 'auth.emailRequired',
+  'Password must be at least 8 characters long': 'auth.passwordTooShort',
+};
+
 function readErrorText(error) {
   if (!error) {
     return '';
@@ -44,7 +52,8 @@ export function getApiErrorMessage(error, fallbackKey = 'common.failedToLoad') {
   const detail = readErrorText(error);
 
   if (detail) {
-    return detail;
+    const translatedKey = TRANSLATED_BACKEND_ERRORS[detail];
+    return translatedKey ? getMessage(language, translatedKey) : detail;
   }
 
   if (error && typeof error === 'object') {

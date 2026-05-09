@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import { useI18n } from '../../../../app/i18n/useI18n.js';
+import { getApiErrorMessage } from '../../../../app/api/getApiErrorMessage.js';
 import { useRegisterMutation } from '../../authApi.js';
 import { setSession } from '../../authSlice.js';
 import { saveSession } from '../../authStorage.js';
@@ -11,6 +13,7 @@ import './RegisterForm.css';
 
 export function RegisterForm({ selectedPlanId = '', onPlanSelect }) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { t } = useI18n();
   const [register, { isLoading }] = useRegisterMutation();
   const { data, isLoading: isPlansLoading } = useGetPlansQuery();
@@ -52,8 +55,9 @@ export function RegisterForm({ selectedPlanId = '', onPlanSelect }) {
       }).unwrap();
       saveSession(data.token, data.user);
       dispatch(setSession({ token: data.token, user: data.user }));
-    } catch {
-      setError(t('auth.registerFailed'));
+      navigate('/', { replace: true });
+    } catch (error) {
+      setError(getApiErrorMessage(error, 'auth.registerFailed'));
     }
   }
 

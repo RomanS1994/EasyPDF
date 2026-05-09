@@ -72,7 +72,7 @@ export const baseApi = createApi({
       credentials: 'include',
       prepareHeaders(headers) {
         const apiKey = import.meta.env.VITE_API_KEY;
-        const sessionToken = getToken();
+        const sessionToken = api.getState?.()?.auth?.token || getToken();
 
         if (apiKey) {
           headers.set('X-API-KEY', apiKey);

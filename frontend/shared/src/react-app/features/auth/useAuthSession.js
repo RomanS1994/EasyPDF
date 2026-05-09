@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { useRefreshSessionMutation } from './authApi.js';
+import { saveSession } from './authStorage.js';
 import { setSession, setSessionError, setSessionInitialized } from './authSlice.js';
 import { getStoredUser, getToken } from './authStorage.js';
 
@@ -27,6 +28,7 @@ function applyRefreshedSession(dispatch, response) {
     return false;
   }
 
+  saveSession(nextToken, nextUser);
   dispatch(setSession({ token: nextToken, user: nextUser }));
   dispatch(setSessionError({ type: '', message: '' }));
   return true;

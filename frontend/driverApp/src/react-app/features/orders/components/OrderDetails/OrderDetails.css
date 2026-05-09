@@ -25,17 +25,13 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: min(100vw, 480px);
+  width: min(100vw, 560px);
   max-width: 100%;
   display: flex;
   flex-direction: column;
   overflow: auto;
-  padding: 24px 28px 24px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.995),
-    rgba(247, 249, 252, 0.98)
-  );
+  padding: 10px 20px 18px;
+  background: linear-gradient(180deg, rgba(250, 252, 255, 0.995), rgba(240, 245, 255, 0.985));
   border-left: 1px solid rgba(15, 23, 42, 0.08);
   box-shadow: -24px 0 40px rgba(15, 23, 42, 0.14);
   animation: orderDrawerIn 220ms ease-out;
@@ -99,65 +95,43 @@
 }
 
 .orderDrawer-header {
-  display: grid;
-  gap: 22px;
-  padding-bottom: 18px;
-  margin-bottom: 18px;
-  border-bottom: 2px solid rgba(15, 23, 42, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px 0 16px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.12);
 }
 
 .orderDrawer-backBtn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   width: fit-content;
   min-height: 28px;
   padding: 0;
   border: 0;
+  border-radius: 0;
   background: transparent;
-  color: rgba(17, 24, 39, 0.82);
+  color: rgba(17, 24, 39, 0.9);
   font: inherit;
   font-size: 15px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   box-shadow: none;
 }
 
-.orderDrawer-backBtn span:first-child {
-  font-size: 17px;
-  line-height: 1;
-}
-
-.orderDrawer-hero {
-  display: grid;
-  gap: 12px;
-}
-
-.orderWindow-title {
-  margin: 0;
-  font-size: clamp(42px, 9vw, 58px);
-  line-height: 0.9;
-  letter-spacing: -0.07em;
-  font-weight: 900;
-  max-width: 100%;
-  text-transform: uppercase;
-  word-break: break-word;
-}
-
-.orderWindow-copy {
-  margin: 0;
-  color: rgba(15, 23, 42, 0.62);
-  font-size: 18px;
-  line-height: 1.25;
-  max-width: 35ch;
-  letter-spacing: -0.02em;
+.orderDrawer-backBtn svg {
+  width: 18px;
+  height: 18px;
+  display: block;
 }
 
 .orderWindow-message,
 .orderWindow-error,
 .orderWindow-state {
   margin: 10px 0 0;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.35;
 }
 
@@ -173,13 +147,271 @@
   color: var(--muted);
 }
 
+.orderSheetCard {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 16px 16px;
+  border: 1px solid rgba(212, 223, 243, 0.96);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.995), rgba(249, 251, 255, 0.985));
+  box-shadow: 0 16px 34px rgba(148, 163, 184, 0.12);
+}
+
+.orderSheetSectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.orderSheetSectionTitle {
+  margin: 0;
+  color: rgba(17, 24, 39, 0.98);
+  font-size: 16px;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  font-weight: 800;
+}
+
+.orderSheetIcon {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(246, 248, 252, 0.98), rgba(241, 245, 250, 0.98));
+  color: rgba(96, 110, 133, 0.95);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.orderSheetIcon--accent {
+  background: linear-gradient(180deg, rgba(239, 245, 255, 0.98), rgba(231, 239, 255, 0.98));
+  color: rgba(37, 99, 235, 0.98);
+}
+
+.orderSheetIcon svg,
+.orderSheetTotalIcon svg,
+.orderSheetEditButton svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.orderSheetRows {
+  display: grid;
+}
+
+.orderSheetRows > * + * {
+  border-top: 1px solid rgba(226, 232, 240, 0.96);
+}
+
+.orderSheetInfoRow {
+  display: grid;
+  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.2fr);
+  gap: 14px;
+  align-items: center;
+  padding: 11px 0;
+}
+
+.orderSheetInfoRow--commission {
+  align-items: start;
+}
+
+.orderSheetInfoLead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.orderSheetInfoLead--alignStart {
+  align-items: flex-start;
+}
+
+.orderSheetInfoLabel {
+  color: rgba(100, 116, 139, 0.96);
+  font-size: 12px;
+  line-height: 1.3;
+  font-weight: 600;
+  min-width: 0;
+}
+
+.orderSheetInfoValue {
+  color: rgba(15, 23, 42, 0.98);
+  font-size: 14px;
+  line-height: 1.3;
+  font-weight: 700;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.orderSheetStatus {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.orderSheetStatus--success {
+  background: linear-gradient(180deg, rgba(233, 250, 236, 0.98), rgba(241, 253, 241, 0.98));
+  color: rgba(34, 197, 94, 0.98);
+}
+
+.orderSheetStatus--danger {
+  background: linear-gradient(180deg, rgba(254, 242, 242, 0.98), rgba(254, 226, 226, 0.98));
+  color: rgba(220, 38, 38, 0.98);
+}
+
+.orderSheetStatus--neutral {
+  background: linear-gradient(180deg, rgba(241, 245, 249, 0.98), rgba(226, 232, 240, 0.98));
+  color: rgba(71, 85, 105, 0.98);
+}
+
+.orderSheetRouteRows {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.orderSheetRouteTimeline {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  justify-items: center;
+  padding-top: 10px;
+}
+
+.orderSheetRouteDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.96), 0 6px 16px rgba(148, 163, 184, 0.16);
+}
+
+.orderSheetRouteDot--from {
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.98), rgba(37, 99, 235, 0.98));
+}
+
+.orderSheetRouteDot--to {
+  background: linear-gradient(180deg, rgba(34, 197, 94, 0.98), rgba(22, 163, 74, 0.98));
+}
+
+.orderSheetRouteLine {
+  width: 2px;
+  min-height: 60px;
+  margin: 6px 0 8px;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(203, 213, 225, 0.95),
+    rgba(203, 213, 225, 0.95) 4px,
+    transparent 4px,
+    transparent 10px
+  );
+}
+
+.orderSheetRouteContent {
+  display: grid;
+}
+
+.orderSheetRouteRow {
+  display: grid;
+  grid-template-columns: minmax(122px, 0.58fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.orderSheetRouteRow + .orderSheetRouteRow {
+  border-top: 1px solid rgba(226, 232, 240, 0.96);
+}
+
+.orderSheetRows--afterRoute {
+  margin-top: 4px;
+}
+
+.orderSheetPriceValue {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  min-width: 0;
+}
+
+.orderSheetEditButton {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  padding: 0;
+  border: 1px solid rgba(210, 222, 243, 0.98);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.96);
+  color: rgba(96, 110, 133, 0.96);
+  box-shadow: 0 10px 24px rgba(148, 163, 184, 0.12);
+}
+
+.orderSheetEditButton:hover:not(:disabled),
+.orderSheetEditButton:focus-visible {
+  color: rgba(37, 99, 235, 0.98);
+  border-color: rgba(147, 197, 253, 0.98);
+}
+
+.orderSheetTotalBar {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(10, 18, 38, 0.98), rgba(25, 56, 116, 0.98));
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.22);
+}
+
+.orderSheetTotalIcon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(12, 19, 34, 0.34);
+  color: rgba(255, 255, 255, 0.98);
+}
+
+.orderSheetTotalCopy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.orderSheetTotalLabel {
+  color: rgba(226, 232, 240, 0.92);
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+.orderSheetTotalValue {
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.15;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
 .orderDrawer-section {
-  padding-top: 32px;
+  padding-top: 24px;
 }
 
 .orderDrawer-sectionTitle {
-  margin: 0 0 22px;
-  font-size: 12px;
+  margin: 0 0 16px;
+  font-size: 11px;
   line-height: 1.2;
   letter-spacing: 0.32em;
   text-transform: uppercase;
@@ -196,15 +428,15 @@
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 2.2fr);
   align-items: center;
-  gap: 18px;
+  gap: 12px;
   min-width: 0;
-  padding: 6px 0;
+  padding: 4px 0;
   border-bottom: 1px solid rgba(15, 23, 42, 0.12);
 }
 
 .orderDrawer-row--featured {
   display: grid;
-  padding-top: 18px;
+  padding-top: 12px;
 }
 
 .orderDrawer-row--input {
@@ -219,7 +451,7 @@
 
 .orderCommissionField-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr) minmax(0, 0.85fr);
+  grid-template-columns: minmax(0, 1fr) minmax(72px, 0.56fr) minmax(72px, 0.56fr);
   gap: 8px;
   align-items: center;
 }
@@ -230,7 +462,11 @@
 }
 
 .orderCommissionField-input {
-  padding-right: 42px;
+  min-height: 42px;
+  padding-right: 48px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .orderCommissionField-clear {
@@ -241,7 +477,7 @@
   height: 28px;
   padding: 0;
   transform: translateY(-50%);
-  border: 1px solid rgba(15, 95, 215, 0.12);
+  border: 1px solid rgba(193, 210, 243, 0.96);
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.92);
   color: var(--muted);
@@ -255,29 +491,29 @@
 
 .orderCommissionField-currencyButton {
   min-height: 42px;
-  padding: 0 8px;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  border-radius: 12px 12px 0 0;
-  background: transparent;
+  padding: 0 10px;
+  border: 1px solid rgba(216, 226, 243, 0.98);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.98);
   color: rgba(100, 116, 139, 0.96);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  box-shadow: none;
+  box-shadow: 0 10px 20px rgba(148, 163, 184, 0.08);
 }
 
 .orderCommissionField-currencyButton.is-active {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(245, 248, 255, 0.96));
-  border-bottom-color: rgba(15, 95, 215, 0.88);
-  color: #0f5fd7;
+  background: linear-gradient(180deg, rgba(243, 247, 255, 0.98), rgba(234, 241, 255, 0.98));
+  border-color: rgba(173, 198, 255, 0.98);
+  color: #2563eb;
 }
 
 .orderCommissionField-converted {
   margin: 0;
   color: rgba(82, 84, 90, 0.9);
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.35;
+  text-align: right;
 }
 
 .orderWindow-label {
@@ -349,7 +585,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-  margin-top: 24px;
+  margin-top: 14px;
 }
 
 .orderDrawer-actions--doc {
@@ -363,10 +599,10 @@
 
 .orderWindow-button {
   width: 100%;
-  min-height: 54px;
-  border-radius: 18px;
-  padding: 12px 14px;
-  font-size: 14px;
+  min-height: 44px;
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -375,8 +611,8 @@
   overflow: hidden;
   display: grid;
   place-items: center;
-  min-height: 58px;
-  padding: 8px 12px;
+  min-height: 46px;
+  padding: 8px 10px;
   border: 1px solid rgba(15, 23, 42, 0.12);
   background: linear-gradient(
     180deg,
@@ -436,8 +672,8 @@
 .orderDrawer-transfer {
   display: grid;
   gap: 10px;
-  margin-top: 18px;
-  padding-top: 18px;
+  margin-top: 14px;
+  padding-top: 14px;
   border-top: 1px solid rgba(15, 23, 42, 0.12);
 }
 
@@ -449,7 +685,7 @@
 .orderDrawer-transferCopy {
   margin: 0;
   color: rgba(82, 84, 90, 0.9);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.32;
 }
 
@@ -464,12 +700,12 @@
   display: grid;
   gap: 6px;
   color: rgba(82, 84, 90, 0.9);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
 }
 
 .orderWindow-field input {
-  min-height: 42px;
+  min-height: 38px;
   padding: 0 12px;
   border: 1px solid rgba(15, 23, 42, 0.12);
   border-radius: 12px;
@@ -482,7 +718,7 @@
   padding: 0;
   display: grid;
   gap: 6px;
-  max-height: 260px;
+  max-height: 220px;
   overflow: auto;
 }
 
@@ -490,7 +726,7 @@
   display: grid;
   gap: 2px;
   width: 100%;
-  padding: 12px 0;
+  padding: 10px 0;
   text-align: left;
   border-radius: 0;
   border: 0;
@@ -509,13 +745,13 @@
 }
 
 .orderWindow-userName {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
 }
 
 .orderWindow-userMeta {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .orderDrawer-selected {
@@ -539,8 +775,8 @@
 .orderPriceEditor-panel {
   width: min(100%, 420px);
   display: grid;
-  gap: 18px;
-  padding: 22px;
+  gap: 16px;
+  padding: 20px;
   border: 1px solid rgba(15, 95, 215, 0.12);
   border-radius: 24px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.995), rgba(247, 249, 252, 0.98));
@@ -555,7 +791,7 @@
 .orderPriceEditor-title {
   margin: 0;
   color: rgba(17, 24, 39, 0.98);
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1.05;
   letter-spacing: -0.04em;
 }
@@ -563,7 +799,7 @@
 .orderPriceEditor-copy {
   margin: 0;
   color: rgba(82, 84, 90, 0.9);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.35;
 }
 
@@ -580,60 +816,142 @@
 @media (max-width: 480px) {
   .orderDrawer-panel {
     width: 100%;
-    padding: 18px 18px 16px;
+    padding: 8px 12px 12px;
   }
 
   .orderDrawer-header {
-    gap: 18px;
+    padding: 10px 0 14px;
+    margin-bottom: 8px;
   }
 
-  .orderWindow-title {
-    font-size: clamp(34px, 12vw, 44px);
+  .orderDrawer-backBtn {
+    min-height: 28px;
+    font-size: 14px;
   }
 
-  .orderWindow-copy {
-    font-size: 15px;
-    max-width: 100%;
+  .orderDrawer-backBtn svg {
+    width: 18px;
+    height: 18px;
   }
 
-  .orderDrawer-section {
-    padding-top: 24px;
-  }
-
-  .orderDrawer-row {
-    grid-template-columns: minmax(0, 0.95fr) minmax(0, 2.05fr);
+  .orderSheetCard {
+    margin-top: 12px;
+    padding: 14px 12px;
     gap: 12px;
-    padding: 6px 0;
+    border-radius: 18px;
+  }
+
+  .orderSheetSectionTitle {
+    font-size: 15px;
+  }
+
+  .orderSheetIcon {
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
+    border-radius: 10px;
+  }
+
+  .orderSheetIcon svg,
+  .orderSheetTotalIcon svg,
+  .orderSheetEditButton svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .orderSheetInfoRow {
+    grid-template-columns: minmax(0, 0.84fr) minmax(0, 1.16fr);
+    gap: 10px;
+    padding: 9px 0;
+  }
+
+  .orderSheetInfoLead {
+    gap: 10px;
+  }
+
+  .orderSheetInfoLabel {
+    font-size: 11px;
+  }
+
+  .orderSheetInfoValue,
+  .orderSheetStatus {
+    justify-self: end;
+    text-align: right;
+  }
+
+  .orderSheetInfoValue {
+    font-size: 12px;
+    line-height: 1.28;
+  }
+
+  .orderSheetStatus {
+    min-height: 28px;
+    padding: 0 12px;
+    font-size: 11px;
+  }
+
+  .orderSheetRouteRows {
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .orderSheetRouteRow {
+    grid-template-columns: minmax(82px, 0.42fr) minmax(0, 1fr);
+    gap: 8px;
+    padding: 9px 0;
+  }
+
+  .orderSheetRouteLine {
+    min-height: 48px;
+  }
+
+  .orderSheetPriceValue {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .orderSheetEditButton {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+  }
+
+  .orderSheetTotalBar {
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 8px;
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .orderSheetTotalIcon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+
+  .orderSheetTotalLabel {
+    font-size: 11px;
+  }
+
+  .orderSheetTotalValue {
+    font-size: 13px;
   }
 
   .orderWindow-input {
-    min-height: 40px;
-    font-size: 15px;
+    min-height: 38px;
+    font-size: 14px;
   }
 
   .orderCommissionField-row {
-    grid-template-columns: minmax(0, 1fr) minmax(56px, 0.72fr) minmax(56px, 0.72fr);
-    gap: 6px;
+    grid-template-columns: minmax(0, 1fr) minmax(54px, 0.75fr) minmax(54px, 0.75fr);
+    gap: 5px;
   }
 
+  .orderCommissionField-input,
   .orderCommissionField-currencyButton {
-    min-height: 40px;
-    border-radius: 10px 10px 0 0;
-  }
-
-  .orderWindow-label {
-    font-size: 10px;
-    letter-spacing: 0.22em;
-  }
-
-  .orderWindow-value {
-    font-size: 15px;
-  }
-
-  .orderWindow-iconButton {
-    width: 26px;
-    height: 26px;
-    flex-basis: 26px;
+    min-height: 36px;
+    border-radius: 11px;
+    font-size: 12px;
   }
 
   .orderPriceEditor {
@@ -661,6 +979,6 @@
   }
 
   .orderWindow-button {
-    min-height: 46px;
+    min-height: 40px;
   }
 }

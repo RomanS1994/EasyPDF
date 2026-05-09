@@ -131,22 +131,22 @@
 }
 
 .planCard--free {
-  --plan-accent: #8e7cff;
-  --plan-accent-soft: rgba(142, 124, 255, 0.08);
-  --plan-border: rgba(142, 124, 255, 0.16);
-  --plan-glow: rgba(142, 124, 255, 0.12);
-  --plan-halo: rgba(142, 124, 255, 0.08);
+  --plan-accent: #72a7ff;
+  --plan-accent-soft: rgba(114, 167, 255, 0.1);
+  --plan-border: rgba(114, 167, 255, 0.18);
+  --plan-glow: rgba(114, 167, 255, 0.14);
+  --plan-halo: rgba(114, 167, 255, 0.1);
   --plan-text: #4a5674;
   --plan-muted: rgba(74, 86, 116, 0.58);
   --plan-bg-start: #ffffff;
-  --plan-bg-mid: #fcfbff;
-  --plan-bg-end: #f4f1ff;
+  --plan-bg-mid: #f6fbff;
+  --plan-bg-end: #e7f4ff;
 }
 
 .planCard--free::before {
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.82), transparent 48%),
-    linear-gradient(180deg, transparent 78%, rgba(142, 124, 255, 0.06));
+    linear-gradient(180deg, transparent 78%, rgba(114, 167, 255, 0.07));
   opacity: 0.45;
 }
 
