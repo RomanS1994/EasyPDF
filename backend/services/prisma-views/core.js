@@ -336,12 +336,14 @@ export function sanitizeUserFromRecords({
 
 export function sanitizeOrderFromRecords(order, owner = null) {
   const planId = owner?.subscription?.planId || DEFAULT_PLAN_ID;
+  const flightNumber = order.flightNumber || order.contractData?.flightNumber || '';
 
   return {
     id: order.id,
     userId: order.userId,
     orderNumber: order.orderNumber,
     status: order.status,
+    flightNumber,
     source: order.source,
     customer: order.customer || {},
     trip: order.trip || {},

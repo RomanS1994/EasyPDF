@@ -30,7 +30,7 @@
   display: flex;
   flex-direction: column;
   overflow: auto;
-  padding: 10px 20px 18px;
+  padding: 8px 18px 14px;
   background: linear-gradient(180deg, rgba(250, 252, 255, 0.995), rgba(240, 245, 255, 0.985));
   border-left: 1px solid rgba(15, 23, 42, 0.08);
   box-shadow: -24px 0 40px rgba(15, 23, 42, 0.14);
@@ -98,8 +98,8 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 10px 0 16px;
-  margin-bottom: 10px;
+  padding: 8px 0 12px;
+  margin-bottom: 8px;
   border-bottom: 1px solid rgba(15, 23, 42, 0.12);
 }
 
@@ -108,14 +108,14 @@
   align-items: center;
   gap: 10px;
   width: fit-content;
-  min-height: 28px;
+  min-height: 24px;
   padding: 0;
   border: 0;
   border-radius: 0;
   background: transparent;
   color: rgba(17, 24, 39, 0.9);
   font: inherit;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.02em;
   box-shadow: none;
@@ -149,9 +149,9 @@
 
 .orderSheetCard {
   display: grid;
-  gap: 12px;
-  margin-top: 14px;
-  padding: 16px 16px;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 14px 14px;
   border: 1px solid rgba(212, 223, 243, 0.96);
   border-radius: 20px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.995), rgba(249, 251, 255, 0.985));
@@ -167,16 +167,16 @@
 .orderSheetSectionTitle {
   margin: 0;
   color: rgba(17, 24, 39, 0.98);
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.1;
   letter-spacing: -0.035em;
   font-weight: 800;
 }
 
 .orderSheetIcon {
-  width: 36px;
-  height: 36px;
-  flex: 0 0 36px;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
   display: grid;
   place-items: center;
   border-radius: 12px;
@@ -209,9 +209,9 @@
 .orderSheetInfoRow {
   display: grid;
   grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.2fr);
-  gap: 14px;
+  gap: 12px;
   align-items: center;
-  padding: 11px 0;
+  padding: 9px 0;
 }
 
 .orderSheetInfoRow--commission {
@@ -231,7 +231,7 @@
 
 .orderSheetInfoLabel {
   color: rgba(100, 116, 139, 0.96);
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.3;
   font-weight: 600;
   min-width: 0;
@@ -239,7 +239,7 @@
 
 .orderSheetInfoValue {
   color: rgba(15, 23, 42, 0.98);
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.3;
   font-weight: 700;
   text-align: right;
@@ -250,8 +250,8 @@
   justify-self: end;
   display: inline-flex;
   align-items: center;
-  min-height: 30px;
-  padding: 0 12px;
+  min-height: 28px;
+  padding: 0 11px;
   border-radius: 999px;
   font-size: 12px;
   line-height: 1;
@@ -275,20 +275,20 @@
 
 .orderSheetRouteRows {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
-  gap: 10px;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 8px;
 }
 
 .orderSheetRouteTimeline {
   display: grid;
   grid-template-rows: auto 1fr auto;
   justify-items: center;
-  padding-top: 10px;
+  padding-top: 8px;
 }
 
 .orderSheetRouteDot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.96), 0 6px 16px rgba(148, 163, 184, 0.16);
 }
@@ -303,8 +303,8 @@
 
 .orderSheetRouteLine {
   width: 2px;
-  min-height: 60px;
-  margin: 6px 0 8px;
+  min-height: 54px;
+  margin: 5px 0 6px;
   background: repeating-linear-gradient(
     180deg,
     rgba(203, 213, 225, 0.95),
@@ -321,9 +321,9 @@
 .orderSheetRouteRow {
   display: grid;
   grid-template-columns: minmax(122px, 0.58fr) minmax(0, 1fr);
-  gap: 12px;
+  gap: 10px;
   align-items: center;
-  padding: 10px 0;
+  padding: 8px 0;
 }
 
 .orderSheetRouteRow + .orderSheetRouteRow {
@@ -338,16 +338,21 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
+}
+
+.orderSheetPriceValue--flight .orderSheetInfoValue {
+  flex: 1;
+  text-align: right;
 }
 
 .orderSheetEditButton {
   display: inline-grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
   padding: 0;
   border: 1px solid rgba(210, 222, 243, 0.98);
   border-radius: 50%;
@@ -364,19 +369,19 @@
 
 .orderSheetTotalBar {
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
-  gap: 10px;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 8px;
   align-items: center;
-  margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: 18px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 16px;
   background: linear-gradient(135deg, rgba(10, 18, 38, 0.98), rgba(25, 56, 116, 0.98));
   box-shadow: 0 18px 38px rgba(15, 23, 42, 0.22);
 }
 
 .orderSheetTotalIcon {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: grid;
   place-items: center;
   border-radius: 12px;
@@ -406,12 +411,12 @@
 }
 
 .orderDrawer-section {
-  padding-top: 24px;
+  padding-top: 18px;
 }
 
 .orderDrawer-sectionTitle {
-  margin: 0 0 16px;
-  font-size: 11px;
+  margin: 0 0 12px;
+  font-size: 10px;
   line-height: 1.2;
   letter-spacing: 0.32em;
   text-transform: uppercase;
@@ -428,15 +433,15 @@
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 2.2fr);
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
-  padding: 4px 0;
+  padding: 2px 0;
   border-bottom: 1px solid rgba(15, 23, 42, 0.12);
 }
 
 .orderDrawer-row--featured {
   display: grid;
-  padding-top: 12px;
+  padding-top: 8px;
 }
 
 .orderDrawer-row--input {
@@ -671,9 +676,9 @@
 
 .orderDrawer-transfer {
   display: grid;
-  gap: 10px;
-  margin-top: 14px;
-  padding-top: 14px;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid rgba(15, 23, 42, 0.12);
 }
 
@@ -685,7 +690,7 @@
 .orderDrawer-transferCopy {
   margin: 0;
   color: rgba(82, 84, 90, 0.9);
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.32;
 }
 
@@ -700,7 +705,7 @@
   display: grid;
   gap: 6px;
   color: rgba(82, 84, 90, 0.9);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
 }
 
@@ -717,8 +722,8 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 6px;
-  max-height: 220px;
+  gap: 4px;
+  max-height: 200px;
   overflow: auto;
 }
 
@@ -726,7 +731,7 @@
   display: grid;
   gap: 2px;
   width: 100%;
-  padding: 10px 0;
+  padding: 8px 0;
   text-align: left;
   border-radius: 0;
   border: 0;
@@ -745,19 +750,19 @@
 }
 
 .orderWindow-userName {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
 }
 
 .orderWindow-userMeta {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 9px;
 }
 
 .orderDrawer-selected {
   display: grid;
-  gap: 4px;
-  padding-top: 6px;
+  gap: 3px;
+  padding-top: 4px;
 }
 
 .orderPriceEditor {
@@ -775,8 +780,8 @@
 .orderPriceEditor-panel {
   width: min(100%, 420px);
   display: grid;
-  gap: 16px;
-  padding: 20px;
+  gap: 14px;
+  padding: 18px;
   border: 1px solid rgba(15, 95, 215, 0.12);
   border-radius: 24px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.995), rgba(247, 249, 252, 0.98));
@@ -791,7 +796,7 @@
 .orderPriceEditor-title {
   margin: 0;
   color: rgba(17, 24, 39, 0.98);
-  font-size: 20px;
+  font-size: 19px;
   line-height: 1.05;
   letter-spacing: -0.04em;
 }
@@ -808,6 +813,27 @@
   gap: 10px;
 }
 
+.orderPriceEditor-input {
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  color: rgba(17, 24, 39, 0.98);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.orderPriceEditor-hint {
+  margin: 0;
+  color: rgba(82, 84, 90, 0.82);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
 .orderPriceEditor-actions {
   display: grid;
   gap: 10px;
@@ -816,40 +842,40 @@
 @media (max-width: 480px) {
   .orderDrawer-panel {
     width: 100%;
-    padding: 8px 12px 12px;
+    padding: 6px 10px 10px;
   }
 
   .orderDrawer-header {
-    padding: 10px 0 14px;
-    margin-bottom: 8px;
+    padding: 6px 0 10px;
+    margin-bottom: 6px;
   }
 
   .orderDrawer-backBtn {
-    min-height: 28px;
-    font-size: 14px;
+    min-height: 22px;
+    font-size: 13px;
   }
 
   .orderDrawer-backBtn svg {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
   }
 
   .orderSheetCard {
-    margin-top: 12px;
-    padding: 14px 12px;
-    gap: 12px;
-    border-radius: 18px;
+    margin-top: 10px;
+    padding: 12px 10px;
+    gap: 10px;
+    border-radius: 16px;
   }
 
   .orderSheetSectionTitle {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .orderSheetIcon {
-    width: 32px;
-    height: 32px;
-    flex-basis: 32px;
-    border-radius: 10px;
+    width: 30px;
+    height: 30px;
+    flex-basis: 30px;
+    border-radius: 9px;
   }
 
   .orderSheetIcon svg,
@@ -861,16 +887,16 @@
 
   .orderSheetInfoRow {
     grid-template-columns: minmax(0, 0.84fr) minmax(0, 1.16fr);
-    gap: 10px;
-    padding: 9px 0;
+    gap: 8px;
+    padding: 7px 0;
   }
 
   .orderSheetInfoLead {
-    gap: 10px;
+    gap: 8px;
   }
 
   .orderSheetInfoLabel {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .orderSheetInfoValue,
@@ -880,29 +906,29 @@
   }
 
   .orderSheetInfoValue {
-    font-size: 12px;
-    line-height: 1.28;
+    font-size: 11px;
+    line-height: 1.22;
   }
 
   .orderSheetStatus {
-    min-height: 28px;
-    padding: 0 12px;
-    font-size: 11px;
+    min-height: 26px;
+    padding: 0 10px;
+    font-size: 10px;
   }
 
   .orderSheetRouteRows {
-    grid-template-columns: 20px minmax(0, 1fr);
-    gap: 8px;
+    grid-template-columns: 18px minmax(0, 1fr);
+    gap: 6px;
   }
 
   .orderSheetRouteRow {
-    grid-template-columns: minmax(82px, 0.42fr) minmax(0, 1fr);
-    gap: 8px;
-    padding: 9px 0;
+    grid-template-columns: minmax(72px, 0.38fr) minmax(0, 1fr);
+    gap: 6px;
+    padding: 7px 0;
   }
 
   .orderSheetRouteLine {
-    min-height: 48px;
+    min-height: 42px;
   }
 
   .orderSheetPriceValue {
@@ -911,62 +937,72 @@
   }
 
   .orderSheetEditButton {
-    width: 34px;
-    height: 34px;
-    flex-basis: 34px;
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
   }
 
   .orderSheetTotalBar {
-    grid-template-columns: 36px minmax(0, 1fr);
-    gap: 8px;
-    padding: 12px;
-    border-radius: 16px;
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 6px;
+    padding: 10px 11px;
+    border-radius: 14px;
   }
 
   .orderSheetTotalIcon {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
   }
 
   .orderSheetTotalLabel {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .orderSheetTotalValue {
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .orderWindow-input {
-    min-height: 38px;
-    font-size: 14px;
+    min-height: 36px;
+    font-size: 13px;
   }
 
   .orderCommissionField-row {
-    grid-template-columns: minmax(0, 1fr) minmax(54px, 0.75fr) minmax(54px, 0.75fr);
-    gap: 5px;
+    grid-template-columns: minmax(0, 1fr) minmax(48px, 0.68fr) minmax(48px, 0.68fr);
+    gap: 4px;
   }
 
   .orderCommissionField-input,
   .orderCommissionField-currencyButton {
-    min-height: 36px;
-    border-radius: 11px;
-    font-size: 12px;
+    min-height: 34px;
+    border-radius: 10px;
+    font-size: 11px;
   }
 
   .orderPriceEditor {
-    padding: 14px;
+    padding: 12px;
   }
 
   .orderPriceEditor-panel {
     width: 100%;
-    padding: 18px;
-    gap: 16px;
-    border-radius: 20px;
+    padding: 16px;
+    gap: 12px;
+    border-radius: 18px;
   }
 
   .orderPriceEditor-title {
-    font-size: 19px;
+    font-size: 18px;
+  }
+
+  .orderPriceEditor-input {
+    min-height: 36px;
+    border-radius: 12px;
+    font-size: 13px;
+  }
+
+  .orderPriceEditor-hint {
+    font-size: 10px;
   }
 
   .orderDrawer-actions--stacked,
@@ -979,6 +1015,6 @@
   }
 
   .orderWindow-button {
-    min-height: 40px;
+    min-height: 38px;
   }
 }

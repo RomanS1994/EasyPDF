@@ -63,6 +63,7 @@ export const ORDER_LIST_SELECT = {
   id: true,
   orderNumber: true,
   status: true,
+  flightNumber: true,
   customer: true,
   trip: true,
   totalPrice: true,
@@ -278,10 +279,13 @@ export function sanitizeOrderRecord(order) {
 }
 
 export function sanitizeOrderListRecord(order) {
+  const flightNumber = order.flightNumber || order.contractData?.flightNumber || '';
+
   return {
     id: order.id,
     orderNumber: pickTextValue(order.orderNumber),
     status: pickTextValue(order.status),
+    flightNumber: pickTextValue(flightNumber),
     customer: {
       name: pickTextValue(order.customer?.name),
       email: pickTextValue(order.customer?.email),

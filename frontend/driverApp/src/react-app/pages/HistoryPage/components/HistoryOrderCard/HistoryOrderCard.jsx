@@ -27,6 +27,16 @@ function RouteOpenIcon() {
   );
 }
 
+function WalletIcon() {
+  return (
+    <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+      <path d="M5.5 7.5a2 2 0 0 1 2-2h8.4a2 2 0 0 1 2 2v1.1h-8.1a2.8 2.8 0 0 0 0 5.6h8.1v1.8a2 2 0 0 1-2 2h-8.4a2 2 0 0 1-2-2Z" />
+      <path d="M17.9 8.4h1a1.7 1.7 0 0 1 1.7 1.7v2a1.7 1.7 0 0 1-1.7 1.7h-8.6a2.7 2.7 0 0 1 0-5.4Z" />
+      <circle cx="17.1" cy="11" r="0.8" fill="currentColor" />
+    </svg>
+  );
+}
+
 function HistoryOrderCard({ order, onOpen }) {
   const navigate = useNavigate();
   const { t } = useI18n();
@@ -96,67 +106,91 @@ function HistoryOrderCard({ order, onOpen }) {
         onKeyDown={handleKeyDown}
       >
         <div className="orderItemHeader">
-          <div className="orderItemIdentity">
-            <div className="orderItemIdentityRow">
-              <strong
-                className={`orderItemCustomer ${customerName === t('history.customerNotSpecified') ? 'is-placeholder' : ''}`}
-              >
-                {customerName}
-              </strong>
-              <button
-                className="orderItemMeetButton"
-                type="button"
-                onClick={handleOpenDisplay}
-                aria-label={`${t('history.openDisplay')} ${customerName}`}
-                title={t('history.openDisplay')}
-              >
-                <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-                  <rect x="3.5" y="5" width="17" height="12.5" rx="2.5" />
-                  <path d="M8 20h8M12 17.5v2.5" />
-                </svg>
-              </button>
-            </div>
-            <p className={`orderItemRoute ${hasRoute ? '' : 'is-placeholder'}`}>
-              {hasRoute ? (
-                <>
-                  <button
-                    className="orderItemRouteLineButton"
-                    type="button"
-                    onClick={(event) => handleOpenRouteModal(event, routeFrom, t('history.routeFrom'))}
-                  >
-                    <span className="orderItemRouteLine">{routeFrom}</span>
-                    <span className="orderItemRouteLineArrow" aria-hidden="true">
-                      <RouteOpenIcon />
-                    </span>
-                  </button>
-                  <button
-                    className="orderItemRouteLineButton"
-                    type="button"
-                    onClick={(event) => handleOpenRouteModal(event, routeTo, t('history.routeTo'))}
-                  >
-                    <span className="orderItemRouteLine">{routeTo}</span>
-                    <span className="orderItemRouteLineArrow" aria-hidden="true">
-                      <RouteOpenIcon />
-                    </span>
-                  </button>
-                </>
-              ) : (
-                t('history.routeNotAdded')
-              )}
-            </p>
+          <strong
+            className={`orderItemCustomer ${customerName === t('history.customerNotSpecified') ? 'is-placeholder' : ''}`}
+          >
+            {customerName}
+          </strong>
+          <button
+            className="orderItemMeetButton"
+            type="button"
+            onClick={handleOpenDisplay}
+            aria-label={`${t('history.openDisplay')} ${customerName}`}
+            title={t('history.openDisplay')}
+          >
+            <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+              <rect x="3.5" y="5" width="17" height="12.5" rx="2.5" />
+              <path d="M8 20h8M12 17.5v2.5" />
+            </svg>
+          </button>
+          <span className="orderStatusBadge">
+            {status.bucket === 'today' ? <span className="orderStatusBadgeDot" aria-hidden="true" /> : null}
+            {status.label}
+          </span>
+        </div>
+        <div className="orderItemRouteCard">
+          <div className="orderItemRouteTrack" aria-hidden="true">
+            <span className="orderItemRouteTrackStart" />
+            <span className="orderItemRouteTrackLine" />
+            <span className="orderItemRouteTrackEnd" />
           </div>
-          <span className="orderStatusBadge">{status.label}</span>
+
+          <div className={`orderItemRoute ${hasRoute ? '' : 'is-placeholder'}`}>
+            {hasRoute ? (
+              <>
+                <button
+                  className="orderItemRouteLineButton"
+                  type="button"
+                  onClick={(event) => handleOpenRouteModal(event, routeFrom, t('history.routeFrom'))}
+                >
+                  <span className="orderItemRouteLineText">
+                    <span className="orderItemRouteLineLabel">{t('history.routeFrom')}</span>
+                    <span className="orderItemRouteLineValue">{routeFrom}</span>
+                  </span>
+                  <span className="orderItemRouteLineArrow" aria-hidden="true">
+                    <RouteOpenIcon />
+                  </span>
+                </button>
+                <button
+                  className="orderItemRouteLineButton"
+                  type="button"
+                  onClick={(event) => handleOpenRouteModal(event, routeTo, t('history.routeTo'))}
+                >
+                  <span className="orderItemRouteLineText">
+                    <span className="orderItemRouteLineLabel">{t('history.routeTo')}</span>
+                    <span className="orderItemRouteLineValue">{routeTo}</span>
+                  </span>
+                  <span className="orderItemRouteLineArrow" aria-hidden="true">
+                    <RouteOpenIcon />
+                  </span>
+                </button>
+              </>
+            ) : (
+              t('history.routeNotAdded')
+            )}
+          </div>
         </div>
         <div className="orderItemMetaRow">
+          <span className="orderItemMetaIcon" aria-hidden="true">
+            <WalletIcon />
+          </span>
           <strong className={`orderItemPrice ${totalPrice === t('history.noPrice') ? 'is-placeholder' : ''}`}>
             {totalPrice}
           </strong>
-          <span className="orderItemDate">{dateTime}</span>
-          <span className="orderItemArrow" aria-hidden="true">
+          <div className="orderItemDateWrap">
+            <span className="orderItemDateIcon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <rect x="4.5" y="5.5" width="15" height="14" rx="2.4" />
+                <path d="M8 3.8v3.1M16 3.8v3.1M4.8 9.5h14.4" />
+              </svg>
+            </span>
+            <span className="orderItemDate">{dateTime}</span>
+          </div>
+          <button className="orderItemArrow" type="button" onClick={handleOpenDetails} aria-label={t('history.openDetails')}>
             <svg viewBox="0 0 20 20" focusable="false">
               <path d="M7.5 4.5 13 10l-5.5 5.5" />
             </svg>
-          </span>
+          </button>
         </div>
       </article>
 

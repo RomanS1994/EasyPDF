@@ -58,12 +58,18 @@ export function buildOrderRecord(body, user, options = {}) {
   const contractData = body.contractData || body.order || {};
   const createdAt = options.createdAt || nowIso();
   const orderSequence = options.orderSequence || 1;
+  const flightNumber =
+    body.flightNumber ||
+    contractData.flightNumber ||
+    body.order?.flightNumber ||
+    '';
 
   return {
     id: randomUUID(),
     userId: user.id,
     orderNumber: generateOrderNumber(user, createdAt, orderSequence),
     status: body.status || 'created',
+    flightNumber,
     source: body.source || 'pdf-app',
     customer: {
       name: contractData.customer?.name || body.customer?.name || '',
@@ -86,7 +92,10 @@ export function buildOrderRecord(body, user, options = {}) {
       url: body.pdf?.url || body.pdfUrl || '',
       fileName: body.pdf?.fileName || body.pdfFileName || '',
     },
-    contractData,
+    contractData: {
+      ...contractData,
+      flightNumber,
+    },
     metadata: typeof body.metadata === 'object' && body.metadata ? body.metadata : {},
     createdAt,
     updatedAt: createdAt,

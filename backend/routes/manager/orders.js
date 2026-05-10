@@ -178,13 +178,14 @@ export async function handleManagerOrderRestore(request, response, orderId) {
       throw new Error('Order already exists');
     }
 
-    const created = await tx.order.create({
-      data: {
-        id: archivedOrder.id,
-        userId: archivedOrder.userId,
-        orderNumber: archivedOrder.orderNumber,
-        status: archivedOrder.status,
-        source: archivedOrder.source,
+      const created = await tx.order.create({
+        data: {
+          id: archivedOrder.id,
+          userId: archivedOrder.userId,
+          orderNumber: archivedOrder.orderNumber,
+          status: archivedOrder.status,
+          flightNumber: archivedOrder.flightNumber,
+          source: archivedOrder.source,
         customer: archivedOrder.customer,
         trip: archivedOrder.trip,
         totalPrice: archivedOrder.totalPrice,
@@ -203,21 +204,23 @@ export async function handleManagerOrderRestore(request, response, orderId) {
       },
     });
 
-    await createAuditLog(tx, {
-      action: 'order.restored',
-      actorUserId: context.user.id,
-      targetUserId: archivedOrder.userId,
-      entityType: 'order',
-      entityId: archivedOrder.id,
-      before: {
-        status: archivedOrder.status,
-        orderNumber: archivedOrder.orderNumber,
-      },
-      after: {
-        status: created.status,
-        orderNumber: created.orderNumber,
-      },
-    });
+      await createAuditLog(tx, {
+        action: 'order.restored',
+        actorUserId: context.user.id,
+        targetUserId: archivedOrder.userId,
+        entityType: 'order',
+        entityId: archivedOrder.id,
+        before: {
+          status: archivedOrder.status,
+          orderNumber: archivedOrder.orderNumber,
+          flightNumber: archivedOrder.flightNumber,
+        },
+        after: {
+          status: created.status,
+          orderNumber: created.orderNumber,
+          flightNumber: created.flightNumber,
+        },
+      });
 
     return sanitizeOrderRecord(created);
   });

@@ -102,6 +102,7 @@ model Order {
   userId       String
   orderNumber  String
   status       String
+  flightNumber String   @default("")
   source       String
   customer     Json
   trip         Json
@@ -126,6 +127,7 @@ model ArchivedOrder {
   userId       String
   orderNumber  String
   status       String
+  flightNumber String   @default("")
   source       String
   customer     Json
   trip         Json

@@ -67,30 +67,11 @@ function getCommissionValue(order) {
   return String(order?.metadata?.commission ?? order?.contractData?.commission ?? "").trim();
 }
 
-function formatStatusLabel(value) {
-  if (!value) {
-    return "-";
-  }
-
-  return String(value)
-    .split(/[_\s-]+/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-    .join(" ");
-}
-
-function getStatusTone(value) {
-  const normalized = String(value || "").toLowerCase();
-
-  if (["created", "completed", "pdf_generated"].includes(normalized)) {
-    return "success";
-  }
-
-  if (["deleted", "cancelled"].includes(normalized)) {
-    return "danger";
-  }
-
-  return "neutral";
+function normalizeFlightNumber(value) {
+  return String(value || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toUpperCase();
 }
 
 function OrderGlyph({ name }) {
@@ -159,6 +140,19 @@ function OrderGlyph({ name }) {
             fill="none"
             stroke="currentColor"
             strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+    case "plane":
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path
+            d="M4 13.5 20.5 4.8l-3.2 7.8 2.7 2.7-2 2-2.7-2.7L7.5 20 6 18.5l2.2-7.1L4 13.5Z"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
@@ -332,6 +326,8 @@ export function OrderDetails({ orderId, onClose }) {
   const [priceEditorOpen, setPriceEditorOpen] = useState(false);
   const [priceInput, setPriceInput] = useState("");
   const [priceCurrency, setPriceCurrency] = useState("EUR");
+  const [flightNumberEditorOpen, setFlightNumberEditorOpen] = useState(false);
+  const [flightNumberInput, setFlightNumberInput] = useState("");
   const skipCommissionSyncRef = useRef(false);
   const [showTransfer, setShowTransfer] = useState(false);
   const [transferSearch, setTransferSearch] = useState("");
@@ -364,8 +360,9 @@ export function OrderDetails({ orderId, onClose }) {
   const tripTime = formatDateTime(getOrderTripTime(order));
   const storedCommission = getCommissionValue(order);
   const storedPrice = String(order?.totalPrice || order?.contractData?.totalPrice || "").trim();
-  const statusTone = getStatusTone(order?.status);
-  const statusLabel = formatStatusLabel(order?.status);
+  const storedFlightNumber = String(
+    order?.flightNumber || order?.contractData?.flightNumber || "",
+  ).trim();
   const amountDue = storedPrice || "-";
   const commissionConverted = useMemo(() => {
     if (!commissionInput) {
@@ -396,6 +393,7 @@ export function OrderDetails({ orderId, onClose }) {
     setTransferSearch("");
     setSelectedUserId("");
     setPriceEditorOpen(false);
+    setFlightNumberEditorOpen(false);
   }, [orderId]);
 
   useEffect(() => {
@@ -447,13 +445,18 @@ export function OrderDetails({ orderId, onClose }) {
         !isGenerating &&
         !isUpdatingOrder
       ) {
-        if (priceEditorOpen) {
-          setPriceEditorOpen(false);
-          return;
-        }
+      if (priceEditorOpen) {
+        setPriceEditorOpen(false);
+        return;
+      }
 
-        if (showTransfer) {
-          setShowTransfer(false);
+      if (flightNumberEditorOpen) {
+        setFlightNumberEditorOpen(false);
+        return;
+      }
+
+      if (showTransfer) {
+        setShowTransfer(false);
           return;
         }
 
@@ -475,6 +478,7 @@ export function OrderDetails({ orderId, onClose }) {
     isGenerating,
     isUpdatingOrder,
     priceEditorOpen,
+    flightNumberEditorOpen,
     onClose,
   ]);
 
@@ -650,6 +654,51 @@ export function OrderDetails({ orderId, onClose }) {
     setPriceEditorOpen(false);
   }
 
+  function openFlightNumberEditor() {
+    setError("");
+    setMessage("");
+    setFlightNumberInput(normalizeFlightNumber(storedFlightNumber));
+    setFlightNumberEditorOpen(true);
+  }
+
+  function closeFlightNumberEditor() {
+    setFlightNumberEditorOpen(false);
+  }
+
+  function handleFlightNumberInputChange(event) {
+    setFlightNumberInput(normalizeFlightNumber(event.target.value));
+  }
+
+  async function saveFlightNumber() {
+    const normalized = normalizeFlightNumber(flightNumberInput);
+
+    if (normalized === storedFlightNumber) {
+      closeFlightNumberEditor();
+      return;
+    }
+
+    setMessage("");
+    setError("");
+
+    try {
+      await updateOrder({
+        orderId,
+        payload: {
+          flightNumber: normalized,
+          contractData: {
+            ...(order.contractData || {}),
+            flightNumber: normalized,
+          },
+        },
+      }).unwrap();
+
+      closeFlightNumberEditor();
+      setMessage(t('contract.flightNumberUpdated'));
+    } catch (updateError) {
+      setError(resolveErrorMessage(updateError, t('contract.failedToUpdateFlightNumber')));
+    }
+  }
+
   function handlePriceInputChange(event) {
     setPriceInput(sanitizePriceInput(event.target.value));
   }
@@ -702,6 +751,11 @@ export function OrderDetails({ orderId, onClose }) {
   function handleCloseRequest() {
     if (priceEditorOpen) {
       setPriceEditorOpen(false);
+      return;
+    }
+
+    if (flightNumberEditorOpen) {
+      setFlightNumberEditorOpen(false);
       return;
     }
 
@@ -791,10 +845,20 @@ export function OrderDetails({ orderId, onClose }) {
 
                 <div className="orderSheetInfoRow">
                   <div className="orderSheetInfoLead">
-                    <OrderCardIcon name="status" />
-                    <span className="orderSheetInfoLabel">{t('common.status')}</span>
+                    <OrderCardIcon name="plane" />
+                    <span className="orderSheetInfoLabel">{t('contract.flightNumber')}</span>
                   </div>
-                  <span className={`orderSheetStatus orderSheetStatus--${statusTone}`}>{statusLabel}</span>
+                  <div className="orderSheetPriceValue orderSheetPriceValue--flight">
+                    <span className="orderSheetInfoValue">{storedFlightNumber || "-"}</span>
+                    <button
+                      className="orderSheetEditButton"
+                      type="button"
+                      onClick={openFlightNumberEditor}
+                      aria-label={t('contract.editFlightNumber')}
+                    >
+                      <OrderGlyph name="edit" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="orderSheetInfoRow">
@@ -1174,6 +1238,68 @@ export function OrderDetails({ orderId, onClose }) {
                 className="orderWindow-button orderWindow-button--secondary"
                 type="button"
                 onClick={closePriceEditor}
+                disabled={isUpdatingOrder}
+              >
+                {t('common.cancel')}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {flightNumberEditorOpen ? (
+        <div
+          className="orderPriceEditor"
+          role="presentation"
+          onClick={closeFlightNumberEditor}
+        >
+          <div
+            className="orderPriceEditor-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('contract.flightNumberEditorTitle')}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="orderPriceEditor-header">
+              <h4 className="orderPriceEditor-title">{t('contract.flightNumberEditorTitle')}</h4>
+              <p className="orderPriceEditor-copy">{t('contract.flightNumberEditorCopy')}</p>
+            </div>
+
+            <div className="orderPriceEditor-field">
+              <input
+                className="orderWindow-input orderPriceEditor-input"
+                type="text"
+                inputMode="text"
+                autoCapitalize="characters"
+                autoCorrect="off"
+                spellCheck={false}
+                aria-label={t('contract.flightNumber')}
+                placeholder={t('contract.flightNumber')}
+                value={flightNumberInput}
+                onChange={handleFlightNumberInputChange}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    void saveFlightNumber();
+                  }
+                }}
+              />
+              <p className="orderPriceEditor-hint">{t('contract.flightNumberEditorHint')}</p>
+            </div>
+
+            <div className="orderPriceEditor-actions">
+              <button
+                className="orderWindow-button orderWindow-button--accent"
+                type="button"
+                onClick={() => void saveFlightNumber()}
+                disabled={isUpdatingOrder}
+              >
+                {isUpdatingOrder ? t('common.saving') : t('contract.saveFlightNumber')}
+              </button>
+              <button
+                className="orderWindow-button orderWindow-button--secondary"
+                type="button"
+                onClick={closeFlightNumberEditor}
                 disabled={isUpdatingOrder}
               >
                 {t('common.cancel')}

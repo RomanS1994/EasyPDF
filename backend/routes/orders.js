@@ -92,6 +92,7 @@ async function handleCreateOrder(request, response) {
           userId: nextOrder.userId,
           orderNumber: nextOrder.orderNumber,
           status: nextOrder.status,
+          flightNumber: nextOrder.flightNumber,
           source: nextOrder.source,
           customer: nextOrder.customer,
           trip: nextOrder.trip,
@@ -114,6 +115,7 @@ async function handleCreateOrder(request, response) {
         after: {
           orderNumber: createdOrder.orderNumber,
           status: createdOrder.status,
+          flightNumber: createdOrder.flightNumber,
         },
       });
 
@@ -168,9 +170,22 @@ async function handleUpdateOrder(request, response, orderId) {
 
       const before = {
         status: order.status,
+        flightNumber: order.flightNumber,
         totalPrice: order.totalPrice,
         pdf: order.pdf,
       };
+      const nextFlightNumber =
+        typeof body.flightNumber === 'string' ? body.flightNumber.trim() : '';
+      const nextContractData =
+        nextFlightNumber || body.contractData || body.status
+          ? {
+              ...(order.contractData || {}),
+              ...(body.contractData && typeof body.contractData === 'object'
+                ? body.contractData
+                : {}),
+              ...(nextFlightNumber ? { flightNumber: nextFlightNumber } : {}),
+            }
+          : order.contractData;
 
       const updated = await tx.order.update({
         where: {
@@ -180,11 +195,12 @@ async function handleUpdateOrder(request, response, orderId) {
           ...(typeof body.status === 'string' && body.status.trim()
             ? { status: body.status.trim() }
             : {}),
+          ...(typeof body.flightNumber === 'string'
+            ? { flightNumber: nextFlightNumber }
+            : {}),
           ...(typeof body.totalPrice === 'string' ? { totalPrice: body.totalPrice } : {}),
           ...(nextPdf !== order.pdf ? { pdf: nextPdf } : {}),
-          ...(body.contractData && typeof body.contractData === 'object'
-            ? { contractData: body.contractData }
-            : {}),
+          ...(nextContractData !== order.contractData ? { contractData: nextContractData } : {}),
           ...(nextMetadata !== order.metadata ? { metadata: nextMetadata } : {}),
           updatedAt: new Date(nowIso()),
         },
@@ -200,6 +216,7 @@ async function handleUpdateOrder(request, response, orderId) {
         before,
         after: {
           status: updated.status,
+          flightNumber: updated.flightNumber,
           totalPrice: updated.totalPrice,
           pdf: updated.pdf,
         },
@@ -245,6 +262,7 @@ async function handleDeleteOrder(request, response, orderId) {
         before: {
           orderNumber: order.orderNumber,
           status: order.status,
+          flightNumber: order.flightNumber,
           userId: order.userId,
           totalPrice: order.totalPrice,
         },
@@ -257,6 +275,7 @@ async function handleDeleteOrder(request, response, orderId) {
           userId: order.userId,
           orderNumber: order.orderNumber,
           status: order.status,
+          flightNumber: order.flightNumber,
           source: order.source,
           customer: order.customer,
           trip: order.trip,
