@@ -77,11 +77,11 @@ export function HistoryPage() {
             {dateFilter ? t('history.noMatch') : orders.length ? t('history.emptyTab') : t('history.empty')}
           </p>
         ) : null}
-
-        {!isLoading && !isError && visibleOrders.length ? (
-          <HistoryOrdersList orders={visibleOrders} onOpen={handleOpenDetails} />
-        ) : null}
       </div>
+
+      {!isLoading && !isError && visibleOrders.length ? (
+        <HistoryOrdersList orders={visibleOrders} onOpen={handleOpenDetails} />
+      ) : null}
 
       {selectedOrderId ? <OrderDetails orderId={selectedOrderId} onClose={handleCloseDetails} /> : null}
     </section>

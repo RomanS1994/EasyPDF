@@ -150,7 +150,6 @@ function HistoryOrderCard({ order, onOpen }) {
                   onClick={(event) => handleOpenRouteModal(event, routeFrom, t('history.routeFrom'))}
                 >
                   <span className="orderItemRouteLineText">
-                    <span className="orderItemRouteLineLabel">{t('history.routeFrom')}</span>
                     <span className="orderItemRouteLineValue">{routeFrom}</span>
                   </span>
                   <span className="orderItemRouteLineArrow" aria-hidden="true">
@@ -163,7 +162,6 @@ function HistoryOrderCard({ order, onOpen }) {
                   onClick={(event) => handleOpenRouteModal(event, routeTo, t('history.routeTo'))}
                 >
                   <span className="orderItemRouteLineText">
-                    <span className="orderItemRouteLineLabel">{t('history.routeTo')}</span>
                     <span className="orderItemRouteLineValue">{routeTo}</span>
                   </span>
                   <span className="orderItemRouteLineArrow" aria-hidden="true">

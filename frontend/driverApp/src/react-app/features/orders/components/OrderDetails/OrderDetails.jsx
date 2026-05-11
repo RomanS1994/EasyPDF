@@ -26,25 +26,6 @@ import { formatDateTime, getOrderTripTime } from "../../../../pages/HistoryPage/
 import { resolveErrorMessage } from "@shared/app/utils/errorMessages.js";
 import "./OrderDetails.css";
 
-function formatDate(value) {
-  if (!value) {
-    return "-";
-  }
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return String(value);
-  }
-
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
-}
-
 function getLocation(value) {
   if (!value) {
     return "-";
@@ -688,10 +669,12 @@ export function OrderDetails({ orderId, onClose }) {
 
                 <div className="orderSheetInfoRow">
                   <div className="orderSheetInfoLead">
-                    <OrderCardIcon name="calendar" />
-                    <span className="orderSheetInfoLabel">{t('contract.createdAt')}</span>
+                    <OrderCardIcon name="accounts" />
+                    <span className="orderSheetInfoLabel">{t('contract.passengers')}</span>
                   </div>
-                  <span className="orderSheetInfoValue">{formatDate(order.createdAt)}</span>
+                  <span className="orderSheetInfoValue">
+                    {order?.contractData?.passengers || order?.passengers || '-'}
+                  </span>
                 </div>
               </div>
             </section>

@@ -3,7 +3,7 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 12px;
+  gap: 14px;
 }
 
 .orderItem {
@@ -114,7 +114,7 @@
 
 .orderItemCard {
   display: grid;
-  gap: 8px;
+  gap: 12px;
   padding: 12px 12px 10px 12px;
 }
 
@@ -299,12 +299,12 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 12px;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   width: 100%;
   min-height: 42px;
-  padding: 5px 4px 5px 2px;
+  padding: 4px 4px 4px 2px;
   border: 0;
-  border-bottom: 1px solid rgba(220, 228, 241, 0.98);
+
   border-radius: 0;
   background: transparent;
   box-shadow: none;
@@ -334,20 +334,8 @@
 
 .orderItemRouteLineText {
   display: grid;
-  gap: 1px;
+  gap: 0;
   min-width: 0;
-}
-
-.orderItemRouteLineLabel {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: #6e7a91;
-  font-size: 7px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
 }
 
 .orderItemRouteLineValue {
@@ -569,7 +557,7 @@
 
 @media (max-width: 480px) {
   .ordersList {
-    gap: 8px;
+    gap: 14px;
   }
 
   .orderItem {
@@ -579,7 +567,7 @@
 
   .orderItemCard {
     padding: 10px 10px 8px 10px;
-    gap: 6px;
+    gap: 12px;
   }
 
   .orderItemCustomer {
@@ -677,11 +665,7 @@
 
   .orderItemRouteLineButton {
     min-height: 38px;
-    padding: 5px 4px 5px 2px;
-  }
-
-  .orderItemRouteLineLabel {
-    font-size: 7px;
+    padding: 4px 4px 4px 2px;
   }
 
   .orderItemRouteLineValue {
