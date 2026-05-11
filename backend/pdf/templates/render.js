@@ -48,6 +48,17 @@ function localDateOnly(date = new Date()) {
   return local.toISOString().slice(0, 10);
 }
 
+function subtractDaysFromDateOnly(value, days) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  date.setDate(date.getDate() - days);
+  return localDateOnly(date);
+}
+
 function normalizeDateOnly(value) {
   if (!value) {
     return localDateOnly();
@@ -145,7 +156,9 @@ export function renderContractPdfHtml({
   const resolvedDocumentType =
     documentType === "offer" ? "offer" : "confirmation";
   const orderNumber = normalizeText(contractData?.orderNumber || "—");
-  const issueDate = normalizeDateOnly(contractData?.today || new Date());
+  const issueDate =
+    subtractDaysFromDateOnly(contractData?.trip?.time, 3) ||
+    normalizeDateOnly(contractData?.today || new Date());
   const company = buildContractCompany(contractData);
   const fullTitle = t(`document.${resolvedDocumentType}Heading`);
   const pageTitle = t(`document.${resolvedDocumentType}Title`);
