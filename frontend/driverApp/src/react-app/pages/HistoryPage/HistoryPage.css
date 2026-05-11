@@ -3,10 +3,6 @@
   gap: 12px;
 }
 
-.orderHistoryScreen {
-  gap: 12px;
-}
-
 .orderHistoryEmpty {
   margin: 0;
   padding: 16px 18px;
@@ -16,10 +12,4 @@
   color: var(--muted);
   text-align: center;
   line-height: 1.45;
-}
-
-@media (max-width: 480px) {
-  .orderHistoryScreen {
-    gap: 10px;
-  }
 }

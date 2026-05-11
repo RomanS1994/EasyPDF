@@ -28,6 +28,10 @@ function RouteEndIcon() {
   return <SvgIcon name="completed" />;
 }
 
+function FlightIcon() {
+  return <SvgIcon name="takeoff" />;
+}
+
 function formatDate(value) {
   const date = parseDateValue(value);
 
@@ -42,6 +46,13 @@ function formatDate(value) {
   });
 }
 
+function normalizeFlightNumber(value) {
+  return String(value || '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .toUpperCase();
+}
+
 function HistoryOrderCard({ order, onOpen }) {
   const { t } = useI18n();
   const [routeModal, setRouteModal] = useState({
@@ -51,6 +62,7 @@ function HistoryOrderCard({ order, onOpen }) {
   const status = getHistoryBucket(order);
   const customerName = getCustomerName(order);
   const totalPrice = getTotalPrice(order);
+  const flightNumber = normalizeFlightNumber(order?.flightNumber || order?.contractData?.flightNumber || '');
   const dateValue = formatDate(getOrderTripTime(order) || order?.createdAt);
   const timeValue = (() => {
     const date = parseDateValue(getOrderTripTime(order) || order?.createdAt);
@@ -124,10 +136,22 @@ function HistoryOrderCard({ order, onOpen }) {
             {customerName}
           </strong>
           <div className="orderItemHeaderActions">
-            <span className="orderStatusBadge">
-              {status.bucket === 'today' ? <span className="orderStatusBadgeDot" aria-hidden="true" /> : null}
-              {status.label}
-            </span>
+            <div className="orderStatusBadgeWrap">
+              {status.bucket === 'today' && flightNumber ? (
+                <div className="orderStatusBadge" aria-hidden="true">
+                  <span className="orderStatusBadgeFlight">
+                    <span className="orderStatusBadgeFlightIcon">
+                      <FlightIcon />
+                    </span>
+                    <span className="orderStatusBadgeFlightValue">{flightNumber}</span>
+                  </span>
+                </div>
+              ) : null}
+              <div className="orderStatusBadgeToday">
+                {status.bucket === 'today' ? <span className="orderStatusBadgeDot" aria-hidden="true" /> : null}
+                {status.label}
+              </div>
+            </div>
           </div>
         </div>
         <div className="orderItemRouteCard">

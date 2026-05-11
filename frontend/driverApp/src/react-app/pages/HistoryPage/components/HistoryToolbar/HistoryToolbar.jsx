@@ -27,7 +27,7 @@ function formatSelectedDate(value) {
   return `${day}.${month}.${year}`;
 }
 
-function HistoryToolbar({ dateFilter, onDateChange, onResetDate, sortKey, onSortChange }) {
+function HistoryToolbar({ showDateFilter, dateFilter, onDateChange, onResetDate, sortKey, onSortChange }) {
   const { t } = useI18n();
   const sortOptions = [
     { key: 'oldest', label: t('history.oldest'), icon: <OldestIcon /> },
@@ -55,36 +55,38 @@ function HistoryToolbar({ dateFilter, onDateChange, onResetDate, sortKey, onSort
         ))}
       </div>
 
-      <div className="orderHistoryDateField" role="group" aria-label={t('history.tripDate')}>
-        <label
-          className={`orderHistorySortButton orderHistorySortButton--date ${dateFilter ? 'is-active' : ''}`}
-          title={dateFilter ? `${t('history.tripDate')}: ${dateFilter}` : t('history.tripDate')}
-        >
-          <TripDateIcon />
-          <input
-            className="orderHistoryDateInput"
-            type="date"
-            value={dateFilter}
-            onChange={event => onDateChange(event.target.value)}
-            aria-label={t('history.tripDate')}
-          />
-        </label>
+      {showDateFilter ? (
+        <div className="orderHistoryDateField" role="group" aria-label={t('history.tripDate')}>
+          <label
+            className={`orderHistorySortButton orderHistorySortButton--date ${dateFilter ? 'is-active' : ''}`}
+            title={dateFilter ? `${t('history.tripDate')}: ${dateFilter}` : t('history.tripDate')}
+          >
+            <TripDateIcon />
+            <input
+              className="orderHistoryDateInput"
+              type="date"
+              value={dateFilter}
+              onChange={event => onDateChange(event.target.value)}
+              aria-label={t('history.tripDate')}
+            />
+          </label>
 
-        <span className={`orderHistoryDateLabel ${dateFilter ? 'is-active' : ''}`}>
-          {selectedDateLabel || t('history.date')}
-        </span>
+          <span className={`orderHistoryDateLabel ${dateFilter ? 'is-active' : ''}`}>
+            {selectedDateLabel || t('history.date')}
+          </span>
 
-        <button
-          className="orderHistorySortButton orderHistorySortButton--clear"
-          type="button"
-          aria-label={t('common.clear')}
-          title={t('common.clear')}
-          onClick={onResetDate}
-          disabled={!dateFilter}
-        >
-          <SvgIcon name="clear" />
-        </button>
-      </div>
+          <button
+            className="orderHistorySortButton orderHistorySortButton--clear"
+            type="button"
+            aria-label={t('common.clear')}
+            title={t('common.clear')}
+            onClick={onResetDate}
+            disabled={!dateFilter}
+          >
+            <SvgIcon name="clear" />
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

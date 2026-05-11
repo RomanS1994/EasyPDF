@@ -1037,10 +1037,6 @@
     grid-template-columns: 1fr;
   }
 
-  .orderDrawer-actions--doc {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .orderWindow-button {
     min-height: 38px;
   }

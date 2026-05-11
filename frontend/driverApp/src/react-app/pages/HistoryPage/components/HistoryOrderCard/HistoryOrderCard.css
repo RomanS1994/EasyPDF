@@ -344,7 +344,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.2;
   color: #19243c;
 }
@@ -361,10 +361,24 @@
   height: 12px;
 }
 
+.orderItemHeaderActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.orderStatusBadgeWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
 .orderStatusBadge {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   align-self: flex-start;
   gap: 8px;
   min-height: 24px;
@@ -379,6 +393,54 @@
   white-space: nowrap;
 }
 
+.orderStatusBadgeFlight {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 2px;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: currentColor;
+  flex: 0 0 auto;
+}
+
+.orderStatusBadgeFlightIcon {
+  display: inline-grid;
+  place-items: center;
+}
+
+.orderStatusBadgeFlightIcon svg {
+  width: 10px;
+  height: 10px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.orderStatusBadgeFlightValue {
+  white-space: nowrap;
+}
+
+.orderStatusBadgeToday {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  color: #15783a;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
 .orderStatusBadgeDot {
   width: 6px;
   height: 6px;
@@ -389,6 +451,11 @@
 
 .orderItem--today .orderStatusBadge {
   background: rgba(52, 199, 89, 0.16);
+  color: #15783a;
+}
+
+.orderItem--today .orderStatusBadgeToday {
+  background: rgba(52, 199, 89, 0.12);
   color: #15783a;
 }
 

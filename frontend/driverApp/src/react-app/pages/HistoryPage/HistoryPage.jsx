@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
-
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { OrderDetails } from '../../features/orders/components/OrderDetails/OrderDetails.jsx';
 import { useGetOrdersQuery } from '../../features/orders/ordersApi.js';
+import { WorkspaceTabs } from '../../components/WorkspaceTabs/WorkspaceTabs.jsx';
 import { HistoryOrdersList } from './components/HistoryOrdersList/HistoryOrdersList.jsx';
 import { HistoryTabs } from './components/HistoryTabs/HistoryTabs.jsx';
 import { HistoryToolbar } from './components/HistoryToolbar/HistoryToolbar.jsx';
@@ -17,14 +17,15 @@ export function HistoryPage() {
   const { data, isLoading, isError } = useGetOrdersQuery();
   const { t } = useI18n();
   const orders = data?.orders || [];
+  const showDateFilter = activeTab !== 'today';
 
   const filteredOrders = useMemo(() => {
-    if (!dateFilter) {
+    if (!showDateFilter || !dateFilter) {
       return orders;
     }
 
     return orders.filter(order => getHistoryDateKey(order) === dateFilter);
-  }, [dateFilter, orders]);
+  }, [dateFilter, orders, showDateFilter]);
 
   const tabCounts = useMemo(() => buildTabCounts(orders), [orders]);
 
@@ -53,15 +54,13 @@ export function HistoryPage() {
 
   return (
     <section className="historyPage pageStack">
-      <div className="screenCard screenCard-stats orderHistoryScreen">
-        <div className="compactHeader">
-          <h2>{t('history.savedPdfs')}</h2>
-          <p>{t('history.subtitle')}</p>
-        </div>
+      <WorkspaceTabs />
 
+      <div className="screenCard screenCard-stats">
         <HistoryTabs activeTab={activeTab} counts={tabCounts} onChange={setActiveTab} />
 
         <HistoryToolbar
+          showDateFilter={showDateFilter}
           dateFilter={dateFilter}
           onDateChange={setDateFilter}
           onResetDate={() => setDateFilter('')}

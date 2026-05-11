@@ -6,6 +6,7 @@ import { ProtectedRoute } from '@shared/app/components/ProtectedRoute/ProtectedR
 import { RouterError } from '@shared/app/components/RouterError/RouterError.jsx';
 import { AccountPage } from './pages/AccountPage/AccountPage.jsx';
 import { HomePage } from './pages/HomePage/HomePage.jsx';
+import { AvailableOrdersPage } from './pages/AvailableOrdersPage/AvailableOrdersPage.jsx';
 import { HistoryDisplayPage } from './pages/HistoryDisplayPage/HistoryDisplayPage.jsx';
 import { HistoryPage } from './pages/HistoryPage/HistoryPage.jsx';
 import { OrdersPage } from './pages/OrdersPage/OrdersPage.jsx';
@@ -31,6 +32,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <OrdersPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'available-orders',
+        element: (
+          <ProtectedRoute>
+            <AvailableOrdersPage />
           </ProtectedRoute>
         ),
       },
