@@ -2,7 +2,7 @@
   position: fixed;
   left: 8px;
   right: 8px;
-  bottom: 40px;
+  bottom: 20px;
   z-index: 30;
   width: auto;
   display: flex;
@@ -198,7 +198,7 @@
     padding: 4px;
     border-radius: 22px;
     gap: 2px;
-    bottom: 4px;
+    bottom: 12px;
     left: 6px;
     right: 6px;
   }

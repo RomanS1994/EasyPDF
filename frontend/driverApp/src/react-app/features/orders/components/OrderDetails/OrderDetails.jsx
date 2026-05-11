@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import { useI18n } from "@shared/app/i18n/useI18n.js";
 import { selectUser } from "@shared/features/auth/authSlice.js";
@@ -88,6 +89,7 @@ function OrderCardIcon({ name, tone = "neutral", className = "" }) {
 }
 
 export function OrderDetails({ orderId, onClose }) {
+  const navigate = useNavigate();
   const currentUser = useSelector(selectUser);
   const { t } = useI18n();
   const canTransfer = hasManagerAccess(currentUser?.role);
@@ -317,6 +319,10 @@ export function OrderDetails({ orderId, onClose }) {
         resolveErrorMessage(error, t('contract.failedGeneratePdf')),
       );
     }
+  }
+
+  function handleOpenDisplay() {
+    navigate(`/history/display/${orderId}`);
   }
 
   async function handleTransfer() {
@@ -658,15 +664,26 @@ export function OrderDetails({ orderId, onClose }) {
                     <OrderCardIcon name="user" />
                     <span className="orderSheetInfoLabel">{t('contract.customer')}</span>
                   </div>
-                  <span className="orderSheetInfoValue">{customer.name || "-"}</span>
+                  <div className="orderSheetValueAction">
+                    <span className="orderSheetInfoValue">{customer.name || "-"}</span>
+                    <button
+                      className="orderSheetDisplayButton"
+                      type="button"
+                      onClick={handleOpenDisplay}
+                      aria-label={`${t('history.openDisplay')} ${customer.name || t('common.noName')}`}
+                      title={t('history.openDisplay')}
+                    >
+                      <SvgIcon name="monitor" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="orderSheetInfoRow">
                   <div className="orderSheetInfoLead">
                     <OrderCardIcon name="mail" />
-                    <span className="orderSheetInfoLabel">{t('contract.customerEmail')}</span>
+                    <span className="orderSheetInfoLabel">{t('contract.customerData')}</span>
                   </div>
-                  <span className="orderSheetInfoValue">{customer.email || "-"}</span>
+                  <span className="orderSheetInfoValue">{customer.phone || customer.email || "-"}</span>
                 </div>
 
                 <div className="orderSheetInfoRow">

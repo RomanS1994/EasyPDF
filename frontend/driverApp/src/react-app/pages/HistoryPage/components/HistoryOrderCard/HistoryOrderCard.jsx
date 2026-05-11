@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { SvgIcon } from '@shared/app/components/SvgIcon/SvgIcon.jsx';
@@ -44,7 +43,6 @@ function formatDate(value) {
 }
 
 function HistoryOrderCard({ order, onOpen }) {
-  const navigate = useNavigate();
   const { t } = useI18n();
   const [routeModal, setRouteModal] = useState({
     address: '',
@@ -99,11 +97,6 @@ function HistoryOrderCard({ order, onOpen }) {
     });
   }
 
-  function handleOpenDisplay(event) {
-    event.stopPropagation();
-    navigate(`/history/display/${order.id}`);
-  }
-
   function handleOpenDetails() {
     onOpen(order.id);
   }
@@ -131,15 +124,6 @@ function HistoryOrderCard({ order, onOpen }) {
             {customerName}
           </strong>
           <div className="orderItemHeaderActions">
-            <button
-              className="orderItemMeetButton"
-              type="button"
-              onClick={handleOpenDisplay}
-              aria-label={`${t('history.openDisplay')} ${customerName}`}
-              title={t('history.openDisplay')}
-            >
-              <SvgIcon name="monitor" />
-            </button>
             <span className="orderStatusBadge">
               {status.bucket === 'today' ? <span className="orderStatusBadgeDot" aria-hidden="true" /> : null}
               {status.label}
