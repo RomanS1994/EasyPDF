@@ -1,20 +1,40 @@
 import { useI18n } from '@shared/app/i18n/useI18n.js';
-import { getDateKey, getOrderDate, parseDateValue } from '../../../shared/dateUtils.js';
+import { getDateKey, parseDateValue } from '../../../shared/dateUtils.js';
 import './StatsSalaryPanel.css';
 
 const EUR_RATE = 25;
 
-function getCycleOrders(orders, usage) {
-  // Відібраємо тільки замовлення поточного циклу.
-  const start = parseDateValue(usage?.periodStart);
-  const end = parseDateValue(usage?.periodEnd);
+function getMonthRange(referenceDate = new Date()) {
+  const start = new Date(referenceDate);
+  start.setDate(1);
+  start.setHours(0, 0, 0, 0);
 
-  if (!start || !end) {
-    return orders;
-  }
+  const end = new Date(start);
+  end.setMonth(start.getMonth() + 1);
+  end.setDate(0);
+  end.setHours(23, 59, 59, 999);
+
+  return { start, end };
+}
+
+function getMonthLabel(language, referenceDate = new Date()) {
+  const locale = language === 'uk' ? 'uk-UA' : language === 'cs' ? 'cs-CZ' : 'en-GB';
+
+  return new Intl.DateTimeFormat(locale, {
+    month: 'long',
+    year: 'numeric',
+  }).format(referenceDate);
+}
+
+function getExecutionDate(order) {
+  return order?.contractData?.trip?.time || order?.trip?.time || '';
+}
+
+function getMonthOrders(orders, referenceDate = new Date()) {
+  const { start, end } = getMonthRange(referenceDate);
 
   return orders.filter(order => {
-    const date = parseDateValue(getOrderDate(order));
+    const date = parseDateValue(getExecutionDate(order));
 
     if (!date) {
       return false;
@@ -99,7 +119,7 @@ function getTopDays(orders) {
   const totals = new Map();
 
   for (const order of orders) {
-    const date = parseDateValue(getOrderDate(order));
+    const date = parseDateValue(getExecutionDate(order));
 
     if (!date) {
       continue;
@@ -128,13 +148,14 @@ function getTopDays(orders) {
 }
 
 export function StatsSalaryPanel({ orders, usage }) {
-  const { t } = useI18n();
-  const cycleOrders = getCycleOrders(orders, usage);
-  const grossTotal = cycleOrders.reduce((sum, order) => {
+  const { language, t } = useI18n();
+  const monthLabel = getMonthLabel(language);
+  const monthOrders = getMonthOrders(orders);
+  const grossTotal = monthOrders.reduce((sum, order) => {
     const gross = getOrderNetAmount(order);
     return sum + toCzkAmount(gross.amount, gross.currency);
   }, 0);
-  const commissionTotal = cycleOrders.reduce((sum, order) => {
+  const commissionTotal = monthOrders.reduce((sum, order) => {
     const commission = getOrderCommission(order);
     return sum + toCzkAmount(commission.amount, commission.currency);
   }, 0);
@@ -142,10 +163,10 @@ export function StatsSalaryPanel({ orders, usage }) {
   const takeHomeShare = grossTotal
     ? Math.min(100, Math.round((netSalary / grossTotal) * 100))
     : 0;
-  const bestDays = getTopDays(cycleOrders);
+  const bestDays = getTopDays(monthOrders);
   const topDay = bestDays[0];
-  const cycleCount = cycleOrders.length;
-  const avgRide = cycleCount ? netSalary / cycleCount : 0;
+  const monthCount = monthOrders.length;
+  const avgRide = monthCount ? netSalary / monthCount : 0;
 
   return (
     <section className="statsPanel is-active statsSalaryPanel">
@@ -155,7 +176,7 @@ export function StatsSalaryPanel({ orders, usage }) {
           <h3>{t('stats.salaryTitle')}</h3>
           <strong>{formatMoney(netSalary)} CZK</strong>
           <p>
-            {t('stats.mainPayout')} {cycleCount} orders.
+            {t('stats.mainPayout')} {monthCount} orders.
           </p>
         </div>
 
@@ -182,7 +203,7 @@ export function StatsSalaryPanel({ orders, usage }) {
       <div className="salaryLedgerCard">
         <div className="usageCard-head">
           <h3>{t('stats.payoutBreakdown')}</h3>
-          <span>{usage?.cycleLabel || t('stats.currentCycle')}</span>
+          <span>{monthLabel}</span>
         </div>
 
         <div className="salaryLedger">
@@ -238,7 +259,7 @@ export function StatsSalaryPanel({ orders, usage }) {
               );
             })
           ) : (
-            <p className="salaryTrendEmpty">No salary data yet.</p>
+            <p className="salaryTrendEmpty">{t('stats.noSalaryDataYet')}</p>
           )}
         </div>
       </div>

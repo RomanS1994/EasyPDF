@@ -1,40 +1,21 @@
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useI18n } from '@shared/app/i18n/useI18n.js';
+import { SvgIcon } from '@shared/app/components/SvgIcon/SvgIcon.jsx';
 import { AddressAutocompleteField } from '../../../addressAutocomplete/AddressAutocompleteField.jsx';
 import { selectTrip, updateTripField } from '../../contractSlice.js';
 import './TripFields.css';
 
 function getPaymentIcon(key) {
   if (key === 'card') {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <rect x="3.5" y="6.5" width="17" height="11" rx="2" />
-        <path d="M3.5 10.5h17" />
-        <path d="M7 14h4" />
-      </svg>
-    );
+    return <SvgIcon name="card" />;
   }
 
   if (key === 'cash') {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <rect x="3.5" y="7.5" width="17" height="9" rx="2" />
-        <circle cx="12" cy="12" r="2.2" />
-        <path d="M6.5 10.5h0.01" />
-        <path d="M17.5 13.5h0.01" />
-      </svg>
-    );
+    return <SvgIcon name="cash" />;
   }
 
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M7 5.5h8l2.5 2.5V18.5H7z" />
-      <path d="M12.5 5.5V8h2.5" />
-      <path d="M9.5 12h5" />
-      <path d="M12 9.5v5" />
-    </svg>
-  );
+  return <SvgIcon name="invoice" />;
 }
 
 export function TripFields() {

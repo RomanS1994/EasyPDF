@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
+import { SvgIcon } from '@shared/app/components/SvgIcon/SvgIcon.jsx';
 import {
   getPlanTypeLabel,
   getPlanVariant,
@@ -18,51 +19,14 @@ function getUserName(user) {
 function OverviewCardIcon({ kind }) {
   switch (kind) {
     case 'cycle':
-      return (
-        <span className="homeOverviewCard-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" focusable="false">
-            <rect x="4.5" y="5" width="15" height="14.5" rx="2.3" />
-            <path d="M8 3.8v2.4" />
-            <path d="M16 3.8v2.4" />
-            <path d="M4.5 9h15" />
-            <path d="M8.3 13.2h3.4" />
-          </svg>
-        </span>
-      );
+      return <span className="homeOverviewCard-icon" aria-hidden="true"><SvgIcon name="calendar" /></span>;
     case 'salary':
-      return (
-        <span className="homeOverviewCard-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" focusable="false">
-            <rect x="4.5" y="7" width="15" height="10" rx="2.2" />
-            <circle cx="12" cy="12" r="2.3" />
-            <path d="M7 9.8v0.1" />
-            <path d="M17 9.8v0.1" />
-            <path d="M7 14.2v0.1" />
-            <path d="M17 14.2v0.1" />
-          </svg>
-        </span>
-      );
+      return <span className="homeOverviewCard-icon" aria-hidden="true"><SvgIcon name="wallet" /></span>;
     case 'orders':
-      return (
-        <span className="homeOverviewCard-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" focusable="false">
-            <rect x="5" y="4.5" width="14" height="15" rx="2.2" />
-            <path d="M8 8.5h8" />
-            <path d="M8 12h8" />
-            <path d="M8 15.5h5.5" />
-          </svg>
-        </span>
-      );
+      return <span className="homeOverviewCard-icon" aria-hidden="true"><SvgIcon name="orders" /></span>;
     case 'account':
     default:
-      return (
-        <span className="homeOverviewCard-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" focusable="false">
-            <circle cx="12" cy="8.8" r="3" />
-            <path d="M5.5 18.2c0-3.5 2.9-6.2 6.5-6.2s6.5 2.7 6.5 6.2" />
-          </svg>
-        </span>
-      );
+      return <span className="homeOverviewCard-icon" aria-hidden="true"><SvgIcon name="profile" /></span>;
   }
 }
 

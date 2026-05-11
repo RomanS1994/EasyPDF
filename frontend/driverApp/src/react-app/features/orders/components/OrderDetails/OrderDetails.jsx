@@ -14,6 +14,7 @@ import {
   setCurrentCurrency,
 } from "../../../contract/utils/priceUtils.js";
 import { useGetAdminUsersQuery } from "@shared/features/admin/adminApi.js";
+import { SvgIcon } from "@shared/app/components/SvgIcon/SvgIcon.jsx";
 import {
   useAssignDriverMutation,
   useDeleteOrderMutation,
@@ -75,235 +76,7 @@ function normalizeFlightNumber(value) {
 }
 
 function OrderGlyph({ name }) {
-  switch (name) {
-    case "back":
-      return (
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path
-            d="M15 5 8 12l7 7"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.35"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      );
-    case "file":
-      return (
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path
-            d="M8 3.75h6.2l4.05 4.05V19.5A1.75 1.75 0 0 1 16.5 21.25h-9A1.75 1.75 0 0 1 5.75 19.5v-14A1.75 1.75 0 0 1 7.5 3.75Z"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M14 3.9v4.2h4.2M9 11.1h5.2M9 15h6.2"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      );
-    case "hash":
-      return (
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path
-            d="M9 4.5 7.5 19.5M16.5 4.5 15 19.5M4.5 9h15M3.75 15h15"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.85"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      );
-    case "status":
-    case "clock":
-      return (
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <circle
-            cx="12"
-            cy="12"
-            r="7.75"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-          />
-          <path
-            d="M12 8.4v4.1l2.75 1.6"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      );
-    case "plane":
-      return (
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path
-            d="M4 13.5 20.5 4.8l-3.2 7.8 2.7 2.7-2 2-2.7-2.7L7.5 20 6 18.5l2.2-7.1L4 13.5Z"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.7"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      );
-    case "user":
-      return (
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path
-            d="M17.2 18.6c-.9-2.3-2.9-3.6-5.2-3.6s-4.3 1.3-5.2 3.6M12 12.7a3.7 3.7 0 1 0 0-7.4 3.7 3.7 0 0 0 0 7.4Z"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      );
-    case "mail":
-      return (
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <rect
-            x="4.5"
-            y="6.25"
-            width="15"
-            height="11.5"
-            rx="2.2"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-          />
-          <path
-            d="m5.8 8 6.2 5.1L18.2 8"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      );
-    case "calendar":
-      return (
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <rect
-            x="4.5"
-            y="5.5"
-            width="15"
-            height="14"
-            rx="2.4"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-          />
-          <path
-            d="M8 3.8v3.1M16 3.8v3.1M4.8 9.5h14.4"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      );
-    case "location":
-      return (
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path
-            d="M12 20.4c3.7-4.1 5.55-7.2 5.55-9.35A5.55 5.55 0 1 0 6.45 11c0 2.15 1.85 5.25 5.55 9.4Z"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <circle cx="12" cy="11" r="1.95" fill="none" stroke="currentColor" strokeWidth="1.8" />
-        </svg>
-      );
-    case "wallet":
-      return (
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path
-            d="M5.75 7.2a2 2 0 0 1 2-2h8.7a2 2 0 0 1 2 2v1.05h-8.4a2.8 2.8 0 0 0 0 5.6h8.4v1.95a2 2 0 0 1-2 2h-8.7a2 2 0 0 1-2-2Z"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M18.25 8.25h1a1.6 1.6 0 0 1 1.6 1.6v2a1.6 1.6 0 0 1-1.6 1.6h-9.2a2.6 2.6 0 1 1 0-5.2Z"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <circle cx="17.35" cy="10.85" r="0.8" fill="currentColor" />
-        </svg>
-      );
-    case "tag":
-      return (
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path
-            d="m4.8 12.4 6.9 6.8a1.7 1.7 0 0 0 2.4 0l6.35-6.35a1.7 1.7 0 0 0 0-2.4L13.6 3.55H7.95A1.95 1.95 0 0 0 6 5.5v5.6Z"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <circle cx="8.8" cy="8.15" r="1.1" fill="currentColor" />
-        </svg>
-      );
-    case "percent":
-      return (
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path
-            d="M7.5 18 16.5 6M8.25 8.6a1.55 1.55 0 1 0 0-3.1 1.55 1.55 0 0 0 0 3.1ZM15.75 18.5a1.55 1.55 0 1 0 0-3.1 1.55 1.55 0 0 0 0 3.1Z"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.9"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      );
-    case "edit":
-      return (
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path
-            d="M4.5 19.5h4.2L19 9.2a1.8 1.8 0 0 0 0-2.5l-1.7-1.7a1.8 1.8 0 0 0-2.5 0L4.5 15.8v3.7z"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.7"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="m13.1 6.4 4.5 4.5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.7"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      );
-    default:
-      return null;
-  }
+  return <SvgIcon name={name} />;
 }
 
 function OrderCardIcon({ name, tone = "neutral", className = "" }) {
@@ -839,7 +612,7 @@ export function OrderDetails({ orderId, onClose }) {
         {error ? <p className="orderWindow-error">{error}</p> : null}
 
         {isLoading ? (
-          <p className="orderWindow-state">{t('common.loadingOrder')}</p>
+          <p className="orderWindow-state">{t('manager.loadingOrder')}</p>
         ) : null}
         {isError ? (
           <p className="orderWindow-state">{t('contract.failedLoadOrder')}</p>
@@ -864,7 +637,7 @@ export function OrderDetails({ orderId, onClose }) {
 
                 <div className="orderSheetInfoRow">
                   <div className="orderSheetInfoLead">
-                    <OrderCardIcon name="plane" />
+                    <OrderCardIcon name="takeoff" />
                     <span className="orderSheetInfoLabel">{t('contract.flightNumber')}</span>
                   </div>
                   <div className="orderSheetPriceValue orderSheetPriceValue--flight">

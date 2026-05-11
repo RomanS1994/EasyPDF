@@ -2,60 +2,45 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useI18n } from '@shared/app/i18n/useI18n.js';
+import { SvgIcon } from '@shared/app/components/SvgIcon/SvgIcon.jsx';
 import {
-  formatDateTime,
   getCustomerName,
   getHistoryBucket,
   getOrderTripTime,
   getTotalPrice,
 } from '../../historyUtils.js';
+import { parseDateValue } from '../../../shared/dateUtils.js';
 import { HistoryRouteModal } from '../HistoryRouteModal/HistoryRouteModal.jsx';
 import './HistoryOrderCard.css';
 
 function RouteOpenIcon() {
-  return (
-    <svg viewBox="0 0 20 20" focusable="false" aria-hidden="true">
-      <path
-        d="M7 4.5 12.5 10 7 15.5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
+  return <SvgIcon name="route-open" />;
 }
 
 function WalletIcon() {
-  return (
-    <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-      <path d="M5.5 7.5a2 2 0 0 1 2-2h8.4a2 2 0 0 1 2 2v1.1h-8.1a2.8 2.8 0 0 0 0 5.6h8.1v1.8a2 2 0 0 1-2 2h-8.4a2 2 0 0 1-2-2Z" />
-      <path d="M17.9 8.4h1a1.7 1.7 0 0 1 1.7 1.7v2a1.7 1.7 0 0 1-1.7 1.7h-8.6a2.7 2.7 0 0 1 0-5.4Z" />
-      <circle cx="17.1" cy="11" r="0.8" fill="currentColor" />
-    </svg>
-  );
+  return <SvgIcon name="wallet" />;
 }
 
 function RouteStartIcon() {
-  return (
-    <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-      <circle cx="12" cy="12" r="6.2" fill="none" stroke="currentColor" strokeWidth="3.2" />
-      <circle cx="12" cy="12" r="2.4" fill="#ffffff" />
-    </svg>
-  );
+  return <SvgIcon name="today" />;
 }
 
 function RouteEndIcon() {
-  return (
-    <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-      <path
-        d="M12 20.2c-2.9-3.4-5.2-6.1-5.2-9.2a5.2 5.2 0 1 1 10.4 0c0 3.1-2.3 5.8-5.2 9.2Z"
-        fill="currentColor"
-      />
-      <circle cx="12" cy="10.2" r="1.9" fill="#ffffff" />
-    </svg>
-  );
+  return <SvgIcon name="completed" />;
+}
+
+function formatDate(value) {
+  const date = parseDateValue(value);
+
+  if (!date) {
+    return '-';
+  }
+
+  return date.toLocaleDateString('uk-UA', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
 }
 
 function HistoryOrderCard({ order, onOpen }) {
@@ -68,7 +53,20 @@ function HistoryOrderCard({ order, onOpen }) {
   const status = getHistoryBucket(order);
   const customerName = getCustomerName(order);
   const totalPrice = getTotalPrice(order);
-  const dateTime = formatDateTime(getOrderTripTime(order) || order?.createdAt);
+  const dateValue = formatDate(getOrderTripTime(order) || order?.createdAt);
+  const timeValue = (() => {
+    const date = parseDateValue(getOrderTripTime(order) || order?.createdAt);
+
+    if (!date) {
+      return '-';
+    }
+
+    return date.toLocaleTimeString('uk-UA', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+  })();
   const routeFrom =
     order?.contractData?.trip?.from?.address ||
     order?.trip?.from?.address ||
@@ -140,10 +138,7 @@ function HistoryOrderCard({ order, onOpen }) {
               aria-label={`${t('history.openDisplay')} ${customerName}`}
               title={t('history.openDisplay')}
             >
-              <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-                <rect x="3.5" y="5" width="17" height="12.5" rx="2.5" />
-                <path d="M8 20h8M12 17.5v2.5" />
-              </svg>
+              <SvgIcon name="monitor" />
             </button>
             <span className="orderStatusBadge">
               {status.bucket === 'today' ? <span className="orderStatusBadgeDot" aria-hidden="true" /> : null}
@@ -207,17 +202,15 @@ function HistoryOrderCard({ order, onOpen }) {
           <span className="orderItemMetaDivider" aria-hidden="true" />
           <div className="orderItemDateWrap">
             <span className="orderItemDateIcon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false">
-                <rect x="4.5" y="5.5" width="15" height="14" rx="2.4" />
-                <path d="M8 3.8v3.1M16 3.8v3.1M4.8 9.5h14.4" />
-              </svg>
+              <SvgIcon name="calendar" />
             </span>
-            <span className="orderItemDate">{dateTime}</span>
+            <span className="orderItemDate">
+              <span className="orderItemDateValue">{dateValue}</span>
+              <span className="orderItemDateTime">{timeValue}</span>
+            </span>
           </div>
           <button className="orderItemArrow" type="button" onClick={handleOpenDetails} aria-label={t('history.openDetails')}>
-            <svg viewBox="0 0 20 20" focusable="false">
-              <path d="M7.5 4.5 13 10l-5.5 5.5" />
-            </svg>
+            <SvgIcon name="chevron-right" />
           </button>
         </div>
       </article>

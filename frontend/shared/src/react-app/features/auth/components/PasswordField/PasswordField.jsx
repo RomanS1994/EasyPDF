@@ -1,57 +1,14 @@
 import { useEffect, useState } from 'react';
 
+import { SvgIcon } from '@shared/app/components/SvgIcon/SvgIcon.jsx';
 import './PasswordField.css';
 
 function EyeIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path
-        d="M2.5 12s3.6-6 9.5-6 9.5 6 9.5 6-3.6 6-9.5 6-9.5-6-9.5-6Z"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle
-        cx="12"
-        cy="12"
-        r="3"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-    </svg>
-  );
+  return <SvgIcon name="eye" />;
 }
 
 function EyeOffIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path
-        d="M4 4l16 16"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <path
-        d="M3.5 12s3.6-6 8.5-6c1.6 0 3 .4 4.2 1.1M20.5 12s-3.6 6-8.5 6c-1.6 0-3-.4-4.2-1.1"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M9.5 9.5A3 3 0 0 1 14.5 14.5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
+  return <SvgIcon name="eye-off" />;
 }
 
 export function PasswordField({
