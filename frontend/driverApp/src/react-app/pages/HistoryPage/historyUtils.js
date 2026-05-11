@@ -1,4 +1,4 @@
-import { formatDateTime, getDateKey, parseDateValue } from '../shared/dateUtils.js';
+import { formatDateTime, getDateKey, getOrderDate, parseDateValue } from '../shared/dateUtils.js';
 
 const EUR_RATE = 25;
 
@@ -148,8 +148,8 @@ function getHistoryBucket(order) {
 }
 
 function getSortTimestamp(order, sortKey) {
-  const primary = sortKey === 'trip-date' ? getOrderTripTime(order) : order?.createdAt;
-  const fallback = sortKey === 'trip-date' ? order?.createdAt : getOrderTripTime(order);
+  const primary = getOrderDate(order);
+  const fallback = order?.createdAt || getOrderTripTime(order);
   const primaryTime = parseDateValue(primary)?.getTime() || 0;
 
   if (primaryTime) {
@@ -175,7 +175,7 @@ function compareOrders(left, right, sortKey) {
 }
 
 function getHistoryDateKey(order) {
-  return getDateKey(getOrderTripTime(order) || order?.createdAt);
+  return getDateKey(getOrderDate(order));
 }
 
 function buildTabCounts(orders) {

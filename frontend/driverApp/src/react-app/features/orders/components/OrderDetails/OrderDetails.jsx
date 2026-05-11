@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { useI18n } from "@shared/app/i18n/useI18n.js";
@@ -323,12 +323,12 @@ export function OrderDetails({ orderId, onClose }) {
   const [error, setError] = useState("");
   const [commissionInput, setCommissionInput] = useState("");
   const [commissionCurrency, setCommissionCurrency] = useState("EUR");
+  const [commissionEditorOpen, setCommissionEditorOpen] = useState(false);
   const [priceEditorOpen, setPriceEditorOpen] = useState(false);
   const [priceInput, setPriceInput] = useState("");
   const [priceCurrency, setPriceCurrency] = useState("EUR");
   const [flightNumberEditorOpen, setFlightNumberEditorOpen] = useState(false);
   const [flightNumberInput, setFlightNumberInput] = useState("");
-  const skipCommissionSyncRef = useRef(false);
   const [showTransfer, setShowTransfer] = useState(false);
   const [transferSearch, setTransferSearch] = useState("");
   const [selectedUserId, setSelectedUserId] = useState("");
@@ -392,17 +392,13 @@ export function OrderDetails({ orderId, onClose }) {
     setShowTransfer(false);
     setTransferSearch("");
     setSelectedUserId("");
+    setCommissionEditorOpen(false);
     setPriceEditorOpen(false);
     setFlightNumberEditorOpen(false);
   }, [orderId]);
 
   useEffect(() => {
     if (!orderId) {
-      return;
-    }
-
-    if (skipCommissionSyncRef.current) {
-      skipCommissionSyncRef.current = false;
       return;
     }
 
@@ -445,18 +441,23 @@ export function OrderDetails({ orderId, onClose }) {
         !isGenerating &&
         !isUpdatingOrder
       ) {
-      if (priceEditorOpen) {
-        setPriceEditorOpen(false);
-        return;
-      }
+        if (commissionEditorOpen) {
+          setCommissionEditorOpen(false);
+          return;
+        }
 
-      if (flightNumberEditorOpen) {
-        setFlightNumberEditorOpen(false);
-        return;
-      }
+        if (priceEditorOpen) {
+          setPriceEditorOpen(false);
+          return;
+        }
 
-      if (showTransfer) {
-        setShowTransfer(false);
+        if (flightNumberEditorOpen) {
+          setFlightNumberEditorOpen(false);
+          return;
+        }
+
+        if (showTransfer) {
+          setShowTransfer(false);
           return;
         }
 
@@ -477,6 +478,7 @@ export function OrderDetails({ orderId, onClose }) {
     isTransferring,
     isGenerating,
     isUpdatingOrder,
+    commissionEditorOpen,
     priceEditorOpen,
     flightNumberEditorOpen,
     onClose,
@@ -604,9 +606,34 @@ export function OrderDetails({ orderId, onClose }) {
     }
   }
 
+  async function handleSaveCommission() {
+    const saved = await saveCommission();
+
+    if (saved) {
+      closeCommissionEditor();
+    }
+  }
+
   function handleCommissionInputChange(event) {
     const nextInput = sanitizePriceInput(event.target.value);
     setCommissionInput(nextInput);
+  }
+
+  function openCommissionEditor() {
+    const currentValue = String(storedCommission || "").trim();
+    const nextCurrency = detectCurrency(currentValue);
+    const nextInput = extractNumericPrice(currentValue);
+
+    setError("");
+    setMessage("");
+    setCommissionCurrency(nextCurrency);
+    setCurrentCurrency(nextCurrency);
+    setCommissionInput(nextInput);
+    setCommissionEditorOpen(true);
+  }
+
+  function closeCommissionEditor() {
+    setCommissionEditorOpen(false);
   }
 
   function handleCommissionCurrencyChange(nextCurrency) {
@@ -616,25 +643,12 @@ export function OrderDetails({ orderId, onClose }) {
 
     setCurrentCurrency(nextCurrency);
     setCommissionCurrency(nextCurrency);
-    void saveCommission(commissionInput, nextCurrency);
   }
 
   function clearCommission() {
-    skipCommissionSyncRef.current = true;
     setCommissionInput("");
     setCommissionCurrency("EUR");
     setCurrentCurrency("EUR");
-    void updateOrder({
-      orderId,
-      payload: {
-        metadata: {
-          ...(order.metadata || {}),
-          commission: "",
-        },
-      },
-    }).unwrap().catch((error) => {
-      setError(resolveErrorMessage(error, t('contract.failedToSaveCommission')));
-    });
   }
 
   function openPriceEditor() {
@@ -749,6 +763,11 @@ export function OrderDetails({ orderId, onClose }) {
   }
 
   function handleCloseRequest() {
+    if (commissionEditorOpen) {
+      setCommissionEditorOpen(false);
+      return;
+    }
+
     if (priceEditorOpen) {
       setPriceEditorOpen(false);
       return;
@@ -957,57 +976,20 @@ export function OrderDetails({ orderId, onClose }) {
                 </div>
 
                 <div className="orderSheetInfoRow orderSheetInfoRow--commission">
-                  <div className="orderSheetInfoLead orderSheetInfoLead--alignStart">
+                  <div className="orderSheetInfoLead">
                     <OrderCardIcon name="percent" />
                     <span className="orderSheetInfoLabel">{t('contract.commission')}</span>
                   </div>
-                  <div className="orderCommissionField">
-                    <div className="orderCommissionField-row">
-                      <div className="orderCommissionField-inputWrap">
-                        <input
-                          className="orderWindow-input orderCommissionField-input"
-                          type="text"
-                          inputMode="decimal"
-                          aria-label={t('contract.commission')}
-                          placeholder={t('contract.commission')}
-                          value={commissionInput}
-                          onChange={handleCommissionInputChange}
-                          onBlur={() => saveCommission()}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter") {
-                              event.preventDefault();
-                              event.currentTarget.blur();
-                            }
-                          }}
-                        />
-
-                        {commissionInput ? (
-                          <button
-                            className="orderCommissionField-clear"
-                            type="button"
-                            onClick={clearCommission}
-                            aria-label={t('common.clear')}
-                          >
-                            ×
-                          </button>
-                        ) : null}
-                      </div>
-
-                      {["EUR", "CZK"].map((item) => (
-                        <button
-                          key={item}
-                          className={`orderCommissionField-currencyButton ${commissionCurrency === item ? "is-active" : ""}`}
-                          type="button"
-                          onClick={() => handleCommissionCurrencyChange(item)}
-                        >
-                          {item}
-                        </button>
-                      ))}
-                    </div>
-
-                    {commissionConverted ? (
-                      <p className="orderCommissionField-converted">{commissionConverted}</p>
-                    ) : null}
+                  <div className="orderSheetPriceValue">
+                    <span className="orderSheetInfoValue">{storedCommission || "-"}</span>
+                    <button
+                      className="orderSheetEditButton"
+                      type="button"
+                      onClick={openCommissionEditor}
+                      aria-label={t('contract.editCommission')}
+                    >
+                      <OrderGlyph name="edit" />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1238,6 +1220,83 @@ export function OrderDetails({ orderId, onClose }) {
                 className="orderWindow-button orderWindow-button--secondary"
                 type="button"
                 onClick={closePriceEditor}
+                disabled={isUpdatingOrder}
+              >
+                {t('common.cancel')}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {commissionEditorOpen ? (
+        <div
+          className="orderPriceEditor"
+          role="presentation"
+          onClick={closeCommissionEditor}
+        >
+          <div
+            className="orderPriceEditor-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('contract.commissionEditorTitle')}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="orderPriceEditor-header">
+              <h4 className="orderPriceEditor-title">{t('contract.commissionEditorTitle')}</h4>
+              <p className="orderPriceEditor-copy">{t('contract.commissionEditorCopy')}</p>
+            </div>
+
+            <div className="orderPriceEditor-field">
+              <div className="orderCommissionField-row">
+                <div className="orderCommissionField-inputWrap">
+                  <input
+                    className="orderWindow-input orderCommissionField-input"
+                    type="text"
+                    inputMode="decimal"
+                    aria-label={t('contract.commission')}
+                    placeholder={`${t('contract.commission')} *`}
+                    value={commissionInput}
+                    onChange={handleCommissionInputChange}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        void handleSaveCommission();
+                      }
+                    }}
+                  />
+                </div>
+
+                {["EUR", "CZK"].map((item) => (
+                  <button
+                    key={item}
+                    className={`orderCommissionField-currencyButton ${commissionCurrency === item ? "is-active" : ""}`}
+                    type="button"
+                    onClick={() => handleCommissionCurrencyChange(item)}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+
+              {commissionConverted ? (
+                <p className="orderCommissionField-converted">{commissionConverted}</p>
+              ) : null}
+            </div>
+
+            <div className="orderPriceEditor-actions">
+              <button
+                className="orderWindow-button orderWindow-button--accent"
+                type="button"
+                onClick={() => void handleSaveCommission()}
+                disabled={isUpdatingOrder}
+              >
+                {isUpdatingOrder ? t('common.saving') : t('contract.saveCommission')}
+              </button>
+              <button
+                className="orderWindow-button orderWindow-button--secondary"
+                type="button"
+                onClick={closeCommissionEditor}
                 disabled={isUpdatingOrder}
               >
                 {t('common.cancel')}

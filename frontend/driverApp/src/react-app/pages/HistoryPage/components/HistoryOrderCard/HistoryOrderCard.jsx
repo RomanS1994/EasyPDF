@@ -37,6 +37,27 @@ function WalletIcon() {
   );
 }
 
+function RouteStartIcon() {
+  return (
+    <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+      <circle cx="12" cy="12" r="6.2" fill="none" stroke="currentColor" strokeWidth="3.2" />
+      <circle cx="12" cy="12" r="2.4" fill="#ffffff" />
+    </svg>
+  );
+}
+
+function RouteEndIcon() {
+  return (
+    <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+      <path
+        d="M12 20.2c-2.9-3.4-5.2-6.1-5.2-9.2a5.2 5.2 0 1 1 10.4 0c0 3.1-2.3 5.8-5.2 9.2Z"
+        fill="currentColor"
+      />
+      <circle cx="12" cy="10.2" r="1.9" fill="#ffffff" />
+    </svg>
+  );
+}
+
 function HistoryOrderCard({ order, onOpen }) {
   const navigate = useNavigate();
   const { t } = useI18n();
@@ -111,28 +132,34 @@ function HistoryOrderCard({ order, onOpen }) {
           >
             {customerName}
           </strong>
-          <button
-            className="orderItemMeetButton"
-            type="button"
-            onClick={handleOpenDisplay}
-            aria-label={`${t('history.openDisplay')} ${customerName}`}
-            title={t('history.openDisplay')}
-          >
-            <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-              <rect x="3.5" y="5" width="17" height="12.5" rx="2.5" />
-              <path d="M8 20h8M12 17.5v2.5" />
-            </svg>
-          </button>
-          <span className="orderStatusBadge">
-            {status.bucket === 'today' ? <span className="orderStatusBadgeDot" aria-hidden="true" /> : null}
-            {status.label}
-          </span>
+          <div className="orderItemHeaderActions">
+            <button
+              className="orderItemMeetButton"
+              type="button"
+              onClick={handleOpenDisplay}
+              aria-label={`${t('history.openDisplay')} ${customerName}`}
+              title={t('history.openDisplay')}
+            >
+              <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                <rect x="3.5" y="5" width="17" height="12.5" rx="2.5" />
+                <path d="M8 20h8M12 17.5v2.5" />
+              </svg>
+            </button>
+            <span className="orderStatusBadge">
+              {status.bucket === 'today' ? <span className="orderStatusBadgeDot" aria-hidden="true" /> : null}
+              {status.label}
+            </span>
+          </div>
         </div>
         <div className="orderItemRouteCard">
           <div className="orderItemRouteTrack" aria-hidden="true">
-            <span className="orderItemRouteTrackStart" />
+            <span className="orderItemRouteTrackStart">
+              <RouteStartIcon />
+            </span>
             <span className="orderItemRouteTrackLine" />
-            <span className="orderItemRouteTrackEnd" />
+            <span className="orderItemRouteTrackEnd">
+              <RouteEndIcon />
+            </span>
           </div>
 
           <div className={`orderItemRoute ${hasRoute ? '' : 'is-placeholder'}`}>
@@ -177,6 +204,7 @@ function HistoryOrderCard({ order, onOpen }) {
           <strong className={`orderItemPrice ${totalPrice === t('history.noPrice') ? 'is-placeholder' : ''}`}>
             {totalPrice}
           </strong>
+          <span className="orderItemMetaDivider" aria-hidden="true" />
           <div className="orderItemDateWrap">
             <span className="orderItemDateIcon" aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false">

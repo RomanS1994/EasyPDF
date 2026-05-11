@@ -12,7 +12,7 @@
   display: grid;
   gap: 10px;
   min-height: 148px;
-  border-radius: 24px;
+  border-radius: 12px;
   background:
     radial-gradient(
       circle at top right,
@@ -141,6 +141,13 @@
   gap: 8px;
 }
 
+.orderItemHeaderActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
+}
+
 .orderItemIdentity {
   display: grid;
   gap: 10px;
@@ -175,8 +182,11 @@
   padding: 0;
   border: 1px solid rgba(0, 122, 255, 0.14);
   border-radius: 999px;
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.98), rgba(243, 248, 255, 0.96));
+  background: radial-gradient(
+    circle at top,
+    rgba(255, 255, 255, 0.98),
+    rgba(243, 248, 255, 0.96)
+  );
   color: var(--accent);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.96),
@@ -195,8 +205,11 @@
 
 .orderItemMeetButton:hover {
   transform: translateY(-1px);
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 1), rgba(236, 245, 255, 0.98));
+  background: radial-gradient(
+    circle at top,
+    rgba(255, 255, 255, 1),
+    rgba(236, 245, 255, 0.98)
+  );
 }
 
 .orderItemMeetButton:focus-visible {
@@ -212,7 +225,7 @@
   grid-template-columns: 26px minmax(0, 1fr);
   gap: 0;
   padding: 5px 5px 4px 5px;
-  border-radius: 12px;
+  border-radius: 4px;
   border: 1px solid rgba(220, 228, 241, 0.9);
   background: rgba(255, 255, 255, 0.72);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
@@ -222,33 +235,57 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 3px;
+  padding-top: 1px;
 }
 
 .orderItemRouteTrackStart,
 .orderItemRouteTrackEnd {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  box-shadow: 0 0 0 5px rgba(224, 235, 255, 0.92);
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    rgba(244, 247, 255, 0.98),
+    rgba(236, 242, 252, 0.98)
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.96);
 }
 
 .orderItemRouteTrackStart {
-  background: #2f78ff;
+  color: #2f78ff;
 }
 
 .orderItemRouteTrackEnd {
-  margin-top: 22px;
-  background: #27c24a;
+  color: #27c24a;
+  background: transparent;
+  box-shadow: none;
+}
+
+.orderItemRouteTrackStart svg,
+.orderItemRouteTrackEnd svg {
+  width: 12px;
+  height: 12px;
+  display: block;
 }
 
 .orderItemRouteTrackLine {
   flex: 1;
   width: 2px;
-  min-height: 14px;
-  margin: 4px 0;
+  min-height: 36px;
+  margin: 3px 0;
   border-radius: 999px;
-  background: rgba(140, 154, 178, 0.72);
+  background: linear-gradient(
+    180deg,
+    rgba(140, 154, 178, 0.62) 0,
+    rgba(140, 154, 178, 0.62) 45%,
+    transparent 45%,
+    transparent 70%,
+    rgba(140, 154, 178, 0.62) 70%,
+    rgba(140, 154, 178, 0.62) 100%
+  );
+  background-size: 2px 8px;
 }
 
 .orderItemRoute {
@@ -380,7 +417,7 @@
 
 .orderItemMetaRow {
   display: grid;
-  grid-template-columns: 30px minmax(0, 1fr) 1px minmax(0, auto) 32px;
+  grid-template-columns: 30px minmax(0, max-content) 1px minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
   min-width: 0;
@@ -401,7 +438,11 @@
   display: grid;
   place-items: center;
   border-radius: 10px;
-  background: linear-gradient(180deg, rgba(229, 248, 232, 0.98), rgba(219, 245, 223, 0.98));
+  background: linear-gradient(
+    180deg,
+    rgba(229, 248, 232, 0.98),
+    rgba(219, 245, 223, 0.98)
+  );
   color: #2ca13b;
 }
 
@@ -430,6 +471,7 @@
   align-items: center;
   gap: 5px;
   min-width: 0;
+  justify-self: end;
   color: #6a778c;
 }
 
@@ -456,8 +498,8 @@
 
 .orderItemDate {
   font-variant-numeric: tabular-nums;
-  font-size: 8px;
-  font-weight: 700;
+  font-size: 9px;
+  font-weight: 800;
   color: #6a778c;
   text-align: right;
   overflow: hidden;
@@ -469,8 +511,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
+  width: 48px;
   height: 30px;
+  justify-self: end;
   border: 1px solid rgba(220, 228, 241, 0.92);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.88);
@@ -481,9 +524,14 @@
 .orderItemArrow svg {
   width: 12px;
   height: 12px;
-  stroke: currentColor;
-  stroke-width: 1.8;
+  display: block;
+  overflow: visible;
   fill: none;
+}
+
+.orderItemArrow svg path {
+  stroke: currentColor;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -514,7 +562,7 @@
 
   .orderItem {
     min-height: 142px;
-    border-radius: 20px;
+    border-radius: 12px;
   }
 
   .orderItemCard {
@@ -524,6 +572,10 @@
 
   .orderItemCustomer {
     font-size: 14px;
+  }
+
+  .orderItemHeaderActions {
+    gap: 10px;
   }
 
   .orderItemMeetButton {
@@ -539,7 +591,7 @@
   .orderItemRouteCard {
     grid-template-columns: 24px minmax(0, 1fr);
     padding: 4px 4px 4px 4px;
-    border-radius: 10px;
+    border-radius: 4px;
   }
 
   .orderItemPrice {
@@ -547,7 +599,7 @@
   }
 
   .orderItemDate {
-    font-size: 8px;
+    font-size: 9px;
   }
 
   .orderItemMetaIcon {
@@ -562,7 +614,7 @@
   }
 
   .orderItemArrow {
-    width: 28px;
+    width: 44px;
     height: 28px;
     border-radius: 10px;
   }
@@ -586,18 +638,25 @@
 
   .orderItemRouteTrackStart,
   .orderItemRouteTrackEnd {
-    width: 4px;
-    height: 4px;
-    box-shadow: 0 0 0 4px rgba(224, 235, 255, 0.92);
+    width: 15px;
+    height: 15px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.96);
   }
 
   .orderItemRouteTrackEnd {
-    margin-top: 18px;
+    background: transparent;
+    box-shadow: none;
   }
 
   .orderItemRouteTrackLine {
-    min-height: 12px;
-    margin: 3px 0;
+    min-height: 30px;
+    margin: 2px 0;
+  }
+
+  .orderItemRouteTrackStart svg,
+  .orderItemRouteTrackEnd svg {
+    width: 11px;
+    height: 11px;
   }
 
   .orderItemRouteLineButton {

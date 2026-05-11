@@ -55,5 +55,5 @@ export function formatDateTime(value) {
 }
 
 export function getOrderDate(order) {
-  return order?.createdAt || order?.contractData?.today || order?.trip?.time || '';
+  return order?.trip?.time || order?.contractData?.trip?.time || order?.createdAt || '';
 }

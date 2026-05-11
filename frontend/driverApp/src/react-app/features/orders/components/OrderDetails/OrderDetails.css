@@ -215,7 +215,7 @@
 }
 
 .orderSheetInfoRow--commission {
-  align-items: start;
+  align-items: center;
 }
 
 .orderSheetInfoLead {
@@ -468,30 +468,9 @@
 
 .orderCommissionField-input {
   min-height: 42px;
-  padding-right: 48px;
   border-radius: 14px;
   font-size: 15px;
   font-weight: 700;
-}
-
-.orderCommissionField-clear {
-  position: absolute;
-  top: 50%;
-  right: 8px;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  transform: translateY(-50%);
-  border: 1px solid rgba(193, 210, 243, 0.96);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.92);
-  color: var(--muted);
-  font-size: 1rem;
-  line-height: 1;
-  box-shadow: 0 8px 20px rgba(15, 95, 215, 0.08);
-  appearance: none;
-  display: grid;
-  place-items: center;
 }
 
 .orderCommissionField-currencyButton {
