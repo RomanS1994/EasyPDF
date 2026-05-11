@@ -7,10 +7,12 @@
 }
 
 .historyDisplayScreen-top {
+  position: relative;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
+  z-index: 2;
 }
 
 .historyDisplayScreen-back {
@@ -25,6 +27,62 @@
   font-size: 16px;
   font-weight: 500;
   letter-spacing: -0.02em;
+}
+
+.historyDisplayScreen-toolbar {
+  position: relative;
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  align-self: flex-start;
+}
+
+.historyDisplayScreen-controlsToggle {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--display-text);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.historyDisplayScreen-controlsToggle svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.historyDisplayScreen-controlsPanel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  display: grid;
+  justify-items: end;
+  transition:
+    transform 220ms ease,
+    opacity 220ms ease;
+  transform-origin: top right;
+}
+
+.historyDisplayScreen-controlsPanel.is-open {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.historyDisplayScreen-controlsPanel.is-closed {
+  transform: translateY(calc(-100% - 12px));
+  opacity: 0;
+  pointer-events: none;
 }
 
 .historyDisplayScreen-controls {
@@ -176,6 +234,20 @@
     gap: 12px;
   }
 
+  .historyDisplayScreen-toolbar {
+    gap: 6px;
+  }
+
+  .historyDisplayScreen-controlsToggle {
+    width: 36px;
+    height: 36px;
+  }
+
+  .historyDisplayScreen-controlsPanel {
+    top: calc(100% + 6px);
+    max-width: calc(100vw - 32px);
+  }
+
   .historyDisplayScreen-controls {
     justify-content: flex-start;
     gap: 4px;
@@ -184,6 +256,10 @@
   .historyDisplayScreen-selectShell {
     min-width: 132px;
     min-height: 40px;
+  }
+
+  .historyDisplayScreen-controlLabel {
+    font-size: 9px;
   }
 
   .historyDisplayScreen-copy {

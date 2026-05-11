@@ -1,4 +1,7 @@
+import { useState } from 'react';
+
 import { useI18n } from '@shared/app/i18n/useI18n.js';
+import { SvgIcon } from '@shared/app/components/SvgIcon/SvgIcon.jsx';
 import './HistoryDisplayScreen.css';
 
 const TEXT_SIZES = {
@@ -22,6 +25,12 @@ function HistoryDisplayScreen({
   onBack,
 }) {
   const { t } = useI18n();
+  const [isControlsOpen, setIsControlsOpen] = useState(true);
+
+  function toggleControls() {
+    setIsControlsOpen(value => !value);
+  }
+
   return (
     <div className="historyDisplayScreen">
       <header className="historyDisplayScreen-top">
@@ -30,45 +39,63 @@ function HistoryDisplayScreen({
           <span>{t('history.back')}</span>
         </button>
 
-        <div className="historyDisplayScreen-controls">
-          <div className="historyDisplayScreen-control">
-            <span className="historyDisplayScreen-controlLabel">{t('history.text')}</span>
-            <label className="historyDisplayScreen-selectShell">
-              <span className="historyDisplayScreen-selectIcon" aria-hidden="true">
-                Aa
-              </span>
-              <select
-                className="historyDisplayScreen-select"
-                aria-label={t('history.text')}
-                value={textSize}
-                onChange={event => onTextSizeChange(event.target.value)}
-              >
-                {textSizeOptions.map(option => (
-                  <option key={option.id} value={option.id}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+        <div className="historyDisplayScreen-toolbar">
+          <button
+            className="historyDisplayScreen-controlsToggle"
+            type="button"
+            aria-label={isControlsOpen ? t('history.hideDisplayControls') : t('history.showDisplayControls')}
+            aria-expanded={isControlsOpen}
+            onClick={toggleControls}
+          >
+            <SvgIcon name="settings" />
+          </button>
 
-          <div className="historyDisplayScreen-control">
-            <span className="historyDisplayScreen-controlLabel">{t('history.background')}</span>
-            <label className="historyDisplayScreen-selectShell">
-              <span className="historyDisplayScreen-selectSwatch" style={{ '--swatch-color': themeOptions.find(option => option.id === themeId)?.swatch || '#eef3ff' }} aria-hidden="true" />
-              <select
-                className="historyDisplayScreen-select"
-                aria-label={t('history.background')}
-                value={themeId}
-                onChange={event => onThemeChange(event.target.value)}
-              >
-                {themeOptions.map(option => (
-                  <option key={option.id} value={option.id}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+          <div className={`historyDisplayScreen-controlsPanel ${isControlsOpen ? 'is-open' : 'is-closed'}`}>
+            <div className="historyDisplayScreen-controls">
+              <div className="historyDisplayScreen-control">
+                <span className="historyDisplayScreen-controlLabel">{t('history.text')}</span>
+                <label className="historyDisplayScreen-selectShell">
+                  <span className="historyDisplayScreen-selectIcon" aria-hidden="true">
+                    Aa
+                  </span>
+                  <select
+                    className="historyDisplayScreen-select"
+                    aria-label={t('history.text')}
+                    value={textSize}
+                    onChange={event => onTextSizeChange(event.target.value)}
+                  >
+                    {textSizeOptions.map(option => (
+                      <option key={option.id} value={option.id}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              <div className="historyDisplayScreen-control">
+                <span className="historyDisplayScreen-controlLabel">{t('history.background')}</span>
+                <label className="historyDisplayScreen-selectShell">
+                  <span
+                    className="historyDisplayScreen-selectSwatch"
+                    style={{ '--swatch-color': themeOptions.find(option => option.id === themeId)?.swatch || '#eef3ff' }}
+                    aria-hidden="true"
+                  />
+                  <select
+                    className="historyDisplayScreen-select"
+                    aria-label={t('history.background')}
+                    value={themeId}
+                    onChange={event => onThemeChange(event.target.value)}
+                  >
+                    {themeOptions.map(option => (
+                      <option key={option.id} value={option.id}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            </div>
           </div>
         </div>
       </header>
