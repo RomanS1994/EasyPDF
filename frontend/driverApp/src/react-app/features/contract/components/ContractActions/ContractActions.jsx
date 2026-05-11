@@ -405,7 +405,6 @@ export function ContractActions() {
       }
 
       dispatch(clearSession());
-      navigate('/', { replace: true });
     } catch (error) {
       if (orderId) {
         try {
