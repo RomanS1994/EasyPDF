@@ -1,7 +1,9 @@
+import { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { SvgIcon } from '@shared/app/components/SvgIcon/SvgIcon.jsx';
+import { formatDateTime } from '@shared/app/utils/dateFormat.js';
 import { AddressAutocompleteField } from '../../../addressAutocomplete/AddressAutocompleteField.jsx';
 import { selectTrip, updateTripField } from '../../contractSlice.js';
 import './TripFields.css';
@@ -19,15 +21,34 @@ function getPaymentIcon(key) {
 }
 
 export function TripFields() {
-  const { t } = useI18n();
+  const { language, t } = useI18n();
   const dispatch = useDispatch();
   const trip = useSelector(selectTrip);
+  const dateInputRef = useRef(null);
   const mapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+  const dateValue = toDateTimeLocalValue(trip.time);
+  const formattedTripTime = dateValue ? formatDateTime(dateValue, language) : '';
   const paymentMethods = [
     { key: 'card', label: t('contract.card') },
     { key: 'cash', label: t('contract.cash') },
     { key: 'invoice', label: t('contract.invoice') },
   ];
+
+  function openDatePicker() {
+    const input = dateInputRef.current;
+
+    if (!input) {
+      return;
+    }
+
+    if (typeof input.showPicker === 'function') {
+      input.showPicker();
+      return;
+    }
+
+    input.focus();
+    input.click();
+  }
 
   return (
     <div className="contractFieldsBlock">
@@ -56,21 +77,35 @@ export function TripFields() {
       </label>
 
       <label className="contractField">
-        <div className="contractFieldControl">
+        <div className="contractDateField">
           <input
-            className="contractField-input contractField-input-date"
+            ref={dateInputRef}
+            className="contractDateField-nativeInput"
             type="datetime-local"
             aria-label={t('contract.pickupDateTime')}
             step="60"
-            required
-            value={toDateTimeLocalValue(trip.time)}
+            value={dateValue}
             onChange={event =>
               dispatch(updateTripField({ key: 'time', value: event.target.value }))
             }
+            tabIndex={-1}
           />
+          <button
+            className={`contractDateField-trigger ${trip.time ? 'is-selected' : ''}`}
+            type="button"
+            onClick={openDatePicker}
+            aria-label={formattedTripTime || t('contract.pickupDateTime')}
+          >
+            <span className="contractDateField-icon" aria-hidden="true">
+              <SvgIcon name="calendar" />
+            </span>
+            <span className={`contractDateField-value ${trip.time ? '' : 'is-placeholder'}`}>
+              {formattedTripTime || `${t('contract.pickupDateTime')} *`}
+            </span>
+          </button>
           {trip.time ? (
             <button
-              className="contractField-clear"
+              className="contractField-clear contractDateField-clear"
               type="button"
               aria-label={t('contract.clearPickupDateTime')}
               onClick={() => dispatch(updateTripField({ key: 'time', value: '' }))}

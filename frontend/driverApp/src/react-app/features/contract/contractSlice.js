@@ -1,21 +1,23 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+function createEmptyBusinessParty() {
+  return {
+    name: '',
+    address: '',
+    ico: '',
+  };
+}
+
 export function createDefaultContractState() {
   return {
-    orderNumber: 'ORD-0013291093548-7FLQ',
-    today: '2025-10-14',
+    orderNumber: '',
+    today: '',
     documentType: 'confirmation',
     driver: {
-      name: 'Roman Stryzhka',
-      address: 'Nam. na Balabence 1437/3, 190 00 Praha 9',
-      spz: '1AF V087',
-      ico: '22319352',
+      ...createEmptyBusinessParty(),
+      spz: '',
     },
-    provider: {
-      name: 'Roman Stryzhka',
-      address: 'Nam. na Balabence 1437/3, 190 00 Praha 9',
-      ico: '22319352',
-    },
+    provider: createEmptyBusinessParty(),
     customer: {
       name: '',
       email: '',
@@ -87,8 +89,20 @@ const contractSlice = createSlice({
         ...provider,
       };
     },
-    resetContract() {
-      return createDefaultContractState();
+    resetContract(state) {
+      return {
+        ...createDefaultContractState(),
+        documentType: state.documentType || 'confirmation',
+        driver: {
+          ...createEmptyBusinessParty(),
+          spz: '',
+          ...state.driver,
+        },
+        provider: {
+          ...createEmptyBusinessParty(),
+          ...state.provider,
+        },
+      };
     },
     replaceContract(_state, action) {
       return action.payload;

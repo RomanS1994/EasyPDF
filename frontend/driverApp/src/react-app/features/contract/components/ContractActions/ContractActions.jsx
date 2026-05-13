@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { useGenerateContractPdfMutation } from '../../contractApi.js';
-import { selectContract } from '../../contractSlice.js';
+import { resetContract, selectContract } from '../../contractSlice.js';
 import {
   clearSession,
   getGenerationWindowMs,
@@ -303,6 +303,7 @@ export function ContractActions() {
         : await createOrder(payload).unwrap();
 
       const order = response?.order || response;
+      dispatch(resetContract());
       setCreatedOrderNumber(String(order?.orderNumber || ''));
     } catch (error) {
       const nextSubscriptionErrorState = getSubscriptionErrorState(error, t);
