@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useI18n } from '@shared/app/i18n/useI18n.js';
@@ -24,7 +23,6 @@ export function TripFields() {
   const { language, t } = useI18n();
   const dispatch = useDispatch();
   const trip = useSelector(selectTrip);
-  const dateInputRef = useRef(null);
   const mapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
   const dateValue = toDateTimeLocalValue(trip.time);
   const formattedTripTime = dateValue ? formatDateTime(dateValue, language) : '';
@@ -33,22 +31,6 @@ export function TripFields() {
     { key: 'cash', label: t('contract.cash') },
     { key: 'invoice', label: t('contract.invoice') },
   ];
-
-  function openDatePicker() {
-    const input = dateInputRef.current;
-
-    if (!input) {
-      return;
-    }
-
-    if (typeof input.showPicker === 'function') {
-      input.showPicker();
-      return;
-    }
-
-    input.focus();
-    input.click();
-  }
 
   return (
     <div className="contractFieldsBlock">
@@ -77,32 +59,25 @@ export function TripFields() {
       </label>
 
       <label className="contractField">
-        <div className="contractDateField">
+        <div className={`contractDateField ${trip.time ? 'is-selected' : ''}`}>
           <input
-            ref={dateInputRef}
             className="contractDateField-nativeInput"
             type="datetime-local"
             aria-label={t('contract.pickupDateTime')}
-            step="60"
+            step="300"
             value={dateValue}
             onChange={event =>
               dispatch(updateTripField({ key: 'time', value: event.target.value }))
             }
-            tabIndex={-1}
           />
-          <button
-            className={`contractDateField-trigger ${trip.time ? 'is-selected' : ''}`}
-            type="button"
-            onClick={openDatePicker}
-            aria-label={formattedTripTime || t('contract.pickupDateTime')}
-          >
+          <div className="contractDateField-trigger" aria-hidden="true">
             <span className="contractDateField-icon" aria-hidden="true">
               <SvgIcon name="calendar" />
             </span>
             <span className={`contractDateField-value ${trip.time ? '' : 'is-placeholder'}`}>
               {formattedTripTime || `${t('contract.pickupDateTime')} *`}
             </span>
-          </button>
+          </div>
           {trip.time ? (
             <button
               className="contractField-clear contractDateField-clear"
