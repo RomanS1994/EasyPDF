@@ -9,7 +9,7 @@ export function SvgIcon({ name, className = '', title, ...props }) {
 
   return (
     <svg className={className.trim()} focusable="false" {...ariaProps} {...props}>
-      <use href={`/shared/icons/sprite.svg#icon-${name}`} />
+      <use href={`#icon-${name}`} />
     </svg>
   );
 }
