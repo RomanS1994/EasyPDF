@@ -30,8 +30,8 @@ export function validateRuntimeEnv() {
     errors.push('API_KEY must not match AUTH_TOKEN_SECRET.');
   }
 
-  if (!databaseUrl) {
-    errors.push('DATABASE_URL is required for Prisma/PostgreSQL.');
+  if (!databaseUrl && !directDatabaseUrl) {
+    errors.push('DATABASE_URL or DIRECT_DATABASE_URL is required for Prisma/PostgreSQL.');
   }
 
   if (databaseUrl && isPlaceholderDatabaseUrl(databaseUrl)) {

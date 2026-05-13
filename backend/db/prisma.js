@@ -2,9 +2,9 @@ import { PrismaClient } from '@prisma/client';
 import { getDatabaseUrl, getDirectDatabaseUrl } from '../config/runtime-env.js';
 
 const globalForPrisma = globalThis;
-// Runtime should use the primary DATABASE_URL first.
-// DIRECT_DATABASE_URL stays as a fallback when the primary runtime URL is not set.
-const datasourceUrl = getDatabaseUrl() || getDirectDatabaseUrl() || undefined;
+// Для Node runtime віддаємо пріоритет прямому PostgreSQL URL, щоб не залежати від
+// Prisma Accelerate/Data Proxy під час локального старту сервера.
+const datasourceUrl = getDirectDatabaseUrl() || getDatabaseUrl() || undefined;
 
 export const prisma =
   globalForPrisma.__pdfAppPrisma ||

@@ -23,6 +23,9 @@ function resolveBaseUrl() {
   return import.meta.env.VITE_API_BASE_URL || '/api';
 }
 
+let offlineNoticeShownSinceReconnect = false;
+let refreshRequestPromise = null;
+
 // Дає коротку паузу перед повторною спробою refresh-запиту.
 function sleep(ms) {
   return new Promise(resolve => window.setTimeout(resolve, ms));
@@ -37,6 +40,34 @@ function isNetworkRefreshError(error) {
   );
 }
 
+function shouldShowOfflineNotice() {
+  return !offlineNoticeShownSinceReconnect;
+}
+
+function markOfflineNoticeShown() {
+  offlineNoticeShownSinceReconnect = true;
+}
+
+function resetOfflineNoticeState() {
+  offlineNoticeShownSinceReconnect = false;
+}
+
+// Показує offline тільки для явних user-actions, а не для фонових query/refetch.
+function shouldSurfaceOfflineForRequest(api) {
+  return api?.type === 'mutation';
+}
+
+// Виконує refresh у режимі single-flight, щоб паралельні 401 не ротили сесію одночасно.
+function getSharedRefreshRequest(runRefreshFlow) {
+  if (!refreshRequestPromise) {
+    refreshRequestPromise = runRefreshFlow().finally(() => {
+      refreshRequestPromise = null;
+    });
+  }
+
+  return refreshRequestPromise;
+}
+
 // Оновлює локальну сесію після вдалого refresh.
 function applySuccessfulRefresh(api, refreshResult) {
   const nextToken = refreshResult?.data?.token || '';
@@ -47,6 +78,7 @@ function applySuccessfulRefresh(api, refreshResult) {
   }
 
   saveSession(nextToken, nextUser);
+  resetOfflineNoticeState();
   api.dispatch(setSession({ token: nextToken, user: nextUser }));
   api.dispatch(clearSessionError());
   return true;
@@ -102,7 +134,7 @@ export const baseApi = createApi({
       return getMessage(readStoredLanguage(), key);
     }
 
-    // Пробує оновити сесію й не показує offline, поки не провалиться retry.
+    // Пробує оновити сесію й повертає структурований результат для поточного запиту.
     async function refreshSession() {
       // Виконує один refresh-запит без побічних ефектів.
       async function runRefreshRequest() {
@@ -116,56 +148,77 @@ export const baseApi = createApi({
         );
       }
 
-      let refreshResult = await runRefreshRequest();
-
-      if (applySuccessfulRefresh(api, refreshResult)) {
-        return true;
-      }
-
-      const refreshError = refreshResult.error;
-      if (refreshError?.status === 401) {
-        clearExpiredSession(api, t);
-        return false;
-      }
-
-      if (isNetworkRefreshError(refreshError)) {
-        await sleep(350);
-        refreshResult = await runRefreshRequest();
+      return getSharedRefreshRequest(async () => {
+        let refreshResult = await runRefreshRequest();
 
         if (applySuccessfulRefresh(api, refreshResult)) {
-          return true;
+          return { ok: true, reason: '' };
         }
-      }
 
-      const finalRefreshError = refreshResult.error;
-      if (finalRefreshError?.status === 401) {
-        clearExpiredSession(api, t);
-        return false;
-      }
+        const refreshError = refreshResult.error;
+        if (refreshError?.status === 401) {
+          clearExpiredSession(api, t);
+          return { ok: false, reason: 'expired' };
+        }
 
-      if (finalRefreshError) {
-        const isOffline = isNetworkRefreshError(finalRefreshError);
+        if (isNetworkRefreshError(refreshError)) {
+          await sleep(350);
+          refreshResult = await runRefreshRequest();
 
-        api.dispatch(
-          setSessionError({
-            type: isOffline ? 'offline' : 'server',
-            message: isOffline
-              ? t('auth.connectionLostKeepSession')
-              : t('auth.sessionCheckFailedKeepSession'),
-          }),
-        );
-      }
+          if (applySuccessfulRefresh(api, refreshResult)) {
+            return { ok: true, reason: '' };
+          }
+        }
 
-      return false;
+        const finalRefreshError = refreshResult.error;
+        if (finalRefreshError?.status === 401) {
+          clearExpiredSession(api, t);
+          return { ok: false, reason: 'expired' };
+        }
+
+        if (!finalRefreshError) {
+          return { ok: false, reason: 'server' };
+        }
+
+        return {
+          ok: false,
+          reason: isNetworkRefreshError(finalRefreshError) ? 'offline' : 'server',
+        };
+      });
     }
 
     let result = await baseQuery(args, api, extraOptions);
 
+    if (!result.error) {
+      resetOfflineNoticeState();
+    }
+
     if (result.error?.status === 401 && !isAuthEndpoint(args)) {
       const refreshed = await refreshSession();
 
-      if (refreshed) {
+      if (refreshed?.ok) {
         result = await baseQuery(args, api, extraOptions);
+
+        if (!result.error) {
+          resetOfflineNoticeState();
+        }
+      } else if (refreshed?.reason === 'offline') {
+        if (shouldSurfaceOfflineForRequest(api) && shouldShowOfflineNotice()) {
+          markOfflineNoticeShown();
+          api.dispatch(
+            setSessionError({
+              type: 'offline',
+              message: t('auth.connectionLostKeepSession'),
+            }),
+          );
+        }
+      } else if (refreshed?.reason === 'server') {
+        api.dispatch(
+          setSessionError({
+            type: 'server',
+            message: t('auth.sessionCheckFailedKeepSession'),
+          }),
+        );
       }
     }
 

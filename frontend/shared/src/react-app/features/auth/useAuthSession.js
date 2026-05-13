@@ -6,6 +6,8 @@ import { saveSession } from './authStorage.js';
 import { setSession, setSessionError, setSessionInitialized } from './authSlice.js';
 import { getStoredUser, getToken } from './authStorage.js';
 
+let sessionBootstrapPromise = null;
+
 // Відновлює сесію з локального сховища без запиту до бекенда.
 function restoreStoredSession(dispatch) {
   const token = getToken();
@@ -50,18 +52,37 @@ export function useAuthSession() {
   const [refreshSession] = useRefreshSessionMutation();
 
   useEffect(() => {
+    let isActive = true;
+
     // Якщо локальна сесія вже є, не робимо зайвий refresh при старті застосунку.
     if (restoreStoredSession(dispatch)) {
-      return;
+      return () => {
+        isActive = false;
+      };
     }
 
-    refreshSession()
-      .unwrap()
+    if (!sessionBootstrapPromise) {
+      sessionBootstrapPromise = refreshSession()
+        .unwrap()
+        .finally(() => {
+          sessionBootstrapPromise = null;
+        });
+    }
+
+    sessionBootstrapPromise
       .then(response => {
+        if (!isActive) {
+          return;
+        }
+
         applyRefreshedSession(dispatch, response);
         dispatch(setSessionInitialized());
       })
       .catch(error => {
+        if (!isActive) {
+          return;
+        }
+
         if (error?.status === 401) {
           dispatch(setSessionInitialized());
           return;
@@ -69,5 +90,9 @@ export function useAuthSession() {
 
         handleSessionBootstrapFailure(dispatch);
       });
+
+    return () => {
+      isActive = false;
+    };
   }, [dispatch, refreshSession]);
 }

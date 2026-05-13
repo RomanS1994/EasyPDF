@@ -1,6 +1,7 @@
 import { prisma } from './prisma.js';
 import {
   getDatabaseUrl,
+  getDirectDatabaseUrl,
   isProductionEnvironment,
 } from '../config/runtime-env.js';
 export async function runStoreRead({ prisma: runPrisma }) {
@@ -12,10 +13,14 @@ export async function runStoreTransaction({ prisma: runPrisma }) {
 }
 
 export function getDatabaseInfo() {
+  const databaseUrl = getDatabaseUrl();
+  const directDatabaseUrl = getDirectDatabaseUrl();
+
   const prismaInfo = {
     provider: 'postgresql',
-    configured: Boolean(getDatabaseUrl()),
+    configured: Boolean(databaseUrl || directDatabaseUrl),
     mode: 'prisma',
+    connectionType: directDatabaseUrl ? 'direct' : databaseUrl ? 'proxy' : 'missing',
     productionOnly: isProductionEnvironment(),
   };
   return prismaInfo;
