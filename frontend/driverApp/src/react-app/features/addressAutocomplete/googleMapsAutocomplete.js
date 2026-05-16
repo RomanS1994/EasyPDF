@@ -66,7 +66,12 @@ export async function loadGoogleMapsPlaces(apiKey) {
 
 export async function createAutocompleteSessionToken(apiKey) {
   const maps = await loadGoogleMapsPlaces(apiKey);
-  const { AutocompleteSessionToken } = await maps.importLibrary('places');
+  await maps.importLibrary('places');
+  const AutocompleteSessionToken = maps.places?.AutocompleteSessionToken;
+
+  if (!AutocompleteSessionToken) {
+    throw new Error('Google Maps Places session token is unavailable.');
+  }
 
   // Сесія зменшує зайві білінг-запити під час набору адреси.
   return new AutocompleteSessionToken();
@@ -74,27 +79,41 @@ export async function createAutocompleteSessionToken(apiKey) {
 
 export async function fetchCzechAutocompleteSuggestions({ apiKey, input, sessionToken }) {
   const maps = await loadGoogleMapsPlaces(apiKey);
-  const { AutocompleteSuggestion } = await maps.importLibrary('places');
+  await maps.importLibrary('places');
+  const AutocompleteService = maps.places?.AutocompleteService;
 
-  const { suggestions } = await AutocompleteSuggestion.fetchAutocompleteSuggestions({
-    input,
-    includedRegionCodes: ['cz'],
-    sessionToken,
+  if (!AutocompleteService) {
+    throw new Error('Google Maps autocomplete service is unavailable.');
+  }
+
+  const service = new AutocompleteService();
+
+  const predictions = await new Promise((resolve, reject) => {
+    const request = {
+      input,
+      componentRestrictions: { country: 'cz' },
+    };
+
+    if (sessionToken) {
+      request.sessionToken = sessionToken;
+    }
+
+    service.getPlacePredictions(
+      request,
+      (results, status) => {
+        if (status === maps.places.PlacesServiceStatus.OK || status === maps.places.PlacesServiceStatus.ZERO_RESULTS) {
+          resolve(results || []);
+          return;
+        }
+
+        reject(new Error(`Autocomplete failed with status: ${status || 'UNKNOWN'}`));
+      },
+    );
   });
 
-  return suggestions
-    .map((suggestion, index) => {
-      const placePrediction = suggestion.placePrediction;
-
-      if (!placePrediction) {
-        return null;
-      }
-
-      return {
-        id: placePrediction.placeId || `${placePrediction.text.toString()}-${index}`,
-        label: placePrediction.text.toString(),
-        placePrediction,
-      };
-    })
-    .filter(Boolean);
+  return predictions.map((prediction, index) => ({
+    id: prediction.place_id || `${prediction.description}-${index}`,
+    label: prediction.description,
+    value: prediction.description,
+  }));
 }

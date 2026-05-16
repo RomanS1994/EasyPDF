@@ -1,4 +1,6 @@
 .contractForm {
+  position: relative;
+  overflow: hidden;
   display: grid;
   gap: 16px;
 }

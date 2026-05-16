@@ -19,6 +19,8 @@ export function AddressAutocompleteField({
   const [statusMessage, setStatusMessage] = useState('');
   const requestIdRef = useRef(0);
   const blurTimerRef = useRef(null);
+  const autocompleteEnabled = Boolean(apiKey);
+  const inputText = String(value ?? '').trim();
 
   useEffect(() => {
     return () => {
@@ -36,12 +38,17 @@ export function AddressAutocompleteField({
       return;
     }
 
-    const text = String(value ?? '').trim();
-
-    if (!apiKey || !text) {
+    if (!inputText) {
       setSuggestions([]);
       setIsLoading(false);
-      setStatusMessage(!apiKey ? 'Add VITE_GOOGLE_MAPS_API_KEY and restart the dev server.' : '');
+      setStatusMessage('');
+      return;
+    }
+
+    if (!autocompleteEnabled) {
+      setSuggestions([]);
+      setIsLoading(false);
+      setStatusMessage('Autocomplete is unavailable.');
       return;
     }
 
@@ -53,13 +60,18 @@ export function AddressAutocompleteField({
         let nextToken = sessionToken;
 
         if (!nextToken) {
-          nextToken = await createAutocompleteSessionToken(apiKey);
-          setSessionToken(nextToken);
+          try {
+            nextToken = await createAutocompleteSessionToken(apiKey);
+            setSessionToken(nextToken);
+          } catch (error) {
+            nextToken = null;
+            setSessionToken(null);
+          }
         }
 
         const results = await fetchCzechAutocompleteSuggestions({
           apiKey,
-          input: text,
+          input: inputText,
           sessionToken: nextToken,
         });
 
@@ -68,14 +80,14 @@ export function AddressAutocompleteField({
         }
 
         setSuggestions(results);
-        setStatusMessage(results.length ? '' : 'No Czech address matches found.');
+        setStatusMessage(results.length ? '' : 'No address matches found.');
       } catch (error) {
         if (requestId !== requestIdRef.current) {
           return;
         }
 
         setSuggestions([]);
-        setStatusMessage('Google Maps autocomplete is unavailable.');
+        setStatusMessage(error?.message || 'Google Maps autocomplete is unavailable.');
       } finally {
         if (requestId === requestIdRef.current) {
           setIsLoading(false);
@@ -86,27 +98,45 @@ export function AddressAutocompleteField({
     return () => {
       window.clearTimeout(timer);
     };
-  }, [apiKey, isOpen, sessionToken, value]);
+  }, [autocompleteEnabled, apiKey, inputText, isOpen, sessionToken]);
 
-  const handleFocus = async () => {
-    setIsOpen(true);
-
-    if (!sessionToken && apiKey) {
-      try {
-        // Починаємо нову сесію, коли користувач відкриває поле.
-        const nextToken = await createAutocompleteSessionToken(apiKey);
-        setSessionToken(nextToken);
-      } catch (error) {
-        setSessionToken(null);
-        setStatusMessage('Google Maps autocomplete is unavailable.');
-      }
+  const handleFocus = () => {
+    if (blurTimerRef.current) {
+      window.clearTimeout(blurTimerRef.current);
+      blurTimerRef.current = null;
     }
+
+    if (!autocompleteEnabled) {
+      setIsOpen(true);
+      setSuggestions([]);
+      setStatusMessage(inputText ? 'Autocomplete is unavailable.' : '');
+      return;
+    }
+
+    setIsOpen(true);
   };
 
   const handleBlur = () => {
     blurTimerRef.current = window.setTimeout(() => {
       setIsOpen(false);
     }, 120);
+  };
+
+  const handleInputChange = event => {
+    const nextValue = event.target.value;
+    onChange(nextValue);
+
+    if (autocompleteEnabled) {
+      if (blurTimerRef.current) {
+        window.clearTimeout(blurTimerRef.current);
+        blurTimerRef.current = null;
+      }
+
+      setIsOpen(true);
+    } else {
+      setIsOpen(true);
+      setStatusMessage(nextValue.trim() ? 'Autocomplete is unavailable.' : '');
+    }
   };
 
   const handleSelect = async suggestion => {
@@ -149,7 +179,7 @@ export function AddressAutocompleteField({
           value={value}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          onChange={event => onChange(event.target.value)}
+          onChange={handleInputChange}
         />
         {value ? (
           <button className="contractField-clear" type="button" aria-label={clearLabel} onClick={onClear}>
@@ -158,9 +188,9 @@ export function AddressAutocompleteField({
         ) : null}
       </div>
 
-      {isOpen ? (
+      {isOpen && inputText ? (
         <div className="addressAutocompleteMenu" role="listbox" aria-label={ariaLabel}>
-          {isLoading ? <div className="addressAutocompleteStatus">...</div> : null}
+          {isLoading ? <div className="addressAutocompleteStatus">Searching...</div> : null}
           {!isLoading && statusMessage ? (
             <div className="addressAutocompleteStatus">{statusMessage}</div>
           ) : null}

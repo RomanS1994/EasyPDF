@@ -8,8 +8,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   plugins: [react()],
   base: '/',
-  envDir: 'frontend/driverApp',
-  root: 'frontend/driverApp',
+  envDir: path.resolve(__dirname, 'frontend/driverApp'),
+  root: path.resolve(__dirname, 'frontend/driverApp'),
   publicDir: 'public',
   appType: 'spa',
   resolve: {
