@@ -164,8 +164,8 @@
 
 .orderItemCustomer {
   margin: 0;
-  font-size: 15px;
-  line-height: 1.12;
+  font-size: 18px;
+  line-height: 1.08;
   font-weight: 800;
   letter-spacing: -0.04em;
   color: var(--text);
@@ -361,6 +361,59 @@
   height: 12px;
 }
 
+.orderItemRouteStats {
+  grid-column: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px 2px 0 2px;
+}
+
+.orderItemRouteStat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #607089;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: none;
+}
+
+.orderItemRouteStatIcon {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 0;
+  background: transparent;
+  color: #2f78ff;
+}
+
+.orderItemRouteStatIcon svg {
+  width: 15px;
+  height: 15px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.orderItemRouteStatValue {
+  min-width: 8px;
+  color: #19243c;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
 .orderItemHeaderActions {
   display: inline-flex;
   align-items: center;
@@ -376,30 +429,39 @@
 }
 
 .orderStatusBadge {
+  appearance: none;
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
   align-self: flex-start;
-  gap: 8px;
-  min-height: 24px;
-  padding: 0 8px;
+  gap: 6px;
+  min-height: 26px;
+  padding: 0 9px;
+  border: 1px solid rgba(15, 23, 42, 0.88);
   border-radius: 999px;
-  background: rgba(0, 122, 255, 0.16);
-  color: #0a63d0;
-  font-size: 8px;
+  background: transparent;
+  color: var(--text);
+  font-size: 10px;
   font-weight: 800;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   white-space: nowrap;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.orderStatusBadge:hover,
+.orderStatusBadge:focus-visible {
+  background: rgba(15, 23, 42, 0.04);
 }
 
 .orderStatusBadgeFlight {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   margin-right: 2px;
-  font-size: 7px;
-  font-weight: 800;
+  font-size: 10px;
+  font-weight: 500;
   letter-spacing: 0.12em;
   color: currentColor;
   flex: 0 0 auto;
@@ -411,8 +473,8 @@
 }
 
 .orderStatusBadgeFlightIcon svg {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.8;
@@ -450,8 +512,9 @@
 }
 
 .orderItem--today .orderStatusBadge {
-  background: rgba(52, 199, 89, 0.16);
-  color: #15783a;
+  border-color: rgba(15, 23, 42, 0.88);
+  background: transparent;
+  color: var(--text);
 }
 
 .orderItem--today .orderStatusBadgeToday {
@@ -460,13 +523,15 @@
 }
 
 .orderItem--completed .orderStatusBadge {
-  background: rgba(215, 106, 61, 0.18);
-  color: #a34f2a;
+  border-color: rgba(15, 23, 42, 0.88);
+  background: transparent;
+  color: var(--text);
 }
 
 .orderItem--draft .orderStatusBadge {
-  background: rgba(118, 124, 141, 0.14);
-  color: #5e6677;
+  border-color: rgba(15, 23, 42, 0.88);
+  background: transparent;
+  color: var(--text);
 }
 
 .orderItemMetaRow {
@@ -569,9 +634,10 @@
 }
 
 .orderItemDateTime {
-  font-size: 13px;
-  font-weight: 900;
-  color: #4f5d72;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--text);
 }
 
 .orderItemArrow {
@@ -638,7 +704,7 @@
   }
 
   .orderItemCustomer {
-    font-size: 14px;
+    font-size: 17px;
   }
 
   .orderItemHeaderActions {
@@ -661,6 +727,18 @@
     border-radius: 4px;
   }
 
+  .orderItemRouteStats {
+    gap: 7px;
+    padding-top: 7px;
+    padding-bottom: 0;
+  }
+
+  .orderItemRouteStat {
+    min-height: 22px;
+    padding-right: 0;
+    font-size: 12px;
+  }
+
   .orderItemPrice {
     font-size: 12px;
   }
@@ -670,7 +748,7 @@
   }
 
   .orderItemDateTime {
-    font-size: 12px;
+    font-size: 15px;
   }
 
   .orderItemMetaIcon {
@@ -696,9 +774,9 @@
   }
 
   .orderStatusBadge {
-    min-height: 22px;
+    min-height: 24px;
     padding: 0 8px;
-    font-size: 8px;
+    font-size: 9px;
   }
 
   .orderStatusBadgeDot {

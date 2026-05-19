@@ -13,6 +13,7 @@ export function createDefaultContractState() {
     orderNumber: '',
     today: '',
     documentType: 'confirmation',
+    flightNumber: '',
     driver: {
       ...createEmptyBusinessParty(),
       spz: '',
@@ -28,6 +29,14 @@ export function createDefaultContractState() {
       to: { address: '' },
       time: '',
       paymentMethod: '',
+      driverComment: '',
+      luggageUnits: 0,
+      childSeats: {
+        enabled: false,
+        infant: 0,
+        child: 0,
+        booster: 0,
+      },
     },
     totalPrice: '',
   };
@@ -45,6 +54,9 @@ const contractSlice = createSlice({
     },
     setDocumentType(state, action) {
       state.documentType = action.payload;
+    },
+    setFlightNumber(state, action) {
+      state.flightNumber = action.payload;
     },
     updateDriverField(state, action) {
       const field = action.payload.key || action.payload.field;
@@ -114,6 +126,7 @@ export const {
   setOrderNumber,
   setToday,
   setDocumentType,
+  setFlightNumber,
   updateDriverField,
   updateProviderField,
   updateCustomerField,

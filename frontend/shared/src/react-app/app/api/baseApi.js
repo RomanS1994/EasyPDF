@@ -1,8 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-import { clearSession as clearStoredSession, saveSession } from '../../features/auth/authStorage.js';
+import { saveSession } from '../../features/auth/authStorage.js';
 import {
-  clearSession,
   clearSessionError,
   setSession,
   setSessionError,
@@ -84,14 +83,12 @@ function applySuccessfulRefresh(api, refreshResult) {
   return true;
 }
 
-// Повністю скидає сесію, якщо refresh підтвердив її завершення.
-function clearExpiredSession(api, t) {
-  clearStoredSession();
-  api.dispatch(clearSession());
+// Позначає проблему refresh без примусового logout користувача.
+function keepSessionAfterRefreshFailure(api, t) {
   api.dispatch(
     setSessionError({
-      type: 'expired',
-      message: t('auth.sessionExpiredSignIn'),
+      type: 'server',
+      message: t('auth.sessionCheckFailedKeepSession'),
     }),
   );
 }
@@ -157,8 +154,8 @@ export const baseApi = createApi({
 
         const refreshError = refreshResult.error;
         if (refreshError?.status === 401) {
-          clearExpiredSession(api, t);
-          return { ok: false, reason: 'expired' };
+          keepSessionAfterRefreshFailure(api, t);
+          return { ok: false, reason: 'server' };
         }
 
         if (isNetworkRefreshError(refreshError)) {
@@ -172,8 +169,8 @@ export const baseApi = createApi({
 
         const finalRefreshError = refreshResult.error;
         if (finalRefreshError?.status === 401) {
-          clearExpiredSession(api, t);
-          return { ok: false, reason: 'expired' };
+          keepSessionAfterRefreshFailure(api, t);
+          return { ok: false, reason: 'server' };
         }
 
         if (!finalRefreshError) {

@@ -57,6 +57,11 @@ function normalizeFlightNumber(value) {
     .toUpperCase();
 }
 
+function normalizeCount(value) {
+  const parsed = Number.parseInt(String(value ?? '').trim(), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
 function OrderGlyph({ name }) {
   return <SvgIcon name={name} />;
 }
@@ -113,6 +118,19 @@ export function OrderDetails({ orderId, onClose }) {
   const order = data?.order || data || {};
   const customer = order?.contractData?.customer || order?.customer || {};
   const trip = order?.contractData?.trip || order?.trip || {};
+  const passengersCount = normalizeCount(order?.contractData?.passengers || order?.passengers);
+  const luggageUnits = normalizeCount(
+    trip?.luggageUnits ||
+      order?.contractData?.luggageUnits ||
+      order?.luggageUnits ||
+      '',
+  );
+  const driverComment = String(
+    trip?.driverComment ||
+      order?.contractData?.driverComment ||
+      order?.driverComment ||
+      '',
+  ).trim();
   const tripTime = formatDateTime(getOrderTripTime(order));
   const storedCommission = getCommissionValue(order);
   const storedPrice = String(order?.totalPrice || order?.contractData?.totalPrice || "").trim();
@@ -667,13 +685,17 @@ export function OrderDetails({ orderId, onClose }) {
                   <span className="orderSheetInfoValue">{customer.phone || customer.email || "-"}</span>
                 </div>
 
-                <div className="orderSheetInfoRow">
-                  <div className="orderSheetInfoLead">
+                <div
+                  className="orderSheetInfoRow orderSheetInfoRow--compactStats"
+                  aria-label={`${t('contract.passengers')}: ${passengersCount}. ${t('contract.luggageUnits')}: ${luggageUnits}.`}
+                >
+                  <span className="orderSheetCompactStat">
                     <OrderCardIcon name="accounts" />
-                    <span className="orderSheetInfoLabel">{t('contract.passengers')}</span>
-                  </div>
-                  <span className="orderSheetInfoValue">
-                    {order?.contractData?.passengers || order?.passengers || '-'}
+                    <span className="orderSheetCompactStatValue">{passengersCount}</span>
+                  </span>
+                  <span className="orderSheetCompactStat">
+                    <OrderCardIcon name="luggage" />
+                    <span className="orderSheetCompactStatValue">{luggageUnits}</span>
                   </span>
                 </div>
               </div>
@@ -720,6 +742,18 @@ export function OrderDetails({ orderId, onClose }) {
                   </div>
                   <span className="orderSheetInfoValue">{trip.paymentMethod || "-"}</span>
                 </div>
+
+                {driverComment ? (
+                  <div className="orderSheetInfoRow orderSheetInfoRow--driverComment">
+                    <div className="orderSheetInfoLead orderSheetInfoLead--alignStart">
+                      <OrderCardIcon name="file" />
+                      <span className="orderSheetInfoLabel">{t('contract.driverComment')}</span>
+                    </div>
+                    <span className="orderSheetInfoValue orderSheetInfoValue--driverComment">
+                      {driverComment}
+                    </span>
+                  </div>
+                ) : null}
               </div>
             </section>
 

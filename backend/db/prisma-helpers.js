@@ -67,6 +67,7 @@ export const ORDER_LIST_SELECT = {
   customer: true,
   trip: true,
   totalPrice: true,
+  contractData: true,
   metadata: true,
   createdAt: true,
   updatedAt: true,
@@ -280,6 +281,12 @@ export function sanitizeOrderRecord(order) {
 
 export function sanitizeOrderListRecord(order) {
   const flightNumber = order.flightNumber || order.contractData?.flightNumber || '';
+  const passengers = order.contractData?.passengers || order.passengers || '';
+  const luggageUnits =
+    order.contractData?.trip?.luggageUnits ||
+    order.contractData?.luggageUnits ||
+    order.trip?.luggageUnits ||
+    '';
 
   return {
     id: order.id,
@@ -294,7 +301,9 @@ export function sanitizeOrderListRecord(order) {
       from: pickTextValue(order.trip?.from),
       to: pickTextValue(order.trip?.to),
       time: pickTextValue(order.trip?.time),
+      luggageUnits: pickTextValue(luggageUnits),
     },
+    passengers: pickTextValue(passengers),
     totalPrice: pickTextValue(order.totalPrice),
     metadata: order.metadata || {},
     createdAt: toIsoString(order.createdAt),

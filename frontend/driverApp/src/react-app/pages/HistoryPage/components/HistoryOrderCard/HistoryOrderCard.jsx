@@ -32,6 +32,14 @@ function FlightIcon() {
   return <SvgIcon name="takeoff" />;
 }
 
+function PassengersIcon() {
+  return <SvgIcon name="accounts" />;
+}
+
+function LuggageIcon() {
+  return <SvgIcon name="luggage" />;
+}
+
 function formatDate(value) {
   const date = parseDateValue(value);
 
@@ -51,6 +59,28 @@ function normalizeFlightNumber(value) {
     .trim()
     .replace(/\s+/g, ' ')
     .toUpperCase();
+}
+
+function normalizeCount(value) {
+  const parsed = Number.parseInt(String(value ?? '').trim(), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
+async function copyTextToClipboard(value) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(value);
+    return;
+  }
+
+  const input = document.createElement('textarea');
+  input.value = value;
+  input.setAttribute('readonly', '');
+  input.style.position = 'fixed';
+  input.style.left = '-9999px';
+  document.body.appendChild(input);
+  input.select();
+  document.execCommand('copy');
+  document.body.removeChild(input);
 }
 
 function HistoryOrderCard({ order, onOpen }) {
@@ -88,6 +118,12 @@ function HistoryOrderCard({ order, onOpen }) {
     order?.trip?.to ||
     '';
   const hasRoute = Boolean(routeFrom && routeTo);
+  const passengersCount = normalizeCount(order?.contractData?.passengers || order?.passengers);
+  const luggageCount = normalizeCount(
+    order?.contractData?.trip?.luggageUnits ||
+      order?.contractData?.luggageUnits ||
+      order?.trip?.luggageUnits,
+  );
 
   function handleOpenRouteModal(event, address, label) {
     event.stopPropagation();
@@ -111,6 +147,20 @@ function HistoryOrderCard({ order, onOpen }) {
 
   function handleOpenDetails() {
     onOpen(order.id);
+  }
+
+  async function handleCopyFlightNumber(event) {
+    event.stopPropagation();
+
+    if (!flightNumber) {
+      return;
+    }
+
+    try {
+      await copyTextToClipboard(flightNumber);
+    } catch {
+      // Clipboard can be blocked by browser permissions; keep the card usable.
+    }
   }
 
   function handleKeyDown(event) {
@@ -138,14 +188,20 @@ function HistoryOrderCard({ order, onOpen }) {
           <div className="orderItemHeaderActions">
             <div className="orderStatusBadgeWrap">
               {status.bucket === 'today' && flightNumber ? (
-                <div className="orderStatusBadge" aria-hidden="true">
+                <button
+                  className="orderStatusBadge"
+                  type="button"
+                  aria-label={`Copy flight number ${flightNumber}`}
+                  title={flightNumber}
+                  onClick={handleCopyFlightNumber}
+                >
                   <span className="orderStatusBadgeFlight">
                     <span className="orderStatusBadgeFlightIcon">
                       <FlightIcon />
                     </span>
                     <span className="orderStatusBadgeFlightValue">{flightNumber}</span>
                   </span>
-                </div>
+                </button>
               ) : null}
               <div className="orderStatusBadgeToday">
                 {status.bucket === 'today' ? <span className="orderStatusBadgeDot" aria-hidden="true" /> : null}
@@ -196,6 +252,21 @@ function HistoryOrderCard({ order, onOpen }) {
             ) : (
               t('history.routeNotAdded')
             )}
+          </div>
+
+          <div className="orderItemRouteStats" aria-label={`${t('contract.passengers')}: ${passengersCount || 0}. ${t('contract.luggageUnits')}: ${luggageCount || 0}.`}>
+            <span className="orderItemRouteStat">
+              <span className="orderItemRouteStatIcon" aria-hidden="true">
+                <PassengersIcon />
+              </span>
+              <span className="orderItemRouteStatValue">{passengersCount || 0}</span>
+            </span>
+            <span className="orderItemRouteStat">
+              <span className="orderItemRouteStatIcon" aria-hidden="true">
+                <LuggageIcon />
+              </span>
+              <span className="orderItemRouteStatValue">{luggageCount || 0}</span>
+            </span>
           </div>
         </div>
         <div className="orderItemMetaRow">

@@ -3,8 +3,15 @@ import {
   sendError,
   sendJson,
 } from '../../lib/http.js';
-import { REFRESH_COOKIE_NAME } from '../../auth/context.js';
-import { hashToken } from '../../auth/tokens.js';
+import {
+  REFRESH_COOKIE_NAME,
+  REFRESH_TOKEN_TTL_SECONDS,
+} from '../../auth/context.js';
+import {
+  createAccessToken,
+  getAccessTokenExpiresAt,
+  hashToken,
+} from '../../auth/tokens.js';
 import {
   buildSanitizedUser,
   createAuditLog,
@@ -14,7 +21,6 @@ import { runStoreTransaction } from '../../db/store.js';
 import {
   buildRequestMeta,
   clearRefreshTokenCookie,
-  issueAuthSession,
   setRefreshTokenCookie,
 } from './shared.js';
 
@@ -58,37 +64,40 @@ export async function handleRefresh(request, response) {
         return null;
       }
 
-      await tx.session.deleteMany({
+      const issuedAt = Date.now();
+      const nextSessionExpiresAt = new Date(
+        issuedAt + REFRESH_TOKEN_TTL_SECONDS * 1000
+      );
+
+      await tx.session.update({
         where: {
           id: currentSession.id,
         },
-      });
-
-      const rotatedSession = issueAuthSession(currentSession.user.id);
-      await tx.session.create({
         data: {
-          id: rotatedSession.session.id,
-          userId: currentSession.user.id,
-          tokenHash: rotatedSession.session.tokenHash,
-          createdAt: new Date(rotatedSession.session.createdAt),
-          expiresAt: new Date(rotatedSession.session.expiresAt),
+          expiresAt: nextSessionExpiresAt,
         },
       });
+
       await createAuditLog(tx, {
         action: 'auth.session.refreshed',
         actorUserId: currentSession.user.id,
         targetUserId: currentSession.user.id,
         entityType: 'session',
-        entityId: rotatedSession.session.id,
+        entityId: currentSession.id,
         meta: buildRequestMeta(request, {
-          replacedSessionId: currentSession.id,
+          sessionId: currentSession.id,
         }),
       });
 
       return {
-        refreshToken: rotatedSession.refreshToken,
-        token: rotatedSession.accessToken,
-        accessTokenExpiresAt: rotatedSession.accessTokenExpiresAt,
+        token: createAccessToken(
+          {
+            userId: currentSession.user.id,
+            sessionId: currentSession.id,
+          },
+          issuedAt
+        ),
+        accessTokenExpiresAt: getAccessTokenExpiresAt(issuedAt),
         user: await buildSanitizedUser(tx, currentSession.user),
       };
     },
@@ -99,7 +108,7 @@ export async function handleRefresh(request, response) {
     return sendError(response, 401, 'Invalid or expired refresh token');
   }
 
-  setRefreshTokenCookie(response, payload.refreshToken);
+  setRefreshTokenCookie(response, refreshToken);
   sendJson(response, 200, {
     token: payload.token,
     accessTokenExpiresAt: payload.accessTokenExpiresAt,
