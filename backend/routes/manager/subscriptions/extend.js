@@ -14,6 +14,29 @@ import {
 import { nowIso, shiftMonths } from '../../../validation/common.js';
 import { resolveExtensionMonths } from '../../../validation/manager.js';
 
+function isBeforeNow(isoDate, timestamp) {
+  const parsed = new Date(isoDate);
+  const now = new Date(timestamp);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return true;
+  }
+
+  return parsed.getTime() < now.getTime();
+}
+
+function buildExtensionWindow(before, months) {
+  const timestamp = nowIso();
+  const shouldRestartWindow =
+    before.status !== 'active' || isBeforeNow(before.currentPeriodEnd, timestamp);
+  const extensionBaseEnd = shouldRestartWindow ? timestamp : before.currentPeriodEnd;
+
+  return {
+    currentPeriodStart: shouldRestartWindow ? timestamp : before.currentPeriodStart,
+    currentPeriodEnd: shiftMonths(extensionBaseEnd, months),
+  };
+}
+
 export async function handleManagerUserExtend(request, response, userId) {
   const context = await requireManager(request, response);
   if (!context) return;
@@ -40,7 +63,7 @@ export async function handleManagerUserExtend(request, response, userId) {
         plan: target.subscription?.plan,
         fallbackStartMode: target.subscription ? 'now' : 'month',
       });
-      const nextEnd = shiftMonths(before.currentPeriodEnd, months);
+      const nextWindow = buildExtensionWindow(before, months);
       const selectedPlan = target.subscription?.plan || (await findStoredPlan(tx, before.planId));
 
       if (!selectedPlan) {
@@ -54,7 +77,8 @@ export async function handleManagerUserExtend(request, response, userId) {
           ...before,
           status: 'active',
           source: 'manager',
-          currentPeriodEnd: nextEnd,
+          currentPeriodStart: nextWindow.currentPeriodStart,
+          currentPeriodEnd: nextWindow.currentPeriodEnd,
           notes: before.notes,
           canceledAt: null,
         },

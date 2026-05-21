@@ -31,8 +31,8 @@ export function SubscriptionExpiredNotice() {
         <p className="subscriptionExpiredNotice-text">{t('contract.subscriptionInactive')}</p>
       </div>
 
-      <Link className="subscriptionExpiredNotice-button" to="/account">
-        {t('account.openAccount')}
+      <Link className="subscriptionExpiredNotice-button" to="/settings/plan-upgrade">
+        {t('contract.openAccountForUpgrade')}
       </Link>
     </div>
   );

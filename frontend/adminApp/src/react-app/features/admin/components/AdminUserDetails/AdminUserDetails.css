@@ -147,6 +147,39 @@
   padding: 0 0.95rem 0.95rem;
 }
 
+.adminUserDetails-periodGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.adminUserDetails-pending,
+.adminUserDetails-extend {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.75rem 0.8rem;
+  border: 1px solid rgba(15, 95, 215, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.adminUserDetails-pending strong {
+  color: #122033;
+  font-size: 0.94rem;
+}
+
+.adminUserDetails-pending p {
+  margin: 0;
+  color: #526173;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.adminUserDetails-extend {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+}
+
 .adminUserDetails-field {
   display: grid;
   gap: 0.3rem;
@@ -181,6 +214,15 @@
 .adminUserDetails-button:disabled {
   opacity: 0.6;
   cursor: default;
+}
+
+.adminUserDetails-button--success {
+  border-color: rgba(22, 163, 74, 0.18);
+  background:
+    linear-gradient(180deg, rgba(34, 197, 94, 0.98), rgba(22, 163, 74, 0.96));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.24) inset,
+    0 10px 22px rgba(22, 163, 74, 0.16);
 }
 
 .adminUserDetails-message,
@@ -221,6 +263,11 @@
   }
 
   .adminUserDetails-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .adminUserDetails-periodGrid,
+  .adminUserDetails-extend {
     grid-template-columns: 1fr;
   }
 

@@ -30,7 +30,7 @@ export function BusinessProfileGuardModal({ isOpen, onLater, onOpenSettings }) {
         <div className="businessProfileGuardModal-actions">
           <Link
             className="businessProfileGuardModal-link"
-            to="/settings"
+            to="/settings/business-profile"
             onClick={onOpenSettings}
           >
             <span className="businessProfileGuardModal-linkIcon" aria-hidden="true">

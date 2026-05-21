@@ -839,6 +839,8 @@
 
 .orderPriceEditor-panel {
   width: min(100%, 420px);
+  max-height: calc(100dvh - 40px);
+  overflow: auto;
   display: grid;
   gap: 14px;
   padding: 18px;

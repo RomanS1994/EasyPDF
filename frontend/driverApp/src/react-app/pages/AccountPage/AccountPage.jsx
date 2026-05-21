@@ -4,13 +4,11 @@ import { Link } from 'react-router-dom';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { selectUser } from '@shared/features/auth/authSlice.js';
 import { AccountProfileForm } from '@shared/features/auth/components/AccountProfileForm/AccountProfileForm.jsx';
-import { BusinessProfileForm } from '@shared/features/auth/components/BusinessProfileForm/BusinessProfileForm.jsx';
 import { LoginForm } from '@shared/features/auth/components/LoginForm/LoginForm.jsx';
 import { RegisterForm } from '@shared/features/auth/components/RegisterForm/RegisterForm.jsx';
 import { useGetOrdersQuery } from '../../features/orders/ordersApi.js';
 import { ProfileDanger } from './components/ProfileDanger/ProfileDanger.jsx';
 import { ProfileHero } from './components/ProfileHero/ProfileHero.jsx';
-import { ProfileUpgrade } from './components/ProfileUpgrade/ProfileUpgrade.jsx';
 import { ProfileWorkspace } from './components/ProfileWorkspace/ProfileWorkspace.jsx';
 import './AccountPage.css';
 
@@ -40,12 +38,9 @@ export function AccountPage() {
 
           <div className="screenCard accountPage-card">
             <AccountProfileForm />
-            <BusinessProfileForm />
           </div>
 
           <ProfileWorkspace user={user} orders={orders} />
-
-          <ProfileUpgrade user={user} />
 
           <ProfileDanger />
         </>

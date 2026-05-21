@@ -19,6 +19,8 @@
   position: relative;
   z-index: 1;
   width: min(100%, 460px);
+  max-height: calc(100dvh - 36px);
+  overflow: auto;
   display: grid;
   gap: 18px;
   padding: 22px;

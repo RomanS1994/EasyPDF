@@ -259,7 +259,7 @@ export function ContractActions() {
 
   function openAccountUpgrade() {
     setSubscriptionErrorState(null);
-    navigate('/account');
+    navigate('/settings/plan-upgrade');
   }
 
   async function handleCreate() {

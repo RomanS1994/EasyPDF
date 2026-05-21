@@ -8,6 +8,8 @@ import { saveSession } from '@shared/features/auth/authStorage.js';
 import {
   useGetAdminPlansQuery,
   useGetAdminUserQuery,
+  useConfirmUserSubscriptionPaymentMutation,
+  useExtendUserSubscriptionMutation,
   useUpdateUserRoleMutation,
   useUpdateUserSubscriptionMutation,
 } from '@shared/features/admin/adminApi.js';
@@ -32,17 +34,26 @@ export function AdminUserDetails({ userId, user: userProp, showSummary = true, s
   const [updateUserRole, { isLoading: isSavingRole }] = useUpdateUserRoleMutation();
   const [updateUserSubscription, { isLoading: isSavingSubscription }] =
     useUpdateUserSubscriptionMutation();
+  const [extendUserSubscription, { isLoading: isExtendingSubscription }] =
+    useExtendUserSubscriptionMutation();
+  const [confirmUserSubscriptionPayment, { isLoading: isConfirmingPayment }] =
+    useConfirmUserSubscriptionPaymentMutation();
   const [roleValue, setRoleValue] = useState('user');
   const [statusValue, setStatusValue] = useState('active');
   const [planId, setPlanId] = useState('');
+  const [extensionMonths, setExtensionMonths] = useState('1');
   const [roleMessage, setRoleMessage] = useState('');
   const [roleError, setRoleError] = useState('');
   const [subscriptionMessage, setSubscriptionMessage] = useState('');
   const [subscriptionError, setSubscriptionError] = useState('');
   const user = userProp || data?.user || data || {};
   const createdAt = formatDateTime(user.createdAt, 'uk');
+  const periodStart = formatDateTime(user.subscription?.currentPeriodStart, 'uk');
+  const periodEnd = formatDateTime(user.subscription?.currentPeriodEnd, 'uk');
   const plans = plansData?.plans || [];
   const firstPlanId = plans[0]?.id || '';
+  const pendingPlanId = user.subscription?.pendingPlanId || '';
+  const pendingPlan = plans.find(plan => plan.id === pendingPlanId);
   const canSaveRole = currentUser?.role === 'admin';
 
   function syncCurrentSession(nextUser) {
@@ -147,6 +158,38 @@ export function AdminUserDetails({ userId, user: userProp, showSummary = true, s
       setSubscriptionMessage(t('admin.subscriptionSaved'));
     } catch {
       setSubscriptionError(t('admin.failedToSaveSubscription'));
+    }
+  }
+
+  async function handleExtendSubscription() {
+    setSubscriptionMessage('');
+    setSubscriptionError('');
+
+    try {
+      const response = await extendUserSubscription({
+        userId: resolvedUserId,
+        months: extensionMonths,
+      }).unwrap();
+      syncCurrentSession(response?.user || response);
+      setSubscriptionMessage(t('admin.subscriptionExtended'));
+    } catch {
+      setSubscriptionError(t('admin.failedToExtendSubscription'));
+    }
+  }
+
+  async function handleConfirmPayment() {
+    setSubscriptionMessage('');
+    setSubscriptionError('');
+
+    try {
+      const response = await confirmUserSubscriptionPayment({
+        userId: resolvedUserId,
+        payload: pendingPlanId ? { planId: pendingPlanId } : {},
+      }).unwrap();
+      syncCurrentSession(response?.user || response);
+      setSubscriptionMessage(t('admin.subscriptionPaymentConfirmed'));
+    } catch {
+      setSubscriptionError(t('admin.failedToConfirmSubscriptionPayment'));
     }
   }
 
@@ -255,6 +298,59 @@ export function AdminUserDetails({ userId, user: userProp, showSummary = true, s
               ))}
             </select>
           </label>
+
+          <div className="adminUserDetails-periodGrid">
+            <div className="adminUserDetails-row">
+              <span className="adminUserDetails-label">{t('admin.validFrom')}</span>
+              <span className="adminUserDetails-value">{periodStart}</span>
+            </div>
+            <div className="adminUserDetails-row">
+              <span className="adminUserDetails-label">{t('admin.validUntil')}</span>
+              <span className="adminUserDetails-value">{periodEnd}</span>
+            </div>
+          </div>
+
+          {pendingPlanId ? (
+            <div className="adminUserDetails-pending">
+              <span className="adminUserDetails-label">{t('admin.pendingUpgrade')}</span>
+              <strong>{pendingPlan?.name || pendingPlanId}</strong>
+              <p>{t('admin.pendingUpgradeCopy')}</p>
+              <button
+                className="adminUserDetails-button adminUserDetails-button--success"
+                type="button"
+                onClick={handleConfirmPayment}
+                disabled={isConfirmingPayment}
+              >
+                {isConfirmingPayment
+                  ? t('admin.confirmingSubscriptionPayment')
+                  : t('admin.confirmSubscriptionPayment')}
+              </button>
+            </div>
+          ) : null}
+
+          <div className="adminUserDetails-extend">
+            <label className="adminUserDetails-field">
+              <span className="adminUserDetails-label">{t('admin.extensionMonths')}</span>
+              <select
+                className="adminUserDetails-select"
+                value={extensionMonths}
+                onChange={event => setExtensionMonths(event.target.value)}
+              >
+                <option value="1">1</option>
+                <option value="3">3</option>
+                <option value="6">6</option>
+                <option value="12">12</option>
+              </select>
+            </label>
+            <button
+              className="adminUserDetails-button"
+              type="button"
+              onClick={handleExtendSubscription}
+              disabled={isExtendingSubscription}
+            >
+              {isExtendingSubscription ? t('admin.extendingSubscription') : t('admin.extendSubscription')}
+            </button>
+          </div>
 
           {isPlansLoading ? <p className="adminUserDetails-note">{t('common.loadingPlans')}</p> : null}
           {isPlansError ? <p className="adminUserDetails-error">{t('admin.failedPlans')}</p> : null}

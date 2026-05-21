@@ -2,12 +2,12 @@ import { useSelector } from "react-redux";
 
 import { hasAdminAccess } from "@shared/features/auth/authAccess.js";
 import { selectUser } from "@shared/features/auth/authSlice.js";
-import { BusinessProfileForm } from "@shared/features/auth/components/BusinessProfileForm/BusinessProfileForm.jsx";
 import { ProfileDanger } from "../AccountPage/components/ProfileDanger/ProfileDanger.jsx";
-import { ProfileUpgrade } from "../AccountPage/components/ProfileUpgrade/ProfileUpgrade.jsx";
 import { SettingsAccountSummary } from "./components/SettingsAccountSummary/SettingsAccountSummary.jsx";
 import { SettingsAdminAccess } from "./components/SettingsAdminAccess/SettingsAdminAccess.jsx";
+import { SettingsBusinessProfileLink } from "./components/SettingsBusinessProfileLink/SettingsBusinessProfileLink.jsx";
 import { SettingsLanguageCard } from "./components/SettingsLanguageCard/SettingsLanguageCard.jsx";
+import { SettingsPlanUpgradeLink } from "./components/SettingsPlanUpgradeLink/SettingsPlanUpgradeLink.jsx";
 import { useI18n } from "@shared/app/i18n/useI18n.js";
 import "./SettingsPage.css";
 
@@ -31,16 +31,8 @@ export function SettingsPage() {
 
       {canAdmin ? <SettingsAdminAccess /> : null}
 
-      <section className="screenCard settingsPage-card">
-        <div className="compactHeader">
-          <h2>{t('settings.businessProfile.title')}</h2>
-          <p>{t('settings.businessProfile.subtitle')}</p>
-        </div>
-
-        <BusinessProfileForm />
-      </section>
-
-      <ProfileUpgrade user={user} />
+      <SettingsBusinessProfileLink />
+      <SettingsPlanUpgradeLink />
 
       <section className="screenCard settingsPage-card">
         <div className="compactHeader">

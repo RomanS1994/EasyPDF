@@ -54,12 +54,7 @@ export function useAuthSession() {
   useEffect(() => {
     let isActive = true;
 
-    // Якщо локальна сесія вже є, не робимо зайвий refresh при старті застосунку.
-    if (restoreStoredSession(dispatch)) {
-      return () => {
-        isActive = false;
-      };
-    }
+    const restoredFromStorage = restoreStoredSession(dispatch);
 
     if (!sessionBootstrapPromise) {
       sessionBootstrapPromise = refreshSession()
@@ -85,6 +80,10 @@ export function useAuthSession() {
 
         if (error?.status === 401) {
           dispatch(setSessionInitialized());
+          return;
+        }
+
+        if (restoredFromStorage) {
           return;
         }
 

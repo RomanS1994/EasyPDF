@@ -52,6 +52,34 @@ export const adminApi = baseApi.injectEndpoints({
         { type: 'AuditLogs', id: 'LIST' },
       ],
     }),
+    extendUserSubscription: builder.mutation({
+      query: ({ userId, months }) => ({
+        url: buildAdminPath(`/users/${userId}/subscription/extend`),
+        method: 'POST',
+        body: { months },
+      }),
+      invalidatesTags: (_result, _error, { userId }) => [
+        { type: 'AdminUsers', id: 'LIST' },
+        { type: 'AdminUsers', id: userId },
+        { type: 'Usage', id: 'CURRENT' },
+        { type: 'Me', id: 'CURRENT' },
+        { type: 'AuditLogs', id: 'LIST' },
+      ],
+    }),
+    confirmUserSubscriptionPayment: builder.mutation({
+      query: ({ userId, payload }) => ({
+        url: buildAdminPath(`/users/${userId}/subscription/confirm-payment`),
+        method: 'POST',
+        body: payload || {},
+      }),
+      invalidatesTags: (_result, _error, { userId }) => [
+        { type: 'AdminUsers', id: 'LIST' },
+        { type: 'AdminUsers', id: userId },
+        { type: 'Usage', id: 'CURRENT' },
+        { type: 'Me', id: 'CURRENT' },
+        { type: 'AuditLogs', id: 'LIST' },
+      ],
+    }),
     getAdminPlans: builder.query({
       query: () => buildAdminPath('/plans'),
       providesTags: result => {
@@ -150,6 +178,8 @@ export const {
   useGetAdminUserQuery,
   useUpdateUserRoleMutation,
   useUpdateUserSubscriptionMutation,
+  useExtendUserSubscriptionMutation,
+  useConfirmUserSubscriptionPaymentMutation,
   useGetAdminPlansQuery,
   useCreatePlanMutation,
   useUpdatePlanMutation,

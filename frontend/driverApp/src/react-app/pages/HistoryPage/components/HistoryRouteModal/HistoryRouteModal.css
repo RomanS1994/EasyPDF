@@ -19,6 +19,8 @@
   position: relative;
   z-index: 1;
   width: min(100%, 420px);
+  max-height: calc(100dvh - 36px);
+  overflow: auto;
   padding: 20px;
   border: 1px solid rgba(15, 95, 215, 0.12);
   border-radius: 28px;

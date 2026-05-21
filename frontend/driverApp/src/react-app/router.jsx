@@ -5,11 +5,13 @@ import { App } from '@shared/app/App.jsx';
 import { ProtectedRoute } from '@shared/app/components/ProtectedRoute/ProtectedRoute.jsx';
 import { RouterError } from '@shared/app/components/RouterError/RouterError.jsx';
 import { AccountPage } from './pages/AccountPage/AccountPage.jsx';
+import { BusinessProfilePage } from './pages/BusinessProfilePage/BusinessProfilePage.jsx';
 import { HomePage } from './pages/HomePage/HomePage.jsx';
 import { AvailableOrdersPage } from './pages/AvailableOrdersPage/AvailableOrdersPage.jsx';
 import { HistoryDisplayPage } from './pages/HistoryDisplayPage/HistoryDisplayPage.jsx';
 import { HistoryPage } from './pages/HistoryPage/HistoryPage.jsx';
 import { OrdersPage } from './pages/OrdersPage/OrdersPage.jsx';
+import { PlanUpgradePage } from './pages/PlanUpgradePage/PlanUpgradePage.jsx';
 import { SettingsPage } from './pages/SettingsPage/SettingsPage.jsx';
 import { SignInPage } from './pages/SignInPage/SignInPage.jsx';
 import { StatsPage } from './pages/StatsPage/StatsPage.jsx';
@@ -52,6 +54,22 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <SettingsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'settings/business-profile',
+        element: (
+          <ProtectedRoute>
+            <BusinessProfilePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'settings/plan-upgrade',
+        element: (
+          <ProtectedRoute>
+            <PlanUpgradePage />
           </ProtectedRoute>
         ),
       },

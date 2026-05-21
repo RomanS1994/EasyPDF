@@ -13,7 +13,7 @@ import {
   resolveSubscriptionView,
 } from '../../../services/prisma-views.js';
 import { buildCycleWindow } from '../../../services/subscriptions/cycle.js';
-import { normalizeText, nowIso } from '../../../validation/common.js';
+import { normalizeText, nowIso, shiftMonths } from '../../../validation/common.js';
 
 function resolvePendingPlanId(body, before) {
   return (
@@ -22,6 +22,35 @@ function resolvePendingPlanId(body, before) {
     (before.status === 'pending' ? before.planId : '') ||
     ''
   );
+}
+
+function isActiveCurrentPlan(before, selectedPlan, timestamp) {
+  const periodEnd = new Date(before.currentPeriodEnd);
+  const now = new Date(timestamp);
+
+  if (Number.isNaN(periodEnd.getTime()) || Number.isNaN(now.getTime())) {
+    return false;
+  }
+
+  return before.status === 'active' && before.planId === selectedPlan.id && periodEnd >= now;
+}
+
+function resolveConfirmationWindow(before, selectedPlan, timestamp) {
+  if (isActiveCurrentPlan(before, selectedPlan, timestamp)) {
+    return {
+      mode: 'renewal',
+      currentPeriodStart: before.currentPeriodStart,
+      currentPeriodEnd: shiftMonths(before.currentPeriodEnd, 1),
+    };
+  }
+
+  const cycle = buildCycleWindow(timestamp);
+
+  return {
+    mode: 'activation',
+    currentPeriodStart: timestamp,
+    currentPeriodEnd: cycle.currentPeriodEnd,
+  };
 }
 
 export async function handleManagerUserConfirmSubscription(request, response, userId) {
@@ -64,7 +93,7 @@ export async function handleManagerUserConfirmSubscription(request, response, us
       }
 
       const timestamp = nowIso();
-      const cycle = buildCycleWindow(timestamp);
+      const confirmationWindow = resolveConfirmationWindow(before, selectedPlan, timestamp);
       const subscriptionData = buildSubscriptionWriteData({
         plan: selectedPlan,
         before,
@@ -73,8 +102,8 @@ export async function handleManagerUserConfirmSubscription(request, response, us
           planId: selectedPlan.id,
           status: 'active',
           source: 'manual_payment',
-          currentPeriodStart: timestamp,
-          currentPeriodEnd: cycle.currentPeriodEnd,
+          currentPeriodStart: confirmationWindow.currentPeriodStart,
+          currentPeriodEnd: confirmationWindow.currentPeriodEnd,
           monthlyGenerationLimit: selectedPlan.monthlyGenerationLimit,
           quotaOverride: null,
           canceledAt: null,
@@ -147,6 +176,7 @@ export async function handleManagerUserConfirmSubscription(request, response, us
         after: userView.subscription,
         meta: {
           planId: selectedPlan.id,
+          mode: confirmationWindow.mode,
         },
       });
 

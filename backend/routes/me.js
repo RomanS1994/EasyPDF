@@ -132,6 +132,32 @@ async function handleUpdateMyProfile(request, response) {
   sendJson(response, 200, { user });
 }
 
+function getPlanValue(plan) {
+  const price = Number(plan?.priceCzk || 0);
+  const limit = Number(plan?.monthlyGenerationLimit || 0);
+
+  return price * 100000 + limit;
+}
+
+function getPlanRequestMode(before, requestedPlan) {
+  if (requestedPlan.id === before.planId) {
+    return 'renewal';
+  }
+
+  const currentPlanValue = getPlanValue(before.plan);
+  const requestedPlanValue = getPlanValue(requestedPlan);
+
+  if (requestedPlanValue < currentPlanValue) {
+    return 'downgrade';
+  }
+
+  if (requestedPlanValue > currentPlanValue) {
+    return 'upgrade';
+  }
+
+  return 'change';
+}
+
 async function handleUpgradeRequest(request, response) {
   const context = await getAuthContext(request, response);
   if (!context) return;
@@ -178,6 +204,7 @@ async function handleUpgradeRequest(request, response) {
         plan: target.subscription?.plan || currentPlan,
         fallbackStartMode: target.subscription ? 'now' : 'month',
       });
+      const requestMode = getPlanRequestMode(before, requestedPlan);
       const requestedAt = nowIso();
       const subscriptionData = buildSubscriptionWriteData({
         plan: currentPlan,
@@ -257,6 +284,7 @@ async function handleUpgradeRequest(request, response) {
         after: userView.subscription,
         meta: {
           requestedPlanId: requestedPlan.id,
+          mode: requestMode,
         },
       });
 

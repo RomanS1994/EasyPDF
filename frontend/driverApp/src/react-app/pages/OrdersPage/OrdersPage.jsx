@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { useI18n } from '@shared/app/i18n/useI18n.js';
+import { selectUser } from '@shared/features/auth/authSlice.js';
 import { ContractForm } from '../../features/contract/components/ContractForm/ContractForm.jsx';
 import { selectContract } from '../../features/contract/contractSlice.js';
 import {
@@ -34,6 +35,7 @@ export function OrdersPage() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const user = useSelector(selectUser);
   const contract = useSelector(selectContract);
   const generationSession = useSelector(selectGenerationSession);
   const [isGateOpen, setIsGateOpen] = useState(false);
@@ -43,9 +45,18 @@ export function OrdersPage() {
     message: '',
   });
   const hasActiveSession = hasGenerationSession(generationSession);
+  const hasActiveSubscription = user?.subscription?.status === 'active';
 
   useEffect(() => {
     if (!isGenerationReady) {
+      return;
+    }
+
+    if (!hasActiveSubscription) {
+      if (hasActiveSession) {
+        dispatch(clearSession());
+      }
+      setIsGateOpen(false);
       return;
     }
 
@@ -57,7 +68,7 @@ export function OrdersPage() {
     if (hasActiveSession) {
       setIsGateOpen(false);
     }
-  }, [hasActiveSession, isGenerationReady, sessionError.message]);
+  }, [dispatch, hasActiveSession, hasActiveSubscription, isGenerationReady, sessionError.message]);
 
   async function handleConfirmGate() {
     setIsReserving(true);
@@ -85,9 +96,22 @@ export function OrdersPage() {
     navigate('/', { replace: true });
   }
 
+  function openAccountUpgrade() {
+    navigate('/settings/plan-upgrade');
+  }
+
   return (
     <section className="ordersPage pageStack">
-      {hasActiveSession ? (
+      {!hasActiveSubscription ? (
+        <div className="ordersPage-blocked">
+          <p className="ordersPage-blockedEyebrow">{t('account.planExpiredEyebrow')}</p>
+          <h2>{t('contract.planExpiredTitle')}</h2>
+          <p>{t('contract.subscriptionInactive')}</p>
+          <button className="ordersPage-blockedButton" type="button" onClick={openAccountUpgrade}>
+            {t('contract.openAccountForUpgrade')}
+          </button>
+        </div>
+      ) : hasActiveSession ? (
         <>
           <GenerationSessionBanner
             session={generationSession}
@@ -98,7 +122,7 @@ export function OrdersPage() {
       ) : null}
 
       <GenerationGateModal
-        isOpen={isGateOpen && !hasActiveSession}
+        isOpen={hasActiveSubscription && isGateOpen && !hasActiveSession}
         isBusy={isReserving}
         onClose={handleCloseGate}
         onConfirm={handleConfirmGate}
