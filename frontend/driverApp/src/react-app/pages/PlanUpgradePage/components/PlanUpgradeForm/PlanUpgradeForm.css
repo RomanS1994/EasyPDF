@@ -108,32 +108,6 @@
   gap: 12px;
 }
 
-.planUpgradeForm-planTitle {
-  display: inline-flex;
-  align-items: center;
-  min-width: 0;
-  gap: 10px;
-}
-
-.planUpgradeForm-planIcon {
-  display: inline-grid;
-  place-items: center;
-  flex: 0 0 auto;
-  width: 38px;
-  height: 38px;
-  border-radius: 14px;
-  background: var(--plan-accent-soft);
-  color: var(--plan-accent);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.88),
-    0 8px 16px color-mix(in srgb, var(--plan-accent) 12%, transparent);
-}
-
-.planUpgradeForm-planIcon svg {
-  width: 20px;
-  height: 20px;
-}
-
 .planUpgradeForm-planName {
   color: var(--ink);
   font-size: 18px;
@@ -143,6 +117,9 @@
 }
 
 .planUpgradeForm-planPrice {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   flex: 0 0 auto;
   min-height: 28px;
   padding: 5px 10px;
@@ -154,6 +131,20 @@
   line-height: 1.4;
 }
 
+.planUpgradeForm-chipIcon {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  color: currentColor;
+}
+
+.planUpgradeForm-chipIcon svg {
+  width: 16px;
+  height: 16px;
+}
+
 .planUpgradeForm-planMeta {
   display: flex;
   flex-wrap: wrap;
@@ -163,10 +154,11 @@
   font-weight: 700;
 }
 
-.planUpgradeForm-planMeta span,
+.planUpgradeForm-chip,
 .planUpgradeForm-current {
   display: inline-flex;
   align-items: center;
+  gap: 7px;
   min-height: 24px;
   padding: 4px 9px;
   border-radius: 999px;
@@ -234,21 +226,6 @@
     align-items: flex-start;
     flex-direction: row;
     gap: 8px;
-  }
-
-  .planUpgradeForm-planTitle {
-    gap: 8px;
-  }
-
-  .planUpgradeForm-planIcon {
-    width: 34px;
-    height: 34px;
-    border-radius: 12px;
-  }
-
-  .planUpgradeForm-planIcon svg {
-    width: 18px;
-    height: 18px;
   }
 
   .planUpgradeForm-planName {

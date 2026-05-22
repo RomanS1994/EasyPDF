@@ -17,7 +17,7 @@ export function SessionNotice() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (sessionErrorType !== 'offline' || !sessionError) {
+    if (!['offline', 'server'].includes(sessionErrorType) || !sessionError) {
       setVisible(false);
       return undefined;
     }

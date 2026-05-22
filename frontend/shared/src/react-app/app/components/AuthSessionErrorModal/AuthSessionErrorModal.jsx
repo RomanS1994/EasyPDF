@@ -16,15 +16,13 @@ export function AuthSessionErrorModal() {
   const sessionError = useSelector(selectSessionError);
   const sessionErrorType = useSelector(selectSessionErrorType);
 
-  if (!sessionError || sessionErrorType === 'offline') {
+  if (!sessionError || sessionErrorType !== 'expired') {
     return null;
   }
 
   function handleClose() {
     dispatch(clearSessionError());
-    if (sessionErrorType === 'expired') {
-      navigate('/sign-in', { replace: true });
-    }
+    navigate('/sign-in', { replace: true });
   }
 
   return (
@@ -37,18 +35,8 @@ export function AuthSessionErrorModal() {
         aria-labelledby="authSessionErrorTitle"
       >
         <div className="authSessionErrorModal-copy">
-          <p className="authSessionErrorModal-eyebrow">
-            {sessionErrorType === 'expired' || sessionErrorType === 'server'
-              ? t('auth.sessionState')
-              : t('auth.onlineState')}
-          </p>
-          <h2 id="authSessionErrorTitle">
-            {sessionErrorType === 'expired'
-              ? t('auth.sessionExpired')
-              : sessionErrorType === 'server'
-                ? t('auth.sessionCheckFailed')
-                : t('auth.connectionError')}
-          </h2>
+          <p className="authSessionErrorModal-eyebrow">{t('auth.sessionState')}</p>
+          <h2 id="authSessionErrorTitle">{t('auth.sessionExpired')}</h2>
           <p>{sessionError}</p>
         </div>
 
@@ -57,7 +45,7 @@ export function AuthSessionErrorModal() {
           type="button"
           onClick={handleClose}
         >
-          {sessionErrorType === 'expired' ? t('auth.goToSignIn') : t('auth.tryAgainLater')}
+          {t('auth.goToSignIn')}
         </button>
       </div>
     </div>

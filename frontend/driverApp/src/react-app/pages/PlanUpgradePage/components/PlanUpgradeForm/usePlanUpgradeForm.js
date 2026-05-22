@@ -41,18 +41,6 @@ function getPlanVariant(plan) {
   return 'silver';
 }
 
-function getPlanIcon(variant) {
-  if (variant === 'platinum') {
-    return 'crown';
-  }
-
-  if (variant === 'gold') {
-    return 'star';
-  }
-
-  return 'medal';
-}
-
 function formatNumber(value) {
   return Number(value || 0).toLocaleString('cs-CZ');
 }
@@ -140,7 +128,6 @@ export function usePlanUpgradeForm() {
     const limit = Number(plan.monthlyGenerationLimit || 0);
 
     return {
-      icon: getPlanIcon(variant),
       variant,
       isCurrent,
       modeLabel: getPlanModeLabel({ direction, isCurrent, t }),

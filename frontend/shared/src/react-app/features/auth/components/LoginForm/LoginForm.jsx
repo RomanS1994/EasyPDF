@@ -24,7 +24,10 @@ export function LoginForm() {
 
     try {
       const data = await login({ email, password }).unwrap();
-      saveSession(data.token, data.user);
+      saveSession(data.token, data.user, {
+        accessTokenExpiresAt: data.accessTokenExpiresAt || '',
+        lastVerifiedAt: new Date().toISOString(),
+      });
       dispatch(setSession({ token: data.token, user: data.user }));
       navigate('/', { replace: true });
     } catch {

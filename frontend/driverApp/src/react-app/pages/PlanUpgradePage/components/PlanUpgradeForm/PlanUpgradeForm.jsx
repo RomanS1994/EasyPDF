@@ -86,17 +86,22 @@ export function PlanUpgradeForm() {
               onClick={() => selectPlan(plan.id)}
             >
               <span className="planUpgradeForm-planTop">
-                <span className="planUpgradeForm-planTitle">
-                  <span className="planUpgradeForm-planIcon" aria-hidden="true">
-                    <SvgIcon name={meta.icon} />
+                <span className="planUpgradeForm-planName">{plan.name || plan.id}</span>
+                <span className="planUpgradeForm-planPrice">
+                  <span className="planUpgradeForm-chipIcon" aria-hidden="true">
+                    <SvgIcon name="coins" />
                   </span>
-                  <span className="planUpgradeForm-planName">{plan.name || plan.id}</span>
+                  <span>{meta.priceLabel}</span>
                 </span>
-                <span className="planUpgradeForm-planPrice">{meta.priceLabel}</span>
               </span>
               <span className="planUpgradeForm-planMeta">
-                <span>{meta.limitLabel}</span>
-                <span>{meta.modeLabel}</span>
+                <span className="planUpgradeForm-chip">
+                  <span className="planUpgradeForm-chipIcon" aria-hidden="true">
+                    <SvgIcon name="token" />
+                  </span>
+                  <span>{meta.limitLabel}</span>
+                </span>
+                <span className="planUpgradeForm-chip">{meta.modeLabel}</span>
               </span>
               {meta.isCurrent ? (
                 <span className="planUpgradeForm-current">{t('home.current')}</span>

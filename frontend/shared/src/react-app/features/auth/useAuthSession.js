@@ -2,9 +2,21 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { useRefreshSessionMutation } from './authApi.js';
-import { saveSession } from './authStorage.js';
-import { setSession, setSessionError, setSessionInitialized } from './authSlice.js';
-import { getStoredUser, getToken } from './authStorage.js';
+import {
+  clearSession as clearStoredSession,
+  getStoredUser,
+  getToken,
+  saveSession,
+  shouldRefreshStoredSession,
+} from './authStorage.js';
+import {
+  clearSession as clearAuthSession,
+  setSession,
+  setSessionError,
+  setSessionInitialized,
+} from './authSlice.js';
+import { getMessage } from '../../app/i18n/messages.js';
+import { readStoredLanguage } from '../../app/i18n/languageStorage.js';
 
 let sessionBootstrapPromise = null;
 
@@ -30,21 +42,44 @@ function applyRefreshedSession(dispatch, response) {
     return false;
   }
 
-  saveSession(nextToken, nextUser);
+  saveSession(nextToken, nextUser, {
+    accessTokenExpiresAt: response?.accessTokenExpiresAt || '',
+    lastVerifiedAt: new Date().toISOString(),
+  });
   dispatch(setSession({ token: nextToken, user: nextUser }));
   dispatch(setSessionError({ type: '', message: '' }));
   return true;
 }
 
-// Завершує bootstrap сесії з м’якою server-помилкою без примусового logout.
-function handleSessionBootstrapFailure(dispatch) {
+function t(key) {
+  return getMessage(readStoredLanguage(), key);
+}
+
+// Завершує bootstrap сесії з неблокуючою server-помилкою без примусового logout.
+function handleSessionBootstrapFailure(dispatch, restoredFromStorage) {
+  if (restoredFromStorage) {
+    dispatch(
+      setSessionError({
+        type: 'server',
+        message: t('auth.sessionCheckFailedKeepSession'),
+      }),
+    );
+    dispatch(setSessionInitialized());
+    return;
+  }
+
+  dispatch(setSessionInitialized());
+}
+
+function handleExpiredStoredSession(dispatch) {
+  clearStoredSession();
+  dispatch(clearAuthSession());
   dispatch(
     setSessionError({
-      type: 'server',
-      message: 'Server session check failed. Your session is kept, so you can try again later.',
+      type: 'expired',
+      message: t('auth.sessionExpiredSignIn'),
     }),
   );
-  dispatch(setSessionInitialized());
 }
 
 export function useAuthSession() {
@@ -55,6 +90,13 @@ export function useAuthSession() {
     let isActive = true;
 
     const restoredFromStorage = restoreStoredSession(dispatch);
+
+    if (restoredFromStorage && !shouldRefreshStoredSession()) {
+      dispatch(setSessionInitialized());
+      return () => {
+        isActive = false;
+      };
+    }
 
     if (!sessionBootstrapPromise) {
       sessionBootstrapPromise = refreshSession()
@@ -79,15 +121,15 @@ export function useAuthSession() {
         }
 
         if (error?.status === 401) {
-          dispatch(setSessionInitialized());
+          if (restoredFromStorage) {
+            handleExpiredStoredSession(dispatch);
+          } else {
+            dispatch(setSessionInitialized());
+          }
           return;
         }
 
-        if (restoredFromStorage) {
-          return;
-        }
-
-        handleSessionBootstrapFailure(dispatch);
+        handleSessionBootstrapFailure(dispatch, restoredFromStorage);
       });
 
     return () => {

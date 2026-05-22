@@ -1,7 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-import { saveSession } from '../../features/auth/authStorage.js';
 import {
+  clearSession as clearStoredSession,
+  saveSession,
+} from '../../features/auth/authStorage.js';
+import {
+  clearSession as clearAuthSession,
   clearSessionError,
   setSession,
   setSessionError,
@@ -22,7 +26,7 @@ function resolveBaseUrl() {
   return import.meta.env.VITE_API_BASE_URL || '/api';
 }
 
-let offlineNoticeShownSinceReconnect = false;
+let refreshWarningShownSinceSuccess = false;
 let refreshRequestPromise = null;
 
 // Дає коротку паузу перед повторною спробою refresh-запиту.
@@ -39,19 +43,19 @@ function isNetworkRefreshError(error) {
   );
 }
 
-function shouldShowOfflineNotice() {
-  return !offlineNoticeShownSinceReconnect;
+function shouldShowRefreshWarning() {
+  return !refreshWarningShownSinceSuccess;
 }
 
-function markOfflineNoticeShown() {
-  offlineNoticeShownSinceReconnect = true;
+function markRefreshWarningShown() {
+  refreshWarningShownSinceSuccess = true;
 }
 
-function resetOfflineNoticeState() {
-  offlineNoticeShownSinceReconnect = false;
+function resetRefreshWarningState() {
+  refreshWarningShownSinceSuccess = false;
 }
 
-// Показує offline тільки для явних user-actions, а не для фонових query/refetch.
+// Показує попередження тільки для явних user-actions, а не для фонових query/refetch.
 function shouldSurfaceOfflineForRequest(api) {
   return api?.type === 'mutation';
 }
@@ -76,19 +80,41 @@ function applySuccessfulRefresh(api, refreshResult) {
     return false;
   }
 
-  saveSession(nextToken, nextUser);
-  resetOfflineNoticeState();
+  saveSession(nextToken, nextUser, {
+    accessTokenExpiresAt: refreshResult?.data?.accessTokenExpiresAt || '',
+    lastVerifiedAt: new Date().toISOString(),
+  });
+  resetRefreshWarningState();
   api.dispatch(setSession({ token: nextToken, user: nextUser }));
   api.dispatch(clearSessionError());
   return true;
 }
 
-// Позначає проблему refresh без примусового logout користувача.
-function keepSessionAfterRefreshFailure(api, t) {
+// Справжній 401 на refresh означає, що refresh-cookie вже недійсний.
+function expireSessionAfterRefreshRejected(api, t) {
+  clearStoredSession();
+  api.dispatch(clearAuthSession());
   api.dispatch(
     setSessionError({
-      type: 'server',
-      message: t('auth.sessionCheckFailedKeepSession'),
+      type: 'expired',
+      message: t('auth.sessionExpiredSignIn'),
+    }),
+  );
+}
+
+function warnAboutRefreshFailure(api, t, type) {
+  if (!shouldSurfaceOfflineForRequest(api) || !shouldShowRefreshWarning()) {
+    return;
+  }
+
+  markRefreshWarningShown();
+  api.dispatch(
+    setSessionError({
+      type,
+      message:
+        type === 'offline'
+          ? t('auth.connectionLostKeepSession')
+          : t('auth.sessionCheckFailedKeepSession'),
     }),
   );
 }
@@ -154,8 +180,8 @@ export const baseApi = createApi({
 
         const refreshError = refreshResult.error;
         if (refreshError?.status === 401) {
-          keepSessionAfterRefreshFailure(api, t);
-          return { ok: false, reason: 'server' };
+          expireSessionAfterRefreshRejected(api, t);
+          return { ok: false, reason: 'expired' };
         }
 
         if (isNetworkRefreshError(refreshError)) {
@@ -169,8 +195,8 @@ export const baseApi = createApi({
 
         const finalRefreshError = refreshResult.error;
         if (finalRefreshError?.status === 401) {
-          keepSessionAfterRefreshFailure(api, t);
-          return { ok: false, reason: 'server' };
+          expireSessionAfterRefreshRejected(api, t);
+          return { ok: false, reason: 'expired' };
         }
 
         if (!finalRefreshError) {
@@ -187,7 +213,7 @@ export const baseApi = createApi({
     let result = await baseQuery(args, api, extraOptions);
 
     if (!result.error) {
-      resetOfflineNoticeState();
+      resetRefreshWarningState();
     }
 
     if (result.error?.status === 401 && !isAuthEndpoint(args)) {
@@ -197,25 +223,12 @@ export const baseApi = createApi({
         result = await baseQuery(args, api, extraOptions);
 
         if (!result.error) {
-          resetOfflineNoticeState();
+          resetRefreshWarningState();
         }
       } else if (refreshed?.reason === 'offline') {
-        if (shouldSurfaceOfflineForRequest(api) && shouldShowOfflineNotice()) {
-          markOfflineNoticeShown();
-          api.dispatch(
-            setSessionError({
-              type: 'offline',
-              message: t('auth.connectionLostKeepSession'),
-            }),
-          );
-        }
+        warnAboutRefreshFailure(api, t, 'offline');
       } else if (refreshed?.reason === 'server') {
-        api.dispatch(
-          setSessionError({
-            type: 'server',
-            message: t('auth.sessionCheckFailedKeepSession'),
-          }),
-        );
+        warnAboutRefreshFailure(api, t, 'server');
       }
     }
 
