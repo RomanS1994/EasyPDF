@@ -21,6 +21,31 @@ export function normalizeText(value) {
   return String(value || '').trim();
 }
 
+export function normalizePhoneNumber(value) {
+  const raw = normalizeText(value);
+  if (!raw) {
+    return '';
+  }
+
+  const compact = raw.replace(/[\s().-]+/g, '');
+  const international = compact.startsWith('00') ? `+${compact.slice(2)}` : compact;
+
+  if (!international.startsWith('+')) {
+    const nationalDigits = international.replace(/\D/g, '');
+    if (/^\d{9}$/.test(nationalDigits)) {
+      return `+420${nationalDigits}`;
+    }
+    throw new Error('Invalid phone number');
+  }
+
+  const phone = `+${international.slice(1).replace(/\D/g, '')}`;
+  if (!/^\+420\d{9}$/.test(phone)) {
+    throw new Error('Invalid phone number');
+  }
+
+  return phone;
+}
+
 export function normalizeInteger(value, fallback = null) {
   if (value === '' || value === null || value === undefined) {
     return fallback;

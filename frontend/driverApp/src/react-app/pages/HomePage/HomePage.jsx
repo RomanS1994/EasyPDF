@@ -7,12 +7,12 @@ import { WorkspaceOverview } from './components/WorkspaceOverview/WorkspaceOverv
 
 export function HomePage() {
   const user = useSelector(selectUser);
-  const { data } = useGetOrdersQuery(undefined, { skip: !user });
+  const { data, isLoading } = useGetOrdersQuery(undefined, { skip: !user });
   const orders = data?.orders || [];
 
   if (!user) {
     return <GuestStage defaultMode="login" />;
   }
 
-  return <WorkspaceOverview user={user} orders={orders} />;
+  return <WorkspaceOverview user={user} orders={orders} isOrdersLoading={isLoading} />;
 }

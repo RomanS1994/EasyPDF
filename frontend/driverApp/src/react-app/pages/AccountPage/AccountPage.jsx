@@ -1,12 +1,12 @@
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 
+import { BackButton } from '@shared/app/components/BackButton/BackButton.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { selectUser } from '@shared/features/auth/authSlice.js';
 import { AccountProfileForm } from '@shared/features/auth/components/AccountProfileForm/AccountProfileForm.jsx';
+import { useGetUsageQuery } from '@shared/features/auth/authApi.js';
 import { LoginForm } from '@shared/features/auth/components/LoginForm/LoginForm.jsx';
 import { RegisterForm } from '@shared/features/auth/components/RegisterForm/RegisterForm.jsx';
-import { useGetOrdersQuery } from '../../features/orders/ordersApi.js';
 import { ProfileDanger } from './components/ProfileDanger/ProfileDanger.jsx';
 import { ProfileHero } from './components/ProfileHero/ProfileHero.jsx';
 import { ProfileWorkspace } from './components/ProfileWorkspace/ProfileWorkspace.jsx';
@@ -14,17 +14,14 @@ import './AccountPage.css';
 
 export function AccountPage() {
   const user = useSelector(selectUser);
-  const { data } = useGetOrdersQuery(undefined, { skip: !user });
+  const { data, isLoading: isUsageLoading } = useGetUsageQuery(undefined, { skip: !user });
   const { t } = useI18n();
-  const orders = data?.orders || [];
+  const orderCount = data?.usage?.orderCount || 0;
 
   return (
     <section className="accountPage pageStack">
       <header className="appTop accountPage-top">
-        <Link className="accountPage-backLink" to="/settings">
-          <span aria-hidden="true">←</span>
-          <span>{t('account.back')}</span>
-        </Link>
+        <BackButton to="/settings" />
         <div className="appTitleBlock">
           <p className="sectionEyebrow">{t('account.eyebrow')}</p>
           <h1>{t('account.title')}</h1>
@@ -40,7 +37,7 @@ export function AccountPage() {
             <AccountProfileForm />
           </div>
 
-          <ProfileWorkspace user={user} orders={orders} />
+          <ProfileWorkspace user={user} orderCount={orderCount} isOrdersLoading={isUsageLoading} />
 
           <ProfileDanger />
         </>

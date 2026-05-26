@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+import { RequestLoader } from '../../../../app/components/RequestLoader/RequestLoader.jsx';
 import { useI18n } from '../../../../app/i18n/useI18n.js';
 import { getApiErrorMessage } from '../../../../app/api/getApiErrorMessage.js';
 import { useRegisterMutation } from '../../authApi.js';
@@ -110,11 +111,12 @@ export function RegisterForm({ selectedPlanId = '', onPlanSelect }) {
           ))}
         </select>
       </label>
+      {isPlansLoading ? <RequestLoader inline size="sm" label={t('common.loadingPlans')} /> : null}
 
       {error ? <p className="registerForm-error">{error}</p> : null}
 
       <button className="registerForm-button" type="submit" disabled={isLoading}>
-        {isLoading ? t('auth.registering') : t('auth.register')}
+        {isLoading ? <RequestLoader inline size="sm" label={t('auth.registering')} /> : t('auth.register')}
       </button>
     </form>
   );

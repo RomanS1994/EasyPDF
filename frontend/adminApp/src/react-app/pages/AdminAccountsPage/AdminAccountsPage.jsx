@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { getApiErrorMessage } from '@shared/app/api/getApiErrorMessage.js';
+import { RequestLoadingState } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { AdminUsersList } from '../../features/admin/components/AdminUsersList/AdminUsersList.jsx';
 import { useGetAdminUsersQuery } from '@shared/features/admin/adminApi.js';
@@ -32,7 +33,7 @@ export function AdminAccountsPage() {
   if (isLoading) {
     return (
       <section className="adminAccountsPage">
-        <p className="adminAccountsPage-state">{t('common.loadingUsers')}</p>
+        <RequestLoadingState className="adminAccountsPage-state" label={t('common.loadingUsers')} />
       </section>
     );
   }

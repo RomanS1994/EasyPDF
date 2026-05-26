@@ -9,6 +9,13 @@
   --workspace-hero-surface: rgba(255, 255, 255, 0.98);
 }
 
+.appLayout--home .workspaceOverview {
+  height: 100%;
+  min-height: 0;
+  align-content: start;
+  overflow: hidden;
+}
+
 .workspaceOverview .appTop {
   position: relative;
   overflow: hidden;

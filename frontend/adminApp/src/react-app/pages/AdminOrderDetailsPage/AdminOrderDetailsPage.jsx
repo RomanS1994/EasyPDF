@@ -1,7 +1,9 @@
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
 
+import { BackButton } from '@shared/app/components/BackButton/BackButton.jsx';
 import { getApiErrorMessage } from '@shared/app/api/getApiErrorMessage.js';
+import { RequestLoader, RequestLoadingState } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { formatDateTime } from '@shared/app/utils/dateFormat.js';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import {
@@ -51,7 +53,7 @@ export function AdminOrderDetailsPage() {
   if (isLoading) {
     return (
       <section className="adminOrderDetailsPage">
-        <p className="adminOrderDetailsPage-state">{t('common.loadingOrders')}</p>
+        <RequestLoadingState className="adminOrderDetailsPage-state" label={t('common.loadingOrders')} />
       </section>
     );
   }
@@ -67,10 +69,7 @@ export function AdminOrderDetailsPage() {
   return (
     <section className="adminOrderDetailsPage">
       <div className="adminOrderDetailsPage-header">
-        <Link className="adminOrderDetailsPage-back" to={backToUserOrders}>
-          <span className="adminOrderDetailsPage-backIcon" aria-hidden="true" />
-          {t('common.back')}
-        </Link>
+        <BackButton to={backToUserOrders} />
 
         {isDeleted ? (
           <span className="adminOrderDetailsPage-badge">{t('common.deleted')}</span>
@@ -136,7 +135,11 @@ export function AdminOrderDetailsPage() {
             }}
             disabled={isRestoring}
           >
-            {isRestoring ? t('common.restoring') : t('common.restore')}
+            {isRestoring ? (
+              <RequestLoader inline size="sm" label={t('common.restoring')} />
+            ) : (
+              t('common.restore')
+            )}
           </button>
         </section>
       ) : null}

@@ -113,7 +113,7 @@ export function StatsUsagePanel({ usage, orders }) {
   const cycleLabel = getCycleLabel(usage);
   const planLimitLabel = usage.limit ? `${usage.used} / ${usage.limit} docs` : t('stats.noDataLabel');
   const remainingLabel = String(usage.remaining || 0);
-  const totalOrders = String(orders.length || 0);
+  const totalOrders = String(usage.orderCount ?? orders.length ?? 0);
   const deletedMessagesLabel = String(usage.deletedMessages || 0);
   return (
     <section className="statsPanel is-active">

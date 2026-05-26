@@ -1,3 +1,4 @@
+import { RequestLoader } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import {
   getPlanTypeLabel,
@@ -5,16 +6,16 @@ import {
 } from '../../../shared/subscriptionUtils.js';
 import './ProfileWorkspace.css';
 
-function getOrderCount(orders) {
+function getOrderCount(value) {
   // Рахуємо збережені записи без складних форматів.
-  return String(orders.length || 0);
+  return String(value || 0);
 }
 
-export function ProfileWorkspace({ user, orders }) {
+export function ProfileWorkspace({ user, orderCount = 0, isOrdersLoading = false }) {
   const { language, t } = useI18n();
   const planType = getPlanTypeLabel(user);
   const cycleText = getSubscriptionWindow(user?.subscription, language);
-  const orderCount = getOrderCount(orders);
+  const ordersCountLabel = getOrderCount(orderCount);
   const roleName = user?.role || '-';
 
   return (
@@ -45,7 +46,9 @@ export function ProfileWorkspace({ user, orders }) {
 
         <article className="profileWorkspace-card">
           <span>{t('account.orders')}</span>
-          <strong>{orderCount}</strong>
+          <strong>
+            {isOrdersLoading ? <RequestLoader inline size="sm" label={t('common.loading')} /> : ordersCountLabel}
+          </strong>
           <p>{t('account.savedRecords')}</p>
         </article>
       </div>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { RequestLoader } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { createAutocompleteSessionToken, fetchCzechAutocompleteSuggestions } from './googleMapsAutocomplete.js';
 import './addressAutocomplete.css';
 
@@ -190,7 +191,11 @@ export function AddressAutocompleteField({
 
       {isOpen && inputText ? (
         <div className="addressAutocompleteMenu" role="listbox" aria-label={ariaLabel}>
-          {isLoading ? <div className="addressAutocompleteStatus">Searching...</div> : null}
+          {isLoading ? (
+            <div className="addressAutocompleteStatus">
+              <RequestLoader inline size="sm" label="Searching..." />
+            </div>
+          ) : null}
           {!isLoading && statusMessage ? (
             <div className="addressAutocompleteStatus">{statusMessage}</div>
           ) : null}

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { RequestLoadingState } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { useGetOrdersQuery } from '../../features/orders/ordersApi.js';
 import { useGetUsageQuery } from '@shared/features/auth/authApi.js';
@@ -22,12 +23,14 @@ function getSafeUsage(usage) {
     remaining: usage?.remaining || 0,
     percent: usage?.percent || 0,
     deletedMessages: usage?.deletedMessages || 0,
+    orderCount: usage?.orderCount || 0,
   };
 }
 
 export function StatsPage() {
   const [activeTab, setActiveTab] = useState('usage');
   const { t } = useI18n();
+  const shouldLoadOrders = activeTab !== 'usage';
   const { data: usageData, isLoading: isUsageLoading, isError: isUsageError } = useGetUsageQuery(
     undefined,
     {
@@ -38,6 +41,7 @@ export function StatsPage() {
   );
   const { data: ordersData, isLoading: isOrdersLoading, isError: isOrdersError } =
     useGetOrdersQuery(undefined, {
+      skip: !shouldLoadOrders,
       refetchOnFocus: true,
       refetchOnReconnect: true,
       refetchOnMountOrArgChange: true,
@@ -45,8 +49,8 @@ export function StatsPage() {
 
   const usage = getSafeUsage(usageData?.usage);
   const orders = ordersData?.orders || [];
-  const isLoading = isUsageLoading || isOrdersLoading;
-  const isError = isUsageError || isOrdersError;
+  const isLoading = isUsageLoading || (shouldLoadOrders && isOrdersLoading);
+  const isError = isUsageError || (shouldLoadOrders && isOrdersError);
 
   return (
     <section className="statsPage pageStack">
@@ -58,7 +62,7 @@ export function StatsPage() {
 
         <StatsTabs value={activeTab} onChange={setActiveTab} />
 
-        {isLoading ? <p className="statusNote">{t('stats.loading')}</p> : null}
+        {isLoading ? <RequestLoadingState className="statusNote" label={t('stats.loading')} /> : null}
         {isError ? <p className="statusNote is-error">{t('stats.failed')}</p> : null}
 
         {!isLoading && !isError && activeTab === 'usage' ? (

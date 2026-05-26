@@ -1,6 +1,8 @@
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
+import { BackButton } from '@shared/app/components/BackButton/BackButton.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
+import { RequestLoadingState } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { useGetAdminUserQuery } from '@shared/features/admin/adminApi.js';
 import { formatDateTime } from '@shared/app/utils/dateFormat.js';
 import { AdminUserDetails } from '../../features/admin/components/AdminUserDetails/AdminUserDetails.jsx';
@@ -34,7 +36,7 @@ export function AdminAccountDetailsPage() {
   if (isLoading) {
     return (
       <section className="adminAccountDetailsPage">
-        <p className="adminAccountDetailsPage-state">{t('admin.loadingUser')}</p>
+        <RequestLoadingState className="adminAccountDetailsPage-state" label={t('admin.loadingUser')} />
       </section>
     );
   }
@@ -51,10 +53,7 @@ export function AdminAccountDetailsPage() {
     <section className="adminAccountDetailsPage">
       <div className="adminAccountDetailsPage-header">
         <div className="adminAccountDetailsPage-backRow">
-          <Link className="adminAccountDetailsPage-back" to="/admin/accounts">
-            <span className="adminAccountDetailsPage-backIcon" aria-hidden="true" />
-            {t('common.back')}
-          </Link>
+          <BackButton to="/admin/accounts" />
         </div>
         <div className="adminAccountDetailsPage-heading">
           <div className="adminAccountDetailsPage-identity">

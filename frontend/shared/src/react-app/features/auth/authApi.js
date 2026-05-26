@@ -36,6 +36,10 @@ export const authApi = baseApi.injectEndpoints({
       query: () => '/me/usage',
       providesTags: [{ type: 'Usage', id: 'CURRENT' }],
     }),
+    getTeam: builder.query({
+      query: () => '/me/team',
+      providesTags: [{ type: 'Me', id: 'TEAM' }],
+    }),
     updateProfile: builder.mutation({
       query: body => ({
         url: '/me/profile',
@@ -43,6 +47,17 @@ export const authApi = baseApi.injectEndpoints({
         body,
       }),
       transformResponse: response => response.user || response,
+    }),
+    updateTeam: builder.mutation({
+      query: body => ({
+        url: '/me/team',
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: [
+        { type: 'Me', id: 'CURRENT' },
+        { type: 'Me', id: 'TEAM' },
+      ],
     }),
     requestSubscriptionUpgrade: builder.mutation({
       query: body => ({
@@ -72,7 +87,9 @@ export const {
   useLogoutMutation,
   useLazyGetMeQuery,
   useGetUsageQuery,
+  useGetTeamQuery,
   useUpdateProfileMutation,
+  useUpdateTeamMutation,
   useRequestSubscriptionUpgradeMutation,
   useDeleteMeMutation,
 } = authApi;

@@ -10,11 +10,18 @@ import { HomePage } from './pages/HomePage/HomePage.jsx';
 import { AvailableOrdersPage } from './pages/AvailableOrdersPage/AvailableOrdersPage.jsx';
 import { HistoryDisplayPage } from './pages/HistoryDisplayPage/HistoryDisplayPage.jsx';
 import { HistoryPage } from './pages/HistoryPage/HistoryPage.jsx';
+import { LanguagePage } from './pages/LanguagePage/LanguagePage.jsx';
 import { OrdersPage } from './pages/OrdersPage/OrdersPage.jsx';
+import {
+  OrderDispatchDriverPage,
+  OrderDispatchPage,
+  OrderDispatchTeamPage,
+} from './pages/OrderDispatchPage/OrderDispatchPage.jsx';
 import { PlanUpgradePage } from './pages/PlanUpgradePage/PlanUpgradePage.jsx';
 import { SettingsPage } from './pages/SettingsPage/SettingsPage.jsx';
 import { SignInPage } from './pages/SignInPage/SignInPage.jsx';
 import { StatsPage } from './pages/StatsPage/StatsPage.jsx';
+import { TeamPage, TeamSearchPage } from './pages/TeamPage/TeamPage.jsx';
 
 export const router = createBrowserRouter([
   {
@@ -34,6 +41,30 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <OrdersPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'orders/:orderId/dispatch',
+        element: (
+          <ProtectedRoute>
+            <OrderDispatchPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'orders/:orderId/dispatch/team',
+        element: (
+          <ProtectedRoute requireManager>
+            <OrderDispatchTeamPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'orders/:orderId/dispatch/driver',
+        element: (
+          <ProtectedRoute>
+            <OrderDispatchDriverPage />
           </ProtectedRoute>
         ),
       },
@@ -66,10 +97,34 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: 'settings/language',
+        element: (
+          <ProtectedRoute>
+            <LanguagePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: 'settings/plan-upgrade',
         element: (
           <ProtectedRoute>
             <PlanUpgradePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'settings/team',
+        element: (
+          <ProtectedRoute requireManager>
+            <TeamPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'settings/team/search',
+        element: (
+          <ProtectedRoute requireManager>
+            <TeamSearchPage />
           </ProtectedRoute>
         ),
       },

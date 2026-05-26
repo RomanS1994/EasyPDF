@@ -1,6 +1,8 @@
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
+import { BackButton } from '@shared/app/components/BackButton/BackButton.jsx';
 import { getApiErrorMessage } from '@shared/app/api/getApiErrorMessage.js';
+import { RequestLoader, RequestLoadingState } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import {
   useGetAdminOrdersQuery,
@@ -18,11 +20,13 @@ export function AdminUserOrdersPage() {
   const { data, isLoading, isError, error } = useGetAdminUserQuery(userId, {
     skip: !userId,
   });
-  const { data: activeOrdersData } = useGetAdminOrdersQuery(
-    userId ? { userId, state: 'active' } : undefined,
+  const { data: activeOrdersData, isLoading: isActiveOrdersLoading } = useGetAdminOrdersQuery(
+    { userId, state: 'active' },
+    { skip: !userId },
   );
-  const { data: deletedOrdersData } = useGetAdminOrdersQuery(
-    userId ? { userId, state: 'deleted' } : undefined,
+  const { data: deletedOrdersData, isLoading: isDeletedOrdersLoading } = useGetAdminOrdersQuery(
+    { userId, state: 'deleted' },
+    { skip: !userId },
   );
   const user = data?.user || data || {};
   const activeOrdersCount = activeOrdersData?.summary?.all || 0;
@@ -31,7 +35,7 @@ export function AdminUserOrdersPage() {
   if (isLoading) {
     return (
       <section className="adminUserOrdersPage">
-        <p className="adminUserOrdersPage-state">{t('common.loadingUsers')}</p>
+        <RequestLoadingState className="adminUserOrdersPage-state" label={t('common.loadingUsers')} />
       </section>
     );
   }
@@ -47,10 +51,7 @@ export function AdminUserOrdersPage() {
   return (
     <section className="adminUserOrdersPage">
       <div className="adminUserOrdersPage-header">
-        <Link className="adminUserOrdersPage-back" to="/admin/orders">
-          <span className="adminUserOrdersPage-backIcon" aria-hidden="true" />
-          {t('common.back')}
-        </Link>
+        <BackButton to="/admin/orders" />
 
         <div className="adminUserOrdersPage-copyBlock">
           <h2 className="adminUserOrdersPage-title">{t('adminOrders.userOrders')}</h2>
@@ -71,7 +72,9 @@ export function AdminUserOrdersPage() {
           onClick={() => setSearchParams({ state: 'active' })}
         >
           {t('common.active')}
-          <span className="adminUserOrdersPage-tabCount">{activeOrdersCount}</span>
+          <span className="adminUserOrdersPage-tabCount">
+            {isActiveOrdersLoading ? <RequestLoader inline size="sm" label={t('common.loading')} /> : activeOrdersCount}
+          </span>
         </button>
         <button
           className={`adminUserOrdersPage-tab${tab === 'deleted' ? ' adminUserOrdersPage-tab--active' : ''}`}
@@ -81,7 +84,9 @@ export function AdminUserOrdersPage() {
           onClick={() => setSearchParams({ state: 'deleted' })}
         >
           {t('common.deleted')}
-          <span className="adminUserOrdersPage-tabCount">{deletedOrdersCount}</span>
+          <span className="adminUserOrdersPage-tabCount">
+            {isDeletedOrdersLoading ? <RequestLoader inline size="sm" label={t('common.loading')} /> : deletedOrdersCount}
+          </span>
         </button>
       </div>
 

@@ -236,6 +236,7 @@ export const baseApi = createApi({
   },
   tagTypes: [
     'Orders',
+    'AvailableOrders',
     'Usage',
     'Me',
     'AdminUsers',

@@ -320,6 +320,7 @@ export function sanitizeUserFromRecords({
     id: user.id,
     name: user.name,
     email: user.email,
+    phone: user.phone || '',
     role: user.role,
     planId: resolvedSubscription.planId || DEFAULT_PLAN_ID,
     plan: resolvedSubscription.plan,
@@ -354,6 +355,21 @@ export function sanitizeOrderFromRecords(order, owner = null) {
     createdAt: toIsoString(order.createdAt),
     updatedAt: toIsoString(order.updatedAt),
     deletedAt: toIsoString(order.deletedAt),
+    createdByUserId: order.createdByUserId || '',
+    createdBy: order.createdBy
+      ? {
+          id: order.createdBy.id,
+          name: order.createdBy.name,
+          email: order.createdBy.email,
+          role: order.createdBy.role,
+        }
+      : order.createdBySnapshot && typeof order.createdBySnapshot === 'object'
+        ? {
+            id: order.createdBySnapshot.id || '',
+            name: order.createdBySnapshot.name || '',
+            email: order.createdBySnapshot.email || '',
+          }
+        : null,
     user: owner
       ? {
           id: owner.id,

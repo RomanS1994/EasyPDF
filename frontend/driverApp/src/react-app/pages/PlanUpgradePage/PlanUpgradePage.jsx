@@ -1,5 +1,4 @@
-import { Link } from 'react-router-dom';
-
+import { BackButton } from '@shared/app/components/BackButton/BackButton.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { PlanUpgradeForm } from './components/PlanUpgradeForm/PlanUpgradeForm.jsx';
 import './PlanUpgradePage.css';
@@ -10,10 +9,7 @@ export function PlanUpgradePage() {
   return (
     <section className="planUpgradePage pageStack">
       <header className="planUpgradePage-header">
-        <Link className="planUpgradePage-back" to="/settings">
-          <span aria-hidden="true">←</span>
-          <span>{t('common.back')}</span>
-        </Link>
+        <BackButton to="/settings" />
 
         <div className="appTitleBlock">
           <h1>{t('settings.planUpgrade.title')}</h1>

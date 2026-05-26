@@ -7,6 +7,12 @@ const TRANSLATED_BACKEND_ERRORS = {
   'Name is required': 'auth.nameRequired',
   'Email is required': 'auth.emailRequired',
   'Password must be at least 8 characters long': 'auth.passwordTooShort',
+  'Phone number must include country code': 'auth.phoneCountryCodeRequired',
+  'Invalid phone number': 'auth.invalidPhoneNumber',
+  'Phone number is already used': 'auth.phoneAlreadyUsed',
+  'Driver phone is required': 'auth.phoneRequiredForOrders',
+  'Team limit exceeded': 'settings.team.failed',
+  'Team driver limit exceeded': 'settings.team.failed',
 };
 
 function readErrorText(error) {

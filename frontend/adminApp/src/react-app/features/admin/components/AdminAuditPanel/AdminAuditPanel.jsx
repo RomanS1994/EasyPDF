@@ -1,3 +1,4 @@
+import { RequestLoadingState } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { useGetAuditLogsQuery } from '@shared/features/admin/adminApi.js';
 import './AdminAuditPanel.css';
@@ -10,7 +11,7 @@ export function AdminAuditPanel() {
   if (isLoading) {
     return (
       <section className="adminAuditPanel">
-        <p className="adminAuditPanel-state">{t('admin.loadingAudit')}</p>
+        <RequestLoadingState className="adminAuditPanel-state" label={t('admin.loadingAudit')} />
       </section>
     );
   }

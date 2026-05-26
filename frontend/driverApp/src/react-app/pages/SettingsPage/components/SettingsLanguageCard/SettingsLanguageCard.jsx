@@ -1,15 +1,17 @@
 import './SettingsLanguageCard.css';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 
-export function SettingsLanguageCard() {
+export function SettingsLanguageCard({ showHeader = true }) {
   const { language, setLanguage, t } = useI18n();
 
   return (
     <section className="screenCard settingsLanguageCard">
-      <div className="compactHeader">
-        <h2>{t('settings.languageCard.title')}</h2>
-        <p>{t('settings.languageCard.subtitle')}</p>
-      </div>
+      {showHeader ? (
+        <div className="compactHeader">
+          <h2>{t('settings.languageCard.title')}</h2>
+          <p>{t('settings.languageCard.subtitle')}</p>
+        </div>
+      ) : null}
 
       <label className="settingsLanguageCard-field">
         <span className="settingsLanguageCard-label">{t('settings.languageCard.label')}</span>

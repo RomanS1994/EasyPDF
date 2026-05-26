@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { RequestLoader, RequestLoadingState } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { formatDateTime } from '@shared/app/utils/dateFormat.js';
 import { selectToken, selectUser, setSession } from '@shared/features/auth/authSlice.js';
@@ -113,7 +114,7 @@ export function AdminUserDetails({ userId, user: userProp, showSummary = true, s
   if (isLoading) {
     return (
       <section className="adminUserDetails">
-        <p className="adminUserDetails-state">{t('admin.loadingUser')}</p>
+        <RequestLoadingState className="adminUserDetails-state" label={t('admin.loadingUser')} />
       </section>
     );
   }
@@ -255,7 +256,11 @@ export function AdminUserDetails({ userId, user: userProp, showSummary = true, s
             onClick={handleSaveRole}
             disabled={isSavingRole || !canSaveRole}
           >
-            {isSavingRole ? t('admin.savingRole') : t('admin.saveRole')}
+            {isSavingRole ? (
+              <RequestLoader inline size="sm" label={t('admin.savingRole')} />
+            ) : (
+              t('admin.saveRole')
+            )}
           </button>
         </div>
       </details>
@@ -321,9 +326,11 @@ export function AdminUserDetails({ userId, user: userProp, showSummary = true, s
                 onClick={handleConfirmPayment}
                 disabled={isConfirmingPayment}
               >
-                {isConfirmingPayment
-                  ? t('admin.confirmingSubscriptionPayment')
-                  : t('admin.confirmSubscriptionPayment')}
+                {isConfirmingPayment ? (
+                  <RequestLoader inline size="sm" label={t('admin.confirmingSubscriptionPayment')} />
+                ) : (
+                  t('admin.confirmSubscriptionPayment')
+                )}
               </button>
             </div>
           ) : null}
@@ -348,11 +355,17 @@ export function AdminUserDetails({ userId, user: userProp, showSummary = true, s
               onClick={handleExtendSubscription}
               disabled={isExtendingSubscription}
             >
-              {isExtendingSubscription ? t('admin.extendingSubscription') : t('admin.extendSubscription')}
+              {isExtendingSubscription ? (
+                <RequestLoader inline size="sm" label={t('admin.extendingSubscription')} />
+              ) : (
+                t('admin.extendSubscription')
+              )}
             </button>
           </div>
 
-          {isPlansLoading ? <p className="adminUserDetails-note">{t('common.loadingPlans')}</p> : null}
+          {isPlansLoading ? (
+            <RequestLoader className="adminUserDetails-note" inline size="sm" label={t('common.loadingPlans')} />
+          ) : null}
           {isPlansError ? <p className="adminUserDetails-error">{t('admin.failedPlans')}</p> : null}
           {subscriptionMessage ? (
             <p className="adminUserDetails-message">{subscriptionMessage}</p>
@@ -367,7 +380,11 @@ export function AdminUserDetails({ userId, user: userProp, showSummary = true, s
             onClick={handleSaveSubscription}
             disabled={isSavingSubscription || isPlansLoading || !planId}
           >
-            {isSavingSubscription ? t('admin.savingSubscription') : t('admin.saveSubscription')}
+            {isSavingSubscription ? (
+              <RequestLoader inline size="sm" label={t('admin.savingSubscription')} />
+            ) : (
+              t('admin.saveSubscription')
+            )}
           </button>
         </div>
       </details>

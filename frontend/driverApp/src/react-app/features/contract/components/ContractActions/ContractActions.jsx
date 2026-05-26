@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+import { RequestLoader } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { useGenerateContractPdfMutation } from '../../contractApi.js';
 import { resetContract, selectContract } from '../../contractSlice.js';
@@ -484,7 +485,11 @@ export function ContractActions() {
           onClick={handleCreate}
           disabled={isCreating || isCreatingNew}
         >
-          {isCreating || isCreatingNew ? t('common.creating') : t('contract.saveOrder')}
+          {isCreating || isCreatingNew ? (
+            <RequestLoader inline size="sm" label={t('common.creating')} />
+          ) : (
+            t('contract.saveOrder')
+          )}
         </button>
 
         <button
@@ -493,7 +498,11 @@ export function ContractActions() {
           onClick={handleDownload}
           disabled={isGenerating || isCreating || isCreatingNew}
         >
-          {isGenerating ? t('common.downloading') : t('contract.downloadPdf')}
+          {isGenerating ? (
+            <RequestLoader inline size="sm" label={t('common.downloading')} />
+          ) : (
+            t('contract.downloadPdf')
+          )}
         </button>
 
         {generationSession.accessGranted ? (

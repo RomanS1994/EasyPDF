@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
+import { BackButton } from "@shared/app/components/BackButton/BackButton.jsx";
+import { RequestLoader, RequestLoadingState } from "@shared/app/components/RequestLoader/RequestLoader.jsx";
 import { useI18n } from "@shared/app/i18n/useI18n.js";
 import { selectUser } from "@shared/features/auth/authSlice.js";
 import { hasManagerAccess } from "@shared/features/auth/authAccess.js";
@@ -18,7 +20,6 @@ import { useGetAdminUsersQuery } from "@shared/features/admin/adminApi.js";
 import { SvgIcon } from "@shared/app/components/SvgIcon/SvgIcon.jsx";
 import {
   useAssignDriverMutation,
-  useDeleteOrderMutation,
   useGetOrderQuery,
   useUpdateOrderMutation,
 } from "../../ordersApi.js";
@@ -93,7 +94,6 @@ export function OrderDetails({ orderId, onClose }) {
   const [showTransfer, setShowTransfer] = useState(false);
   const [transferSearch, setTransferSearch] = useState("");
   const [selectedUserId, setSelectedUserId] = useState("");
-  const [deleteOrder, { isLoading: isDeleting }] = useDeleteOrderMutation();
   const [assignDriver, { isLoading: isTransferring }] =
     useAssignDriverMutation();
   const [updateOrder, { isLoading: isUpdatingOrder }] = useUpdateOrderMutation();
@@ -210,7 +210,6 @@ export function OrderDetails({ orderId, onClose }) {
     function handleKeyDown(event) {
       if (
         event.key === "Escape" &&
-        !isDeleting &&
         !isTransferring &&
         !isGenerating &&
         !isUpdatingOrder
@@ -248,7 +247,6 @@ export function OrderDetails({ orderId, onClose }) {
   }, [
     orderId,
     showTransfer,
-    isDeleting,
     isTransferring,
     isGenerating,
     isUpdatingOrder,
@@ -261,18 +259,7 @@ export function OrderDetails({ orderId, onClose }) {
   async function handleDelete() {
     setMessage("");
     setError("");
-
-    if (!window.confirm(t('contract.deleteOrderConfirm'))) {
-      return;
-    }
-
-    try {
-      await deleteOrder(orderId).unwrap();
-      setMessage(t('contract.orderDeleted'));
-      onClose();
-    } catch (error) {
-      setError(resolveErrorMessage(error, t('contract.failedToDeleteOrder')));
-    }
+    navigate(`/orders/${orderId}/dispatch`);
   }
 
   async function handleDownloadPdf(documentType) {
@@ -602,22 +589,14 @@ export function OrderDetails({ orderId, onClose }) {
         aria-label={t('contract.currentOrder')}
       >
         <div className="orderDrawer-header">
-          <button
-            className="orderDrawer-backBtn"
-            type="button"
-            onClick={handleCloseRequest}
-            aria-label={t('common.back')}
-          >
-            <OrderGlyph name="back" />
-            <span>{t('common.back')}</span>
-          </button>
+          <BackButton label={t('common.back')} onClick={handleCloseRequest} />
         </div>
 
         {message ? <p className="orderWindow-message">{message}</p> : null}
         {error ? <p className="orderWindow-error">{error}</p> : null}
 
         {isLoading ? (
-          <p className="orderWindow-state">{t('manager.loadingOrder')}</p>
+          <RequestLoadingState className="orderWindow-state" label={t('manager.loadingOrder')} />
         ) : null}
         {isError ? (
           <p className="orderWindow-state">{t('contract.failedLoadOrder')}</p>
@@ -819,7 +798,7 @@ export function OrderDetails({ orderId, onClose }) {
                 onClick={() => handleDownloadPdf("offer")}
                 disabled={isGenerating}
               >
-                {isGenerating ? t('common.generating') : t('contract.offerPdf')}
+                {isGenerating ? <RequestLoader inline size="sm" label={t('common.generating')} /> : t('contract.offerPdf')}
               </button>
               <button
                 className="orderWindow-button orderWindow-button--doc"
@@ -827,7 +806,7 @@ export function OrderDetails({ orderId, onClose }) {
                 onClick={() => handleDownloadPdf("confirmation")}
                 disabled={isGenerating}
               >
-                {isGenerating ? t('common.generating') : t('contract.confirmationPdf')}
+                {isGenerating ? <RequestLoader inline size="sm" label={t('common.generating')} /> : t('contract.confirmationPdf')}
               </button>
             </div>
 
@@ -838,7 +817,7 @@ export function OrderDetails({ orderId, onClose }) {
                 onClick={handleSaveAndClose}
                 disabled={isUpdatingOrder}
               >
-                {isUpdatingOrder ? t('common.saving') : t('common.save')}
+                {isUpdatingOrder ? <RequestLoader inline size="sm" label={t('common.saving')} /> : t('common.save')}
               </button>
               {canTransfer ? (
                 <button
@@ -853,9 +832,8 @@ export function OrderDetails({ orderId, onClose }) {
                 className="orderWindow-button orderWindow-button--danger"
                 type="button"
                 onClick={handleDelete}
-                disabled={isDeleting}
               >
-                {isDeleting ? t('common.deleting') : t('common.delete')}
+                {t('common.delete')}
               </button>
             </div>
 
@@ -889,7 +867,7 @@ export function OrderDetails({ orderId, onClose }) {
                 </div>
 
                 {isUsersFetching ? (
-                  <p className="orderWindow-state">{t('contract.loadingDrivers')}</p>
+                  <RequestLoadingState className="orderWindow-state" label={t('contract.loadingDrivers')} />
                 ) : null}
 
                 {!isUsersFetching && transferUsers.length ? (
@@ -941,7 +919,11 @@ export function OrderDetails({ orderId, onClose }) {
                     onClick={handleTransfer}
                     disabled={isTransferring || !selectedUserId}
                   >
-                    {isTransferring ? t('common.transferring') : t('contract.confirmTransfer')}
+                    {isTransferring ? (
+                      <RequestLoader inline size="sm" label={t('common.transferring')} />
+                    ) : (
+                      t('contract.confirmTransfer')
+                    )}
                   </button>
                   <button
                     className="orderWindow-button"
@@ -1021,7 +1003,7 @@ export function OrderDetails({ orderId, onClose }) {
                 onClick={() => void savePrice()}
                 disabled={isUpdatingOrder}
               >
-                {isUpdatingOrder ? t('common.saving') : t('contract.savePrice')}
+                {isUpdatingOrder ? <RequestLoader inline size="sm" label={t('common.saving')} /> : t('contract.savePrice')}
               </button>
               <button
                 className="orderWindow-button orderWindow-button--secondary"
@@ -1098,7 +1080,7 @@ export function OrderDetails({ orderId, onClose }) {
                 onClick={() => void handleSaveCommission()}
                 disabled={isUpdatingOrder}
               >
-                {isUpdatingOrder ? t('common.saving') : t('contract.saveCommission')}
+                {isUpdatingOrder ? <RequestLoader inline size="sm" label={t('common.saving')} /> : t('contract.saveCommission')}
               </button>
               <button
                 className="orderWindow-button orderWindow-button--secondary"
@@ -1160,7 +1142,7 @@ export function OrderDetails({ orderId, onClose }) {
                 onClick={() => void saveFlightNumber()}
                 disabled={isUpdatingOrder}
               >
-                {isUpdatingOrder ? t('common.saving') : t('contract.saveFlightNumber')}
+                {isUpdatingOrder ? <RequestLoader inline size="sm" label={t('common.saving')} /> : t('contract.saveFlightNumber')}
               </button>
               <button
                 className="orderWindow-button orderWindow-button--secondary"

@@ -1,3 +1,4 @@
+import { RequestLoadingState } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { useGetAdminOrdersQuery } from '@shared/features/admin/adminApi.js';
 import './AdminOrdersPanel.css';
@@ -37,7 +38,7 @@ export function AdminOrdersPanel({
         </div>
       ) : null}
       {isLoading ? (
-        <p className="adminOrdersPanel-state">{t('common.loadingOrders')}</p>
+        <RequestLoadingState className="adminOrdersPanel-state" label={t('common.loadingOrders')} />
       ) : isError ? (
         <p className="adminOrdersPanel-state">{t('admin.failedOrders')}</p>
       ) : isEmpty ? (

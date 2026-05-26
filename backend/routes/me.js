@@ -1,4 +1,6 @@
-import { getAuthContext } from '../auth/context.js';
+import { randomUUID } from 'node:crypto';
+
+import { getAuthContext, requireManager } from '../auth/context.js';
 import { DEFAULT_PLAN_ID } from '../config/plans.js';
 import {
   buildSanitizedUser,
@@ -13,12 +15,380 @@ import {
   sendError,
   sendJson,
 } from '../lib/http.js';
-import { normalizeUserProfile } from '../services/profiles.js';
+import { normalizeTeamDriverIds, normalizeUserProfile } from '../services/profiles.js';
 import {
   buildSubscriptionWriteData,
   resolveSubscriptionView,
 } from '../services/prisma-views.js';
-import { normalizeText, nowIso } from '../validation/common.js';
+import { normalizePhoneNumber, normalizeText, nowIso } from '../validation/common.js';
+
+const TEAM_DRIVER_SELECT = {
+  id: true,
+  name: true,
+  email: true,
+  phone: true,
+  role: true,
+  profile: true,
+  updatedAt: true,
+};
+
+const TEAM_WITH_MEMBERS_INCLUDE = {
+  members: {
+    select: {
+      userId: true,
+    },
+    orderBy: {
+      createdAt: 'asc',
+    },
+  },
+};
+
+function sanitizeTeamDriver(user) {
+  const profile = normalizeUserProfile(user.profile, user.name);
+
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone || '',
+    role: user.role,
+    avatarUrl: profile.avatarUrl,
+    profile: {
+      avatarUrl: profile.avatarUrl,
+      driver: profile.driver,
+    },
+    updatedAt:
+      user.updatedAt instanceof Date ? user.updatedAt.toISOString() : String(user.updatedAt || ''),
+  };
+}
+
+function toIsoString(value) {
+  if (!value) return '';
+
+  const parsed = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(parsed.getTime()) ? '' : parsed.toISOString();
+}
+
+function sanitizeTeamRecord(team) {
+  return {
+    id: team.id,
+    name: team.name,
+    driverIds: (team.members || []).map(member => member.userId).filter(Boolean),
+    createdAt: toIsoString(team.createdAt),
+    updatedAt: toIsoString(team.updatedAt),
+  };
+}
+
+function isUuidLike(value) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
+function normalizeTeamId(value, ownerUserId) {
+  const id = normalizeText(value);
+  if (!id) {
+    return randomUUID();
+  }
+
+  if (isUuidLike(id) || id.startsWith(`${ownerUserId}-`)) {
+    return id;
+  }
+
+  return `${ownerUserId}-${id}`;
+}
+
+function normalizeTeamRecords(value, ownerUserId) {
+  const source = Array.isArray(value) ? value : [];
+  const seen = new Set();
+  const teams = [];
+
+  for (const item of source) {
+    const team = item && typeof item === 'object' ? item : {};
+    let id = normalizeTeamId(team.id, ownerUserId);
+
+    if (seen.has(id)) {
+      id = `${id}-${teams.length + 1}`;
+    }
+
+    seen.add(id);
+    teams.push({
+      id,
+      name: normalizeText(team.name) || `Team ${teams.length + 1}`,
+      driverIds: normalizeTeamDriverIds(team.driverIds ?? team.teamDriverIds),
+    });
+  }
+
+  return teams;
+}
+
+function filterTeamDrivers(teams, availableDriverIds) {
+  return teams.map(team => ({
+    ...team,
+    driverIds: team.driverIds.filter(driverId => availableDriverIds.has(driverId)),
+  }));
+}
+
+function getActiveTeam(teams, activeTeamId) {
+  return teams.find(team => team.id === activeTeamId) || teams[0] || null;
+}
+
+async function loadAvailableTeamDrivers(client) {
+  const users = await client.user.findMany({
+    where: {
+      role: {
+        in: ['user', 'manager'],
+      },
+    },
+    select: TEAM_DRIVER_SELECT,
+    orderBy: [
+      {
+        name: 'asc',
+      },
+      {
+        email: 'asc',
+      },
+    ],
+  });
+
+  return users.map(sanitizeTeamDriver);
+}
+
+async function loadUserTeams(client, ownerUserId) {
+  const teams = await client.team.findMany({
+    where: {
+      ownerUserId,
+    },
+    include: TEAM_WITH_MEMBERS_INCLUDE,
+    orderBy: [
+      {
+        createdAt: 'asc',
+      },
+      {
+        name: 'asc',
+      },
+    ],
+  });
+
+  return teams.map(sanitizeTeamRecord);
+}
+
+async function handleGetMyTeam(request, response) {
+  const context = await requireManager(request, response);
+  if (!context) return;
+
+  const [drivers, storedTeams] = await Promise.all([
+    loadAvailableTeamDrivers(prisma),
+    loadUserTeams(prisma, context.user.id),
+  ]);
+  const availableDriverIds = new Set(drivers.map(driver => driver.id));
+  const teams = filterTeamDrivers(storedTeams, availableDriverIds);
+  const activeTeam = getActiveTeam(teams, context.user.activeTeamId);
+  const activeTeamId = activeTeam?.id || '';
+  const teamDriverIds = activeTeam?.driverIds || [];
+
+  sendJson(response, 200, {
+    activeTeamId,
+    teamDriverIds,
+    teams,
+    drivers,
+  });
+}
+
+async function handleUpdateMyTeam(request, response) {
+  const context = await requireManager(request, response);
+  if (!context) return;
+
+  const body = await readJsonBody(request);
+
+  const result = await runStoreTransaction({
+    prisma: async tx => {
+      const [target, drivers] = await Promise.all([
+        tx.user.findUnique({
+          where: {
+            id: context.user.id,
+          },
+          include: USER_WITH_SUBSCRIPTION_INCLUDE,
+        }),
+        loadAvailableTeamDrivers(tx),
+      ]);
+
+      if (!target) {
+        throw new Error('User not found');
+      }
+
+      const currentTeams = await loadUserTeams(tx, target.id);
+      const availableDriverIds = new Set(drivers.map(driver => driver.id));
+      const hasTeamListInput = Array.isArray(body.teams);
+      const hasDriverIdsInput =
+        Object.prototype.hasOwnProperty.call(body, 'driverIds') ||
+        Object.prototype.hasOwnProperty.call(body, 'teamDriverIds');
+      const requestedActiveTeamId = normalizeText(
+        body.activeTeamId ?? target.activeTeamId
+      );
+      let requestedTeams = hasTeamListInput
+        ? normalizeTeamRecords(body.teams, target.id)
+        : filterTeamDrivers(currentTeams, availableDriverIds);
+
+      if (hasDriverIdsInput) {
+        const requestedDriverIds = normalizeTeamDriverIds(body.driverIds ?? body.teamDriverIds);
+        const activeTeam = getActiveTeam(requestedTeams, requestedActiveTeamId);
+
+        if (activeTeam) {
+          requestedTeams = requestedTeams.map(team =>
+            team.id === activeTeam.id ? { ...team, driverIds: requestedDriverIds } : team
+          );
+        } else if (requestedDriverIds.length) {
+          requestedTeams = [
+            {
+              id: `${target.id}-default`,
+              name: 'My team',
+              driverIds: requestedDriverIds,
+            },
+          ];
+        }
+      }
+
+      const activeTeam = getActiveTeam(requestedTeams, requestedActiveTeamId);
+      const nextActiveTeamId = activeTeam?.id || requestedTeams[0]?.id || null;
+
+      if (requestedTeams.length > 20) {
+        throw new Error('Team limit exceeded');
+      }
+
+      if (requestedTeams.some(team => team.driverIds.length > 200)) {
+        throw new Error('Team driver limit exceeded');
+      }
+
+      const requestedDriverIds = requestedTeams.flatMap(team => team.driverIds);
+      const hasUnknownDriver = requestedDriverIds.some(driverId => !availableDriverIds.has(driverId));
+
+      if (hasUnknownDriver) {
+        throw new Error('Selected driver not found');
+      }
+
+      const requestedTeamIds = requestedTeams.map(team => team.id);
+      if (requestedTeamIds.length) {
+        const foreignTeam = await tx.team.findFirst({
+          where: {
+            id: {
+              in: requestedTeamIds,
+            },
+            ownerUserId: {
+              not: target.id,
+            },
+          },
+          select: {
+            id: true,
+          },
+        });
+
+        if (foreignTeam) {
+          throw new Error('Team not found');
+        }
+      }
+
+      if (requestedTeamIds.length) {
+        await tx.team.deleteMany({
+          where: {
+            ownerUserId: target.id,
+            id: {
+              notIn: requestedTeamIds,
+            },
+          },
+        });
+      } else {
+        await tx.team.deleteMany({
+          where: {
+            ownerUserId: target.id,
+          },
+        });
+      }
+
+      for (const team of requestedTeams) {
+        await tx.team.upsert({
+          where: {
+            id: team.id,
+          },
+          create: {
+            id: team.id,
+            ownerUserId: target.id,
+            name: team.name,
+          },
+          update: {
+            name: team.name,
+            updatedAt: new Date(nowIso()),
+          },
+        });
+
+        if (team.driverIds.length) {
+          await tx.teamMember.deleteMany({
+            where: {
+              teamId: team.id,
+              userId: {
+                notIn: team.driverIds,
+              },
+            },
+          });
+          await tx.teamMember.createMany({
+            data: team.driverIds.map(driverId => ({
+              teamId: team.id,
+              userId: driverId,
+            })),
+            skipDuplicates: true,
+          });
+        } else {
+          await tx.teamMember.deleteMany({
+            where: {
+              teamId: team.id,
+            },
+          });
+        }
+      }
+
+      const updatedUser = await tx.user.update({
+        where: {
+          id: target.id,
+        },
+        data: {
+          activeTeamId: nextActiveTeamId,
+          updatedAt: new Date(nowIso()),
+        },
+        include: USER_WITH_SUBSCRIPTION_INCLUDE,
+      });
+      const nextTeams = await loadUserTeams(tx, target.id);
+
+      await createAuditLog(tx, {
+        action: 'user.team.updated',
+        actorUserId: target.id,
+        targetUserId: target.id,
+        entityType: 'team',
+        entityId: target.id,
+        before: {
+          activeTeamId: target.activeTeamId || '',
+          teams: currentTeams,
+        },
+        after: {
+          activeTeamId: nextActiveTeamId || '',
+          teams: nextTeams,
+        },
+        meta: {
+          teamsCount: nextTeams.length,
+          selectedDriversCount: requestedDriverIds.length,
+        },
+      });
+      const nextActiveTeam = getActiveTeam(nextTeams, nextActiveTeamId);
+
+      return {
+        activeTeamId: nextActiveTeam?.id || '',
+        drivers,
+        teamDriverIds: nextActiveTeam?.driverIds || [],
+        teams: nextTeams,
+        user: await buildSanitizedUser(tx, updatedUser),
+      };
+    },
+  });
+
+  sendJson(response, 200, result);
+}
 
 async function handleDeleteMe(request, response) {
   const context = await getAuthContext(request, response);
@@ -52,6 +422,9 @@ async function handleUpdateMyProfile(request, response) {
   const body = await readJsonBody(request);
   const incomingProfile =
     body.profile && typeof body.profile === 'object' ? body.profile : body;
+  const hasPhoneInput =
+    Object.prototype.hasOwnProperty.call(body, 'phone') ||
+    Object.prototype.hasOwnProperty.call(incomingProfile, 'phone');
 
   const user = await runStoreTransaction({
     prisma: async tx => {
@@ -68,6 +441,9 @@ async function handleUpdateMyProfile(request, response) {
 
       const currentProfile = normalizeUserProfile(target.profile, target.name);
       const requestedName = normalizeText(body.name ?? incomingProfile.name ?? target.name) || target.name;
+      const nextPhone = hasPhoneInput
+        ? normalizePhoneNumber(body.phone ?? incomingProfile.phone)
+        : target.phone || '';
       const nextAvatarUrl = normalizeText(
         body.avatarUrl ??
           incomingProfile.avatarUrl ??
@@ -77,6 +453,24 @@ async function handleUpdateMyProfile(request, response) {
 
       if (nextAvatarUrl && nextAvatarUrl.length > 120000) {
         throw new Error('Avatar image is too large. Please upload a smaller image.');
+      }
+
+      if (hasPhoneInput && nextPhone) {
+        const existingPhoneUser = await tx.user.findFirst({
+          where: {
+            phone: nextPhone,
+            id: {
+              not: target.id,
+            },
+          },
+          select: {
+            id: true,
+          },
+        });
+
+        if (existingPhoneUser) {
+          throw new Error('Phone number is already used');
+        }
       }
 
       const nextProfile = normalizeUserProfile(
@@ -96,10 +490,12 @@ async function handleUpdateMyProfile(request, response) {
       );
       const before = {
         name: target.name,
+        phone: target.phone || '',
         profile: currentProfile,
       };
       const after = {
         name: requestedName,
+        phone: nextPhone,
         profile: nextProfile,
       };
 
@@ -109,6 +505,7 @@ async function handleUpdateMyProfile(request, response) {
         },
         data: {
           name: requestedName,
+          ...(hasPhoneInput ? { phone: nextPhone || null } : {}),
           profile: nextProfile,
           updatedAt: new Date(nowIso()),
         },
@@ -305,6 +702,16 @@ export async function handleMeRoutes(request, response, { pathName }) {
     return true;
   }
 
+  if (request.method === 'GET' && pathName === '/api/me/team') {
+    await handleGetMyTeam(request, response);
+    return true;
+  }
+
+  if (request.method === 'PATCH' && pathName === '/api/me/team') {
+    await handleUpdateMyTeam(request, response);
+    return true;
+  }
+
   if (request.method === 'DELETE' && pathName === '/api/me') {
     await handleDeleteMe(request, response);
     return true;
@@ -333,9 +740,20 @@ export async function handleMeRoutes(request, response, { pathName }) {
     const context = await getAuthContext(request, response);
     if (!context) return true;
 
-    const user = await buildSanitizedUser(prisma, context.user);
+    const [user, orderCount] = await Promise.all([
+      buildSanitizedUser(prisma, context.user),
+      prisma.order.count({
+        where: {
+          userId: context.user.id,
+        },
+      }),
+    ]);
+
     sendJson(response, 200, {
-      usage: user.usage,
+      usage: {
+        ...user.usage,
+        orderCount,
+      },
     });
     return true;
   }

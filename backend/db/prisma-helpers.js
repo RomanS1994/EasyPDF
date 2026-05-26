@@ -49,6 +49,14 @@ export const ORDER_WITH_OWNER_INCLUDE = {
       subscription: true,
     },
   },
+  createdBy: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+    },
+  },
 };
 
 export const ARCHIVED_ORDER_WITH_OWNER_INCLUDE = {
@@ -57,10 +65,21 @@ export const ARCHIVED_ORDER_WITH_OWNER_INCLUDE = {
       subscription: true,
     },
   },
+  createdBy: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+    },
+  },
 };
 
 export const ORDER_LIST_SELECT = {
   id: true,
+  userId: true,
+  createdByUserId: true,
+  createdBySnapshot: true,
   orderNumber: true,
   status: true,
   flightNumber: true,
@@ -290,6 +309,7 @@ export function sanitizeOrderListRecord(order) {
 
   return {
     id: order.id,
+    userId: pickTextValue(order.userId),
     orderNumber: pickTextValue(order.orderNumber),
     status: pickTextValue(order.status),
     flightNumber: pickTextValue(flightNumber),
@@ -318,6 +338,20 @@ export function sanitizeOrderListRecord(order) {
           },
         }
       : {}),
+    createdByUserId: pickTextValue(order.createdByUserId),
+    createdBy: order.createdBy
+      ? {
+          id: order.createdBy.id,
+          name: pickTextValue(order.createdBy.name),
+          email: pickTextValue(order.createdBy.email),
+        }
+      : order.createdBySnapshot && typeof order.createdBySnapshot === 'object'
+        ? {
+            id: pickTextValue(order.createdBySnapshot.id),
+            name: pickTextValue(order.createdBySnapshot.name),
+            email: pickTextValue(order.createdBySnapshot.email),
+          }
+        : null,
   };
 }
 

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 
 import { getApiErrorMessage } from '@shared/app/api/getApiErrorMessage.js';
+import { RequestLoader } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import {
   useGetAdminUsersQuery,
@@ -21,14 +22,15 @@ export function AdminPage() {
     isLoading: isOrdersLoading,
     isError: isOrdersError,
     error: ordersError,
-  } = useGetAdminOrdersQuery();
+  } = useGetAdminOrdersQuery({ limit: 1 });
 
   const users = usersData?.users || [];
   const orders = ordersData?.orders || [];
+  const ordersTotal = ordersData?.summary?.all ?? orders.length;
 
   function getCount(value, isLoading) {
     if (isLoading) {
-      return '—';
+      return <RequestLoader inline size="sm" label={t('common.loading')} />;
     }
 
     return String(value);
@@ -54,7 +56,7 @@ export function AdminPage() {
     {
       tone: 'amber',
       label: t('adminDashboard.orders'),
-      value: getCount(orders.length, isOrdersLoading),
+      value: getCount(ordersTotal, isOrdersLoading),
       copy: t('adminOrders.copy'),
       state: isOrdersError ? getMetricState(isOrdersError, ordersError, t('common.failedToLoad')) : '',
       to: '/admin/orders',

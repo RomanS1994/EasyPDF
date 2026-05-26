@@ -12,6 +12,13 @@ import { prisma } from '../db/prisma.js';
 import { runStoreTransaction } from '../db/store.js';
 import { readJsonBody, sendError, sendJson } from '../lib/http.js';
 import { buildOrderRecord } from '../services/orders.js';
+import {
+  acceptOrderOffer,
+  createOrderOffer,
+  listAvailableOrderOffers,
+  searchDispatchDrivers,
+  skipOrderOffer,
+} from '../services/order-dispatch.js';
 import { validateOrderCreateInput } from '../validation/orders.js';
 import { nowIso, normalizePaginationParams, normalizeText } from '../validation/common.js';
 
@@ -36,6 +43,10 @@ async function handleCreateOrder(request, response) {
   const context = await getAuthContext(request, response);
   if (!context) return;
 
+  if (!context.user.phone) {
+    return sendError(response, 403, 'Driver phone is required');
+  }
+
   const resolvedUsage = (await buildSanitizedUser(prisma, context.user)).usage;
   if (resolvedUsage.status !== 'active') {
     return sendError(response, 403, 'Subscription is not active', resolvedUsage);
@@ -58,6 +69,10 @@ async function handleCreateOrder(request, response) {
 
       if (!freshUser) {
         throw new Error('User not found');
+      }
+
+      if (!freshUser.phone) {
+        throw new Error('Driver phone is required');
       }
 
       const freshUserView = await buildSanitizedUser(tx, freshUser);
@@ -90,6 +105,8 @@ async function handleCreateOrder(request, response) {
         data: {
           id: nextOrder.id,
           userId: nextOrder.userId,
+          createdByUserId: nextOrder.createdByUserId,
+          createdBySnapshot: nextOrder.createdBySnapshot,
           orderNumber: nextOrder.orderNumber,
           status: nextOrder.status,
           flightNumber: nextOrder.flightNumber,
@@ -273,6 +290,8 @@ async function handleDeleteOrder(request, response, orderId) {
         data: {
           id: order.id,
           userId: order.userId,
+          createdByUserId: order.createdByUserId,
+          createdBySnapshot: order.createdBySnapshot,
           orderNumber: order.orderNumber,
           status: order.status,
           flightNumber: order.flightNumber,
@@ -382,9 +401,107 @@ async function handleAssignDriver(request, response, orderId) {
   sendJson(response, 200, { order: transferredOrder });
 }
 
+async function handleSearchDispatchDrivers(request, response, url) {
+  const context = await getAuthContext(request, response);
+  if (!context) return;
+
+  const search = normalizeText(url.searchParams.get('search'));
+  const drivers = await searchDispatchDrivers(prisma, {
+    search,
+    excludeUserId: context.user.id,
+  });
+
+  sendJson(response, 200, { drivers });
+}
+
+async function handleAvailableOrderOffers(request, response) {
+  const context = await getAuthContext(request, response);
+  if (!context) return;
+
+  const offers = await listAvailableOrderOffers(prisma, context.user.id);
+
+  sendJson(response, 200, { offers });
+}
+
+async function handleCreateOrderOffer(request, response, orderId) {
+  const context = await getAuthContext(request, response);
+  if (!context) return;
+
+  const body = await readJsonBody(request);
+  const offer = await runStoreTransaction({
+    prisma: async tx => {
+      const order = await tx.order.findFirst({
+        where: {
+          id: orderId,
+        },
+        include: ORDER_WITH_OWNER_INCLUDE,
+      });
+
+      if (!order) {
+        throw new Error('Order not found');
+      }
+
+      const isOwner = order.userId === context.user.id;
+      const isManager = hasManagerAccess(context.user.role);
+
+      if (!isOwner && !isManager) {
+        throw new Error('You do not have access to this order');
+      }
+
+      return createOrderOffer(tx, {
+        actor: context.user,
+        order,
+        body,
+      });
+    },
+  });
+
+  sendJson(response, 201, { offer });
+}
+
+async function handleAcceptOrderOffer(request, response, orderId, offerId) {
+  const context = await getAuthContext(request, response);
+  if (!context) return;
+
+  const order = await runStoreTransaction({
+    prisma: tx => acceptOrderOffer(tx, {
+      actor: context.user,
+      orderId,
+      offerId,
+    }),
+  });
+
+  sendJson(response, 200, { order });
+}
+
+async function handleSkipOrderOffer(request, response, orderId, offerId) {
+  const context = await getAuthContext(request, response);
+  if (!context) return;
+
+  const result = await runStoreTransaction({
+    prisma: tx => skipOrderOffer(tx, {
+      actor: context.user,
+      orderId,
+      offerId,
+    }),
+  });
+
+  sendJson(response, 200, result);
+}
+
 export async function handleOrderRoutes(request, response, { pathName, url }) {
   if (request.method === 'POST' && pathName === '/api/orders') {
     await handleCreateOrder(request, response);
+    return true;
+  }
+
+  if (request.method === 'GET' && pathName === '/api/orders/available') {
+    await handleAvailableOrderOffers(request, response);
+    return true;
+  }
+
+  if (request.method === 'GET' && pathName === '/api/orders/drivers') {
+    await handleSearchDispatchDrivers(request, response, url);
     return true;
   }
 
@@ -396,6 +513,11 @@ export async function handleOrderRoutes(request, response, { pathName, url }) {
     const orders = await prisma.order.findMany({
       where: {
         userId: context.user.id,
+        offers: {
+          none: {
+            status: 'open',
+          },
+        },
       },
       select: ORDER_LIST_SELECT,
       orderBy: {
@@ -423,7 +545,27 @@ export async function handleOrderRoutes(request, response, { pathName, url }) {
     return false;
   }
 
-  if (segments.length > 3 && request.method !== 'PATCH') {
+  if (action === 'offers' && request.method === 'POST' && segments.length === 4) {
+    await handleCreateOrderOffer(request, response, orderId);
+    return true;
+  }
+
+  if (action === 'offers' && request.method === 'POST' && segments.length === 6) {
+    const offerId = segments[4] || '';
+    const offerAction = segments[5] || '';
+
+    if (offerAction === 'accept') {
+      await handleAcceptOrderOffer(request, response, orderId, offerId);
+      return true;
+    }
+
+    if (offerAction === 'skip') {
+      await handleSkipOrderOffer(request, response, orderId, offerId);
+      return true;
+    }
+  }
+
+  if (segments.length > 3 && action !== 'assign-driver') {
     return false;
   }
 

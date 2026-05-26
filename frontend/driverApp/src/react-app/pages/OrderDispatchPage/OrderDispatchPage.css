@@ -1,0 +1,228 @@
+.orderDispatchPage {
+  gap: 18px;
+}
+
+.orderDispatchPage-header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.orderDispatchSummary {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+}
+
+.orderDispatchSummary-main {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.orderDispatchSummary-main span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
+.orderDispatchSummary-main strong {
+  display: block;
+  margin-top: 2px;
+  color: var(--text);
+  font-size: 1.05rem;
+}
+
+.orderDispatchSummary-icon,
+.orderDispatchAction-icon,
+.orderDispatchListIcon {
+  display: inline-grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 14px;
+  color: #0f766e;
+  background: #ccfbf1;
+}
+
+.orderDispatchSummary-icon svg,
+.orderDispatchAction-icon svg,
+.orderDispatchListIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.orderDispatchSummary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.orderDispatchSummary-grid div {
+  min-width: 0;
+}
+
+.orderDispatchSummary-grid dt {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.orderDispatchSummary-grid dd {
+  margin: 0;
+  min-width: 0;
+  color: var(--text);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.orderDispatchActions,
+.orderDispatchList {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.orderDispatchAction,
+.orderDispatchListButton {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.9);
+  text-align: left;
+  text-decoration: none;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.07);
+}
+
+.orderDispatchAction:not(:disabled):hover,
+.orderDispatchListButton:not(:disabled):hover {
+  border-color: rgba(14, 116, 144, 0.22);
+  transform: translateY(-1px);
+}
+
+.orderDispatchAction:disabled,
+.orderDispatchAction.is-disabled,
+.orderDispatchListButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.orderDispatchAction--danger {
+  border-color: rgba(220, 38, 38, 0.2);
+  background: #fff1f2;
+}
+
+.orderDispatchAction--danger .orderDispatchAction-icon {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.orderDispatchAction-copy,
+.orderDispatchListCopy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.orderDispatchAction-copy strong,
+.orderDispatchListCopy strong {
+  color: var(--text);
+  font-size: 0.96rem;
+}
+
+.orderDispatchAction-copy span,
+.orderDispatchListCopy span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.orderDispatchAction-chevron,
+.orderDispatchListButton > svg {
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+}
+
+.orderDispatchSearch {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.orderDispatchSearch input {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 14px;
+  padding: 0 14px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.92);
+  font: inherit;
+}
+
+.orderDispatchMessage,
+.orderDispatchError,
+.orderDispatchState {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-weight: 800;
+}
+
+.orderDispatchMessage {
+  color: #047857;
+  background: #d1fae5;
+}
+
+.orderDispatchError {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.orderDispatchState {
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+@media (max-width: 640px) {
+  .orderDispatchPage-header {
+    grid-template-columns: 1fr;
+  }
+
+  .orderDispatchSummary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .orderDispatchAction,
+  .orderDispatchListButton {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .orderDispatchAction-chevron,
+  .orderDispatchListButton > svg {
+    display: none;
+  }
+}
+

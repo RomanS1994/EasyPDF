@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
+import { RequestLoader } from "@shared/app/components/RequestLoader/RequestLoader.jsx";
 import { useI18n } from "@shared/app/i18n/useI18n.js";
 import {
   useDeleteMeMutation,
@@ -17,7 +18,7 @@ export function ProfileDanger({ showHeader = true, bare = false }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useI18n();
-  const [logout] = useLogoutMutation();
+  const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
   const [deleteMe, { isLoading: isDeleting }] = useDeleteMeMutation();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -72,8 +73,9 @@ export function ProfileDanger({ showHeader = true, bare = false }) {
           className="profileDanger-button"
           type="button"
           onClick={handleLogout}
+          disabled={isLoggingOut}
         >
-          {t('account.logout')}
+          {isLoggingOut ? <RequestLoader inline size="sm" label={t('common.loading')} /> : t('account.logout')}
         </button>
 
         <button
@@ -82,7 +84,7 @@ export function ProfileDanger({ showHeader = true, bare = false }) {
           onClick={handleDelete}
           disabled={isDeleting}
         >
-          {isDeleting ? t('common.deleting') : t('account.deleteAccount')}
+          {isDeleting ? <RequestLoader inline size="sm" label={t('common.deleting')} /> : t('account.deleteAccount')}
         </button>
       </div>
 

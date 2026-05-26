@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { RequestLoader } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { useUpdateProfileMutation } from '@shared/features/auth/authApi.js';
 import { selectToken, setSession } from '@shared/features/auth/authSlice.js';
@@ -217,7 +218,11 @@ export function ProfileHero({ user }) {
               onClick={handlePickPhoto}
               disabled={isLoading}
             >
-              {t('account.changePhoto')}
+              {isLoading ? (
+                <RequestLoader inline size="sm" label={t('auth.savingProfile')} />
+              ) : (
+                t('account.changePhoto')
+              )}
             </button>
 
             {hasAvatar ? (
@@ -227,7 +232,11 @@ export function ProfileHero({ user }) {
                 onClick={handleRemovePhoto}
                 disabled={isLoading}
               >
-                {t('account.removePhoto')}
+                {isLoading ? (
+                  <RequestLoader inline size="sm" label={t('auth.savingProfile')} />
+                ) : (
+                  t('account.removePhoto')
+                )}
               </button>
             ) : null}
           </div>

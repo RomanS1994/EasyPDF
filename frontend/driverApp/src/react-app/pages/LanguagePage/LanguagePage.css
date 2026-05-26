@@ -1,0 +1,15 @@
+.languagePage {
+  display: grid;
+  gap: 12px;
+}
+
+.languagePage-header {
+  display: grid;
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .languagePage {
+    gap: 10px;
+  }
+}

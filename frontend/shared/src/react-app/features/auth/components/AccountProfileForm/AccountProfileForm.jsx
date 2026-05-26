@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { RequestLoader } from '../../../../app/components/RequestLoader/RequestLoader.jsx';
 import { useI18n } from '../../../../app/i18n/useI18n.js';
 import { useUpdateProfileMutation } from '../../authApi.js';
 import { selectToken, selectUser, setSession } from '../../authSlice.js';
@@ -53,7 +54,7 @@ export function AccountProfileForm() {
       {error ? <p className="accountProfileForm-error">{error}</p> : null}
 
       <button className="accountProfileForm-button" type="submit" disabled={isLoading}>
-        {isLoading ? t('auth.savingProfile') : t('auth.saveProfile')}
+        {isLoading ? <RequestLoader inline size="sm" label={t('auth.savingProfile')} /> : t('auth.saveProfile')}
       </button>
     </form>
   );

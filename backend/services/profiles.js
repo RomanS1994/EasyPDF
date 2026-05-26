@@ -19,6 +19,24 @@ export function buildDefaultProfile(name = '') {
   };
 }
 
+export function normalizeTeamDriverIds(value) {
+  const source = Array.isArray(value) ? value : [];
+  const seen = new Set();
+  const ids = [];
+
+  for (const item of source) {
+    const id = normalizeText(item);
+    if (!id || seen.has(id)) {
+      continue;
+    }
+
+    seen.add(id);
+    ids.push(id);
+  }
+
+  return ids;
+}
+
 export function normalizeUserProfile(profile, name = '') {
   const source = profile && typeof profile === 'object' ? profile : {};
   const defaults = buildDefaultProfile(name);

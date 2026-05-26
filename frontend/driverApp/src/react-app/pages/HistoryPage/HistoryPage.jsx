@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
+import { RequestLoadingState } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { OrderDetails } from '../../features/orders/components/OrderDetails/OrderDetails.jsx';
 import { useGetOrdersQuery } from '../../features/orders/ordersApi.js';
 import { WorkspaceTabs } from '../../components/WorkspaceTabs/WorkspaceTabs.jsx';
@@ -68,7 +69,9 @@ export function HistoryPage() {
           onSortChange={setSortKey}
         />
 
-        {isLoading ? <p className="orderHistoryEmpty">{t('history.loading')}</p> : null}
+        {isLoading ? (
+          <RequestLoadingState className="orderHistoryEmpty" label={t('history.loading')} />
+        ) : null}
         {isError ? <p className="orderHistoryEmpty">{t('history.failed')}</p> : null}
 
         {!isLoading && !isError && !visibleOrders.length ? (

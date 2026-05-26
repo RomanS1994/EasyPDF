@@ -46,13 +46,14 @@ export function OrdersPage() {
   });
   const hasActiveSession = hasGenerationSession(generationSession);
   const hasActiveSubscription = user?.subscription?.status === 'active';
+  const hasDriverPhone = Boolean(user?.phone);
 
   useEffect(() => {
     if (!isGenerationReady) {
       return;
     }
 
-    if (!hasActiveSubscription) {
+    if (!hasActiveSubscription || !hasDriverPhone) {
       if (hasActiveSession) {
         dispatch(clearSession());
       }
@@ -68,7 +69,14 @@ export function OrdersPage() {
     if (hasActiveSession) {
       setIsGateOpen(false);
     }
-  }, [dispatch, hasActiveSession, hasActiveSubscription, isGenerationReady, sessionError.message]);
+  }, [
+    dispatch,
+    hasActiveSession,
+    hasActiveSubscription,
+    hasDriverPhone,
+    isGenerationReady,
+    sessionError.message,
+  ]);
 
   async function handleConfirmGate() {
     setIsReserving(true);
@@ -100,6 +108,10 @@ export function OrdersPage() {
     navigate('/settings/plan-upgrade');
   }
 
+  function openBusinessProfile() {
+    navigate('/settings/business-profile');
+  }
+
   return (
     <section className="ordersPage pageStack">
       {!hasActiveSubscription ? (
@@ -109,6 +121,15 @@ export function OrdersPage() {
           <p>{t('contract.subscriptionInactive')}</p>
           <button className="ordersPage-blockedButton" type="button" onClick={openAccountUpgrade}>
             {t('contract.openAccountForUpgrade')}
+          </button>
+        </div>
+      ) : !hasDriverPhone ? (
+        <div className="ordersPage-blocked">
+          <p className="ordersPage-blockedEyebrow">{t('settings.businessProfile.title')}</p>
+          <h2>{t('auth.phoneTitle')}</h2>
+          <p>{t('auth.phoneRequiredForOrders')}</p>
+          <button className="ordersPage-blockedButton" type="button" onClick={openBusinessProfile}>
+            {t('settings.businessProfile.title')}
           </button>
         </div>
       ) : hasActiveSession ? (
@@ -122,7 +143,7 @@ export function OrdersPage() {
       ) : null}
 
       <GenerationGateModal
-        isOpen={hasActiveSubscription && isGateOpen && !hasActiveSession}
+        isOpen={hasActiveSubscription && hasDriverPhone && isGateOpen && !hasActiveSession}
         isBusy={isReserving}
         onClose={handleCloseGate}
         onConfirm={handleConfirmGate}

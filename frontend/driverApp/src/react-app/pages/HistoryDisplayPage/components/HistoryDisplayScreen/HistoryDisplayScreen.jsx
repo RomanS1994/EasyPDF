@@ -1,6 +1,8 @@
 import { useState } from 'react';
 
+import { BackButton } from '@shared/app/components/BackButton/BackButton.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
+import { RequestLoadingState } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { SvgIcon } from '@shared/app/components/SvgIcon/SvgIcon.jsx';
 import './HistoryDisplayScreen.css';
 
@@ -34,10 +36,7 @@ function HistoryDisplayScreen({
   return (
     <div className="historyDisplayScreen">
       <header className="historyDisplayScreen-top">
-        <button className="historyDisplayScreen-back" type="button" onClick={onBack}>
-          <span aria-hidden="true">←</span>
-          <span>{t('history.back')}</span>
-        </button>
+        <BackButton label={t('history.back')} onClick={onBack} />
 
         <div className="historyDisplayScreen-toolbar">
           <button
@@ -101,7 +100,9 @@ function HistoryDisplayScreen({
       </header>
 
       <main className="historyDisplayScreen-body">
-        {isLoading ? <p className="historyDisplayScreen-state">{t('history.loadingOrder')}</p> : null}
+        {isLoading ? (
+          <RequestLoadingState className="historyDisplayScreen-state" label={t('history.loadingOrder')} />
+        ) : null}
         {isError ? <p className="historyDisplayScreen-state">{t('history.failedToLoadOrder')}</p> : null}
 
         {!isLoading && !isError ? (

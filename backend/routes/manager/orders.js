@@ -4,6 +4,7 @@ import {
   ARCHIVED_ORDER_WITH_OWNER_INCLUDE,
   ORDER_WITH_OWNER_INCLUDE,
   ORDER_LIST_WITH_OWNER_SELECT,
+  createAuditLog,
   sanitizeOrderListRecord,
   sanitizeOrderRecord,
 } from '../../db/prisma-helpers.js';
@@ -49,20 +50,24 @@ export async function handleManagerOrders(request, response, url) {
   const state = normalizeOrderCollectionState(url.searchParams.get('state'));
   const { skip, limit } = normalizePaginationParams(url.searchParams);
   const { model, select } = getOrderCollectionConfig(state);
+  const baseWhere = userId
+    ? {
+        userId,
+      }
+    : undefined;
 
-  const candidateOrders = await model.findMany({
-    where: userId
-      ? {
-          userId,
-        }
-      : undefined,
-    select,
-    orderBy: {
-      createdAt: 'desc',
-    },
-    skip,
-    take: limit,
-  });
+  const [candidateOrders, totalCount] = await Promise.all([
+    model.findMany({
+      where: baseWhere,
+      select,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip,
+      take: limit,
+    }),
+    search ? Promise.resolve(null) : model.count({ where: baseWhere }),
+  ]);
 
   const scopedOrders = candidateOrders.filter(order => {
     if (!search) {
@@ -87,6 +92,9 @@ export async function handleManagerOrders(request, response, url) {
   });
 
   const summary = buildManagerOrdersSummary(scopedOrders);
+  if (Number.isInteger(totalCount)) {
+    summary.all = totalCount;
+  }
   const orders = scopedOrders
     .filter(order => matchesManagerOrderStatus(order, status))
     .map(sanitizeOrderListRecord);
@@ -182,6 +190,8 @@ export async function handleManagerOrderRestore(request, response, orderId) {
         data: {
           id: archivedOrder.id,
           userId: archivedOrder.userId,
+          createdByUserId: archivedOrder.createdByUserId,
+          createdBySnapshot: archivedOrder.createdBySnapshot,
           orderNumber: archivedOrder.orderNumber,
           status: archivedOrder.status,
           flightNumber: archivedOrder.flightNumber,

@@ -23,31 +23,71 @@ enum SubscriptionStatus {
 }
 
 model User {
-  id           String        @id
+  id           String   @id
   name         String
-  email        String        @unique
+  email        String   @unique
+  phone        String?  @unique
   passwordHash String
-  role         UserRole      @default(user)
+  role         UserRole @default(user)
+  activeTeamId String?
   profile      Json
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  sessions     Session[]
-  subscription Subscription?
-  orders       Order[]
-  archivedOrders ArchivedOrder[]
+  sessions        Session[]
+  subscription    Subscription?
+  orders          Order[]          @relation("OrderOwner")
+  createdOrders   Order[]          @relation("OrderCreator")
+  archivedOrders  ArchivedOrder[]  @relation("ArchivedOrderOwner")
+  createdArchivedOrders ArchivedOrder[] @relation("ArchivedOrderCreator")
+  activeTeam      Team?           @relation("UserActiveTeam", fields: [activeTeamId], references: [id], onDelete: SetNull)
+  ownedTeams      Team[]          @relation("TeamOwner")
+  teamMemberships TeamMember[]    @relation("TeamMemberUser")
+  sentOrderOffers OrderOffer[]     @relation("OrderOfferSender")
+  createdOrderOffers OrderOffer[]  @relation("OrderOfferCreator")
+  acceptedOrderOffers OrderOffer[] @relation("OrderOfferAccepter")
+  orderOfferTargets OrderOfferTarget[] @relation("OrderOfferTargetDriver")
 
+  @@index([activeTeamId])
   @@map("users")
 }
 
-model Session {
-  id         String   @id
-  userId     String
-  tokenHash  String   @unique
-  createdAt  DateTime @default(now())
-  expiresAt  DateTime
+model Team {
+  id          String   @id
+  ownerUserId String
+  name        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  owner          User         @relation("TeamOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
+  activeForUsers User[]       @relation("UserActiveTeam")
+  members        TeamMember[]
+
+  @@index([ownerUserId])
+  @@map("teams")
+}
+
+model TeamMember {
+  teamId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation("TeamMemberUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([teamId, userId])
+  @@index([userId])
+  @@map("team_members")
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  tokenHash String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expiresAt])
@@ -55,15 +95,15 @@ model Session {
 }
 
 model Plan {
-  id                     String         @id
+  id                     String   @id
   name                   String
   monthlyGenerationLimit Int
   description            String
-  isActive               Boolean        @default(true)
-  createdAt              DateTime       @default(now())
-  updatedAt              DateTime       @updatedAt
+  isActive               Boolean  @default(true)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 
-  subscriptions          Subscription[]
+  subscriptions Subscription[]
 
   @@map("plans")
 }
@@ -88,8 +128,8 @@ model Subscription {
   createdAt              DateTime           @default(now())
   updatedAt              DateTime           @updatedAt
 
-  user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan                   Plan               @relation(fields: [planId], references: [id], onDelete: Restrict)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan Plan @relation(fields: [planId], references: [id], onDelete: Restrict)
 
   @@index([planId])
   @@index([status])
@@ -98,54 +138,115 @@ model Subscription {
 }
 
 model Order {
-  id           String   @id
-  userId       String
-  orderNumber  String
-  status       String
-  flightNumber String   @default("")
-  source       String
-  customer     Json
-  trip         Json
-  totalPrice   String
-  pdf          Json
-  contractData Json
-  metadata     Json
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String   @id
+  userId            String
+  createdByUserId   String?
+  createdBySnapshot Json?
+  orderNumber       String
+  status            String
+  flightNumber      String   @default("")
+  source            String
+  customer          Json
+  trip              Json
+  totalPrice        String
+  pdf               Json
+  contractData      Json
+  metadata          Json
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation("OrderOwner", fields: [userId], references: [id], onDelete: Cascade)
+  createdBy         User?    @relation("OrderCreator", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  offers            OrderOffer[]
 
   @@index([userId])
+  @@index([createdByUserId])
   @@index([status])
   @@index([orderNumber])
   @@index([createdAt])
   @@map("orders")
 }
 
-
 model ArchivedOrder {
-  id           String   @id
-  userId       String
-  orderNumber  String
-  status       String
-  flightNumber String   @default("")
-  source       String
-  customer     Json
-  trip         Json
-  totalPrice   String
-  pdf          Json
-  contractData Json
-  metadata     Json
-  createdAt    DateTime
-  updatedAt    DateTime
-  deletedAt    DateTime @default(now())
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String   @id
+  userId            String
+  createdByUserId   String?
+  createdBySnapshot Json?
+  orderNumber       String
+  status            String
+  flightNumber      String   @default("")
+  source            String
+  customer          Json
+  trip              Json
+  totalPrice        String
+  pdf               Json
+  contractData      Json
+  metadata          Json
+  createdAt         DateTime
+  updatedAt         DateTime
+  deletedAt         DateTime @default(now())
+  user              User     @relation("ArchivedOrderOwner", fields: [userId], references: [id], onDelete: Cascade)
+  createdBy         User?    @relation("ArchivedOrderCreator", fields: [createdByUserId], references: [id], onDelete: SetNull)
 
   @@index([userId])
+  @@index([createdByUserId])
   @@index([status])
   @@index([orderNumber])
   @@index([deletedAt])
   @@index([createdAt])
   @@map("archived_orders")
+}
+
+model OrderOffer {
+  id               String   @id
+  orderId          String
+  fromUserId       String
+  createdByUserId  String?
+  targetType       String
+  targetUserId     String?
+  targetTeamId     String?
+  targetTeamName   String?
+  status           String   @default("open")
+  expiresAt        DateTime?
+  acceptedByUserId String?
+  acceptedAt       DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  order          Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  fromUser       User    @relation("OrderOfferSender", fields: [fromUserId], references: [id], onDelete: Cascade)
+  createdByUser  User?   @relation("OrderOfferCreator", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  acceptedByUser User?   @relation("OrderOfferAccepter", fields: [acceptedByUserId], references: [id], onDelete: SetNull)
+  targets        OrderOfferTarget[]
+
+  @@index([orderId])
+  @@index([orderId, status])
+  @@index([fromUserId])
+  @@index([createdByUserId])
+  @@index([targetType])
+  @@index([targetUserId])
+  @@index([targetTeamId])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("order_offers")
+}
+
+model OrderOfferTarget {
+  id          String   @id
+  offerId     String
+  userId      String
+  status      String   @default("pending")
+  respondedAt DateTime?
+  createdAt   DateTime @default(now())
+
+  offer OrderOffer @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  user  User       @relation("OrderOfferTargetDriver", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([offerId, userId])
+  @@index([offerId])
+  @@index([offerId, status])
+  @@index([userId])
+  @@index([userId, status])
+  @@map("order_offer_targets")
 }
 
 model AuditLog {

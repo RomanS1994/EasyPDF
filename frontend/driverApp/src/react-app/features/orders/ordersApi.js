@@ -26,6 +26,24 @@ export const ordersApi = baseApi.injectEndpoints({
         { type: 'Orders', id: orderId },
       ],
     }),
+    getAvailableOrders: builder.query({
+      query: () => '/orders/available',
+      providesTags: result => {
+        const offers = Array.isArray(result?.offers) ? result.offers : [];
+
+        return [
+          { type: 'AvailableOrders', id: 'LIST' },
+          ...offers.map(offer => ({ type: 'AvailableOrders', id: offer.id })),
+        ];
+      },
+    }),
+    searchDispatchDrivers: builder.query({
+      query: (query = {}) => ({
+        url: '/orders/drivers',
+        params: query,
+      }),
+      providesTags: [{ type: 'AvailableOrders', id: 'DRIVERS' }],
+    }),
     createOrder: builder.mutation({
       query: body => ({
         url: '/orders',
@@ -63,6 +81,40 @@ export const ordersApi = baseApi.injectEndpoints({
         { type: 'Usage', id: 'CURRENT' },
       ],
     }),
+    createOrderOffer: builder.mutation({
+      query: ({ orderId, payload }) => ({
+        url: `/orders/${orderId}/offers`,
+        method: 'POST',
+        body: payload,
+      }),
+      invalidatesTags: (_result, _error, { orderId }) => [
+        { type: 'Orders', id: 'LIST' },
+        { type: 'Orders', id: orderId },
+        { type: 'AvailableOrders', id: 'LIST' },
+      ],
+    }),
+    acceptOrderOffer: builder.mutation({
+      query: ({ orderId, offerId }) => ({
+        url: `/orders/${orderId}/offers/${offerId}/accept`,
+        method: 'POST',
+      }),
+      invalidatesTags: (_result, _error, { orderId, offerId }) => [
+        { type: 'Orders', id: 'LIST' },
+        { type: 'Orders', id: orderId },
+        { type: 'AvailableOrders', id: 'LIST' },
+        { type: 'AvailableOrders', id: offerId },
+      ],
+    }),
+    skipOrderOffer: builder.mutation({
+      query: ({ orderId, offerId }) => ({
+        url: `/orders/${orderId}/offers/${offerId}/skip`,
+        method: 'POST',
+      }),
+      invalidatesTags: (_result, _error, { offerId }) => [
+        { type: 'AvailableOrders', id: 'LIST' },
+        { type: 'AvailableOrders', id: offerId },
+      ],
+    }),
     assignDriver: builder.mutation({
       query: ({ orderId, userId }) => ({
         url: `/orders/${orderId}/assign-driver`,
@@ -82,8 +134,13 @@ export const ordersApi = baseApi.injectEndpoints({
 export const {
   useGetOrdersQuery,
   useGetOrderQuery,
+  useGetAvailableOrdersQuery,
+  useSearchDispatchDriversQuery,
   useCreateOrderMutation,
   useUpdateOrderMutation,
   useDeleteOrderMutation,
+  useCreateOrderOfferMutation,
+  useAcceptOrderOfferMutation,
+  useSkipOrderOfferMutation,
   useAssignDriverMutation,
 } = ordersApi;

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { RequestLoader } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { SvgIcon } from '@shared/app/components/SvgIcon/SvgIcon.jsx';
 import {
@@ -30,7 +31,7 @@ function OverviewCardIcon({ kind }) {
   }
 }
 
-export function WorkspaceOverview({ user, orders }) {
+export function WorkspaceOverview({ user, orders, isOrdersLoading = false }) {
   const { language, t } = useI18n();
   const userName = getUserName(user);
   const planType = getPlanTypeLabel(user);
@@ -75,14 +76,18 @@ export function WorkspaceOverview({ user, orders }) {
           <article className="homeOverviewCard homeOverviewCard--salary">
             <OverviewCardIcon kind="salary" />
             <span>{t('home.weeklyIncome')}</span>
-            <strong>{weeklySalaryTotal}</strong>
+            <strong>
+              {isOrdersLoading ? <RequestLoader inline size="sm" label={t('common.loading')} /> : weeklySalaryTotal}
+            </strong>
             <p>{t('home.weeklyIncomeInfo')}</p>
           </article>
 
           <Link className="homeOverviewCard homeOverviewCard-link homeOverviewCard--orders" to="/orders">
             <OverviewCardIcon kind="orders" />
             <span>{t('home.orders')}</span>
-            <strong>{orderCount}</strong>
+            <strong>
+              {isOrdersLoading ? <RequestLoader inline size="sm" label={t('common.loading')} /> : orderCount}
+            </strong>
             <p>{t('home.savedOrders')}</p>
           </Link>
 

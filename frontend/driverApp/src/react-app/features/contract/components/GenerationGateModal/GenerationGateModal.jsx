@@ -1,3 +1,4 @@
+import { RequestLoader } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import './GenerationGateModal.css';
 
@@ -67,7 +68,7 @@ export function GenerationGateModal({
             onClick={onConfirm}
             disabled={isBusy}
           >
-            {isBusy ? t('contract.starting') : t('contract.startOrder')}
+            {isBusy ? <RequestLoader inline size="sm" label={t('contract.starting')} /> : t('contract.startOrder')}
           </button>
 
           <button

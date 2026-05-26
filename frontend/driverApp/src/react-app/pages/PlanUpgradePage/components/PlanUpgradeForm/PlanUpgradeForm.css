@@ -1,6 +1,6 @@
 .planUpgradeForm {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .planUpgradeForm-state {
@@ -15,66 +15,75 @@
 
 .planUpgradeForm-plan {
   --plan-accent: #5f6b7c;
+  --plan-accent-strong: #0f172a;
   --plan-accent-soft: rgba(95, 107, 124, 0.1);
-  --plan-accent-border: rgba(95, 107, 124, 0.2);
-  --plan-surface: rgba(255, 255, 255, 0.96);
-  --plan-surface-end: rgba(248, 250, 252, 0.94);
+  --plan-accent-tint: rgba(248, 250, 252, 0.96);
+  --plan-accent-border: rgba(95, 107, 124, 0.22);
+  --plan-icon-bg: rgba(248, 250, 252, 0.95);
   position: relative;
   display: grid;
-  gap: 12px;
+  grid-template-columns: 68px minmax(0, 1fr) minmax(130px, auto);
+  align-items: center;
+  gap: 14px;
   width: 100%;
-  min-height: 112px;
-  padding: 14px;
+  min-height: 126px;
+  padding: 22px 20px;
   overflow: hidden;
   border: 1px solid var(--plan-accent-border);
-  border-radius: 16px;
+  border-radius: 18px;
   background:
-    linear-gradient(180deg, var(--plan-surface), var(--plan-surface-end));
-  color: var(--ink);
+    radial-gradient(circle at 9% 50%, var(--plan-accent-soft), transparent 27%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), var(--plan-accent-tint));
+  color: var(--text);
   font: inherit;
   text-align: left;
   cursor: pointer;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.94),
-    0 10px 20px rgba(15, 23, 42, 0.05);
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 16px 28px rgba(15, 23, 42, 0.06);
   transition:
     border-color 160ms ease,
     box-shadow 160ms ease,
     transform 160ms ease;
 }
 
-.planUpgradeForm-plan::before {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 5px;
-  background: var(--plan-accent);
+.planUpgradeForm-plan.has-badge {
+  padding-top: 46px;
 }
 
 .planUpgradeForm-plan--silver {
-  --plan-accent: #64748b;
-  --plan-accent-soft: rgba(100, 116, 139, 0.12);
-  --plan-accent-border: rgba(100, 116, 139, 0.24);
-  --plan-surface-end: rgba(245, 247, 250, 0.96);
+  --plan-accent: #52627a;
+  --plan-accent-strong: #0f172a;
+  --plan-accent-soft: rgba(82, 98, 122, 0.1);
+  --plan-accent-tint: rgba(248, 250, 252, 0.98);
+  --plan-accent-border: rgba(82, 98, 122, 0.2);
+  --plan-icon-bg: rgba(248, 250, 252, 0.96);
 }
 
 .planUpgradeForm-plan--gold {
-  --plan-accent: #c98b0d;
-  --plan-accent-soft: rgba(201, 139, 13, 0.13);
-  --plan-accent-border: rgba(201, 139, 13, 0.24);
-  --plan-surface-end: rgba(255, 249, 235, 0.96);
+  --plan-accent: #d18a00;
+  --plan-accent-strong: #c77f00;
+  --plan-accent-soft: rgba(209, 138, 0, 0.13);
+  --plan-accent-tint: rgba(255, 250, 238, 0.98);
+  --plan-accent-border: rgba(209, 138, 0, 0.28);
+  --plan-icon-bg: rgba(255, 248, 224, 0.96);
 }
 
 .planUpgradeForm-plan--platinum {
-  --plan-accent: #0f8f73;
-  --plan-accent-soft: rgba(15, 143, 115, 0.13);
-  --plan-accent-border: rgba(15, 143, 115, 0.24);
-  --plan-surface-end: rgba(239, 252, 247, 0.96);
+  --plan-accent: #0f9b82;
+  --plan-accent-strong: #0f8b76;
+  --plan-accent-soft: rgba(15, 155, 130, 0.13);
+  --plan-accent-tint: rgba(240, 253, 250, 0.98);
+  --plan-accent-border: rgba(15, 155, 130, 0.28);
+  --plan-icon-bg: rgba(230, 252, 246, 0.96);
 }
 
 .planUpgradeForm-plan:hover {
   transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--plan-accent) 44%, white);
+  border-color: color-mix(in srgb, var(--plan-accent) 42%, white);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    0 18px 32px rgba(15, 23, 42, 0.08);
 }
 
 .planUpgradeForm-plan:focus-visible {
@@ -82,127 +91,249 @@
   border-color: color-mix(in srgb, var(--plan-accent) 58%, white);
   box-shadow:
     0 0 0 4px color-mix(in srgb, var(--plan-accent) 16%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.94),
-    0 14px 24px rgba(15, 23, 42, 0.08);
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 18px 32px rgba(15, 23, 42, 0.08);
 }
 
 .planUpgradeForm-plan.is-selected {
-  border-color: color-mix(in srgb, var(--plan-accent) 58%, white);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), var(--plan-surface-end));
+  border-color: color-mix(in srgb, var(--plan-accent) 64%, white);
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--plan-accent) 22%, transparent),
-    0 12px 24px color-mix(in srgb, var(--plan-accent) 16%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+    0 0 0 1px color-mix(in srgb, var(--plan-accent) 24%, transparent),
+    0 18px 34px color-mix(in srgb, var(--plan-accent) 14%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.98);
 }
 
 .planUpgradeForm-plan:disabled {
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.72;
 }
 
-.planUpgradeForm-planTop {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.planUpgradeForm-planName {
-  color: var(--ink);
-  font-size: 18px;
-  font-weight: 800;
-  line-height: 1.1;
-  overflow-wrap: anywhere;
-}
-
-.planUpgradeForm-planPrice {
+.planUpgradeForm-badge {
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  flex: 0 0 auto;
-  min-height: 28px;
-  padding: 5px 10px;
+  min-height: 24px;
+  max-width: calc(100% - 36px);
+  padding: 4px 10px;
+  border: 1px solid color-mix(in srgb, var(--plan-accent) 16%, white);
   border-radius: 999px;
-  background: var(--plan-accent-soft);
-  color: var(--plan-accent);
+  background: color-mix(in srgb, var(--plan-accent) 10%, white);
+  color: var(--plan-accent-strong);
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.1;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.planUpgradeForm-badgeIcon,
+.planUpgradeForm-planActionIcon,
+.planUpgradeForm-buttonIcon,
+.planUpgradeForm-secureNoteIcon {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  color: currentColor;
+}
+
+.planUpgradeForm-badgeIcon {
+  width: 17px;
+  height: 17px;
+}
+
+.planUpgradeForm-tierIcon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  background: var(--plan-icon-bg);
+  color: var(--plan-accent-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 14px 26px color-mix(in srgb, var(--plan-accent) 12%, transparent);
+}
+
+.planUpgradeForm-tierIcon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.planUpgradeForm-planBody {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.planUpgradeForm-planName {
+  display: block;
+  color: var(--text);
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+
+.planUpgradeForm-planDescription {
+  display: block;
+  color: var(--muted);
   font-size: 12px;
-  font-weight: 800;
-  line-height: 1.4;
+  font-weight: 500;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.planUpgradeForm-planMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding-top: 8px;
+  color: color-mix(in srgb, var(--plan-accent) 38%, var(--muted));
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.planUpgradeForm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
 }
 
 .planUpgradeForm-chipIcon {
   display: inline-grid;
   place-items: center;
   flex: 0 0 auto;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   color: currentColor;
 }
 
-.planUpgradeForm-chipIcon svg {
-  width: 16px;
-  height: 16px;
+.planUpgradeForm-badgeIcon svg,
+.planUpgradeForm-chipIcon svg,
+.planUpgradeForm-planActionIcon svg,
+.planUpgradeForm-buttonIcon svg,
+.planUpgradeForm-secureNoteIcon svg {
+  width: 100%;
+  height: 100%;
 }
 
-.planUpgradeForm-planMeta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  color: color-mix(in srgb, var(--plan-accent) 52%, var(--muted));
+.planUpgradeForm-separator {
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(100, 116, 139, 0.36);
+}
+
+.planUpgradeForm-planAside {
+  display: grid;
+  justify-items: end;
+  gap: 14px;
+  min-width: 0;
+}
+
+.planUpgradeForm-planPrice {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  color: var(--plan-accent-strong);
+}
+
+.planUpgradeForm-planPriceAmount {
+  font-size: 24px;
+  font-weight: 750;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.planUpgradeForm-planPricePeriod {
+  color: color-mix(in srgb, var(--plan-accent) 28%, var(--muted));
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 550;
+  line-height: 1.1;
+  white-space: nowrap;
 }
 
-.planUpgradeForm-chip,
-.planUpgradeForm-current {
+.planUpgradeForm-planAction {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
-  min-height: 24px;
-  padding: 4px 9px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.74);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.86);
+  min-height: 34px;
+  max-width: 100%;
+  padding: 0 12px;
+  border: 1px solid color-mix(in srgb, var(--plan-accent) 42%, white);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--plan-accent-strong);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.15;
+  text-align: center;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
 }
 
-.planUpgradeForm-current {
-  justify-self: start;
-  background: color-mix(in srgb, var(--plan-accent) 12%, white);
-  color: color-mix(in srgb, var(--plan-accent) 78%, #0f5132);
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
+.planUpgradeForm-planActionIcon {
+  width: 15px;
+  height: 15px;
+}
+
+.planUpgradeForm-plan.is-current .planUpgradeForm-planAction {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--plan-accent) 14%, white);
+  color: var(--plan-accent-strong);
+}
+
+.planUpgradeForm-plan.is-selected:not(.is-current) .planUpgradeForm-planAction {
+  background: color-mix(in srgb, var(--plan-accent) 9%, white);
 }
 
 .planUpgradeForm-message {
   margin: 0;
   color: var(--success);
   font-size: 12px;
+  font-weight: 500;
 }
 
 .planUpgradeForm-error {
   margin: 0;
   color: var(--danger);
   font-size: 12px;
+  font-weight: 500;
 }
 
 .planUpgradeForm-button {
-  align-self: flex-start;
-  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 16px;
   padding: 0 18px;
-  border: 1px solid rgba(15, 95, 215, 0.18);
-  border-radius: 16px;
+  border: 1px solid rgba(15, 95, 215, 0.2);
+  border-radius: 14px;
   background:
-    linear-gradient(180deg, rgba(31, 111, 255, 0.98), rgba(15, 95, 215, 0.96));
+    linear-gradient(180deg, rgba(31, 111, 255, 0.99), rgba(13, 91, 216, 0.98));
   color: #fff;
   font: inherit;
+  font-size: 15px;
   font-weight: 700;
   letter-spacing: 0;
   cursor: pointer;
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.24) inset,
-    0 10px 22px rgba(15, 95, 215, 0.18);
+    0 1px 0 rgba(255, 255, 255, 0.28) inset,
+    0 14px 26px rgba(15, 95, 215, 0.2);
+}
+
+.planUpgradeForm-buttonIcon {
+  width: 20px;
+  height: 20px;
 }
 
 .planUpgradeForm-button:disabled {
@@ -210,37 +341,174 @@
   cursor: not-allowed;
 }
 
-@media (max-width: 480px) {
-  .planUpgradeForm {
-    gap: 10px;
-  }
+.planUpgradeForm-secureNote {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 2px 0 0;
+  color: #8490a5;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: center;
+}
 
+.planUpgradeForm-secureNoteIcon {
+  width: 15px;
+  height: 15px;
+}
+
+@media (max-width: 720px) {
   .planUpgradeForm-plan {
-    min-height: 104px;
-    gap: 8px;
-    padding: 12px;
-    border-radius: 15px;
+    grid-template-columns: 48px minmax(0, 1fr) 122px;
+    gap: 10px;
+    min-height: 118px;
+    padding: 18px 14px;
   }
 
-  .planUpgradeForm-planTop {
-    align-items: flex-start;
-    flex-direction: row;
-    gap: 8px;
+  .planUpgradeForm-plan.has-badge {
+    padding-top: 42px;
   }
 
-  .planUpgradeForm-planName {
-    font-size: 16px;
+  .planUpgradeForm-tierIcon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .planUpgradeForm-tierIcon svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .planUpgradeForm-planAside {
+    grid-column: auto;
+    align-items: end;
+    justify-items: end;
+    gap: 8px;
   }
 
   .planUpgradeForm-planPrice {
-    width: fit-content;
+    justify-items: end;
+  }
+}
+
+@media (max-width: 480px) {
+  .planUpgradeForm {
+    gap: 8px;
+  }
+
+  .planUpgradeForm-plans {
+    gap: 8px;
+  }
+
+  .planUpgradeForm-plan {
+    grid-template-columns: 38px minmax(0, 1fr) 96px;
+    gap: 8px;
+    min-height: 104px;
+    padding: 16px 12px;
+    border-radius: 12px;
+  }
+
+  .planUpgradeForm-plan.has-badge {
+    padding-top: 42px;
+  }
+
+  .planUpgradeForm-badge {
+    top: 8px;
+    left: 10px;
+    min-height: 20px;
+    padding: 3px 8px;
+    font-size: 10px;
+  }
+
+  .planUpgradeForm-badgeIcon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .planUpgradeForm-tierIcon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .planUpgradeForm-tierIcon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .planUpgradeForm-planBody {
+    gap: 5px;
+  }
+
+  .planUpgradeForm-planName {
+    font-size: 17px;
+  }
+
+  .planUpgradeForm-planDescription,
+  .planUpgradeForm-planMeta,
+  .planUpgradeForm-planAction,
+  .planUpgradeForm-planPricePeriod {
+    font-size: 10px;
+  }
+
+  .planUpgradeForm-planMeta {
+    gap: 6px 8px;
+    padding-top: 6px;
+  }
+
+  .planUpgradeForm-chip {
+    gap: 6px;
+  }
+
+  .planUpgradeForm-chipIcon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .planUpgradeForm-planAside {
+    grid-template-columns: 1fr;
+    align-items: end;
+    justify-items: end;
+    gap: 8px;
+  }
+
+  .planUpgradeForm-planPrice {
+    justify-items: end;
+    gap: 2px;
+  }
+
+  .planUpgradeForm-planPriceAmount {
+    font-size: 19px;
+  }
+
+  .planUpgradeForm-planAction {
+    width: 100%;
+    min-height: 28px;
+    padding: 0 7px;
+    border-radius: 10px;
+  }
+
+  .planUpgradeForm-planActionIcon {
+    width: 13px;
+    height: 13px;
   }
 
   .planUpgradeForm-button {
-    width: 100%;
-    min-height: 40px;
-    padding: 0 16px;
-    border-radius: 15px;
-    font-size: 12px;
+    min-height: 42px;
+    margin-top: 12px;
+    padding: 0 12px;
+    border-radius: 11px;
+    font-size: 13px;
+  }
+
+  .planUpgradeForm-buttonIcon {
+    width: 17px;
+    height: 17px;
+  }
+
+  .planUpgradeForm-secureNote {
+    align-items: flex-start;
+    font-size: 10px;
   }
 }

@@ -15,34 +15,6 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.86);
 }
 
-.adminOrderDetailsPage-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  width: fit-content;
-  min-height: 30px;
-  padding: 0 10px 0 8px;
-  border: 1px solid rgba(15, 95, 215, 0.12);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
-  color: #1d4ed8;
-  text-decoration: none;
-  font-size: 0.76rem;
-  font-weight: 800;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.92),
-    0 8px 16px rgba(15, 23, 42, 0.04);
-}
-
-.adminOrderDetailsPage-backIcon {
-  width: 8px;
-  height: 8px;
-  border-left: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  transform: rotate(45deg);
-  margin-top: -1px;
-}
-
 .adminOrderDetailsPage-badge {
   justify-self: start;
   padding: 4px 10px;
@@ -224,11 +196,6 @@
 
   .adminOrderDetailsPage-header {
     padding: 8px;
-  }
-
-  .adminOrderDetailsPage-back {
-    min-height: 28px;
-    font-size: 0.72rem;
   }
 
   .adminOrderDetailsPage-summaryItem,

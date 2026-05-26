@@ -54,6 +54,14 @@ function generateOrderNumber(user, createdAt, sequence = 1) {
   return `ORD-${initials}-${datePart}-${sequencePart}-${suffix}`;
 }
 
+export function buildOrderCreatorSnapshot(user) {
+  return {
+    id: user?.id || '',
+    name: user?.name || '',
+    email: user?.email || '',
+  };
+}
+
 export function buildOrderRecord(body, user, options = {}) {
   const contractData = body.contractData || body.order || {};
   const createdAt = options.createdAt || nowIso();
@@ -67,6 +75,8 @@ export function buildOrderRecord(body, user, options = {}) {
   return {
     id: randomUUID(),
     userId: user.id,
+    createdByUserId: user.id,
+    createdBySnapshot: buildOrderCreatorSnapshot(user),
     orderNumber: generateOrderNumber(user, createdAt, orderSequence),
     status: body.status || 'created',
     flightNumber,

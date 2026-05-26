@@ -41,13 +41,25 @@ function getPlanVariant(plan) {
   return 'silver';
 }
 
+function getPlanIconName(variant) {
+  if (variant === 'gold') {
+    return 'gem';
+  }
+
+  if (variant === 'platinum') {
+    return 'crown';
+  }
+
+  return 'star';
+}
+
 function formatNumber(value) {
   return Number(value || 0).toLocaleString('cs-CZ');
 }
 
 function getPlanModeLabel({ direction, isCurrent, t }) {
   if (isCurrent) {
-    return t('account.renewPlan');
+    return t('settings.planUpgrade.autoRenewal');
   }
 
   if (direction === 'upgrade') {
@@ -71,6 +83,36 @@ function getPlanDirection(planValue, currentPlanValue) {
   }
 
   return 'change';
+}
+
+function getPlanActionLabel({ direction, isCurrent, planName, t }) {
+  if (isCurrent) {
+    return t('settings.planUpgrade.active');
+  }
+
+  if (direction === 'upgrade') {
+    return t('settings.planUpgrade.upgradeTo', { plan: planName });
+  }
+
+  return t('settings.planUpgrade.changeTo', { plan: planName });
+}
+
+function getPlanBadgeMeta({ isCurrent, variant, t }) {
+  if (isCurrent) {
+    return {
+      iconName: 'check-circle',
+      label: t('settings.planUpgrade.currentPlanBadge'),
+    };
+  }
+
+  if (variant === 'gold') {
+    return {
+      iconName: 'star',
+      label: t('settings.planUpgrade.popular'),
+    };
+  }
+
+  return null;
 }
 
 export function usePlanUpgradeForm() {
@@ -124,15 +166,23 @@ export function usePlanUpgradeForm() {
     const planValue = getPlanValue(plan);
     const direction = getPlanDirection(planValue, currentPlanValue);
     const variant = getPlanVariant(plan);
+    const planName = plan.name || plan.id;
     const price = Number(plan.priceCzk || 0);
     const limit = Number(plan.monthlyGenerationLimit || 0);
+    const badge = getPlanBadgeMeta({ isCurrent, variant, t });
 
     return {
       variant,
       isCurrent,
+      actionLabel: getPlanActionLabel({ direction, isCurrent, planName, t }),
+      badgeIconName: badge?.iconName || '',
+      badgeLabel: badge?.label || '',
+      descriptionLabel: t(`settings.planUpgrade.planDescriptions.${variant}`),
+      iconName: getPlanIconName(variant),
+      monthLabel: t('settings.planUpgrade.perMonth'),
       modeLabel: getPlanModeLabel({ direction, isCurrent, t }),
       priceLabel: `${formatNumber(price)} CZK`,
-      limitLabel: t('contract.planTokensShort', { count: formatNumber(limit) }),
+      limitLabel: t('settings.planUpgrade.planTokensLabel', { count: formatNumber(limit) }),
     };
   }
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+import { RequestLoader } from '../../../../app/components/RequestLoader/RequestLoader.jsx';
 import { useI18n } from '../../../../app/i18n/useI18n.js';
 import { useLoginMutation } from '../../authApi.js';
 import { setSession } from '../../authSlice.js';
@@ -67,7 +68,7 @@ export function LoginForm() {
       {error ? <p className="loginForm-error">{error}</p> : null}
 
       <button className="loginForm-button" type="submit" disabled={isLoading}>
-        {isLoading ? t('auth.loggingIn') : t('auth.login')}
+        {isLoading ? <RequestLoader inline size="sm" label={t('auth.loggingIn')} /> : t('auth.login')}
       </button>
     </form>
   );

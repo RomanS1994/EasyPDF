@@ -1,4 +1,6 @@
+import { RequestLoader } from '../../../../app/components/RequestLoader/RequestLoader.jsx';
 import { useBusinessProfileForm } from './useBusinessProfileForm.js';
+import { PhoneNumberCard } from './PhoneNumberCard.jsx';
 import './BusinessProfileForm.css';
 
 export function BusinessProfileForm() {
@@ -15,7 +17,9 @@ export function BusinessProfileForm() {
   return (
     <form className="businessProfileForm" onSubmit={handleSubmit}>
       <div className="businessProfileForm-sections">
-        <section className="businessProfileForm-card">
+        <PhoneNumberCard t={t} />
+
+        <section className="businessProfileForm-card businessProfileForm-card--driver">
           <h3 className="businessProfileForm-subtitle">{t('auth.driverLabel')}</h3>
 
           <label className="businessProfileForm-field">
@@ -95,7 +99,11 @@ export function BusinessProfileForm() {
       {error ? <p className="businessProfileForm-error">{error}</p> : null}
 
       <button className="businessProfileForm-button" type="submit" disabled={isLoading}>
-        {isLoading ? t('auth.savingProfile') : t('auth.saveBusinessProfile')}
+        {isLoading ? (
+          <RequestLoader inline size="sm" label={t('auth.savingProfile')} />
+        ) : (
+          t('auth.saveBusinessProfile')
+        )}
       </button>
     </form>
   );

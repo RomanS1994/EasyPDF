@@ -2,6 +2,7 @@ import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import { useI18n } from '@shared/app/i18n/useI18n.js';
+import { GlobalRequestLoader } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { selectUser } from '@shared/features/auth/authSlice.js';
 import { AdminBottomTabs } from '../../components/AdminBottomTabs/AdminBottomTabs.jsx';
 import './AdminLayout.css';
@@ -18,6 +19,7 @@ export function AdminLayout({ children }) {
   if (isAuthRoute(location.pathname)) {
     return (
       <div className="adminLayout adminLayout--auth">
+        <GlobalRequestLoader />
         <div className="adminAuthShell">
           <p className="adminAuthShell-kicker">DocTra</p>
           <h1 className="adminAuthShell-title">{t('app.admin')}</h1>
@@ -31,6 +33,7 @@ export function AdminLayout({ children }) {
 
   return (
     <div className="adminLayout adminLayout--workspace">
+      <GlobalRequestLoader />
       <div className="adminLayout-shell">
         <header className="adminLayout-header">
           <div className="adminLayout-brand">

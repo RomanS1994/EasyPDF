@@ -7,21 +7,6 @@
   padding-bottom: 18px;
 }
 
-.accountPage-backLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  width: fit-content;
-  min-height: 28px;
-  padding: 0 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 700;
-  text-decoration: none;
-}
-
 .accountPage-card {
   display: grid;
   gap: 14px;

@@ -1,5 +1,5 @@
 .appLayout {
-  min-height: 100vh;
+  min-height: 100dvh;
   color: var(--text);
 }
 
@@ -29,8 +29,30 @@
   position: relative;
 }
 
+.appLayout--home {
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
 .appLayout-workspaceBody {
   padding: 12px 0 calc(92px + env(safe-area-inset-bottom));
+}
+
+.appLayout--home .appLayout-workspaceBody {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.appLayout--home .pageContainer,
+.appLayout--home .appLayout-main {
+  height: 100%;
+  min-height: 0;
+}
+
+.appLayout--home .pageContainer {
+  padding-bottom: 0;
 }
 
 .appLayout-main {
@@ -65,8 +87,12 @@
     padding: 8px 0 calc(88px + env(safe-area-inset-bottom));
   }
 
-  .pageContainer {
-    max-width: 100%;
-    padding: 0 8px 12px;
+  .appLayout--workspace .pageContainer {
+    max-width: none;
+    padding: 0 4px 12px;
+  }
+
+  .appLayout--home .pageContainer {
+    padding-bottom: 0;
   }
 }
