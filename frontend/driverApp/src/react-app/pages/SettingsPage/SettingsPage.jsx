@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 
-import { hasAdminAccess, hasManagerAccess } from "@shared/features/auth/authAccess.js";
+import { hasAdminAccess, hasPlatinumTeamAccess } from "@shared/features/auth/authAccess.js";
 import { selectUser } from "@shared/features/auth/authSlice.js";
 import { ProfileDanger } from "../AccountPage/components/ProfileDanger/ProfileDanger.jsx";
 import { SettingsAccountSummary } from "./components/SettingsAccountSummary/SettingsAccountSummary.jsx";
@@ -15,7 +15,7 @@ import "./SettingsPage.css";
 export function SettingsPage() {
   const user = useSelector(selectUser);
   const canAdmin = hasAdminAccess(user);
-  const canManageTeam = hasManagerAccess(user);
+  const canManageTeam = hasPlatinumTeamAccess(user);
   const { t } = useI18n();
 
   return (

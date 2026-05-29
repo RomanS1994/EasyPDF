@@ -1,3 +1,5 @@
+import { Fragment } from 'react';
+
 import { SvgIcon } from '@shared/app/components/SvgIcon/SvgIcon.jsx';
 import { RequestLoader, RequestLoadingState } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 
@@ -109,6 +111,17 @@ export function PlanUpgradeForm() {
                     </span>
                     <span>{meta.limitLabel}</span>
                   </span>
+                  {meta.featureChips.map(feature => (
+                    <Fragment key={feature.key}>
+                      <span className="planUpgradeForm-separator" aria-hidden="true" />
+                      <span className="planUpgradeForm-chip">
+                        <span className="planUpgradeForm-chipIcon" aria-hidden="true">
+                          <SvgIcon name={feature.iconName} />
+                        </span>
+                        <span>{feature.label}</span>
+                      </span>
+                    </Fragment>
+                  ))}
                   <span className="planUpgradeForm-separator" aria-hidden="true" />
                   <span className="planUpgradeForm-chip">
                     <span className="planUpgradeForm-chipIcon" aria-hidden="true">

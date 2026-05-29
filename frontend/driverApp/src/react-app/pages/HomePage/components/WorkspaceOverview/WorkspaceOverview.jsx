@@ -8,6 +8,7 @@ import {
   getSubscriptionEndDate,
   getWeeklySalaryTotal,
 } from '../../../shared/subscriptionUtils.js';
+import { FlightTrackingNotice } from '../FlightTrackingNotice/FlightTrackingNotice.jsx';
 
 import heroRobotImage from '../../../../assets/main_robot.png';
 import './WorkspaceOverview.css';
@@ -99,6 +100,8 @@ export function WorkspaceOverview({ user, orders, isOrdersLoading = false }) {
           </Link>
         </div>
       </div>
+
+      <FlightTrackingNotice />
     </div>
   );
 }

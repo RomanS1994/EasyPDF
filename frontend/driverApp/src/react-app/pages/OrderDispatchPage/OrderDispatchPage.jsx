@@ -7,7 +7,7 @@ import { RequestLoader, RequestLoadingState } from '@shared/app/components/Reque
 import { SvgIcon } from '@shared/app/components/SvgIcon/SvgIcon.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { resolveErrorMessage } from '@shared/app/utils/errorMessages.js';
-import { hasManagerAccess } from '@shared/features/auth/authAccess.js';
+import { hasPlatinumTeamAccess } from '@shared/features/auth/authAccess.js';
 import { selectUser } from '@shared/features/auth/authSlice.js';
 import { useGetTeamQuery } from '@shared/features/auth/authApi.js';
 import {
@@ -156,7 +156,7 @@ export function OrderDispatchPage() {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const currentUser = useSelector(selectUser);
-  const canUseTeams = hasManagerAccess(currentUser?.role);
+  const canUseTeams = hasPlatinumTeamAccess(currentUser);
   const { isError, isLoading, order, t } = useDispatchOrder(orderId);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -225,7 +225,7 @@ export function OrderDispatchPage() {
               disabled={!canUseTeams || isSending || isDeleting}
             >
               <strong>{t('orderDispatch.sendTeam')}</strong>
-              <span>{canUseTeams ? t('orderDispatch.sendTeamCopy') : t('orderDispatch.managerOnly')}</span>
+              <span>{canUseTeams ? t('orderDispatch.sendTeamCopy') : t('orderDispatch.platinumOnly')}</span>
             </DispatchAction>
 
             <DispatchAction
@@ -447,4 +447,3 @@ export function OrderDispatchDriverPage() {
     </OrderDispatchShell>
   );
 }
-

@@ -11,6 +11,11 @@ import {
 import { prisma } from '../db/prisma.js';
 import { runStoreTransaction } from '../db/store.js';
 import { readJsonBody, sendError, sendJson } from '../lib/http.js';
+import { hasFlightStatusAccess } from '../services/flight-status.js';
+import {
+  refreshFlightStatusForOrder,
+  refreshFlightStatusesForOrders,
+} from '../services/flight-status-refresh.js';
 import { buildOrderRecord } from '../services/orders.js';
 import {
   acceptOrderOffer,
@@ -21,6 +26,12 @@ import {
 } from '../services/order-dispatch.js';
 import { validateOrderCreateInput } from '../validation/orders.js';
 import { nowIso, normalizePaginationParams, normalizeText } from '../validation/common.js';
+
+function getOrderSanitizeOptions(user) {
+  return {
+    includeFlightStatus: hasFlightStatusAccess(user),
+  };
+}
 
 function getUtcDayBounds(isoValue) {
   const date = new Date(isoValue);
@@ -136,7 +147,7 @@ async function handleCreateOrder(request, response) {
         },
       });
 
-      return sanitizeOrderRecord(createdOrder);
+      return sanitizeOrderRecord(createdOrder, getOrderSanitizeOptions(freshUser));
     },
   });
 
@@ -239,7 +250,7 @@ async function handleUpdateOrder(request, response, orderId) {
         },
       });
 
-      return sanitizeOrderRecord(updated);
+      return sanitizeOrderRecord(updated, getOrderSanitizeOptions(context.user));
     },
   });
 
@@ -366,7 +377,7 @@ async function handleAssignDriver(request, response, orderId) {
       }
 
       if (targetUser.id === order.userId) {
-        return sanitizeOrderRecord(order);
+        return sanitizeOrderRecord(order, getOrderSanitizeOptions(context.user));
       }
 
       const updated = await tx.order.update({
@@ -394,7 +405,7 @@ async function handleAssignDriver(request, response, orderId) {
         },
       });
 
-      return sanitizeOrderRecord(updated);
+      return sanitizeOrderRecord(updated, getOrderSanitizeOptions(context.user));
     },
   });
 
@@ -418,7 +429,7 @@ async function handleAvailableOrderOffers(request, response) {
   const context = await getAuthContext(request, response);
   if (!context) return;
 
-  const offers = await listAvailableOrderOffers(prisma, context.user.id);
+  const offers = await listAvailableOrderOffers(prisma, context.user);
 
   sendJson(response, 200, { offers });
 }
@@ -526,9 +537,12 @@ export async function handleOrderRoutes(request, response, { pathName, url }) {
       skip,
       take: limit,
     });
+    const refreshedOrders = await refreshFlightStatusesForOrders(prisma, orders, {
+      enabled: hasFlightStatusAccess(context.user),
+    });
 
     sendJson(response, 200, {
-      orders: orders.map(sanitizeOrderListRecord),
+      orders: refreshedOrders.map(order => sanitizeOrderListRecord(order, getOrderSanitizeOptions(context.user))),
     });
     return true;
   }
@@ -593,8 +607,12 @@ export async function handleOrderRoutes(request, response, { pathName, url }) {
       return true;
     }
 
+    const refreshedOrder = await refreshFlightStatusForOrder(prisma, order, {
+      enabled: hasFlightStatusAccess(context.user),
+    });
+
     sendJson(response, 200, {
-      order: sanitizeOrderRecord(order),
+      order: sanitizeOrderRecord(refreshedOrder, getOrderSanitizeOptions(context.user)),
     });
     return true;
   }

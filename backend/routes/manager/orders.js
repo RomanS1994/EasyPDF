@@ -10,11 +10,18 @@ import {
 } from '../../db/prisma-helpers.js';
 import { prisma } from '../../db/prisma.js';
 import { sendJson } from '../../lib/http.js';
+import { hasFlightStatusAccess } from '../../services/flight-status.js';
 import {
   buildManagerOrdersSummary,
   matchesManagerOrderStatus,
 } from '../../services/orders.js';
 import { normalizePaginationParams, normalizeText } from '../../validation/common.js';
+
+function getOrderSanitizeOptions(user) {
+  return {
+    includeFlightStatus: hasFlightStatusAccess(user),
+  };
+}
 
 function normalizeOrderCollectionState(value) {
   const state = normalizeText(value).toLowerCase();
@@ -97,7 +104,7 @@ export async function handleManagerOrders(request, response, url) {
   }
   const orders = scopedOrders
     .filter(order => matchesManagerOrderStatus(order, status))
-    .map(sanitizeOrderListRecord);
+    .map(order => sanitizeOrderListRecord(order, getOrderSanitizeOptions(context.user)));
 
   sendJson(response, 200, { orders, summary });
 }
@@ -149,7 +156,7 @@ export async function handleManagerOrderDetail(request, response, orderId, url) 
   }
 
   sendJson(response, 200, {
-    order: sanitizeOrderRecord(order),
+    order: sanitizeOrderRecord(order, getOrderSanitizeOptions(context.user)),
   });
 }
 
@@ -232,7 +239,7 @@ export async function handleManagerOrderRestore(request, response, orderId) {
         },
       });
 
-    return sanitizeOrderRecord(created);
+    return sanitizeOrderRecord(created, getOrderSanitizeOptions(context.user));
   });
 
   sendJson(response, 200, {

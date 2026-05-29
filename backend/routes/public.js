@@ -2,10 +2,11 @@ import { getAuthContext } from '../auth/context.js';
 import { getPlanById, isSupportedPdfDocumentType } from '../config/plans.js';
 import { getDatabaseHealth } from '../db/store.js';
 import { listStoredPlans } from '../db/plans-store.js';
-import { ORDER_WITH_OWNER_INCLUDE, sanitizeOrderRecord } from '../db/prisma-helpers.js';
+import { ORDER_WITH_OWNER_INCLUDE } from '../db/prisma-helpers.js';
 import { prisma } from '../db/prisma.js';
 import { readJsonBody, sendJson, sendPdf } from '../lib/http.js';
 import { createContractPdf } from '../pdf/contracts.js';
+import { buildOwnerContractBusinessPatch } from '../services/order-dispatch.js';
 import { nowIso } from '../validation/common.js';
 
 function resolvePdfPlan(context) {
@@ -17,14 +18,12 @@ function resolvePdfPlan(context) {
 }
 
 async function findOrderForPdf(orderId) {
-  const order = await prisma.order.findFirst({
+  return prisma.order.findFirst({
     where: {
       id: orderId,
     },
     include: ORDER_WITH_OWNER_INCLUDE,
   });
-
-  return order ? sanitizeOrderRecord(order) : null;
 }
 
 async function listAvailablePlans() {
@@ -87,6 +86,7 @@ export async function handlePublicRoutes(request, response, { pathName }) {
       ...(order.contractData && typeof order.contractData === 'object' ? order.contractData : {}),
       ...(body.order && typeof body.order === 'object' ? body.order : {}),
       ...(body.contractData && typeof body.contractData === 'object' ? body.contractData : {}),
+      ...buildOwnerContractBusinessPatch(order.user),
       orderNumber: order.orderNumber || body.order?.orderNumber || body.contractData?.orderNumber || '',
       documentType: requestedDocumentType,
     };

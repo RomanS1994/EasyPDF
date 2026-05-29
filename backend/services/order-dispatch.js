@@ -5,6 +5,13 @@ import {
   createAuditLog,
   sanitizeOrderRecord,
 } from '../db/prisma-helpers.js';
+import { hasFlightStatusAccess } from './flight-status.js';
+import {
+  refreshFlightStatusForOrder,
+  refreshFlightStatusesForOrders,
+} from './flight-status-refresh.js';
+import { normalizeUserProfile } from './profiles.js';
+import { requireTeamFeatureAccess } from './team-access.js';
 import { normalizeText, nowIso } from '../validation/common.js';
 
 export const ORDER_OFFER_STATUS = {
@@ -57,6 +64,39 @@ function sanitizeBasicUser(user) {
     name: user.name || '',
     email: user.email || '',
     role: user.role || '',
+  };
+}
+
+function getOrderSanitizeOptions(user) {
+  return {
+    includeFlightStatus: hasFlightStatusAccess(user),
+  };
+}
+
+export function buildOwnerContractBusinessPatch(user) {
+  const profile = normalizeUserProfile(user?.profile, user?.name || '');
+
+  return {
+    driver: {
+      name: profile.driver.name || user?.name || '',
+      address: profile.driver.address || '',
+      spz: profile.driver.spz || '',
+      ico: profile.driver.ico || '',
+    },
+    provider: {
+      name: profile.provider.name || user?.name || '',
+      address: profile.provider.address || '',
+      ico: profile.provider.ico || '',
+    },
+  };
+}
+
+function buildAcceptedOrderContractData(contractData, owner) {
+  const source = contractData && typeof contractData === 'object' ? contractData : {};
+
+  return {
+    ...source,
+    ...buildOwnerContractBusinessPatch(owner),
   };
 }
 
@@ -214,6 +254,21 @@ async function resolveTeamTargets(client, actorId, excludeUserId, targetTeamId) 
   if (!teamId) {
     throw new Error('Team id is required');
   }
+
+  const actor = await client.user.findUnique({
+    where: {
+      id: actorId,
+    },
+    include: {
+      subscription: {
+        include: {
+          plan: true,
+        },
+      },
+    },
+  });
+
+  requireTeamFeatureAccess(actor);
 
   const team = await client.team.findFirst({
     where: {
@@ -449,7 +504,7 @@ export async function closeExpiredOrderOffers(client) {
   }
 }
 
-export function sanitizeAvailableOrderOffer(offer) {
+export function sanitizeAvailableOrderOffer(offer, options = {}) {
   return {
     id: offer.id,
     orderId: offer.orderId,
@@ -463,12 +518,13 @@ export function sanitizeAvailableOrderOffer(offer) {
     updatedAt: toIsoString(offer.updatedAt),
     fromUser: sanitizeBasicUser(offer.fromUser),
     createdByUser: sanitizeBasicUser(offer.createdByUser),
-    order: sanitizeOrderRecord(offer.order),
+    order: sanitizeOrderRecord(offer.order, options),
   };
 }
 
-export async function listAvailableOrderOffers(client, userId) {
+export async function listAvailableOrderOffers(client, user) {
   await closeExpiredOrderOffers(client);
+  const userId = typeof user === 'string' ? user : user?.id;
 
   const offers = await client.orderOffer.findMany({
     where: {
@@ -496,7 +552,24 @@ export async function listAvailableOrderOffers(client, userId) {
     },
   });
 
-  return offers.map(sanitizeAvailableOrderOffer);
+  const refreshedOrders = await refreshFlightStatusesForOrders(
+    client,
+    offers.map(offer => offer.order),
+    {
+      enabled: hasFlightStatusAccess(user),
+    }
+  );
+  const refreshedOrdersById = new Map(refreshedOrders.map(order => [order.id, order]));
+
+  return offers.map(offer =>
+    sanitizeAvailableOrderOffer(
+      {
+        ...offer,
+        order: refreshedOrdersById.get(offer.order.id) || offer.order,
+      },
+      getOrderSanitizeOptions(user)
+    )
+  );
 }
 
 export async function acceptOrderOffer(client, { actor, orderId, offerId }) {
@@ -578,6 +651,7 @@ export async function acceptOrderOffer(client, { actor, orderId, offerId }) {
     },
     data: {
       userId: actor.id,
+      contractData: buildAcceptedOrderContractData(offer.order.contractData, actor),
       updatedAt: acceptedAt,
     },
     include: ORDER_WITH_OWNER_INCLUDE,
@@ -599,7 +673,11 @@ export async function acceptOrderOffer(client, { actor, orderId, offerId }) {
     },
   });
 
-  return sanitizeOrderRecord(updatedOrder);
+  const refreshedOrder = await refreshFlightStatusForOrder(client, updatedOrder, {
+    enabled: hasFlightStatusAccess(actor),
+  });
+
+  return sanitizeOrderRecord(refreshedOrder, getOrderSanitizeOptions(actor));
 }
 
 export async function skipOrderOffer(client, { actor, orderId, offerId }) {

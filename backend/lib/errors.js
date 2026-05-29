@@ -14,6 +14,7 @@ const STATUS_BY_MESSAGE = new Map([
   ['Administrators cannot be selected as transfer targets', 400],
   ['Selected driver not found', 404],
   ['Team not found', 404],
+  ['Platinum plan is required to manage teams', 403],
   ['Driver id is required', 400],
   ['Dispatch target type is required', 400],
   ['Team id is required', 400],

@@ -115,6 +115,28 @@ function getPlanBadgeMeta({ isCurrent, variant, t }) {
   return null;
 }
 
+function getPlanFeatureChips({ variant, t }) {
+  const chips = [];
+
+  if (variant === 'gold' || variant === 'platinum') {
+    chips.push({
+      iconName: 'invoice',
+      key: 'invoices',
+      label: t('settings.planUpgrade.invoices'),
+    });
+  }
+
+  if (variant === 'platinum') {
+    chips.push({
+      iconName: 'accounts',
+      key: 'teams',
+      label: t('settings.planUpgrade.teams'),
+    });
+  }
+
+  return chips;
+}
+
 export function usePlanUpgradeForm() {
   const dispatch = useDispatch();
   const token = useSelector(selectToken);
@@ -183,6 +205,7 @@ export function usePlanUpgradeForm() {
       modeLabel: getPlanModeLabel({ direction, isCurrent, t }),
       priceLabel: `${formatNumber(price)} CZK`,
       limitLabel: t('settings.planUpgrade.planTokensLabel', { count: formatNumber(limit) }),
+      featureChips: getPlanFeatureChips({ variant, t }),
     };
   }
 

@@ -1,4 +1,5 @@
 import { DEFAULT_PLAN_ID, getPlanById } from '../../config/plans.js';
+import { normalizeOrderMetadata } from '../flight-status.js';
 import { normalizeUserProfile } from '../profiles.js';
 import { buildCurrentMonthWindow, buildCycleWindow } from '../subscriptions/cycle.js';
 import {
@@ -335,7 +336,7 @@ export function sanitizeUserFromRecords({
   };
 }
 
-export function sanitizeOrderFromRecords(order, owner = null) {
+export function sanitizeOrderFromRecords(order, owner = null, options = {}) {
   const planId = owner?.subscription?.planId || DEFAULT_PLAN_ID;
   const flightNumber = order.flightNumber || order.contractData?.flightNumber || '';
 
@@ -351,7 +352,7 @@ export function sanitizeOrderFromRecords(order, owner = null) {
     totalPrice: order.totalPrice,
     pdf: order.pdf || {},
     contractData: order.contractData || {},
-    metadata: order.metadata || {},
+    metadata: normalizeOrderMetadata(order.metadata, options),
     createdAt: toIsoString(order.createdAt),
     updatedAt: toIsoString(order.updatedAt),
     deletedAt: toIsoString(order.deletedAt),

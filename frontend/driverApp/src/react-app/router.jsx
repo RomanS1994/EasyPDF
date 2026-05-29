@@ -55,7 +55,7 @@ export const router = createBrowserRouter([
       {
         path: 'orders/:orderId/dispatch/team',
         element: (
-          <ProtectedRoute requireManager>
+          <ProtectedRoute requirePlatinumTeam>
             <OrderDispatchTeamPage />
           </ProtectedRoute>
         ),
@@ -115,7 +115,7 @@ export const router = createBrowserRouter([
       {
         path: 'settings/team',
         element: (
-          <ProtectedRoute requireManager>
+          <ProtectedRoute requirePlatinumTeam>
             <TeamPage />
           </ProtectedRoute>
         ),
@@ -123,7 +123,7 @@ export const router = createBrowserRouter([
       {
         path: 'settings/team/search',
         element: (
-          <ProtectedRoute requireManager>
+          <ProtectedRoute requirePlatinumTeam>
             <TeamSearchPage />
           </ProtectedRoute>
         ),

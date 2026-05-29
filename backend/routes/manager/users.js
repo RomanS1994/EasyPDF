@@ -9,6 +9,7 @@ import {
 } from '../../db/prisma-helpers.js';
 import { prisma } from '../../db/prisma.js';
 import { sendJson } from '../../lib/http.js';
+import { hasFlightStatusAccess } from '../../services/flight-status.js';
 import { normalizeText } from '../../validation/common.js';
 
 const MANAGER_USER_SELECT = {
@@ -38,6 +39,12 @@ const MANAGER_USER_SELECT = {
     },
   },
 };
+
+function getOrderSanitizeOptions(user) {
+  return {
+    includeFlightStatus: hasFlightStatusAccess(user),
+  };
+}
 
 async function loadAvatarUrls(prismaClient, userIds) {
   const ids = Array.isArray(userIds) ? userIds.filter(Boolean) : [];
@@ -188,7 +195,7 @@ export async function handleManagerUserDetail(request, response, userId) {
 
   sendJson(response, 200, {
     user: summary[0] || (await buildSanitizedUser(prisma, target)),
-    recentOrders: recentOrders.map(sanitizeOrderListRecord),
+    recentOrders: recentOrders.map(order => sanitizeOrderListRecord(order, getOrderSanitizeOptions(context.user))),
     audit: await sanitizeAuditLogs(prisma, auditRecords),
   });
 }

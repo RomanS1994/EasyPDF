@@ -55,6 +55,23 @@
   background: linear-gradient(180deg, #767c8d, rgba(118, 124, 141, 0.06));
 }
 
+.orderItem--flight-landed::before {
+  background: linear-gradient(180deg, #34c759, rgba(52, 199, 89, 0.06));
+}
+
+.orderItem--flight-delayed::before {
+  background: linear-gradient(180deg, #f5a400, rgba(245, 164, 0, 0.06));
+}
+
+.orderItem--flight-in_air::before,
+.orderItem--flight-scheduled::before {
+  background: linear-gradient(180deg, #2f78ff, rgba(47, 120, 255, 0.06));
+}
+
+.orderItem--flight-cancelled::before {
+  background: linear-gradient(180deg, #cf2f2f, rgba(207, 47, 47, 0.06));
+}
+
 .orderItem--today {
   background:
     radial-gradient(
@@ -230,6 +247,14 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
+.orderItemRouteCard--flight {
+  padding-top: 4px;
+}
+
+.orderItemRouteCard--flight .orderItemRouteTrack {
+  grid-row: 1 / span 3;
+}
+
 .orderItemRouteTrack {
   display: flex;
   flex-direction: column;
@@ -295,6 +320,11 @@
   overflow: hidden;
 }
 
+.orderItemRoute--flight {
+  grid-column: 2;
+  padding-top: 2px;
+}
+
 .orderItemRouteLineButton {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 12px;
@@ -315,6 +345,10 @@
     color 150ms ease,
     transform 150ms ease,
     background-color 150ms ease;
+}
+
+.orderItemRouteLineButton--single {
+  min-height: 34px;
 }
 
 .orderItemRouteLineButton:last-child {
@@ -532,6 +566,254 @@
   border-color: rgba(15, 23, 42, 0.88);
   background: transparent;
   color: var(--text);
+}
+
+.orderFlightStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(235, 247, 239, 0.96);
+  color: #15783a;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.orderFlightStatusBadgeDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.orderFlightStatusBadge--delayed {
+  background: rgba(255, 245, 222, 0.98);
+  color: #c57c00;
+}
+
+.orderFlightStatusBadge--in_air,
+.orderFlightStatusBadge--scheduled {
+  background: rgba(235, 242, 255, 0.98);
+  color: #1769e8;
+}
+
+.orderFlightStatusBadge--cancelled {
+  background: rgba(255, 236, 236, 0.98);
+  color: #cf2f2f;
+}
+
+.orderFlightStatusBadge--unknown {
+  background: rgba(241, 244, 250, 0.98);
+  color: #667085;
+}
+
+.orderFlightPanel {
+  display: grid;
+  grid-column: 2;
+  grid-template-columns: minmax(160px, 1fr) minmax(148px, 0.82fr) minmax(150px, 0.86fr);
+  align-items: start;
+  gap: 14px;
+  min-width: 0;
+  padding: 4px 4px 7px 2px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #19243c;
+  box-shadow: none;
+}
+
+.orderFlightPanelIdentity,
+.orderFlightPanelDetails,
+.orderFlightPanelExtra {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.orderFlightPanelDetails {
+  min-height: 40px;
+  padding-left: 14px;
+  border-left: 1px solid rgba(220, 228, 241, 0.9);
+}
+
+.orderFlightPanelExtra {
+  min-height: 40px;
+  padding-left: 14px;
+  border-left: 1px solid rgba(220, 228, 241, 0.9);
+}
+
+.orderFlightPanelNumber {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: hidden;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0;
+  cursor: pointer;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.orderFlightPanelNumber:hover,
+.orderFlightPanelNumber:focus-visible {
+  color: #0f5fd7;
+  outline: none;
+}
+
+.orderFlightPanelStatus,
+.orderFlightPanelRoute,
+.orderFlightPanelMeta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.orderFlightPanelStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: #1a6f38;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.18;
+  font-variant-numeric: tabular-nums;
+}
+
+.orderFlightPanelStatus::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.62);
+}
+
+.orderFlightPanelRoute,
+.orderFlightPanelMeta {
+  color: #5f6f86;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.orderFlightPanelMeta {
+  color: #3e4b60;
+}
+
+.orderFlightPanel--landed {
+  grid-template-columns: minmax(160px, 0.9fr) minmax(190px, 1.15fr);
+}
+
+.orderFlightPanel--landed .orderFlightPanelStatus {
+  color: #1a8f43;
+}
+
+.orderFlightPanel--delayed .orderFlightPanelStatus {
+  color: #b87500;
+}
+
+.orderFlightPanel--delayed .orderFlightPanelStatus::before,
+.orderFlightPanel--in_air .orderFlightPanelStatus::before,
+.orderFlightPanel--scheduled .orderFlightPanelStatus::before,
+.orderFlightPanel--cancelled .orderFlightPanelStatus::before,
+.orderFlightPanel--unknown .orderFlightPanelStatus::before {
+  display: none;
+}
+
+.orderFlightPanel--in_air,
+.orderFlightPanel--scheduled {
+  grid-template-columns: minmax(160px, 1fr) minmax(148px, 0.82fr) minmax(150px, 0.86fr);
+}
+
+.orderFlightPanel--in_air .orderFlightPanelStatus,
+.orderFlightPanel--scheduled .orderFlightPanelStatus {
+  color: #1769e8;
+}
+
+.orderFlightPanel--cancelled .orderFlightPanelStatus {
+  color: #cf2f2f;
+}
+
+.orderFlightPanel--unknown .orderFlightPanelStatus {
+  color: #667085;
+}
+
+.orderFlightProgress {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 0 4px;
+}
+
+.orderFlightProgressCodes {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: #5f6f86;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.orderFlightProgressTrack {
+  display: grid;
+  grid-template-columns: 8px minmax(14px, 1fr) 16px minmax(14px, 1fr) 8px;
+  align-items: center;
+  color: #2f78ff;
+}
+
+.orderFlightProgressDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 0 3px rgba(47, 120, 255, 0.12);
+}
+
+.orderFlightProgressLine {
+  height: 2px;
+  background: currentColor;
+}
+
+.orderFlightProgressPlane {
+  display: grid;
+  place-items: center;
+  color: currentColor;
+}
+
+.orderFlightProgressPlane svg {
+  width: 15px;
+  height: 15px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .orderItemMetaRow {
@@ -783,6 +1065,69 @@
     width: 5px;
     height: 5px;
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.55);
+  }
+
+  .orderFlightStatusBadge {
+    min-height: 24px;
+    padding: 0 9px;
+    font-size: 9px;
+    letter-spacing: 0.13em;
+  }
+
+  .orderFlightStatusBadgeDot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .orderFlightPanel {
+    grid-template-columns: minmax(82px, 0.9fr) minmax(74px, 0.76fr) minmax(82px, 0.84fr);
+    gap: 6px;
+    padding: 3px 2px 6px 2px;
+  }
+
+  .orderFlightPanel--landed {
+    grid-template-columns: minmax(92px, 0.9fr) minmax(120px, 1fr);
+  }
+
+  .orderFlightPanelDetails,
+  .orderFlightPanelExtra {
+    min-height: 36px;
+    padding-left: 7px;
+  }
+
+  .orderFlightPanelNumber {
+    font-size: 12px;
+  }
+
+  .orderFlightPanelStatus {
+    font-size: 11px;
+  }
+
+  .orderFlightPanelRoute,
+  .orderFlightPanelMeta {
+    font-size: 10px;
+  }
+
+  .orderFlightProgress {
+    padding: 0 2px;
+  }
+
+  .orderFlightProgressCodes {
+    font-size: 9px;
+  }
+
+  .orderFlightProgressTrack {
+    grid-template-columns: 7px minmax(10px, 1fr) 14px minmax(10px, 1fr) 7px;
+  }
+
+  .orderFlightProgressDot {
+    width: 7px;
+    height: 7px;
+  }
+
+  .orderFlightProgressPlane svg {
+    width: 14px;
+    height: 14px;
   }
 
   .orderItemRouteTrackStart,

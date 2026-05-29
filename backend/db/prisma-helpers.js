@@ -8,6 +8,7 @@ import {
   sanitizeOrderFromRecords,
   sanitizeUserFromRecords,
 } from '../services/prisma-views.js';
+import { normalizeOrderMetadata } from '../services/flight-status.js';
 import { normalizeText, nowIso } from '../validation/common.js';
 
 function toIsoString(value) {
@@ -294,11 +295,11 @@ export async function buildManagerUserSummaries(client, users) {
   );
 }
 
-export function sanitizeOrderRecord(order) {
-  return sanitizeOrderFromRecords(order, order.user || null);
+export function sanitizeOrderRecord(order, options = {}) {
+  return sanitizeOrderFromRecords(order, order.user || null, options);
 }
 
-export function sanitizeOrderListRecord(order) {
+export function sanitizeOrderListRecord(order, options = {}) {
   const flightNumber = order.flightNumber || order.contractData?.flightNumber || '';
   const passengers = order.contractData?.passengers || order.passengers || '';
   const luggageUnits =
@@ -325,7 +326,7 @@ export function sanitizeOrderListRecord(order) {
     },
     passengers: pickTextValue(passengers),
     totalPrice: pickTextValue(order.totalPrice),
-    metadata: order.metadata || {},
+    metadata: normalizeOrderMetadata(order.metadata, options),
     createdAt: toIsoString(order.createdAt),
     updatedAt: toIsoString(order.updatedAt),
     deletedAt: toIsoString(order.deletedAt),

@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
-import { getAuthContext, requireManager } from '../auth/context.js';
+import { getAuthContext } from '../auth/context.js';
 import { DEFAULT_PLAN_ID } from '../config/plans.js';
 import {
   buildSanitizedUser,
@@ -16,6 +16,7 @@ import {
   sendJson,
 } from '../lib/http.js';
 import { normalizeTeamDriverIds, normalizeUserProfile } from '../services/profiles.js';
+import { requireTeamFeatureAccess } from '../services/team-access.js';
 import {
   buildSubscriptionWriteData,
   resolveSubscriptionView,
@@ -172,8 +173,9 @@ async function loadUserTeams(client, ownerUserId) {
 }
 
 async function handleGetMyTeam(request, response) {
-  const context = await requireManager(request, response);
+  const context = await getAuthContext(request, response);
   if (!context) return;
+  requireTeamFeatureAccess(context.user);
 
   const [drivers, storedTeams] = await Promise.all([
     loadAvailableTeamDrivers(prisma),
@@ -194,8 +196,9 @@ async function handleGetMyTeam(request, response) {
 }
 
 async function handleUpdateMyTeam(request, response) {
-  const context = await requireManager(request, response);
+  const context = await getAuthContext(request, response);
   if (!context) return;
+  requireTeamFeatureAccess(context.user);
 
   const body = await readJsonBody(request);
 
