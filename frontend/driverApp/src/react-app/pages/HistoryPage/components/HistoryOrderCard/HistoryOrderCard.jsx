@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { SvgIcon } from '@shared/app/components/SvgIcon/SvgIcon.jsx';
@@ -8,7 +8,7 @@ import {
   getOrderTripTime,
   getTotalPrice,
 } from '../../historyUtils.js';
-import { parseDateValue } from '../../../shared/dateUtils.js';
+import { getDateKey, parseDateValue } from '../../../shared/dateUtils.js';
 import { HistoryRouteModal } from '../HistoryRouteModal/HistoryRouteModal.jsx';
 import './HistoryOrderCard.css';
 
@@ -54,6 +54,22 @@ function formatDate(value) {
   });
 }
 
+function getRelativeDateKey(offsetDays) {
+  const date = new Date();
+  date.setDate(date.getDate() + offsetDays);
+  return getDateKey(date);
+}
+
+function isFlightStatusDisplayWindow(value) {
+  const dateKey = getDateKey(value);
+
+  if (!dateKey) {
+    return false;
+  }
+
+  return dateKey === getRelativeDateKey(0) || dateKey === getRelativeDateKey(1);
+}
+
 function normalizeFlightNumber(value) {
   return String(value || '')
     .trim()
@@ -69,6 +85,25 @@ const FLIGHT_STATUS_VALUES = new Set([
   'cancelled',
   'unknown',
 ]);
+const COPY_NOTICE_DURATION_MS = 1400;
+
+const AIRPORT_CITY_BY_CODE = {
+  AMS: 'Amsterdam',
+  BCN: 'Barcelona',
+  BER: 'Berlin',
+  CDG: 'Paris',
+  FRA: 'Frankfurt',
+  FCO: 'Rome',
+  LGW: 'London',
+  LHR: 'London',
+  LTN: 'London',
+  MUC: 'Munich',
+  ORY: 'Paris',
+  PRG: 'Prague',
+  STN: 'London',
+  VIE: 'Vienna',
+  WAW: 'Warsaw',
+};
 
 function isPlainObject(value) {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value));
@@ -201,15 +236,24 @@ function normalizeFlightStatus(value, fallbackFlightNumber) {
   };
 }
 
-function formatFlightRoute(route) {
-  const from = normalizeFlightText(route?.from);
-  const to = normalizeFlightText(route?.to);
+function cleanupDepartureCity(value) {
+  const cleaned = normalizeFlightText(value)
+    .replace(/\b(international|airport|letiště|aeroport)\b/gi, '')
+    .replace(/\b(vaclav havel|václava havla|schiphol)\b/gi, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
 
-  if (from && to) {
-    return `${from} → ${to}`;
+  return cleaned || normalizeFlightText(value);
+}
+
+function formatFlightRoute(route) {
+  const fromCode = normalizeFlightText(route?.fromCode).toUpperCase();
+
+  if (AIRPORT_CITY_BY_CODE[fromCode]) {
+    return AIRPORT_CITY_BY_CODE[fromCode];
   }
 
-  return from || to;
+  return cleanupDepartureCity(route?.from);
 }
 
 function getFlightRouteCode(value) {
@@ -366,7 +410,19 @@ function FlightProgress({ route }) {
   );
 }
 
-function FlightStatusPanel({ flightStatus, onCopyFlightNumber }) {
+function FlightCopyToast({ visible, label }) {
+  if (!visible) {
+    return null;
+  }
+
+  return (
+    <span className="orderFlightCopyToast" role="status" aria-live="polite">
+      {label}
+    </span>
+  );
+}
+
+function FlightStatusPanel({ flightStatus, onCopyFlightNumber, copyNoticeVisible, copyNoticeLabel }) {
   if (!flightStatus?.flightNumber) {
     return null;
   }
@@ -382,15 +438,18 @@ function FlightStatusPanel({ flightStatus, onCopyFlightNumber }) {
       aria-label={`Flight ${flightStatus.flightNumber}: ${statusText.primary}`}
     >
       <div className="orderFlightPanelIdentity">
-        <button
-          className="orderFlightPanelNumber"
-          type="button"
-          aria-label={`Copy flight number ${flightStatus.flightNumber}`}
-          title={flightStatus.flightNumber}
-          onClick={onCopyFlightNumber}
-        >
-          {flightStatus.flightNumber}
-        </button>
+        <span className="orderFlightPanelNumberWrap">
+          <button
+            className="orderFlightPanelNumber"
+            type="button"
+            aria-label={`Copy flight number ${flightStatus.flightNumber}`}
+            title={flightStatus.flightNumber}
+            onClick={onCopyFlightNumber}
+          >
+            {flightStatus.flightNumber}
+          </button>
+          <FlightCopyToast visible={copyNoticeVisible} label={copyNoticeLabel} />
+        </span>
         {route ? <span className="orderFlightPanelRoute">{route}</span> : null}
       </div>
       {showProgress ? <FlightProgress route={flightStatus.route} /> : null}
@@ -434,6 +493,8 @@ async function copyTextToClipboard(value) {
 
 function HistoryOrderCard({ order, onOpen }) {
   const { t } = useI18n();
+  const copyNoticeTimerRef = useRef(null);
+  const [copyNoticeVisible, setCopyNoticeVisible] = useState(false);
   const [routeModal, setRouteModal] = useState({
     address: '',
     label: '',
@@ -441,13 +502,14 @@ function HistoryOrderCard({ order, onOpen }) {
   const status = getHistoryBucket(order);
   const customerName = getCustomerName(order);
   const totalPrice = getTotalPrice(order);
+  const orderTripTime = getOrderTripTime(order);
   const flightNumber = normalizeFlightNumber(order?.flightNumber || order?.contractData?.flightNumber || '');
-  const flightStatus = flightNumber
+  const flightStatus = flightNumber && isFlightStatusDisplayWindow(orderTripTime)
     ? normalizeFlightStatus(order?.metadata?.flightStatus, flightNumber)
     : null;
-  const dateValue = formatDate(getOrderTripTime(order) || order?.createdAt);
+  const dateValue = formatDate(orderTripTime || order?.createdAt);
   const timeValue = (() => {
-    const date = parseDateValue(getOrderTripTime(order) || order?.createdAt);
+    const date = parseDateValue(orderTripTime || order?.createdAt);
 
     if (!date) {
       return '-';
@@ -478,6 +540,25 @@ function HistoryOrderCard({ order, onOpen }) {
       order?.contractData?.luggageUnits ||
       order?.trip?.luggageUnits,
   );
+  const copyNoticeLabel = t('history.flightTextCopied');
+
+  useEffect(() => () => {
+    if (copyNoticeTimerRef.current) {
+      window.clearTimeout(copyNoticeTimerRef.current);
+    }
+  }, []);
+
+  function showCopyNotice() {
+    if (copyNoticeTimerRef.current) {
+      window.clearTimeout(copyNoticeTimerRef.current);
+    }
+
+    setCopyNoticeVisible(true);
+    copyNoticeTimerRef.current = window.setTimeout(() => {
+      setCopyNoticeVisible(false);
+      copyNoticeTimerRef.current = null;
+    }, COPY_NOTICE_DURATION_MS);
+  }
 
   function handleOpenRouteModal(event, address, label) {
     event.stopPropagation();
@@ -512,6 +593,7 @@ function HistoryOrderCard({ order, onOpen }) {
 
     try {
       await copyTextToClipboard(flightNumber);
+      showCopyNotice();
     } catch {
       // Clipboard can be blocked by browser permissions; keep the card usable.
     }
@@ -546,20 +628,23 @@ function HistoryOrderCard({ order, onOpen }) {
               ) : (
                 <>
                   {status.bucket === 'today' && flightNumber ? (
-                    <button
-                      className="orderStatusBadge"
-                      type="button"
-                      aria-label={`Copy flight number ${flightNumber}`}
-                      title={flightNumber}
-                      onClick={handleCopyFlightNumber}
-                    >
-                      <span className="orderStatusBadgeFlight">
-                        <span className="orderStatusBadgeFlightIcon">
-                          <FlightIcon />
+                    <span className="orderStatusBadgeCopyTarget">
+                      <button
+                        className="orderStatusBadge"
+                        type="button"
+                        aria-label={`Copy flight number ${flightNumber}`}
+                        title={flightNumber}
+                        onClick={handleCopyFlightNumber}
+                      >
+                        <span className="orderStatusBadgeFlight">
+                          <span className="orderStatusBadgeFlightIcon">
+                            <FlightIcon />
+                          </span>
+                          <span className="orderStatusBadgeFlightValue">{flightNumber}</span>
                         </span>
-                        <span className="orderStatusBadgeFlightValue">{flightNumber}</span>
-                      </span>
-                    </button>
+                      </button>
+                      <FlightCopyToast visible={copyNoticeVisible} label={copyNoticeLabel} />
+                    </span>
                   ) : null}
                   <div className="orderStatusBadgeToday">
                     {status.bucket === 'today' ? <span className="orderStatusBadgeDot" aria-hidden="true" /> : null}
@@ -581,7 +666,14 @@ function HistoryOrderCard({ order, onOpen }) {
             </span>
           </div>
 
-          {flightStatus ? <FlightStatusPanel flightStatus={flightStatus} onCopyFlightNumber={handleCopyFlightNumber} /> : null}
+          {flightStatus ? (
+            <FlightStatusPanel
+              flightStatus={flightStatus}
+              onCopyFlightNumber={handleCopyFlightNumber}
+              copyNoticeVisible={copyNoticeVisible}
+              copyNoticeLabel={copyNoticeLabel}
+            />
+          ) : null}
 
           <div className={`orderItemRoute ${hasVisibleRoute ? '' : 'is-placeholder'} ${flightStatus ? 'orderItemRoute--flight' : ''}`}>
             {hasVisibleRoute ? (

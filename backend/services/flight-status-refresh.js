@@ -40,13 +40,56 @@ function getDatePart(value) {
   return date.toISOString().slice(0, 10);
 }
 
-function getFlightDate(order) {
+function getOrderFlightDate(order) {
   return (
     getDatePart(order?.trip?.time) ||
-    getDatePart(order?.contractData?.trip?.time) ||
-    getDatePart(order?.metadata?.flightStatus?.scheduledArrival) ||
-    getDatePart(order?.metadata?.flightStatus?.estimatedArrival)
+    getDatePart(order?.contractData?.trip?.time)
   );
+}
+
+function getLocalDateKey(date) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+    return '';
+  }
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function getRelativeDateKey(offsetDays) {
+  const date = new Date();
+  date.setDate(date.getDate() + offsetDays);
+  return getLocalDateKey(date);
+}
+
+function isFlightDateInRefreshWindow(flightDate) {
+  const dateKey = getDatePart(flightDate);
+
+  if (!dateKey) {
+    return false;
+  }
+
+  return dateKey === getRelativeDateKey(0) || dateKey === getRelativeDateKey(1);
+}
+
+function getFlightStatusDate(flightStatus) {
+  return (
+    getDatePart(flightStatus?.scheduledArrival) ||
+    getDatePart(flightStatus?.estimatedArrival) ||
+    getDatePart(flightStatus?.actualArrival)
+  );
+}
+
+function isFlightStatusForDate(flightStatus, flightDate) {
+  const expectedDate = getDatePart(flightDate);
+
+  if (!expectedDate) {
+    return true;
+  }
+
+  return getFlightStatusDate(flightStatus) === expectedDate;
 }
 
 function getStatusValue(flightStatus) {
@@ -93,7 +136,7 @@ function isInformativeStatus(flightStatus) {
   );
 }
 
-function mergeFlightStatus(existingFlightStatus, nextFlightStatus) {
+function mergeFlightStatus(existingFlightStatus, nextFlightStatus, flightDate) {
   const normalizedNextFlightStatus = normalizeFlightStatusValue(nextFlightStatus);
 
   if (!normalizedNextFlightStatus) {
@@ -101,9 +144,15 @@ function mergeFlightStatus(existingFlightStatus, nextFlightStatus) {
   }
 
   const normalizedExistingFlightStatus = normalizeFlightStatusValue(existingFlightStatus);
+  const existingMatchesDate = isFlightStatusForDate(normalizedExistingFlightStatus, flightDate);
+
+  if (!isFlightStatusForDate(normalizedNextFlightStatus, flightDate)) {
+    return existingMatchesDate ? normalizedExistingFlightStatus : null;
+  }
 
   if (
     isWeakScheduledStatus(normalizedNextFlightStatus) &&
+    existingMatchesDate &&
     isInformativeStatus(normalizedExistingFlightStatus)
   ) {
     return {
@@ -132,8 +181,12 @@ function normalizeCachedFlightStatus(metadata) {
   return null;
 }
 
-function isFlightStatusFresh(metadata) {
+function isFlightStatusFresh(metadata, flightDate) {
   if (!isPlainObject(metadata?.flightStatus)) {
+    return false;
+  }
+
+  if (!isFlightStatusForDate(metadata.flightStatus, flightDate)) {
     return false;
   }
 
@@ -146,6 +199,28 @@ function isFlightStatusFresh(metadata) {
   return Date.now() - updatedAt.getTime() < getCacheTtlMs();
 }
 
+function removeFlightStatusFromMetadata(metadata) {
+  const normalizedMetadata = isPlainObject(metadata) ? { ...metadata } : {};
+  delete normalizedMetadata.flightStatus;
+  return normalizedMetadata;
+}
+
+function buildOrderSelect(order) {
+  return Object.fromEntries(Object.keys(order).map(key => [key, true]));
+}
+
+function updateOrderMetadata(client, order, metadata) {
+  return client.order.update({
+    where: {
+      id: order.id,
+    },
+    data: {
+      metadata,
+    },
+    select: buildOrderSelect(order),
+  });
+}
+
 async function refreshOrderFlightStatus(client, order) {
   const flightNumber = getFlightNumber(order);
 
@@ -153,56 +228,67 @@ async function refreshOrderFlightStatus(client, order) {
     return order;
   }
 
-  const normalizedMetadata = normalizeCachedFlightStatus(order.metadata);
+  const flightDate = getOrderFlightDate(order);
 
-  if (normalizedMetadata) {
-    return client.order.update({
-      where: {
-        id: order.id,
-      },
-      data: {
-        metadata: normalizedMetadata,
-      },
-      select: Object.fromEntries(Object.keys(order).map(key => [key, true])),
-    });
+  if (!isFlightDateInRefreshWindow(flightDate)) {
+    return order;
   }
 
-  if (isFlightStatusFresh(order.metadata)) {
-    return order;
+  let currentOrder = order;
+
+  if (
+    isPlainObject(currentOrder.metadata?.flightStatus) &&
+    !isFlightStatusForDate(currentOrder.metadata.flightStatus, flightDate)
+  ) {
+    currentOrder = await updateOrderMetadata(
+      client,
+      currentOrder,
+      removeFlightStatusFromMetadata(currentOrder.metadata)
+    );
+  }
+
+  const normalizedMetadata = normalizeCachedFlightStatus(currentOrder.metadata);
+
+  if (normalizedMetadata) {
+    return updateOrderMetadata(client, currentOrder, normalizedMetadata);
+  }
+
+  if (isFlightStatusFresh(currentOrder.metadata, flightDate)) {
+    return currentOrder;
   }
 
   try {
     const flightStatus = await fetchAviationstackFlightStatus(flightNumber, {
-      flightDate: getFlightDate(order),
+      flightDate,
     });
 
     if (!flightStatus) {
-      return order;
+      return currentOrder;
     }
 
-    const mergedFlightStatus = mergeFlightStatus(order.metadata?.flightStatus, flightStatus);
+    const mergedFlightStatus = mergeFlightStatus(
+      currentOrder.metadata?.flightStatus,
+      flightStatus,
+      flightDate
+    );
+
+    if (!mergedFlightStatus) {
+      return currentOrder;
+    }
 
     const metadata = {
-      ...(isPlainObject(order.metadata) ? order.metadata : {}),
+      ...(isPlainObject(currentOrder.metadata) ? currentOrder.metadata : {}),
       flightStatus: mergedFlightStatus,
     };
 
-    return client.order.update({
-      where: {
-        id: order.id,
-      },
-      data: {
-        metadata,
-      },
-      select: Object.fromEntries(Object.keys(order).map(key => [key, true])),
-    });
+    return updateOrderMetadata(client, currentOrder, metadata);
   } catch (error) {
     console.warn(
       `Failed to refresh flight status for order ${order?.id || ''}: ${
         error instanceof Error ? error.message : String(error)
       }`
     );
-    return order;
+    return currentOrder;
   }
 }
 
@@ -219,7 +305,13 @@ export async function refreshFlightStatusesForOrders(client, orders, { enabled =
       break;
     }
 
-    if (!getFlightNumber(order) || isFlightStatusFresh(order.metadata)) {
+    const flightDate = getOrderFlightDate(order);
+
+    if (
+      !getFlightNumber(order) ||
+      !isFlightDateInRefreshWindow(flightDate) ||
+      isFlightStatusFresh(order.metadata, flightDate)
+    ) {
       continue;
     }
 

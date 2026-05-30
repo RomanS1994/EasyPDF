@@ -2,6 +2,7 @@ import { nowIso } from '../validation/common.js';
 
 const DEFAULT_BASE_URL = 'https://api.aviationstack.com/v1';
 const DEFAULT_TIMEOUT_MS = 6000;
+const FALLBACK_FLIGHTS_LIMIT = 10;
 
 function normalizeFlightNumber(value) {
   return String(value || '')
@@ -65,17 +66,29 @@ function normalizeFlightDate(value) {
   return match ? match[1] : '';
 }
 
-function buildFlightsUrl(flightNumber, { flightDate = '' } = {}) {
+function getDatePart(value) {
+  const text = String(value || '').trim();
+  const directDate = text.match(/^(\d{4}-\d{2}-\d{2})/);
+
+  if (directDate) {
+    return directDate[1];
+  }
+
+  const date = new Date(text);
+  return Number.isNaN(date.getTime()) ? '' : date.toISOString().slice(0, 10);
+}
+
+function buildFlightsUrl(flightNumber, { flightDate = '', includeFlightDate = true, limit = 1 } = {}) {
   const baseUrl = getAviationstackBaseUrl().replace(/\/+$/, '');
   const url = new URL(`${baseUrl}/flights`);
 
   url.searchParams.set('access_key', getAviationstackApiKey());
   url.searchParams.set('flight_iata', normalizeFlightNumber(flightNumber));
-  url.searchParams.set('limit', '1');
+  url.searchParams.set('limit', String(limit));
 
   const normalizedFlightDate = normalizeFlightDate(flightDate);
 
-  if (normalizedFlightDate) {
+  if (includeFlightDate && normalizedFlightDate) {
     url.searchParams.set('flight_date', normalizedFlightDate);
   }
 
@@ -99,6 +112,32 @@ function normalizeFlightStatus(value, arrivalDelay) {
   if (status === 'scheduled') return 'scheduled';
 
   return 'unknown';
+}
+
+function getFlightRecordDate(record) {
+  const arrival = record?.arrival && typeof record.arrival === 'object' ? record.arrival : {};
+  const departure = record?.departure && typeof record.departure === 'object' ? record.departure : {};
+
+  return (
+    getDatePart(arrival.scheduled) ||
+    getDatePart(departure.scheduled) ||
+    getDatePart(arrival.estimated) ||
+    getDatePart(departure.estimated)
+  );
+}
+
+function selectFlightRecord(records, { flightDate = '' } = {}) {
+  if (!Array.isArray(records) || !records.length) {
+    return null;
+  }
+
+  const normalizedFlightDate = normalizeFlightDate(flightDate);
+
+  if (!normalizedFlightDate) {
+    return records[0];
+  }
+
+  return records.find(record => getFlightRecordDate(record) === normalizedFlightDate) || null;
 }
 
 export function normalizeAviationstackFlight(record, fallbackFlightNumber) {
@@ -173,7 +212,11 @@ async function requestFlightStatus(flightNumber, options, signal) {
     throw new Error(`aviationstack request failed with ${response.status}`);
   }
 
-  const flight = Array.isArray(payload?.data) ? payload.data[0] : null;
+  const flight = selectFlightRecord(payload?.data, options);
+  if (!flight) {
+    return null;
+  }
+
   return normalizeAviationstackFlight(flight, flightNumber);
 }
 
@@ -197,7 +240,15 @@ export async function fetchAviationstackFlightStatus(flightNumber, { flightDate 
       );
     } catch (error) {
       if (normalizedFlightDate && error?.code === 'function_access_restricted') {
-        return await requestFlightStatus(normalizedFlightNumber, {}, controller.signal);
+        return await requestFlightStatus(
+          normalizedFlightNumber,
+          {
+            flightDate: normalizedFlightDate,
+            includeFlightDate: false,
+            limit: FALLBACK_FLIGHTS_LIMIT,
+          },
+          controller.signal
+        );
       }
 
       throw error;

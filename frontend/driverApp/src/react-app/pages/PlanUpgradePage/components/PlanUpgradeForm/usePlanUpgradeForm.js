@@ -132,6 +132,11 @@ function getPlanFeatureChips({ variant, t }) {
       key: 'teams',
       label: t('settings.planUpgrade.teams'),
     });
+    chips.push({
+      iconName: 'plane',
+      key: 'flightTracking',
+      label: t('settings.planUpgrade.flightTracking'),
+    });
   }
 
   return chips;

@@ -63,6 +63,51 @@ function normalizeCount(value) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 }
 
+function normalizePhoneHref(value) {
+  const source = String(value || "").trim();
+  const digits = source.replace(/\D/g, "");
+
+  if (!digits) {
+    return "";
+  }
+
+  return `${source.startsWith("+") ? "+" : ""}${digits}`;
+}
+
+function normalizeWhatsAppPhone(value) {
+  return String(value || "").replace(/\D/g, "");
+}
+
+async function copyTextToClipboard(value) {
+  const text = String(value || "").trim();
+
+  if (!text) {
+    return false;
+  }
+
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return true;
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  textarea.style.pointerEvents = "none";
+
+  document.body.appendChild(textarea);
+  textarea.select();
+  textarea.setSelectionRange(0, text.length);
+
+  try {
+    return document.execCommand("copy");
+  } finally {
+    document.body.removeChild(textarea);
+  }
+}
+
 function OrderGlyph({ name }) {
   return <SvgIcon name={name} />;
 }
@@ -91,6 +136,8 @@ export function OrderDetails({ orderId, onClose }) {
   const [priceCurrency, setPriceCurrency] = useState("EUR");
   const [flightNumberEditorOpen, setFlightNumberEditorOpen] = useState(false);
   const [flightNumberInput, setFlightNumberInput] = useState("");
+  const [contactActionsOpen, setContactActionsOpen] = useState(false);
+  const [copyNotice, setCopyNotice] = useState("");
   const [showTransfer, setShowTransfer] = useState(false);
   const [transferSearch, setTransferSearch] = useState("");
   const [selectedUserId, setSelectedUserId] = useState("");
@@ -118,6 +165,11 @@ export function OrderDetails({ orderId, onClose }) {
   const order = data?.order || data || {};
   const customer = order?.contractData?.customer || order?.customer || {};
   const trip = order?.contractData?.trip || order?.trip || {};
+  const customerPhone = String(customer.phone || "").trim();
+  const customerEmail = String(customer.email || "").trim();
+  const customerContact = customerPhone || customerEmail;
+  const customerPhoneHref = normalizePhoneHref(customerPhone);
+  const customerWhatsAppPhone = normalizeWhatsAppPhone(customerPhone);
   const passengersCount = normalizeCount(order?.contractData?.passengers || order?.passengers);
   const luggageUnits = normalizeCount(
     trip?.luggageUnits ||
@@ -169,6 +221,8 @@ export function OrderDetails({ orderId, onClose }) {
     setCommissionEditorOpen(false);
     setPriceEditorOpen(false);
     setFlightNumberEditorOpen(false);
+    setContactActionsOpen(false);
+    setCopyNotice("");
   }, [orderId]);
 
   useEffect(() => {
@@ -200,6 +254,20 @@ export function OrderDetails({ orderId, onClose }) {
   }, [isClosing, onClose]);
 
   useEffect(() => {
+    if (!copyNotice) {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => {
+      setCopyNotice("");
+    }, 2400);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [copyNotice]);
+
+  useEffect(() => {
     if (!orderId) {
       return undefined;
     }
@@ -229,6 +297,11 @@ export function OrderDetails({ orderId, onClose }) {
           return;
         }
 
+        if (contactActionsOpen) {
+          setContactActionsOpen(false);
+          return;
+        }
+
         if (showTransfer) {
           setShowTransfer(false);
           return;
@@ -253,6 +326,7 @@ export function OrderDetails({ orderId, onClose }) {
     commissionEditorOpen,
     priceEditorOpen,
     flightNumberEditorOpen,
+    contactActionsOpen,
     onClose,
   ]);
 
@@ -444,6 +518,41 @@ export function OrderDetails({ orderId, onClose }) {
     setFlightNumberEditorOpen(false);
   }
 
+  function openContactActions() {
+    if (!customerPhoneHref) {
+      return;
+    }
+
+    setError("");
+    setMessage("");
+    setContactActionsOpen(true);
+  }
+
+  function closeContactActions() {
+    setContactActionsOpen(false);
+  }
+
+  async function handleCopyContact() {
+    if (!customerContact) {
+      return;
+    }
+
+    setMessage("");
+    setError("");
+
+    try {
+      const copied = await copyTextToClipboard(customerContact);
+
+      if (!copied) {
+        throw new Error("Clipboard unavailable");
+      }
+
+      setCopyNotice(t('contract.contactCopied'));
+    } catch {
+      setError(t('contract.failedToCopyContact'));
+    }
+  }
+
   function handleFlightNumberInputChange(event) {
     setFlightNumberInput(normalizeFlightNumber(event.target.value));
   }
@@ -543,6 +652,11 @@ export function OrderDetails({ orderId, onClose }) {
       return;
     }
 
+    if (contactActionsOpen) {
+      setContactActionsOpen(false);
+      return;
+    }
+
     if (showTransfer) {
       setShowTransfer(false);
       return;
@@ -588,6 +702,13 @@ export function OrderDetails({ orderId, onClose }) {
         aria-modal="true"
         aria-label={t('contract.currentOrder')}
       >
+        {copyNotice ? (
+          <div className="orderContactToast" role="status" aria-live="polite">
+            <SvgIcon name="copy" />
+            <span>{copyNotice}</span>
+          </div>
+        ) : null}
+
         <div className="orderDrawer-header">
           <BackButton label={t('common.back')} onClick={handleCloseRequest} />
         </div>
@@ -661,7 +782,33 @@ export function OrderDetails({ orderId, onClose }) {
                     <OrderCardIcon name="mail" />
                     <span className="orderSheetInfoLabel">{t('contract.customerData')}</span>
                   </div>
-                  <span className="orderSheetInfoValue">{customer.phone || customer.email || "-"}</span>
+                  <div className="orderSheetContactValue">
+                    {customerPhone ? (
+                      <button
+                        className="orderSheetContactTextButton"
+                        type="button"
+                        onClick={() => void handleCopyContact()}
+                        aria-label={t('contract.copyContact')}
+                        title={t('contract.copyContact')}
+                      >
+                        {customerPhone}
+                      </button>
+                    ) : (
+                      <span className="orderSheetInfoValue">{customerEmail || "-"}</span>
+                    )}
+
+                    {customerPhoneHref ? (
+                      <button
+                        className="orderSheetContactButton"
+                        type="button"
+                        onClick={openContactActions}
+                        aria-label={t('contract.openContactActions')}
+                        title={t('contract.openContactActions')}
+                      >
+                        <OrderGlyph name="phone-call" />
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
 
                 <div
@@ -1153,6 +1300,68 @@ export function OrderDetails({ orderId, onClose }) {
                 {t('common.cancel')}
               </button>
             </div>
+          </div>
+        </div>
+      ) : null}
+
+      {contactActionsOpen ? (
+        <div
+          className="orderContactModal"
+          role="presentation"
+          onClick={closeContactActions}
+        >
+          <div
+            className="orderContactModal-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('contract.contactActionsTitle')}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="orderPriceEditor-header">
+              <h4 className="orderPriceEditor-title">{t('contract.contactActionsTitle')}</h4>
+              <p className="orderPriceEditor-copy">{customerPhone}</p>
+            </div>
+
+            <div className="orderContactActions">
+              {customerWhatsAppPhone ? (
+                <a
+                  className="orderContactAction orderContactAction--whatsapp"
+                  href={`https://wa.me/${customerWhatsAppPhone}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={closeContactActions}
+                >
+                  <SvgIcon name="message-circle" />
+                  <span>{t('contract.whatsapp')}</span>
+                </a>
+              ) : null}
+
+              <a
+                className="orderContactAction orderContactAction--call"
+                href={`tel:${customerPhoneHref}`}
+                onClick={closeContactActions}
+              >
+                <SvgIcon name="phone-call" />
+                <span>{t('contract.callContact')}</span>
+              </a>
+
+              <a
+                className="orderContactAction orderContactAction--message"
+                href={`sms:${customerPhoneHref}`}
+                onClick={closeContactActions}
+              >
+                <SvgIcon name="send" />
+                <span>{t('contract.writeContact')}</span>
+              </a>
+            </div>
+
+            <button
+              className="orderWindow-button orderWindow-button--secondary"
+              type="button"
+              onClick={closeContactActions}
+            >
+              {t('common.cancel')}
+            </button>
           </div>
         </div>
       ) : null}

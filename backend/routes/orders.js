@@ -33,6 +33,20 @@ function getOrderSanitizeOptions(user) {
   };
 }
 
+function isPlainObject(value) {
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+}
+
+function getOrderTripTimeValue(order) {
+  return order?.contractData?.trip?.time || order?.trip?.time || '';
+}
+
+function removeFlightStatusFromMetadata(metadata) {
+  const nextMetadata = isPlainObject(metadata) ? { ...metadata } : {};
+  delete nextMetadata.flightStatus;
+  return nextMetadata;
+}
+
 function getUtcDayBounds(isoValue) {
   const date = new Date(isoValue);
   if (Number.isNaN(date.getTime())) {
@@ -188,7 +202,7 @@ async function handleUpdateOrder(request, response, orderId) {
             ...(body.pdfFileName ? { fileName: body.pdfFileName } : {}),
           }
         : order.pdf;
-      const nextMetadata =
+      let nextMetadata =
         body.metadata && typeof body.metadata === 'object'
           ? {
               ...(order.metadata || {}),
@@ -214,6 +228,15 @@ async function handleUpdateOrder(request, response, orderId) {
               ...(nextFlightNumber ? { flightNumber: nextFlightNumber } : {}),
             }
           : order.contractData;
+      const didFlightNumberChange =
+        typeof body.flightNumber === 'string' && nextFlightNumber !== order.flightNumber;
+      const didTripTimeChange =
+        Boolean(body.contractData && typeof body.contractData === 'object') &&
+        getOrderTripTimeValue({ ...order, contractData: nextContractData }) !== getOrderTripTimeValue(order);
+
+      if ((didFlightNumberChange || didTripTimeChange) && isPlainObject(nextMetadata?.flightStatus)) {
+        nextMetadata = removeFlightStatusFromMetadata(nextMetadata);
+      }
 
       const updated = await tx.order.update({
         where: {
