@@ -78,6 +78,24 @@ function normalizeWhatsAppPhone(value) {
   return String(value || "").replace(/\D/g, "");
 }
 
+function getPhoneContactValue(...values) {
+  return values
+    .map((value) => String(value || "").trim())
+    .find((value) => {
+      if (!value || value.includes("@")) {
+        return false;
+      }
+
+      return value.replace(/\D/g, "").length >= 7;
+    }) || "";
+}
+
+function getEmailContactValue(...values) {
+  return values
+    .map((value) => String(value || "").trim())
+    .find((value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) || "";
+}
+
 async function copyTextToClipboard(value) {
   const text = String(value || "").trim();
 
@@ -165,11 +183,13 @@ export function OrderDetails({ orderId, onClose }) {
   const order = data?.order || data || {};
   const customer = order?.contractData?.customer || order?.customer || {};
   const trip = order?.contractData?.trip || order?.trip || {};
-  const customerPhone = String(customer.phone || "").trim();
+  const customerContact = String(customer.phone || customer.email || customer.contact || "").trim();
   const customerEmail = String(customer.email || "").trim();
-  const customerContact = customerPhone || customerEmail;
+  const customerPhone = getPhoneContactValue(customer.phone, customer.email, customer.contact);
+  const customerEmailContact = getEmailContactValue(customer.email, customer.contact, customer.phone);
   const customerPhoneHref = normalizePhoneHref(customerPhone);
   const customerWhatsAppPhone = normalizeWhatsAppPhone(customerPhone);
+  const isCopyableContact = Boolean(customerPhone || customerEmailContact);
   const passengersCount = normalizeCount(order?.contractData?.passengers || order?.passengers);
   const luggageUnits = normalizeCount(
     trip?.luggageUnits ||
@@ -532,6 +552,14 @@ export function OrderDetails({ orderId, onClose }) {
     setContactActionsOpen(false);
   }
 
+  function handleEmailContact() {
+    if (!customerEmailContact) {
+      return;
+    }
+
+    window.location.href = `mailto:${customerEmailContact}`;
+  }
+
   async function handleCopyContact() {
     if (!customerContact) {
       return;
@@ -783,7 +811,7 @@ export function OrderDetails({ orderId, onClose }) {
                     <span className="orderSheetInfoLabel">{t('contract.customerData')}</span>
                   </div>
                   <div className="orderSheetContactValue">
-                    {customerPhone ? (
+                    {isCopyableContact ? (
                       <button
                         className="orderSheetContactTextButton"
                         type="button"
@@ -791,10 +819,10 @@ export function OrderDetails({ orderId, onClose }) {
                         aria-label={t('contract.copyContact')}
                         title={t('contract.copyContact')}
                       >
-                        {customerPhone}
+                        {customerContact}
                       </button>
                     ) : (
-                      <span className="orderSheetInfoValue">{customerEmail || "-"}</span>
+                      <span className="orderSheetInfoValue">{customerContact || customerEmail || "-"}</span>
                     )}
 
                     {customerPhoneHref ? (
@@ -806,6 +834,16 @@ export function OrderDetails({ orderId, onClose }) {
                         title={t('contract.openContactActions')}
                       >
                         <OrderGlyph name="phone-call" />
+                      </button>
+                    ) : customerEmailContact ? (
+                      <button
+                        className="orderSheetContactButton orderSheetContactButton--email"
+                        type="button"
+                        onClick={handleEmailContact}
+                        aria-label={t('contract.emailContact')}
+                        title={t('contract.emailContact')}
+                      >
+                        <OrderGlyph name="mail" />
                       </button>
                     ) : null}
                   </div>

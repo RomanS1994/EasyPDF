@@ -6,6 +6,7 @@ import { ProtectedRoute } from '@shared/app/components/ProtectedRoute/ProtectedR
 import { RouterError } from '@shared/app/components/RouterError/RouterError.jsx';
 import { AccountPage } from './pages/AccountPage/AccountPage.jsx';
 import { BusinessProfilePage } from './pages/BusinessProfilePage/BusinessProfilePage.jsx';
+import { FlightTrackingPage } from './pages/FlightTrackingPage/FlightTrackingPage.jsx';
 import { HomePage } from './pages/HomePage/HomePage.jsx';
 import { AvailableOrdersPage } from './pages/AvailableOrdersPage/AvailableOrdersPage.jsx';
 import { HistoryDisplayPage } from './pages/HistoryDisplayPage/HistoryDisplayPage.jsx';
@@ -109,6 +110,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <PlanUpgradePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'flight-tracking',
+        element: (
+          <ProtectedRoute>
+            <FlightTrackingPage />
           </ProtectedRoute>
         ),
       },

@@ -8,17 +8,14 @@ const features = [
   {
     icon: 'takeoff',
     titleKey: 'flightTrackingFeatureStatusTitle',
-    copyKey: 'flightTrackingFeatureStatusCopy',
   },
   {
     icon: 'location',
     titleKey: 'flightTrackingFeaturePickupTitle',
-    copyKey: 'flightTrackingFeaturePickupCopy',
   },
   {
     icon: 'orders',
     titleKey: 'flightTrackingFeatureOrderTitle',
-    copyKey: 'flightTrackingFeatureOrderCopy',
   },
 ];
 
@@ -47,7 +44,6 @@ export function FlightTrackingNotice() {
           <span className="flightTrackingNotice-status">{t('home.flightTrackingStatus')}</span>
           <h2 id="flight-tracking-notice-title">{t('home.flightTrackingTitle')}</h2>
           <p className="flightTrackingNotice-subtitle">{t('home.flightTrackingSubtitle')}</p>
-          <p className="flightTrackingNotice-summary">{t('home.flightTrackingCopy')}</p>
         </div>
       </div>
 
@@ -58,7 +54,6 @@ export function FlightTrackingNotice() {
               <SvgIcon name={feature.icon} />
             </span>
             <strong>{t(`home.${feature.titleKey}`)}</strong>
-            <p>{t(`home.${feature.copyKey}`)}</p>
           </li>
         ))}
       </ul>
@@ -69,17 +64,12 @@ export function FlightTrackingNotice() {
         </span>
         <div className="flightTrackingNotice-ctaCopy">
           <strong>{t('home.flightTrackingBenefit')}</strong>
-          <p>{t('home.flightTrackingCtaCopy')}</p>
         </div>
         <div className="flightTrackingNotice-ctaAction">
-          <Link className="flightTrackingNotice-button" to="/settings/plan-upgrade">
-            {t('home.flightTrackingCta')}
+          <Link className="flightTrackingNotice-button" to="/flight-tracking">
+            {t('home.flightTrackingLearnMore')}
             <SvgIcon name="chevron-right" />
           </Link>
-          <span className="flightTrackingNotice-ctaNote">
-            <SvgIcon name="lock-keyhole" />
-            {t('home.flightTrackingCtaNote')}
-          </span>
         </div>
       </div>
     </section>

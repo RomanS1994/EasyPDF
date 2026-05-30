@@ -1,0 +1,360 @@
+.flightTrackingPage {
+  display: grid;
+  gap: 12px;
+  color: #0f172a;
+}
+
+.flightTrackingPage-header {
+  display: flex;
+}
+
+.flightTrackingPage-hero {
+  position: relative;
+  min-height: 360px;
+  overflow: hidden;
+  border: 1px solid rgba(96, 165, 250, 0.36);
+  border-radius: 26px;
+  color: #ffffff;
+  background: #04142f;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 18px 36px rgba(15, 23, 42, 0.18);
+}
+
+.flightTrackingPage-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(3, 11, 28, 0.96) 0%, rgba(5, 22, 51, 0.84) 42%, rgba(5, 22, 51, 0.28) 100%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.1) 0%, rgba(2, 6, 23, 0.76) 100%);
+  pointer-events: none;
+}
+
+.flightTrackingPage-heroImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: 62% 50%;
+  filter: saturate(1.12) contrast(1.12) brightness(0.82);
+}
+
+.flightTrackingPage-heroContent {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: end;
+  gap: 14px;
+  max-width: 25rem;
+  min-height: 360px;
+  padding: 22px;
+}
+
+.flightTrackingPage-eyebrow,
+.flightTrackingPage-sectionHeader span,
+.flightTrackingPage-finalCta span {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 24px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.flightTrackingPage-eyebrow {
+  gap: 6px;
+  padding: 0 12px;
+  color: #c4b5fd;
+  background: rgba(124, 58, 237, 0.18);
+  border: 1px solid rgba(167, 139, 250, 0.28);
+}
+
+.flightTrackingPage-eyebrow svg {
+  width: 14px;
+  height: 14px;
+}
+
+.flightTrackingPage-hero h1,
+.flightTrackingPage-sectionHeader h2,
+.flightTrackingPage-finalCta h2 {
+  margin: 0;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.flightTrackingPage-hero h1 {
+  max-width: 20rem;
+  font-size: 30px;
+  line-height: 1.02;
+  text-shadow: 0 8px 28px rgba(0, 0, 0, 0.34);
+}
+
+.flightTrackingPage-hero p {
+  max-width: 21rem;
+  margin: 0;
+  color: rgba(226, 232, 240, 0.9);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.flightTrackingPage-heroStats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.flightTrackingPage-heroStats span {
+  display: grid;
+  gap: 3px;
+  min-height: 58px;
+  padding: 10px;
+  border: 1px solid rgba(147, 197, 253, 0.18);
+  border-radius: 16px;
+  background: rgba(3, 15, 36, 0.58);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.flightTrackingPage-heroStats strong {
+  color: #93c5fd;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.flightTrackingPage-heroStats span {
+  color: rgba(226, 232, 240, 0.82);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.flightTrackingPage-primaryCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: fit-content;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 14px;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #c084fc 0%, #2563eb 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 12px 28px rgba(37, 99, 235, 0.28);
+}
+
+.flightTrackingPage-primaryCta svg {
+  width: 16px;
+  height: 16px;
+}
+
+.flightTrackingPage-section,
+.flightTrackingPage-benefits,
+.flightTrackingPage-finalCta {
+  display: grid;
+  gap: 12px;
+}
+
+.flightTrackingPage-sectionHeader {
+  display: grid;
+  gap: 6px;
+}
+
+.flightTrackingPage-sectionHeader span,
+.flightTrackingPage-finalCta span {
+  color: #2563eb;
+}
+
+.flightTrackingPage-sectionHeader h2,
+.flightTrackingPage-finalCta h2 {
+  font-size: 22px;
+  line-height: 1.08;
+}
+
+.flightTrackingPage-workflow,
+.flightTrackingPage-benefitGrid {
+  display: grid;
+  gap: 9px;
+}
+
+.flightTrackingPage-step,
+.flightTrackingPage-benefit {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  min-height: 86px;
+  padding: 12px;
+  border: 1px solid rgba(15, 95, 215, 0.12);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 96% 4%, rgba(59, 130, 246, 0.13), transparent 28%),
+    rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+}
+
+.flightTrackingPage-stepIcon,
+.flightTrackingPage-benefitIcon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 15px;
+  color: #0f5fd7;
+  background: rgba(239, 246, 255, 0.94);
+}
+
+.flightTrackingPage-stepIcon svg,
+.flightTrackingPage-benefitIcon svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+}
+
+.flightTrackingPage-step strong,
+.flightTrackingPage-benefit strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.flightTrackingPage-step p,
+.flightTrackingPage-benefit p,
+.flightTrackingPage-finalCta p {
+  margin: 0;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.42;
+}
+
+.flightTrackingPage-finalCta {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid rgba(124, 58, 237, 0.26);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 7% 20%, rgba(168, 85, 247, 0.2), transparent 30%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(238, 244, 255, 0.92));
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+}
+
+.flightTrackingPage-finalCta > div {
+  display: grid;
+  gap: 5px;
+}
+
+@media (max-width: 480px) {
+  .flightTrackingPage {
+    gap: 10px;
+  }
+
+  .flightTrackingPage-hero {
+    min-height: 330px;
+    border-radius: 22px;
+  }
+
+  .flightTrackingPage-heroContent {
+    gap: 11px;
+    min-height: 330px;
+    padding: 16px;
+  }
+
+  .flightTrackingPage-hero h1 {
+    max-width: 17rem;
+    font-size: 24px;
+  }
+
+  .flightTrackingPage-hero p {
+    max-width: 17.5rem;
+    font-size: 11px;
+  }
+
+  .flightTrackingPage-eyebrow,
+  .flightTrackingPage-sectionHeader span,
+  .flightTrackingPage-finalCta span {
+    min-height: 20px;
+    font-size: 8px;
+  }
+
+  .flightTrackingPage-heroStats span {
+    min-height: 50px;
+    padding: 8px;
+    border-radius: 14px;
+    font-size: 9px;
+  }
+
+  .flightTrackingPage-heroStats strong {
+    font-size: 15px;
+  }
+
+  .flightTrackingPage-primaryCta {
+    width: 100%;
+    min-height: 38px;
+    border-radius: 12px;
+    font-size: 11px;
+  }
+
+  .flightTrackingPage-sectionHeader h2,
+  .flightTrackingPage-finalCta h2 {
+    font-size: 18px;
+  }
+
+  .flightTrackingPage-step,
+  .flightTrackingPage-benefit {
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 9px;
+    min-height: 74px;
+    padding: 10px;
+    border-radius: 16px;
+  }
+
+  .flightTrackingPage-stepIcon,
+  .flightTrackingPage-benefitIcon {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+  }
+
+  .flightTrackingPage-stepIcon svg,
+  .flightTrackingPage-benefitIcon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .flightTrackingPage-step strong,
+  .flightTrackingPage-benefit strong {
+    font-size: 12px;
+  }
+
+  .flightTrackingPage-step p,
+  .flightTrackingPage-benefit p,
+  .flightTrackingPage-finalCta p {
+    font-size: 10px;
+  }
+
+  .flightTrackingPage-finalCta {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 18px;
+  }
+}
