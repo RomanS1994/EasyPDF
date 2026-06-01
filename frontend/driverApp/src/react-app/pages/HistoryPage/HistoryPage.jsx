@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { RequestLoadingState } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { OrderDetails } from '../../features/orders/components/OrderDetails/OrderDetails.jsx';
@@ -15,10 +15,22 @@ export function HistoryPage() {
   const [dateFilter, setDateFilter] = useState('');
   const [sortKey, setSortKey] = useState('oldest');
   const [selectedOrderId, setSelectedOrderId] = useState('');
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
   const { data, isLoading, isError } = useGetOrdersQuery();
   const { t } = useI18n();
   const orders = data?.orders || [];
   const showDateFilter = activeTab !== 'today';
+  const referenceDate = useMemo(() => new Date(currentTime), [currentTime]);
+
+  useEffect(() => {
+    const timerId = window.setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60_000);
+
+    return () => {
+      window.clearInterval(timerId);
+    };
+  }, []);
 
   const filteredOrders = useMemo(() => {
     if (!showDateFilter || !dateFilter) {
@@ -42,8 +54,8 @@ export function HistoryPage() {
       list.push(order);
     }
 
-    return [...list].sort((left, right) => compareOrders(left, right, sortKey));
-  }, [activeTab, filteredOrders, sortKey]);
+    return [...list].sort((left, right) => compareOrders(left, right, sortKey, { referenceDate }));
+  }, [activeTab, filteredOrders, referenceDate, sortKey]);
 
   function handleCloseDetails() {
     setSelectedOrderId('');
@@ -82,7 +94,7 @@ export function HistoryPage() {
       </div>
 
       {!isLoading && !isError && visibleOrders.length ? (
-        <HistoryOrdersList orders={visibleOrders} onOpen={handleOpenDetails} />
+        <HistoryOrdersList orders={visibleOrders} onOpen={handleOpenDetails} referenceDate={referenceDate} />
       ) : null}
 
       {selectedOrderId ? <OrderDetails orderId={selectedOrderId} onClose={handleCloseDetails} /> : null}

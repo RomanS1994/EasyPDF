@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { RequestLoader } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
@@ -12,6 +13,34 @@ import { FlightTrackingNotice } from '../FlightTrackingNotice/FlightTrackingNoti
 
 import heroRobotImage from '../../../../assets/main_robot.png';
 import './WorkspaceOverview.css';
+
+const DESKTOP_ROBOT_MAX_TRAVEL = 10;
+const MOBILE_ROBOT_MAX_TRAVEL = 8;
+
+function getRobotMaxTravel() {
+  if (typeof window !== 'undefined' && window.matchMedia('(max-width: 480px)').matches) {
+    return MOBILE_ROBOT_MAX_TRAVEL;
+  }
+
+  return DESKTOP_ROBOT_MAX_TRAVEL;
+}
+
+function createRobotPose() {
+  const angle = Math.random() * Math.PI * 2;
+  const maxTravel = getRobotMaxTravel();
+  const radius = (0.45 + Math.random() * 0.55) * maxTravel;
+
+  return {
+    '--robot-x': `${(Math.cos(angle) * radius).toFixed(1)}px`,
+    '--robot-y': `${(Math.sin(angle) * radius).toFixed(1)}px`,
+    '--robot-depth': `${(20 + Math.random() * 3).toFixed(1)}px`,
+    '--robot-spin': `${(-3 + Math.random() * 6).toFixed(1)}deg`,
+    '--robot-yaw': `${(-16 + Math.random() * 32).toFixed(1)}deg`,
+    '--robot-pitch': `${(-3 + Math.random() * 6).toFixed(1)}deg`,
+    '--robot-scale': (1 + Math.random() * 0.018).toFixed(3),
+    '--robot-transition': `${Math.round(2600 + Math.random() * 1100)}ms`,
+  };
+}
 
 function getUserName(user) {
   // Беремо коротке ім'я для верхнього привітання.
@@ -40,6 +69,26 @@ export function WorkspaceOverview({ user, orders, isOrdersLoading = false }) {
   const planWindowEnd = getSubscriptionEndDate(user?.subscription, language);
   const weeklySalaryTotal = getWeeklySalaryTotal(orders);
   const orderCount = String(orders.length || 0);
+  const [robotPose, setRobotPose] = useState(() => createRobotPose());
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return undefined;
+    }
+
+    let timeoutId;
+
+    const moveRobot = () => {
+      setRobotPose(createRobotPose());
+      timeoutId = window.setTimeout(moveRobot, 2400 + Math.random() * 1300);
+    };
+
+    timeoutId = window.setTimeout(moveRobot, 450);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
 
   return (
     <div className={`workspaceOverview workspaceOverview--${planVariant} pageStack`}>
@@ -53,7 +102,11 @@ export function WorkspaceOverview({ user, orders, isOrdersLoading = false }) {
         <div className="workspaceOverview-mark" aria-hidden="true">
           <div className="workspaceOverview-markSurface" />
           <div className="workspaceOverview-markFrame">
-            <img className="workspaceOverview-markImage" src={heroRobotImage} alt="" />
+            <div className="workspaceOverview-robotOrbit" style={robotPose}>
+              <div className="workspaceOverview-robotPulse">
+                <img className="workspaceOverview-markImage" src={heroRobotImage} alt="" />
+              </div>
+            </div>
           </div>
         </div>
 

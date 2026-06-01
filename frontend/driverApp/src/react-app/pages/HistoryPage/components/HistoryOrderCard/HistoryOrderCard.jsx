@@ -7,6 +7,7 @@ import {
   getHistoryBucket,
   getOrderTripTime,
   getTotalPrice,
+  isOrderCompletedByTime,
 } from '../../historyUtils.js';
 import { getDateKey, parseDateValue } from '../../../shared/dateUtils.js';
 import { HistoryRouteModal } from '../HistoryRouteModal/HistoryRouteModal.jsx';
@@ -491,7 +492,27 @@ async function copyTextToClipboard(value) {
   document.body.removeChild(input);
 }
 
-function HistoryOrderCard({ order, onOpen }) {
+function getOrderStatusLabel(status, isCompletedByTime, t) {
+  if (isCompletedByTime) {
+    return t('history.done');
+  }
+
+  if (status.bucket === 'today') {
+    return t('history.today');
+  }
+
+  if (status.bucket === 'planned') {
+    return t('history.planned');
+  }
+
+  if (status.bucket === 'completed') {
+    return t('history.completed');
+  }
+
+  return t('history.draft');
+}
+
+function HistoryOrderCard({ order, onOpen, referenceDate }) {
   const { t } = useI18n();
   const copyNoticeTimerRef = useRef(null);
   const [copyNoticeVisible, setCopyNoticeVisible] = useState(false);
@@ -500,11 +521,13 @@ function HistoryOrderCard({ order, onOpen }) {
     label: '',
   });
   const status = getHistoryBucket(order);
+  const completedByTime = isOrderCompletedByTime(order, referenceDate);
+  const statusLabel = getOrderStatusLabel(status, completedByTime, t);
   const customerName = getCustomerName(order);
   const totalPrice = getTotalPrice(order);
   const orderTripTime = getOrderTripTime(order);
   const flightNumber = normalizeFlightNumber(order?.flightNumber || order?.contractData?.flightNumber || '');
-  const flightStatus = flightNumber && isFlightStatusDisplayWindow(orderTripTime)
+  const flightStatus = !completedByTime && flightNumber && isFlightStatusDisplayWindow(orderTripTime)
     ? normalizeFlightStatus(order?.metadata?.flightStatus, flightNumber)
     : null;
   const dateValue = formatDate(orderTripTime || order?.createdAt);
@@ -607,7 +630,7 @@ function HistoryOrderCard({ order, onOpen }) {
   }
 
   return (
-    <li className={`orderItem orderItem--history orderItem--${status.bucket} ${flightStatus ? `orderItem--flight-${flightStatus.status}` : ''}`}>
+    <li className={`orderItem orderItem--history orderItem--${status.bucket} ${completedByTime ? 'orderItem--doneByTime' : ''} ${flightStatus ? `orderItem--flight-${flightStatus.status}` : ''}`}>
       <article
         className="orderItemCard orderItemCard-history"
         role="button"
@@ -623,7 +646,12 @@ function HistoryOrderCard({ order, onOpen }) {
           </strong>
           <div className="orderItemHeaderActions">
             <div className="orderStatusBadgeWrap">
-              {flightStatus ? (
+              {completedByTime ? (
+                <div className="orderStatusBadgeToday orderStatusBadgeToday--done">
+                  <span className="orderStatusBadgeDot" aria-hidden="true" />
+                  {statusLabel}
+                </div>
+              ) : flightStatus ? (
                 <FlightStatusBadge flightStatus={flightStatus} />
               ) : (
                 <>
@@ -648,7 +676,7 @@ function HistoryOrderCard({ order, onOpen }) {
                   ) : null}
                   <div className="orderStatusBadgeToday">
                     {status.bucket === 'today' ? <span className="orderStatusBadgeDot" aria-hidden="true" /> : null}
-                    {status.label}
+                    {statusLabel}
                   </div>
                 </>
               )}

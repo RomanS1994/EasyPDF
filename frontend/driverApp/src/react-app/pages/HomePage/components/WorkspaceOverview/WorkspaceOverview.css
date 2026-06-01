@@ -1,12 +1,17 @@
 .workspaceOverview {
   display: grid;
   gap: 13px;
-  --workspace-hero-start: #f7faff;
-  --workspace-hero-mid: #edf2ff;
-  --workspace-hero-end: #dfe9ff;
-  --workspace-hero-border: rgba(15, 95, 215, 0.18);
-  --workspace-hero-glow: rgba(15, 95, 215, 0.11);
-  --workspace-hero-surface: rgba(255, 255, 255, 0.98);
+  --workspace-brand: #2f7ef8;
+  --workspace-hero-title: #0f172a;
+  --workspace-hero-copy: #65748b;
+  --workspace-hero-border: rgba(47, 126, 248, 0.2);
+  --workspace-hero-bg: url('../../../../assets/plan-bg-free.png');
+  --workspace-hero-overlay: linear-gradient(90deg, rgba(255, 255, 255, 0.64), rgba(255, 255, 255, 0.2) 56%, transparent);
+  --workspace-pill-bg: rgba(255, 255, 255, 0.76);
+  --workspace-pill-border: rgba(255, 255, 255, 0.68);
+  --workspace-pill-shadow: rgba(20, 32, 57, 0.1);
+  --workspace-robot-frame: rgba(47, 126, 248, 0.17);
+  --workspace-robot-glow: rgba(47, 126, 248, 0.13);
 }
 
 .appLayout--home .workspaceOverview {
@@ -22,77 +27,89 @@
   gap: 11px;
   padding: 15px 15px 19px;
   border: 1px solid var(--workspace-hero-border);
-  background:
-    radial-gradient(
-      circle at 18% 18%,
-      rgba(255, 255, 255, 0.82),
-      transparent 24%
-    ),
-    radial-gradient(
-      circle at 84% 16%,
-      var(--workspace-hero-glow),
-      transparent 30%
-    ),
-    linear-gradient(
-      160deg,
-      var(--workspace-hero-surface) 0%,
-      var(--workspace-hero-start) 42%,
-      var(--workspace-hero-mid) 70%,
-      var(--workspace-hero-end) 100%
-    );
+  background: var(--workspace-hero-bg) center / cover no-repeat;
   box-shadow:
     0 10px 26px rgba(20, 32, 57, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.86);
+  isolation: isolate;
+}
+
+.workspaceOverview .appTop::before,
+.workspaceOverview .appTop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.workspaceOverview .appTop::before {
+  z-index: 0;
+  background: var(--workspace-hero-overlay);
+}
+
+.workspaceOverview .appTop::after {
+  display: none;
+}
+
+.workspaceOverview .appTitleBlock,
+.workspaceOverview .topMetrics {
+  position: relative;
+  z-index: 1;
 }
 
 .workspaceOverview--free {
-  --workspace-hero-start: #fdfbff;
-  --workspace-hero-mid: #f1ecff;
-  --workspace-hero-end: #e3dbff;
-  --workspace-hero-border: rgba(142, 124, 255, 0.22);
-  --workspace-hero-glow: rgba(142, 124, 255, 0.16);
-  --workspace-hero-surface: rgba(255, 255, 255, 0.98);
+  --workspace-brand: #2f7ef8;
+  --workspace-hero-border: rgba(47, 126, 248, 0.2);
+  --workspace-hero-bg: url('../../../../assets/plan-bg-free.png');
+  --workspace-robot-frame: rgba(47, 126, 248, 0.17);
+  --workspace-robot-glow: rgba(47, 126, 248, 0.13);
 }
 
 .workspaceOverview--silver {
-  --workspace-hero-start: #f8fafc;
-  --workspace-hero-mid: #e9edf3;
-  --workspace-hero-end: #d8e0ea;
-  --workspace-hero-border: rgba(141, 152, 168, 0.24);
-  --workspace-hero-glow: rgba(141, 152, 168, 0.16);
-  --workspace-hero-surface: rgba(255, 255, 255, 0.98);
+  --workspace-brand: #5f6776;
+  --workspace-hero-border: rgba(107, 114, 128, 0.2);
+  --workspace-hero-bg: url('../../../../assets/plan-bg-silver.png');
+  --workspace-robot-frame: rgba(107, 114, 128, 0.18);
+  --workspace-robot-glow: rgba(107, 114, 128, 0.13);
 }
 
 .workspaceOverview--gold {
-  --workspace-hero-start: #fff9ee;
-  --workspace-hero-mid: #fff0c5;
-  --workspace-hero-end: #ffe09a;
-  --workspace-hero-border: rgba(216, 161, 29, 0.24);
-  --workspace-hero-glow: rgba(216, 161, 29, 0.2);
-  --workspace-hero-surface: rgba(255, 255, 255, 0.98);
+  --workspace-brand: #d29600;
+  --workspace-hero-border: rgba(210, 150, 0, 0.22);
+  --workspace-hero-bg: url('../../../../assets/plan-bg-gold.png');
+  --workspace-robot-frame: rgba(210, 150, 0, 0.2);
+  --workspace-robot-glow: rgba(210, 150, 0, 0.16);
 }
 
 .workspaceOverview--platinum {
-  --workspace-hero-start: #f5fff9;
-  --workspace-hero-mid: #e3f8ee;
-  --workspace-hero-end: #cfeadc;
-  --workspace-hero-border: rgba(79, 155, 127, 0.24);
-  --workspace-hero-glow: rgba(79, 155, 127, 0.18);
-  --workspace-hero-surface: rgba(255, 255, 255, 0.98);
+  --workspace-brand: #16ad9d;
+  --workspace-hero-title: #0f172a;
+  --workspace-hero-copy: #64748b;
+  --workspace-hero-border: rgba(20, 184, 166, 0.24);
+  --workspace-hero-bg: url('../../../../assets/plan-bg-platinum.png');
+  --workspace-hero-overlay: linear-gradient(90deg, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.16) 58%, transparent);
+  --workspace-pill-bg: rgba(255, 255, 255, 0.76);
+  --workspace-pill-border: rgba(255, 255, 255, 0.68);
+  --workspace-pill-shadow: rgba(20, 32, 57, 0.1);
+  --workspace-robot-frame: rgba(20, 184, 166, 0.22);
+  --workspace-robot-glow: rgba(20, 184, 166, 0.16);
 }
 
 .workspaceOverview .sectionEyebrow {
   min-height: 24px;
   padding: 0 10px;
+  background: var(--workspace-pill-bg);
+  color: var(--workspace-brand);
   font-size: 11px;
 }
 
 .workspaceOverview .appTitleBlock {
-  gap: 4px;
+  gap: 8px;
   max-width: calc(100% - 112px);
 }
 
 .workspaceOverview .appTitleBlock h1 {
+  color: var(--workspace-hero-title);
   font-size: clamp(26px, 5vw, 34px);
   line-height: 1.02;
 }
@@ -105,6 +122,7 @@
 
 .workspaceOverview .appTitleBlock p:last-child {
   max-width: 17rem;
+  color: var(--workspace-hero-copy);
   font-size: 14px;
   line-height: 1.4;
 }
@@ -113,8 +131,11 @@
   position: absolute;
   top: 16px;
   right: 16px;
-  width: 92px;
-  height: 92px;
+  z-index: 1;
+  --workspace-mark-size: 92px;
+  --workspace-robot-size: 82px;
+  width: var(--workspace-mark-size);
+  height: var(--workspace-mark-size);
   pointer-events: none;
   perspective: 900px;
   transform-style: preserve-3d;
@@ -128,19 +149,19 @@
   display: grid;
   place-items: center;
   position: relative;
-  border: 1px solid rgba(15, 95, 215, 0.14);
+  border: 1px solid var(--workspace-robot-frame);
   border-radius: 50%;
   background:
     radial-gradient(
       circle at 35% 30%,
       rgba(255, 255, 255, 0.9),
-      rgba(235, 241, 255, 0.82) 52%,
-      rgba(222, 233, 255, 0.72)
+      color-mix(in srgb, var(--workspace-brand) 8%, white) 52%,
+      color-mix(in srgb, var(--workspace-brand) 14%, white)
     ),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(240, 245, 255, 0.9));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.74), color-mix(in srgb, var(--workspace-brand) 8%, rgba(255, 255, 255, 0.78)));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.92),
-    0 10px 24px rgba(15, 95, 215, 0.08);
+    0 10px 24px var(--workspace-robot-glow);
   overflow: hidden;
 }
 
@@ -156,33 +177,60 @@
     ),
     radial-gradient(
       circle at 50% 42%,
-      rgba(15, 95, 215, 0.12),
+      var(--workspace-robot-glow),
       transparent 48%
     ),
-    radial-gradient(circle at 68% 72%, rgba(15, 95, 215, 0.06), transparent 40%);
+    radial-gradient(circle at 68% 72%, color-mix(in srgb, var(--workspace-robot-glow) 62%, transparent), transparent 40%);
   opacity: 0.92;
   transform: translate3d(0, 0, -18px);
   animation: workspaceRobotSurface 14s ease-in-out infinite;
 }
 
+.workspaceOverview-robotOrbit {
+  width: var(--workspace-robot-size);
+  height: var(--workspace-robot-size);
+  display: grid;
+  place-items: center;
+  position: relative;
+  z-index: 1;
+  transform-style: preserve-3d;
+  transform: translate3d(var(--robot-x, 0), var(--robot-y, 0), var(--robot-depth, 20px))
+    rotate(var(--robot-spin, 0deg));
+  transition: transform var(--robot-transition, 3200ms) cubic-bezier(0.42, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.workspaceOverview-robotPulse {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  animation: workspaceRobotPulse 7.2s ease-in-out infinite;
+  transform-origin: center center;
+  will-change: transform;
+}
+
 .workspaceOverview-markImage {
-  width: 62px;
-  height: 62px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   object-position: center center;
   display: block;
   position: relative;
-  z-index: 1;
   backface-visibility: hidden;
   transform-style: preserve-3d;
-  filter: drop-shadow(0 4px 12px rgba(0, 122, 255, 0.18))
-    drop-shadow(0 0 10px rgba(8, 145, 178, 0.08));
-  animation: workspaceRobotFloat 16s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+  filter: drop-shadow(0 4px 12px color-mix(in srgb, var(--workspace-brand) 26%, transparent))
+    drop-shadow(0 0 10px color-mix(in srgb, var(--workspace-brand) 15%, transparent));
+  transform: rotateY(var(--robot-yaw, 0deg)) rotateX(var(--robot-pitch, 0deg))
+    scale(var(--robot-scale, 1));
+  transition: transform var(--robot-transition, 3200ms) ease-in-out;
   transform-origin: center center;
+  will-change: transform;
 }
 
 .workspaceOverview .topMetrics {
   gap: 7px;
+  padding-top: 28px;
 }
 
 .workspaceOverview .topMetric {
@@ -192,14 +240,23 @@
   min-height: 40px;
   padding: 10px 12px;
   border-radius: 12px;
+  border-color: var(--workspace-pill-border);
+  background: var(--workspace-pill-bg);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 12px 24px var(--workspace-pill-shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 .workspaceOverview .topMetric span {
+  color: var(--workspace-brand);
   font-size: 10px;
   min-width: 0;
 }
 
 .workspaceOverview .topMetric strong {
+  color: var(--workspace-hero-title);
   font-size: 18px;
   line-height: 0.95;
   text-align: right;
@@ -384,13 +441,8 @@
   .workspaceOverview-mark {
     top: 12px;
     right: 12px;
-    width: 76px;
-    height: 76px;
-  }
-
-  .workspaceOverview-markImage {
-    width: 50px;
-    height: 50px;
+    --workspace-mark-size: 76px;
+    --workspace-robot-size: 66px;
   }
 
   .workspaceOverview .sectionEyebrow {
@@ -402,6 +454,10 @@
     font-size: clamp(22px, 6.2vw, 28px);
   }
 
+  .workspaceOverview .appTitleBlock {
+    gap: 7px;
+  }
+
   .workspaceOverview .appTitleBlock p:last-child {
     max-width: 15rem;
     font-size: 10px;
@@ -409,6 +465,7 @@
 
   .workspaceOverview .topMetrics {
     gap: 5px;
+    padding-top: 22px;
   }
 
   .workspaceOverview .topMetric {
@@ -477,42 +534,6 @@
   }
 }
 
-@keyframes workspaceRobotFloat {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 18px) rotate(-0.2deg) rotateX(0deg)
-      rotateY(0deg) scale(1);
-  }
-  12% {
-    transform: translate3d(1px, -1px, 20px) rotate(0.4deg) rotateX(1deg)
-      rotateY(-14deg) scale(1.01);
-  }
-  24% {
-    transform: translate3d(0, 0, 21px) rotate(-0.5deg) rotateX(-1deg)
-      rotateY(10deg) scale(0.998);
-  }
-  38% {
-    transform: translate3d(-1px, 1px, 22px) rotate(0.5deg) rotateX(1.2deg)
-      rotateY(-18deg) scale(1.012);
-  }
-  52% {
-    transform: translate3d(1px, -1px, 21px) rotate(-0.3deg) rotateX(-0.8deg)
-      rotateY(16deg) scale(1.004);
-  }
-  66% {
-    transform: translate3d(-1px, 1px, 20px) rotate(0.4deg) rotateX(0.9deg)
-      rotateY(-12deg) scale(1.008);
-  }
-  80% {
-    transform: translate3d(1px, 0, 21px) rotate(-0.35deg) rotateX(-0.7deg)
-      rotateY(13deg) scale(1.002);
-  }
-  92% {
-    transform: translate3d(0, 1px, 20px) rotate(0.2deg) rotateX(0.6deg)
-      rotateY(-8deg) scale(1);
-  }
-}
-
 @keyframes workspaceRobotSurface {
   0%,
   100% {
@@ -522,6 +543,16 @@
   50% {
     opacity: 1;
     transform: translate3d(0.5px, -0.5px, -18px) scale(1.03);
+  }
+}
+
+@keyframes workspaceRobotPulse {
+  0%,
+  100% {
+    transform: scale(0.98);
+  }
+  50% {
+    transform: scale(1.08);
   }
 }
 
@@ -546,7 +577,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .workspaceOverview-markSurface,
+  .workspaceOverview-robotOrbit,
+  .workspaceOverview-robotPulse,
   .workspaceOverview-markImage {
     animation: none;
+    transition: none;
   }
 }

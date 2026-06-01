@@ -72,6 +72,10 @@
   background: linear-gradient(180deg, #cf2f2f, rgba(207, 47, 47, 0.06));
 }
 
+.orderItem--doneByTime::before {
+  background: linear-gradient(180deg, #d76a3d, rgba(215, 106, 61, 0.06));
+}
+
 .orderItem--today {
   background:
     radial-gradient(
@@ -107,6 +111,25 @@
       180deg,
       rgba(255, 255, 255, 0.992),
       rgba(255, 244, 235, 0.98)
+    );
+}
+
+.orderItem--doneByTime {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(0, 122, 255, 0.1),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at left top,
+      rgba(215, 106, 61, 0.13),
+      transparent 24%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.992),
+      rgba(255, 246, 239, 0.98)
     );
 }
 
@@ -605,6 +628,12 @@
 .orderItem--today .orderStatusBadgeToday {
   background: rgba(52, 199, 89, 0.12);
   color: #15783a;
+}
+
+.orderItem--doneByTime .orderStatusBadgeToday,
+.orderStatusBadgeToday--done {
+  background: rgba(215, 106, 61, 0.12);
+  color: #9f4a23;
 }
 
 .orderItem--completed .orderStatusBadge {

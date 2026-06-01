@@ -1,18 +1,19 @@
 .flightTrackingNotice {
   position: relative;
   display: grid;
-  gap: 7px;
-  min-height: 204px;
-  padding: 12px 15px 11px;
+  gap: 9px;
+  min-height: 188px;
+  padding: 14px 16px 12px;
   overflow: hidden;
-  border: 1px solid rgba(96, 165, 250, 0.34);
-  border-radius: 26px;
-  color: #f8fbff;
-  background: #051633;
+  border: 1px solid rgba(37, 99, 235, 0.16);
+  border-radius: 24px;
+  color: #102033;
+  background:
+    radial-gradient(circle at 94% 18%, rgba(45, 212, 191, 0.12), transparent 28%),
+    linear-gradient(135deg, #f8fbff 0%, #edf7ff 56%, #e9fff8 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
-    0 18px 34px rgba(5, 22, 51, 0.22);
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 10px 24px rgba(30, 58, 90, 0.07);
   isolation: isolate;
 }
 
@@ -22,10 +23,10 @@
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(90deg, rgba(3, 11, 28, 0.94) 0%, rgba(5, 22, 51, 0.76) 48%, rgba(5, 22, 51, 0.24) 100%),
-    linear-gradient(180deg, rgba(2, 6, 23, 0.3) 0%, rgba(2, 6, 23, 0.1) 46%, rgba(2, 6, 23, 0.72) 100%),
-    linear-gradient(90deg, rgba(147, 197, 253, 0.08) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(147, 197, 253, 0.05) 1px, transparent 1px);
+    linear-gradient(90deg, rgba(248, 251, 255, 0.99) 0%, rgba(248, 251, 255, 0.94) 42%, rgba(248, 251, 255, 0.54) 62%, rgba(248, 251, 255, 0.08) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.36) 0%, rgba(219, 234, 254, 0.06) 100%),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.04) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(59, 130, 246, 0.035) 1px, transparent 1px);
   background-size: 100% 100%, 100% 100%, 42px 42px, 42px 42px;
   pointer-events: none;
 }
@@ -33,15 +34,15 @@
 .flightTrackingNotice::after {
   content: "";
   position: absolute;
-  inset: auto -8% -24% 30%;
+  inset: auto -4% -28% 46%;
   z-index: 1;
-  height: 54%;
+  height: 48%;
   background:
-    radial-gradient(ellipse at center, rgba(34, 211, 238, 0.16), transparent 54%),
-    linear-gradient(180deg, rgba(59, 130, 246, 0.16), rgba(88, 28, 135, 0.2));
+    radial-gradient(ellipse at center, rgba(45, 212, 191, 0.16), transparent 58%),
+    linear-gradient(180deg, rgba(191, 219, 254, 0.2), rgba(125, 211, 252, 0.1));
   filter: blur(2px);
   transform: skewY(-6deg);
-  opacity: 0.78;
+  opacity: 0.64;
   pointer-events: none;
 }
 
@@ -56,13 +57,17 @@
 
 .flightTrackingNotice-photo {
   position: absolute;
-  inset: 0;
-  width: 100%;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: auto;
+  width: 68%;
   height: 100%;
   display: block;
   object-fit: cover;
-  object-position: 62% 50%;
-  filter: saturate(1.16) contrast(1.12) brightness(0.75);
+  object-position: 62% 48%;
+  opacity: 0.92;
+  filter: saturate(0.96) contrast(1.08) brightness(1.04);
 }
 
 .flightTrackingNotice-visual::after {
@@ -70,8 +75,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 70% 36%, rgba(37, 99, 235, 0.18), transparent 34%),
-    radial-gradient(circle at 88% 78%, rgba(124, 58, 237, 0.2), transparent 30%);
+    linear-gradient(90deg, rgba(248, 251, 255, 0.62), transparent 42%),
+    linear-gradient(180deg, transparent 0%, rgba(248, 251, 255, 0.38) 100%);
 }
 
 .flightTrackingNotice-route {
@@ -81,11 +86,11 @@
   z-index: 1;
   width: 92px;
   height: 58px;
-  border-bottom: 2px dashed rgba(45, 212, 191, 0.78);
-  border-left: 2px dashed rgba(59, 130, 246, 0.68);
+  border-bottom: 2px dashed rgba(20, 184, 166, 0.5);
+  border-left: 2px dashed rgba(59, 130, 246, 0.36);
   border-radius: 0 0 0 100px;
   transform: rotate(-17deg);
-  filter: drop-shadow(0 0 8px rgba(45, 212, 191, 0.52));
+  filter: drop-shadow(0 0 7px rgba(45, 212, 191, 0.24));
 }
 
 .flightTrackingNotice-route::after {
@@ -96,8 +101,8 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #22d3ee;
-  box-shadow: 0 0 16px rgba(34, 211, 238, 0.95);
+  background: #14b8a6;
+  box-shadow: 0 0 12px rgba(20, 184, 166, 0.42);
 }
 
 .flightTrackingNotice-main {
@@ -107,7 +112,7 @@
   grid-template-columns: 48px minmax(0, 1fr);
   gap: 10px;
   max-width: calc(100% - 10px);
-  min-height: 58px;
+  min-height: 54px;
 }
 
 .flightTrackingNotice-heroIcon {
@@ -116,13 +121,13 @@
   place-items: center;
   width: 46px;
   height: 46px;
-  border: 1px solid rgba(147, 197, 253, 0.28);
+  border: 1px solid rgba(96, 165, 250, 0.22);
   border-radius: 16px;
-  color: #5b8cff;
-  background: rgba(255, 255, 255, 0.08);
+  color: #2563eb;
+  background: rgba(255, 255, 255, 0.76);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 12px 28px rgba(0, 0, 0, 0.16);
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 10px 22px rgba(37, 99, 235, 0.1);
 }
 
 .flightTrackingNotice-heroIcon svg {
@@ -141,7 +146,7 @@
   height: 9px;
   border-radius: 50%;
   background: #34d399;
-  box-shadow: 0 0 14px rgba(52, 211, 153, 0.82);
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.46);
 }
 
 .flightTrackingNotice-copy {
@@ -150,7 +155,7 @@
   gap: 4px;
   min-width: 0;
   padding-top: 2px;
-  padding-right: 76px;
+  padding-right: 82px;
 }
 
 .flightTrackingNotice-status,
@@ -166,49 +171,48 @@
 
 .flightTrackingNotice-status {
   min-height: 14px;
-  color: #a78bfa;
+  color: #2563eb;
   font-size: 8px;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.04em;
 }
 
 .flightTrackingNotice-plan {
   position: absolute;
-  top: 13px;
-  right: 15px;
+  top: 14px;
+  right: 16px;
   z-index: 3;
   gap: 5px;
   min-height: 24px;
   padding: 0 12px;
-  color: #ffffff;
+  color: #334155;
   font-size: 10px;
-  letter-spacing: 0.05em;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  letter-spacing: 0.02em;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(148, 163, 184, 0.22);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 0 18px rgba(147, 197, 253, 0.18);
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 8px 18px rgba(30, 64, 175, 0.08);
 }
 
 .flightTrackingNotice-plan svg {
   width: 12px;
   height: 12px;
-  color: #a78bfa;
+  color: #2563eb;
 }
 
 .flightTrackingNotice-copy h2 {
   max-width: 18.6rem;
   margin: 0;
-  color: #ffffff;
+  color: #0f172a;
   font-size: 13px;
   font-weight: 900;
   letter-spacing: 0;
   line-height: 1.08;
-  text-shadow: 0 2px 20px rgba(255, 255, 255, 0.14);
 }
 
 .flightTrackingNotice-subtitle {
   margin: 0;
-  color: #93c5fd;
+  color: #42617f;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0;
@@ -220,36 +224,36 @@
   z-index: 2;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0;
+  gap: 7px;
   margin: 0;
-  padding: 7px 9px;
+  padding: 0;
   list-style: none;
-  border: 1px solid rgba(147, 197, 253, 0.22);
-  border-radius: 17px;
-  background: rgba(3, 15, 36, 0.54);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .flightTrackingNotice-features li {
   display: grid;
   grid-template-columns: 24px minmax(0, 1fr);
   align-items: center;
-  gap: 7px;
-  min-height: 38px;
-  padding: 0 7px;
-  border-right: 1px solid rgba(147, 197, 253, 0.22);
-  color: #ffffff;
+  gap: 6px;
+  min-height: 36px;
+  padding: 6px 7px;
+  border: 1px solid rgba(96, 165, 250, 0.12);
+  border-radius: 14px;
+  color: #102033;
+  background: rgba(255, 255, 255, 0.42);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.52),
+    0 4px 10px rgba(30, 58, 90, 0.035);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .flightTrackingNotice-features li:first-child {
-  padding-left: 0;
+  padding-left: 7px;
 }
 
 .flightTrackingNotice-features li:last-child {
-  padding-right: 0;
-  border-right: 0;
+  padding-right: 7px;
 }
 
 .flightTrackingNotice-featureIcon {
@@ -258,27 +262,27 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  color: #60a5fa;
-  background: rgba(37, 99, 235, 0.2);
+  color: #2563eb;
+  background: rgba(219, 234, 254, 0.82);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 0 18px rgba(59, 130, 246, 0.24);
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    0 0 14px rgba(59, 130, 246, 0.12);
 }
 
 .flightTrackingNotice-features li:first-child .flightTrackingNotice-featureIcon {
-  color: #34d399;
-  background: rgba(16, 185, 129, 0.2);
+  color: #0f9f87;
+  background: rgba(204, 251, 241, 0.78);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 0 18px rgba(16, 185, 129, 0.28);
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    0 0 14px rgba(16, 185, 129, 0.12);
 }
 
 .flightTrackingNotice-features li:last-child .flightTrackingNotice-featureIcon {
-  color: #a78bfa;
-  background: rgba(124, 58, 237, 0.22);
+  color: #475569;
+  background: rgba(241, 245, 249, 0.84);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 0 18px rgba(124, 58, 237, 0.3);
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    0 0 14px rgba(71, 85, 105, 0.08);
 }
 
 .flightTrackingNotice-featureIcon svg {
@@ -289,7 +293,7 @@
 }
 
 .flightTrackingNotice-features strong {
-  color: #ffffff;
+  color: #102033;
   font-size: 8px;
   font-weight: 900;
   letter-spacing: 0;
@@ -300,41 +304,42 @@
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) minmax(130px, 39%);
+  grid-template-columns: 32px minmax(0, 1fr) minmax(128px, 35%);
   gap: 8px;
   align-items: center;
-  min-height: 42px;
-  padding: 6px 9px;
-  border: 1px solid rgba(168, 85, 247, 0.38);
-  border-radius: 18px;
+  min-height: 38px;
+  padding: 5px 7px;
+  border: 1px solid rgba(96, 165, 250, 0.18);
+  border-radius: 16px;
   background:
-    radial-gradient(circle at 8% 24%, rgba(196, 181, 253, 0.16), transparent 23%),
-    radial-gradient(circle at 92% 20%, rgba(96, 165, 250, 0.18), transparent 28%),
-    linear-gradient(90deg, rgba(76, 29, 149, 0.76), rgba(30, 64, 175, 0.58));
+    radial-gradient(circle at 92% 20%, rgba(45, 212, 191, 0.1), transparent 30%),
+    rgba(255, 255, 255, 0.7);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 0 24px rgba(124, 58, 237, 0.18);
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    0 6px 16px rgba(30, 64, 175, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .flightTrackingNotice-ctaIcon {
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 13px;
-  color: #f8fbff;
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
+  color: #2563eb;
   background:
-    radial-gradient(circle at 44% 42%, rgba(255, 255, 255, 0.34), transparent 38%),
-    linear-gradient(145deg, rgba(226, 232, 240, 0.28), rgba(51, 65, 85, 0.36));
-  border: 1px solid rgba(255, 255, 255, 0.24);
+    radial-gradient(circle at 44% 42%, rgba(255, 255, 255, 0.9), transparent 38%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(219, 234, 254, 0.72));
+  border: 1px solid rgba(96, 165, 250, 0.22);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.24),
-    0 0 20px rgba(167, 139, 250, 0.2);
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 8px 16px rgba(37, 99, 235, 0.08);
 }
 
 .flightTrackingNotice-ctaIcon svg {
-  width: 23px;
-  height: 23px;
+  width: 20px;
+  height: 20px;
 }
 
 .flightTrackingNotice-ctaCopy {
@@ -343,7 +348,7 @@
 }
 
 .flightTrackingNotice-ctaCopy strong {
-  color: #ffffff;
+  color: #24364a;
   font-size: 9px;
   font-weight: 900;
   line-height: 1.18;
@@ -360,7 +365,7 @@
   align-items: center;
   justify-content: center;
   gap: 5px;
-  min-height: 30px;
+  min-height: 28px;
   padding: 0 9px;
   border-radius: 12px;
   color: #ffffff;
@@ -368,10 +373,10 @@
   font-size: 9px;
   font-weight: 900;
   white-space: nowrap;
-  background: linear-gradient(135deg, #c084fc 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    0 10px 22px rgba(37, 99, 235, 0.28);
+    0 8px 18px rgba(37, 99, 235, 0.18);
   transition:
     transform 160ms ease,
     box-shadow 160ms ease;
@@ -389,7 +394,7 @@
 @media (max-width: 480px) {
   .flightTrackingNotice {
     gap: 6px;
-    min-height: 194px;
+    min-height: 186px;
     padding: 11px 13px 10px;
     border-radius: 22px;
   }

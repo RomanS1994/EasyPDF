@@ -47,6 +47,49 @@ function getOrderFlightDate(order) {
   );
 }
 
+function getOrderTripTime(order) {
+  return order?.trip?.time || order?.contractData?.trip?.time || '';
+}
+
+function hasExplicitClockTime(value) {
+  if (!value) {
+    return false;
+  }
+
+  if (value instanceof Date) {
+    return Boolean(
+      value.getHours() ||
+        value.getMinutes() ||
+        value.getSeconds() ||
+        value.getMilliseconds()
+    );
+  }
+
+  return /(?:T|\s)\d{1,2}:\d{2}/.test(String(value).trim());
+}
+
+function parseDateValue(value) {
+  if (!value) {
+    return null;
+  }
+
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : new Date(value.getTime());
+  }
+
+  const text = String(value).trim();
+  const normalized = /^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}/.test(text)
+    ? text.replace(' ', 'T')
+    : text;
+  const date = new Date(normalized);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return date;
+}
+
 function getLocalDateKey(date) {
   if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
     return '';
@@ -56,6 +99,27 @@ function getLocalDateKey(date) {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+}
+
+function isOrderCompletedByTime(order, referenceDate = new Date()) {
+  const tripTime = getOrderTripTime(order);
+
+  if (!hasExplicitClockTime(tripTime)) {
+    return false;
+  }
+
+  const tripDate = parseDateValue(tripTime);
+  const currentDate = parseDateValue(referenceDate);
+
+  if (!tripDate || !currentDate) {
+    return false;
+  }
+
+  if (getLocalDateKey(tripDate) !== getLocalDateKey(currentDate)) {
+    return false;
+  }
+
+  return tripDate.getTime() < currentDate.getTime();
 }
 
 function getRelativeDateKey(offsetDays) {
@@ -228,6 +292,10 @@ async function refreshOrderFlightStatus(client, order) {
     return order;
   }
 
+  if (isOrderCompletedByTime(order)) {
+    return order;
+  }
+
   const flightDate = getOrderFlightDate(order);
 
   if (!isFlightDateInRefreshWindow(flightDate)) {
@@ -309,6 +377,7 @@ export async function refreshFlightStatusesForOrders(client, orders, { enabled =
 
     if (
       !getFlightNumber(order) ||
+      isOrderCompletedByTime(order) ||
       !isFlightDateInRefreshWindow(flightDate) ||
       isFlightStatusFresh(order.metadata, flightDate)
     ) {

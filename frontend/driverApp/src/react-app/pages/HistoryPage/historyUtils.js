@@ -56,6 +56,48 @@ function getOrderTripTime(order) {
   return order?.contractData?.trip?.time || order?.trip?.time || '';
 }
 
+function hasExplicitClockTime(value) {
+  if (!value) {
+    return false;
+  }
+
+  if (value instanceof Date) {
+    return Boolean(
+      value.getHours() ||
+        value.getMinutes() ||
+        value.getSeconds() ||
+        value.getMilliseconds(),
+    );
+  }
+
+  return /(?:T|\s)\d{1,2}:\d{2}/.test(String(value).trim());
+}
+
+function hasOrderTripClockTime(order) {
+  return hasExplicitClockTime(getOrderTripTime(order));
+}
+
+function isOrderCompletedByTime(order, referenceDate = new Date()) {
+  const tripTime = getOrderTripTime(order);
+
+  if (!hasExplicitClockTime(tripTime)) {
+    return false;
+  }
+
+  const tripDate = parseDateValue(tripTime);
+  const currentDate = parseDateValue(referenceDate);
+
+  if (!tripDate || !currentDate) {
+    return false;
+  }
+
+  if (getDateKey(tripDate) !== getDateKey(currentDate)) {
+    return false;
+  }
+
+  return tripDate.getTime() < currentDate.getTime();
+}
+
 function getCustomerName(order) {
   return (
     order?.contractData?.customer?.name ||
@@ -148,7 +190,7 @@ function getHistoryBucket(order) {
 }
 
 function getSortTimestamp(order, sortKey) {
-  const primary = getOrderDate(order);
+  const primary = getOrderTripTime(order) || getOrderDate(order);
   const fallback = order?.createdAt || getOrderTripTime(order);
   const primaryTime = parseDateValue(primary)?.getTime() || 0;
 
@@ -159,12 +201,37 @@ function getSortTimestamp(order, sortKey) {
   return parseDateValue(fallback)?.getTime() || 0;
 }
 
-function compareOrders(left, right, sortKey) {
+function getTodayActionSortGroup(order, referenceDate, bucket) {
+  if (bucket !== 'today') {
+    return 0;
+  }
+
+  if (isOrderCompletedByTime(order, referenceDate)) {
+    return 2;
+  }
+
+  return hasOrderTripClockTime(order) ? 0 : 1;
+}
+
+function compareOrders(left, right, sortKey, options = {}) {
+  const referenceDate = options.referenceDate || new Date();
+  const leftBucket = getHistoryBucket(left).bucket;
+  const rightBucket = getHistoryBucket(right).bucket;
+  const leftGroup = getTodayActionSortGroup(left, referenceDate, leftBucket);
+  const rightGroup = getTodayActionSortGroup(right, referenceDate, rightBucket);
+
+  if (leftGroup !== rightGroup) {
+    return leftGroup - rightGroup;
+  }
+
+  const effectiveSortKey = leftBucket === 'today' && rightBucket === 'today' && leftGroup === 0
+    ? 'oldest'
+    : sortKey;
   const leftTime = getSortTimestamp(left, sortKey);
   const rightTime = getSortTimestamp(right, sortKey);
 
   if (leftTime !== rightTime) {
-    if (sortKey === 'newest') {
+    if (effectiveSortKey === 'newest') {
       return rightTime - leftTime;
     }
 
@@ -211,4 +278,5 @@ export {
   getOrderTripTime,
   getRouteLabel,
   getTotalPrice,
+  isOrderCompletedByTime,
 };

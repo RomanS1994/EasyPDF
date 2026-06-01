@@ -16,10 +16,14 @@
 .planUpgradeForm-plan {
   --plan-accent: #5f6b7c;
   --plan-accent-strong: #0f172a;
-  --plan-accent-soft: rgba(95, 107, 124, 0.1);
-  --plan-accent-tint: rgba(248, 250, 252, 0.96);
   --plan-accent-border: rgba(95, 107, 124, 0.22);
   --plan-icon-bg: rgba(248, 250, 252, 0.95);
+  --plan-card-text: var(--text);
+  --plan-card-muted: var(--muted);
+  --plan-bg-image: url('../../../../assets/plan-bg-free.png');
+  --plan-card-overlay: linear-gradient(90deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.4));
+  --plan-chip-bg: rgba(255, 255, 255, 0.72);
+  --plan-action-bg: rgba(255, 255, 255, 0.72);
   position: relative;
   display: grid;
   grid-template-columns: 68px minmax(0, 1fr) minmax(130px, auto);
@@ -32,8 +36,8 @@
   border: 1px solid var(--plan-accent-border);
   border-radius: 18px;
   background:
-    radial-gradient(circle at 9% 50%, var(--plan-accent-soft), transparent 27%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), var(--plan-accent-tint));
+    var(--plan-card-overlay),
+    var(--plan-bg-image) center / cover no-repeat;
   color: var(--text);
   font: inherit;
   text-align: left;
@@ -52,30 +56,32 @@
 }
 
 .planUpgradeForm-plan--silver {
-  --plan-accent: #52627a;
-  --plan-accent-strong: #0f172a;
-  --plan-accent-soft: rgba(82, 98, 122, 0.1);
-  --plan-accent-tint: rgba(248, 250, 252, 0.98);
-  --plan-accent-border: rgba(82, 98, 122, 0.2);
+  --plan-accent: #6b7280;
+  --plan-accent-strong: #4b5563;
+  --plan-accent-border: rgba(107, 114, 128, 0.22);
   --plan-icon-bg: rgba(248, 250, 252, 0.96);
+  --plan-bg-image: url('../../../../assets/plan-bg-silver.png');
 }
 
 .planUpgradeForm-plan--gold {
-  --plan-accent: #d18a00;
-  --plan-accent-strong: #c77f00;
-  --plan-accent-soft: rgba(209, 138, 0, 0.13);
-  --plan-accent-tint: rgba(255, 250, 238, 0.98);
-  --plan-accent-border: rgba(209, 138, 0, 0.28);
+  --plan-accent: #d29600;
+  --plan-accent-strong: #8a5a00;
+  --plan-accent-border: rgba(210, 150, 0, 0.26);
   --plan-icon-bg: rgba(255, 248, 224, 0.96);
+  --plan-bg-image: url('../../../../assets/plan-bg-gold.png');
 }
 
 .planUpgradeForm-plan--platinum {
-  --plan-accent: #0f9b82;
-  --plan-accent-strong: #0f8b76;
-  --plan-accent-soft: rgba(15, 155, 130, 0.13);
-  --plan-accent-tint: rgba(240, 253, 250, 0.98);
-  --plan-accent-border: rgba(15, 155, 130, 0.28);
-  --plan-icon-bg: rgba(230, 252, 246, 0.96);
+  --plan-accent: #16ad9d;
+  --plan-accent-strong: #14776f;
+  --plan-accent-border: rgba(20, 184, 166, 0.26);
+  --plan-icon-bg: rgba(232, 255, 251, 0.96);
+  --plan-card-text: var(--text);
+  --plan-card-muted: var(--muted);
+  --plan-bg-image: url('../../../../assets/plan-bg-platinum.png');
+  --plan-card-overlay: linear-gradient(90deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.32));
+  --plan-chip-bg: rgba(255, 255, 255, 0.72);
+  --plan-action-bg: rgba(255, 255, 255, 0.72);
 }
 
 .planUpgradeForm-plan:hover {
@@ -121,7 +127,7 @@
   padding: 4px 10px;
   border: 1px solid color-mix(in srgb, var(--plan-accent) 16%, white);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--plan-accent) 10%, white);
+  background: color-mix(in srgb, var(--plan-accent) 10%, var(--plan-chip-bg));
   color: var(--plan-accent-strong);
   font-size: 11px;
   font-weight: 650;
@@ -170,7 +176,7 @@
 
 .planUpgradeForm-planName {
   display: block;
-  color: var(--text);
+  color: var(--plan-card-text);
   font-size: 21px;
   font-weight: 700;
   line-height: 1.05;
@@ -179,7 +185,7 @@
 
 .planUpgradeForm-planDescription {
   display: block;
-  color: var(--muted);
+  color: var(--plan-card-muted);
   font-size: 12px;
   font-weight: 500;
   line-height: 1.35;
@@ -192,7 +198,7 @@
   align-items: center;
   gap: 8px 12px;
   padding-top: 8px;
-  color: color-mix(in srgb, var(--plan-accent) 38%, var(--muted));
+  color: color-mix(in srgb, var(--plan-accent) 38%, var(--plan-card-muted));
   font-size: 12px;
   font-weight: 600;
   line-height: 1.2;
@@ -269,7 +275,7 @@
   padding: 0 12px;
   border: 1px solid color-mix(in srgb, var(--plan-accent) 42%, white);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--plan-action-bg);
   color: var(--plan-accent-strong);
   font-size: 12px;
   font-weight: 650;
