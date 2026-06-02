@@ -565,8 +565,8 @@ async function handleUpgradeRequest(request, response) {
   const body = await readJsonBody(request);
   const requestedPlanId = normalizeText(body.planId);
 
-  if (!requestedPlanId || requestedPlanId === DEFAULT_PLAN_ID) {
-    throw new Error('Choose a paid plan for manual activation');
+  if (!requestedPlanId) {
+    throw new Error('Choose a plan for manual activation');
   }
 
   const user = await runStoreTransaction({
@@ -594,8 +594,8 @@ async function handleUpgradeRequest(request, response) {
         throw new Error('Current plan is not configured');
       }
 
-      if (!requestedPlan || requestedPlan.id === DEFAULT_PLAN_ID) {
-        throw new Error('Invalid paid plan');
+      if (!requestedPlan) {
+        throw new Error('Invalid plan');
       }
 
       const before = resolveSubscriptionView({
@@ -604,6 +604,11 @@ async function handleUpgradeRequest(request, response) {
         plan: target.subscription?.plan || currentPlan,
         fallbackStartMode: target.subscription ? 'now' : 'month',
       });
+
+      if (requestedPlan.id === DEFAULT_PLAN_ID && before.planId === DEFAULT_PLAN_ID) {
+        throw new Error('Free plan is already active');
+      }
+
       const requestMode = getPlanRequestMode(before, requestedPlan);
       const requestedAt = nowIso();
       const subscriptionData = buildSubscriptionWriteData({
@@ -613,7 +618,8 @@ async function handleUpgradeRequest(request, response) {
           ...before,
           pendingPlanId: requestedPlan.id,
           pendingRequestedAt: requestedAt,
-          pendingSource: 'manual_payment',
+          pendingSource:
+            requestedPlan.id === DEFAULT_PLAN_ID ? 'manual_downgrade' : 'manual_payment',
           notes: normalizeText(body.notes ?? before.notes),
         },
         actorUserId: null,

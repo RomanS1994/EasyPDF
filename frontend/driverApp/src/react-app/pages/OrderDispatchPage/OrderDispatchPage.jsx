@@ -16,7 +16,14 @@ import {
   useGetOrderQuery,
   useSearchDispatchDriversQuery,
 } from '../../features/orders/ordersApi.js';
-import { formatDateTime, getOrderTripTime } from '../HistoryPage/historyUtils.js';
+import {
+  formatDateTime,
+  getHistoryBucket,
+  getOrderTripTime,
+  getTotalPrice,
+  isOrderCompletedByTime,
+} from '../HistoryPage/historyUtils.js';
+import { parseDateValue } from '../shared/dateUtils.js';
 import './OrderDispatchPage.css';
 
 function getLocation(value) {
@@ -25,19 +32,94 @@ function getLocation(value) {
   return value.address || value.name || value.label || '-';
 }
 
+function normalizeCount(value) {
+  const parsed = Number.parseInt(String(value ?? '').trim(), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
+function formatOrderDate(value) {
+  const date = parseDateValue(value);
+
+  if (!date) {
+    return '-';
+  }
+
+  return date.toLocaleDateString('uk-UA', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+}
+
+function formatOrderTime(value) {
+  const date = parseDateValue(value);
+
+  if (!date) {
+    return '-';
+  }
+
+  return date.toLocaleTimeString('uk-UA', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+}
+
 function getOrderSummary(order, t) {
   const contractData = order?.contractData || {};
   const customer = contractData.customer || order?.customer || {};
   const trip = contractData.trip || order?.trip || {};
+  const tripTime = getOrderTripTime(order);
 
   return {
     orderNumber: order?.orderNumber || order?.id || '-',
     customerName: customer.name || t('history.guest'),
     from: getLocation(trip.from),
     to: getLocation(trip.to),
-    tripTime: formatDateTime(getOrderTripTime(order)),
-    totalPrice: order?.totalPrice || contractData.totalPrice || '-',
+    tripDate: formatOrderDate(tripTime || order?.createdAt),
+    tripTime: formatOrderTime(tripTime || order?.createdAt),
+    fullTripTime: formatDateTime(tripTime || order?.createdAt),
+    totalPrice: getTotalPrice(order),
+    passengers: normalizeCount(contractData.passengers || order?.passengers),
+    luggage: normalizeCount(trip.luggageUnits || contractData.luggageUnits || order?.luggageUnits),
     createdBy: order?.createdBy?.name || order?.createdBy?.email || '-',
+  };
+}
+
+function getDispatchStatus(order, t) {
+  if (isOrderCompletedByTime(order)) {
+    return {
+      label: t('history.done'),
+      tone: 'done',
+    };
+  }
+
+  const status = getHistoryBucket(order);
+
+  if (status.bucket === 'today') {
+    return {
+      label: t('history.today'),
+      tone: 'today',
+    };
+  }
+
+  if (status.bucket === 'planned') {
+    return {
+      label: t('history.planned'),
+      tone: 'planned',
+    };
+  }
+
+  if (status.bucket === 'completed') {
+    return {
+      label: t('history.completed'),
+      tone: 'completed',
+    };
+  }
+
+  return {
+    label: t('history.draft'),
+    tone: 'draft',
   };
 }
 
@@ -58,41 +140,80 @@ function OrderDispatchShell({ backTo, children, subtitle, title }) {
 
 function OrderDispatchSummary({ order, t }) {
   const summary = getOrderSummary(order, t);
+  const status = getDispatchStatus(order, t);
 
   return (
     <section className="orderDispatchSummary">
-      <div className="orderDispatchSummary-main">
-        <span className="orderDispatchSummary-icon" aria-hidden="true">
-          <SvgIcon name="file" />
-        </span>
-        <div>
-          <span>{summary.orderNumber}</span>
-          <strong>{summary.customerName}</strong>
+      <div className="orderDispatchSummary-header">
+        <div className="orderDispatchSummary-identity">
+          <strong className="orderDispatchSummary-customer">{summary.customerName}</strong>
+        </div>
+        <div className={`orderDispatchSummary-status orderDispatchSummary-status--${status.tone}`}>
+          <span className="orderDispatchSummary-statusDot" aria-hidden="true" />
+          {status.label}
         </div>
       </div>
 
-      <dl className="orderDispatchSummary-grid">
-        <div>
-          <dt>{t('contract.from')}</dt>
-          <dd>{summary.from}</dd>
+      <div className="orderDispatchSummary-routeCard">
+        <div className="orderDispatchSummary-routeTrack" aria-hidden="true">
+          <span className="orderDispatchSummary-routeIcon">
+            <SvgIcon name="today" />
+          </span>
+          <span className="orderDispatchSummary-routeLine" />
+          <span className="orderDispatchSummary-routeIcon orderDispatchSummary-routeIcon--end">
+            <SvgIcon name="completed" />
+          </span>
         </div>
-        <div>
-          <dt>{t('contract.to')}</dt>
-          <dd>{summary.to}</dd>
+
+        <div className="orderDispatchSummary-route">
+          <div className="orderDispatchSummary-routePoint">
+            <strong>{summary.from}</strong>
+          </div>
+          <div className="orderDispatchSummary-routePoint">
+            <strong>{summary.to}</strong>
+          </div>
         </div>
-        <div>
-          <dt>{t('contract.tripTime')}</dt>
-          <dd>{summary.tripTime}</dd>
+
+        <div
+          className="orderDispatchSummary-stats"
+          aria-label={`${t('contract.passengers')}: ${summary.passengers}. ${t('contract.luggageUnits')}: ${summary.luggage}.`}
+        >
+          <span className="orderDispatchSummary-stat">
+            <span className="orderDispatchSummary-statIcon" aria-hidden="true">
+              <SvgIcon name="accounts" />
+            </span>
+            <span>{summary.passengers}</span>
+          </span>
+          <span className="orderDispatchSummary-stat">
+            <span className="orderDispatchSummary-statIcon" aria-hidden="true">
+              <SvgIcon name="luggage" />
+            </span>
+            <span>{summary.luggage}</span>
+          </span>
         </div>
-        <div>
-          <dt>{t('contract.amountDue')}</dt>
-          <dd>{summary.totalPrice}</dd>
+      </div>
+
+      <div className="orderDispatchSummary-meta">
+        <span className="orderDispatchSummary-metaIcon" aria-hidden="true">
+          <SvgIcon name="wallet" />
+        </span>
+        <strong className="orderDispatchSummary-price">{summary.totalPrice}</strong>
+        <span className="orderDispatchSummary-divider" aria-hidden="true" />
+        <div className="orderDispatchSummary-dateWrap" title={summary.fullTripTime}>
+          <span className="orderDispatchSummary-dateIcon" aria-hidden="true">
+            <SvgIcon name="calendar" />
+          </span>
+          <span className="orderDispatchSummary-date">
+            <span>{summary.tripDate}</span>
+            <strong>{summary.tripTime}</strong>
+          </span>
         </div>
-        <div>
-          <dt>{t('orderDispatch.createdBy')}</dt>
-          <dd>{summary.createdBy}</dd>
-        </div>
-      </dl>
+      </div>
+
+      <div className="orderDispatchSummary-createdBy">
+        <span>{t('orderDispatch.createdBy')}</span>
+        <strong>{summary.createdBy}</strong>
+      </div>
     </section>
   );
 }

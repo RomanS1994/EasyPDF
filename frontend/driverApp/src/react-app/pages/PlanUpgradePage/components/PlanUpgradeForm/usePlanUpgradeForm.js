@@ -7,10 +7,6 @@ import { selectToken, selectUser, setSession } from '@shared/features/auth/authS
 import { saveSession } from '@shared/features/auth/authStorage.js';
 import { useGetPlansQuery } from '@shared/features/plans/plansApi.js';
 
-function getPaidPlans(plans) {
-  return plans.filter(plan => Number(plan.priceCzk || 0) > 0);
-}
-
 function getPlanValue(plan) {
   const price = Number(plan?.priceCzk || 0);
   const limit = Number(plan?.monthlyGenerationLimit || 0);
@@ -18,13 +14,36 @@ function getPlanValue(plan) {
   return price * 100000 + limit;
 }
 
+function getPlanRank(plan) {
+  const variant = getPlanVariant(plan);
+
+  if (variant === 'silver') return 1;
+  if (variant === 'gold') return 2;
+  if (variant === 'platinum') return 3;
+  if (variant === 'free') return 4;
+
+  return 5;
+}
+
 function getSortedPlans(plans) {
-  return [...plans].sort((first, second) => getPlanValue(first) - getPlanValue(second));
+  return [...plans].sort((first, second) => {
+    const rankDiff = getPlanRank(first) - getPlanRank(second);
+
+    if (rankDiff !== 0) {
+      return rankDiff;
+    }
+
+    return getPlanValue(first) - getPlanValue(second);
+  });
 }
 
 function getPlanVariant(plan) {
   const planName = String(plan?.id || plan?.slug || plan?.name || '').toLowerCase();
   const limit = Number(plan?.monthlyGenerationLimit || 0);
+
+  if (planName.includes('free') || planName.includes('trial') || limit <= 100) {
+    return 'free';
+  }
 
   if (planName.includes('silver') || planName.includes('starter') || limit <= 300) {
     return 'silver';
@@ -42,6 +61,10 @@ function getPlanVariant(plan) {
 }
 
 function getPlanIconName(variant) {
+  if (variant === 'free') {
+    return 'gift';
+  }
+
   if (variant === 'gold') {
     return 'gem';
   }
@@ -55,6 +78,20 @@ function getPlanIconName(variant) {
 
 function formatNumber(value) {
   return Number(value || 0).toLocaleString('cs-CZ');
+}
+
+function getDiscountPercent(plan, originalPrice, price) {
+  const configuredDiscount = Number(plan?.discountPercent || 0);
+
+  if (configuredDiscount > 0) {
+    return Math.min(100, Math.round(configuredDiscount));
+  }
+
+  if (originalPrice > price && originalPrice > 0) {
+    return Math.round(((originalPrice - price) / originalPrice) * 100);
+  }
+
+  return 0;
 }
 
 function getPlanModeLabel({ direction, isCurrent, t }) {
@@ -88,6 +125,10 @@ function getPlanDirection(planValue, currentPlanValue) {
 function getPlanActionLabel({ direction, isCurrent, planName, t }) {
   if (isCurrent) {
     return t('settings.planUpgrade.active');
+  }
+
+  if (String(planName).toLowerCase() === 'free') {
+    return t('settings.planUpgrade.selectFree');
   }
 
   if (direction === 'upgrade') {
@@ -153,16 +194,15 @@ export function usePlanUpgradeForm() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const plans = data?.plans || [];
-  const paidPlans = useMemo(() => getPaidPlans(plans), [plans]);
   const currentPlanId = user?.subscription?.plan?.id || user?.plan?.id || '';
   const currentPlan =
-    paidPlans.find(plan => plan.id === currentPlanId) ||
+    plans.find(plan => plan.id === currentPlanId) ||
     user?.subscription?.plan ||
     user?.plan ||
     null;
   const pendingPlanId = user?.subscription?.pendingPlanId || '';
   const currentPlanValue = getPlanValue(currentPlan);
-  const availablePlans = useMemo(() => getSortedPlans(paidPlans), [paidPlans]);
+  const availablePlans = useMemo(() => getSortedPlans(plans), [plans]);
   const defaultPlanId = availablePlans.some(plan => plan.id === currentPlanId)
     ? currentPlanId
     : availablePlans[0]?.id || '';
@@ -170,6 +210,11 @@ export function usePlanUpgradeForm() {
     ? planId
     : defaultPlanId;
   const selectedPlan = availablePlans.find(plan => plan.id === selectedPlanId) || null;
+  const isSelectedCurrentFreePlan = Boolean(
+    selectedPlan?.id &&
+      selectedPlan.id === currentPlanId &&
+      Number(selectedPlan.priceCzk || 0) <= 0
+  );
   const isSelectedRenewal = Boolean(
     selectedPlan?.id && selectedPlan.id === currentPlanId && Number(selectedPlan.priceCzk || 0) > 0
   );
@@ -195,6 +240,8 @@ export function usePlanUpgradeForm() {
     const variant = getPlanVariant(plan);
     const planName = plan.name || plan.id;
     const price = Number(plan.priceCzk || 0);
+    const originalPrice = Number(plan.originalPriceCzk || 0);
+    const discountPercent = getDiscountPercent(plan, originalPrice, price);
     const limit = Number(plan.monthlyGenerationLimit || 0);
     const badge = getPlanBadgeMeta({ isCurrent, variant, t });
 
@@ -209,6 +256,9 @@ export function usePlanUpgradeForm() {
       monthLabel: t('settings.planUpgrade.perMonth'),
       modeLabel: getPlanModeLabel({ direction, isCurrent, t }),
       priceLabel: `${formatNumber(price)} CZK`,
+      originalPriceLabel:
+        originalPrice > price ? `${formatNumber(originalPrice)} CZK` : '',
+      discountLabel: discountPercent > 0 ? `-${discountPercent}%` : '',
       limitLabel: t('settings.planUpgrade.planTokensLabel', { count: formatNumber(limit) }),
       featureChips: getPlanFeatureChips({ variant, t }),
     };
@@ -219,7 +269,7 @@ export function usePlanUpgradeForm() {
     setMessage('');
     setError('');
 
-    if (!selectedPlanId) {
+    if (!selectedPlanId || isSelectedCurrentFreePlan) {
       setError(t('auth.choosePaidPlan'));
       return;
     }
@@ -241,7 +291,7 @@ export function usePlanUpgradeForm() {
     isLoading,
     isPlansError,
     isPlansLoading,
-    hasSelectablePlans: Boolean(availablePlans.length),
+    hasSelectablePlans: Boolean(availablePlans.length && !isSelectedCurrentFreePlan),
     loadingLabel,
     message,
     pendingPlanId,

@@ -134,6 +134,20 @@ export function PlanUpgradeForm() {
 
               <span className="planUpgradeForm-planAside">
                 <span className="planUpgradeForm-planPrice">
+                  {meta.originalPriceLabel || meta.discountLabel ? (
+                    <span className="planUpgradeForm-planPriceTop">
+                      {meta.originalPriceLabel ? (
+                        <span className="planUpgradeForm-planOriginalPrice">
+                          {meta.originalPriceLabel}
+                        </span>
+                      ) : null}
+                      {meta.discountLabel ? (
+                        <span className="planUpgradeForm-discountBadge">
+                          {meta.discountLabel}
+                        </span>
+                      ) : null}
+                    </span>
+                  ) : null}
                   <span className="planUpgradeForm-planPriceAmount">{meta.priceLabel}</span>
                   <span className="planUpgradeForm-planPricePeriod">/ {meta.monthLabel}</span>
                 </span>

@@ -70,6 +70,8 @@ export function WorkspaceOverview({ user, orders, isOrdersLoading = false }) {
   const weeklySalaryTotal = getWeeklySalaryTotal(orders);
   const orderCount = String(orders.length || 0);
   const [robotPose, setRobotPose] = useState(() => createRobotPose());
+  const [arePromoBannersVisible, setArePromoBannersVisible] = useState(true);
+  const promoBannersId = 'workspace-overview-promo-banners';
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -118,43 +120,58 @@ export function WorkspaceOverview({ user, orders, isOrdersLoading = false }) {
         </div>
       </header>
 
-      <div className="screenCard screenCard-home">
-        <div className="homeOverviewGrid">
-          <article className="homeOverviewCard homeOverviewCard--cycle">
-            <OverviewCardIcon kind="cycle" />
-            <span>{t('home.cycle')}</span>
-            <strong>{planWindowEnd}</strong>
-            <p>{t('home.planValidityEnd')}</p>
-          </article>
+      <div className="workspaceOverview-summaryStack">
+        <div className="screenCard screenCard-home">
+          <div className="homeOverviewGrid">
+            <article className="homeOverviewCard homeOverviewCard--cycle">
+              <OverviewCardIcon kind="cycle" />
+              <span>{t('home.cycle')}</span>
+              <strong>{planWindowEnd}</strong>
+              <p>{t('home.planValidityEnd')}</p>
+            </article>
 
-          <article className="homeOverviewCard homeOverviewCard--salary">
-            <OverviewCardIcon kind="salary" />
-            <span>{t('home.weeklyIncome')}</span>
-            <strong>
-              {isOrdersLoading ? <RequestLoader inline size="sm" label={t('common.loading')} /> : weeklySalaryTotal}
-            </strong>
-            <p>{t('home.weeklyIncomeInfo')}</p>
-          </article>
+            <article className="homeOverviewCard homeOverviewCard--salary">
+              <OverviewCardIcon kind="salary" />
+              <span>{t('home.weeklyIncome')}</span>
+              <strong>
+                {isOrdersLoading ? <RequestLoader inline size="sm" label={t('common.loading')} /> : weeklySalaryTotal}
+              </strong>
+              <p>{t('home.weeklyIncomeInfo')}</p>
+            </article>
 
-          <Link className="homeOverviewCard homeOverviewCard-link homeOverviewCard--orders" to="/orders">
-            <OverviewCardIcon kind="orders" />
-            <span>{t('home.orders')}</span>
-            <strong>
-              {isOrdersLoading ? <RequestLoader inline size="sm" label={t('common.loading')} /> : orderCount}
-            </strong>
-            <p>{t('home.savedOrders')}</p>
-          </Link>
+            <Link className="homeOverviewCard homeOverviewCard-link homeOverviewCard--orders" to="/orders">
+              <OverviewCardIcon kind="orders" />
+              <span>{t('home.orders')}</span>
+              <strong>
+                {isOrdersLoading ? <RequestLoader inline size="sm" label={t('common.loading')} /> : orderCount}
+              </strong>
+              <p>{t('home.savedOrders')}</p>
+            </Link>
 
-          <Link className="homeOverviewCard homeOverviewCard-link homeOverviewCard--account" to="/account">
-            <OverviewCardIcon kind="account" />
-            <span>{t('home.account')}</span>
-            <strong>{userName}</strong>
-            <p>{t('home.profileData')}</p>
-          </Link>
+            <Link className="homeOverviewCard homeOverviewCard-link homeOverviewCard--account" to="/account">
+              <OverviewCardIcon kind="account" />
+              <span>{t('home.account')}</span>
+              <strong>{userName}</strong>
+              <p>{t('home.profileData')}</p>
+            </Link>
+          </div>
         </div>
+
+        <button
+          className="workspaceOverview-promoToggle"
+          type="button"
+          aria-controls={promoBannersId}
+          aria-expanded={arePromoBannersVisible}
+          aria-label={arePromoBannersVisible ? t('home.promoBannersCollapse') : t('home.promoBannersExpand')}
+          onClick={() => setArePromoBannersVisible(current => !current)}
+        >
+          <span className="workspaceOverview-promoToggleBar" aria-hidden="true" />
+        </button>
       </div>
 
-      <FlightTrackingNotice />
+      <div id={promoBannersId} className="workspaceOverview-promoBanners" hidden={!arePromoBannersVisible}>
+        <FlightTrackingNotice />
+      </div>
     </div>
   );
 }

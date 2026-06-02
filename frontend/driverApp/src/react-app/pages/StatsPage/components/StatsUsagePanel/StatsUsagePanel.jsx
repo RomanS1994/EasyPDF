@@ -74,42 +74,9 @@ function getCycleLabel(usage) {
   return start;
 }
 
-function getPlanForecast(usage) {
-  // Оцінюємо простий прогноз на кінець циклу.
-  const start = parseDateValue(usage?.periodStart);
-  const end = parseDateValue(usage?.periodEnd);
-
-  if (!start || !end) {
-    return {
-      projectedVolume: 0,
-      projectedPercent: 0,
-    };
-  }
-
-  const now = new Date();
-  const anchor = now.getTime() > end.getTime() ? end : now;
-  const elapsedDays = Math.max(
-    1,
-    Math.ceil((anchor.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
-  );
-  const totalDays = Math.max(
-    1,
-    Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
-  );
-  const perDay = usage.used / elapsedDays;
-  const projectedVolume = Math.round(perDay * totalDays);
-  const projectedPercent = usage.limit ? Math.min(100, Math.round((projectedVolume / usage.limit) * 100)) : 0;
-
-  return {
-    projectedVolume,
-    projectedPercent,
-  };
-}
-
 export function StatsUsagePanel({ usage, orders }) {
   const { t } = useI18n();
   const percent = usage.percent || 0;
-  const forecast = getPlanForecast(usage);
   const cycleLabel = getCycleLabel(usage);
   const planLimitLabel = usage.limit ? `${usage.used} / ${usage.limit} docs` : t('stats.noDataLabel');
   const remainingLabel = String(usage.remaining || 0);
@@ -155,9 +122,9 @@ export function StatsUsagePanel({ usage, orders }) {
         </div>
         <div className="usageForecast">
           <article className="usageForecast-card">
-            <span>{t('stats.forecast')}</span>
-            <strong>{forecast.projectedVolume}</strong>
-            <p>{t('stats.projectedCount')}</p>
+            <span>{t('stats.available')}</span>
+            <strong>{remainingLabel}</strong>
+            <p>{t('stats.availableDocs')}</p>
           </article>
           <article className="usageForecast-card">
             <span>{t('stats.total')}</span>

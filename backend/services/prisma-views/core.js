@@ -29,8 +29,10 @@ function getFallbackPlan(planId = DEFAULT_PLAN_ID) {
     return {
       id: DEFAULT_PLAN_ID,
       name: 'Free',
-      monthlyGenerationLimit: 10,
+      monthlyGenerationLimit: 100,
       priceCzk: 0,
+      originalPriceCzk: 199,
+      discountPercent: 100,
       description: '',
       pdfProfile: 'free',
       pdfQuality: 'basic',
@@ -61,6 +63,14 @@ export function normalizePlanView(plan) {
       fallback.monthlyGenerationLimit
     ),
     priceCzk: normalizeInteger(plan?.priceCzk, configuredPlan?.priceCzk ?? fallback.priceCzk),
+    originalPriceCzk: normalizeInteger(
+      plan?.originalPriceCzk,
+      configuredPlan?.originalPriceCzk ?? fallback.originalPriceCzk ?? null
+    ),
+    discountPercent: normalizeInteger(
+      plan?.discountPercent,
+      configuredPlan?.discountPercent ?? fallback.discountPercent ?? 0
+    ),
     description: normalizeText(plan?.description) || fallback.description,
     pdfProfile: normalizeText(plan?.pdfProfile) || configuredPlan?.pdfProfile || fallback.pdfProfile,
     pdfQuality: normalizeText(plan?.pdfQuality) || configuredPlan?.pdfQuality || fallback.pdfQuality,

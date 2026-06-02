@@ -80,8 +80,8 @@ export async function handleManagerUserConfirmSubscription(request, response, us
       });
       const pendingPlanId = resolvePendingPlanId(body, before);
 
-      if (!pendingPlanId || pendingPlanId === DEFAULT_PLAN_ID) {
-        throw new Error('No paid upgrade request is waiting for confirmation');
+      if (!pendingPlanId) {
+        throw new Error('No plan change request is waiting for confirmation');
       }
 
       const selectedPlan = await findStoredPlan(tx, pendingPlanId, {
@@ -89,10 +89,11 @@ export async function handleManagerUserConfirmSubscription(request, response, us
       });
 
       if (!selectedPlan) {
-        throw new Error('Invalid paid plan');
+        throw new Error('Invalid plan');
       }
 
       const timestamp = nowIso();
+      const isFreePlan = selectedPlan.id === DEFAULT_PLAN_ID;
       const confirmationWindow = resolveConfirmationWindow(before, selectedPlan, timestamp);
       const subscriptionData = buildSubscriptionWriteData({
         plan: selectedPlan,
@@ -101,7 +102,7 @@ export async function handleManagerUserConfirmSubscription(request, response, us
           ...before,
           planId: selectedPlan.id,
           status: 'active',
-          source: 'manual_payment',
+          source: isFreePlan ? 'manual_downgrade' : 'manual_payment',
           currentPeriodStart: confirmationWindow.currentPeriodStart,
           currentPeriodEnd: confirmationWindow.currentPeriodEnd,
           monthlyGenerationLimit: selectedPlan.monthlyGenerationLimit,
@@ -167,7 +168,7 @@ export async function handleManagerUserConfirmSubscription(request, response, us
 
       const userView = await buildSanitizedUser(tx, updatedUser);
       await createAuditLog(tx, {
-        action: 'subscription.payment_confirmed',
+        action: isFreePlan ? 'subscription.plan_change_confirmed' : 'subscription.payment_confirmed',
         actorUserId: context.user.id,
         targetUserId: updatedUser.id,
         entityType: 'subscription',

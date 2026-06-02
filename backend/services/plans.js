@@ -28,6 +28,11 @@ export function normalizePlanRecord(plan) {
     name: normalizeText(source.name) || `Plan ${limit || ''}`.trim(),
     monthlyGenerationLimit: limit,
     priceCzk: normalizeInteger(source.priceCzk, defaultPlan?.priceCzk ?? null),
+    originalPriceCzk: normalizeInteger(
+      source.originalPriceCzk,
+      defaultPlan?.originalPriceCzk ?? null
+    ),
+    discountPercent: normalizeInteger(source.discountPercent, defaultPlan?.discountPercent ?? 0),
     description: normalizeText(source.description),
     pdfProfile: normalizeText(source.pdfProfile) || defaultPlan?.pdfProfile || 'starter',
     pdfQuality: normalizeText(source.pdfQuality) || defaultPlan?.pdfQuality || 'essential',
