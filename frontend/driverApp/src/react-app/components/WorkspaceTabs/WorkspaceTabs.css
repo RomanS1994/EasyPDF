@@ -16,7 +16,7 @@
 }
 
 .workspaceTabs--history {
-  grid-template-columns: minmax(0, 0.78fr) minmax(122px, 1.44fr) minmax(
+  grid-template-columns: minmax(0, 0.78fr) minmax(124px, 0.96fr) minmax(
       0,
       0.78fr
     );
@@ -166,7 +166,7 @@
 
 @media (max-width: 390px) {
   .workspaceTabs--history {
-    grid-template-columns: minmax(0, 0.72fr) minmax(144px, 1.56fr) minmax(
+    grid-template-columns: minmax(0, 0.72fr) minmax(124px, 0.96fr) minmax(
         0,
         0.72fr
       );
