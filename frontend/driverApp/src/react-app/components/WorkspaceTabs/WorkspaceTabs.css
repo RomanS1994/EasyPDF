@@ -16,10 +16,7 @@
 }
 
 .workspaceTabs--history {
-  grid-template-columns: minmax(0, 0.78fr) minmax(124px, 0.96fr) minmax(
-      0,
-      0.78fr
-    );
+  grid-template-columns: minmax(0, 0.8fr) minmax(144px, 1.16fr) minmax(0, 0.8fr);
 }
 
 .workspaceTabs--available {
@@ -27,7 +24,7 @@
 }
 
 .workspaceTabs--calendar {
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 0.9fr) minmax(118px, 1.2fr);
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 0.9fr) minmax(118px, 0.8fr);
 }
 
 .workspaceTabs-tab {
@@ -166,13 +163,19 @@
 
 @media (max-width: 390px) {
   .workspaceTabs--history {
-    grid-template-columns: minmax(0, 0.72fr) minmax(124px, 0.96fr) minmax(
+    grid-template-columns: minmax(0, 0.62fr) minmax(144px, 1.16fr) minmax(
         0,
-        0.72fr
+        0.62fr
       );
   }
 
-  .workspaceTabs--available,
+  .workspaceTabs--available {
+    grid-template-columns: minmax(118px, 1.2fr) minmax(0, 0.9fr) minmax(
+        0,
+        0.9fr
+      );
+  }
+
   .workspaceTabs--calendar {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
