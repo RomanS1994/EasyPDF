@@ -19,9 +19,11 @@ import { normalizeTeamDriverIds, normalizeUserProfile } from '../services/profil
 import { requireTeamFeatureAccess } from '../services/team-access.js';
 import {
   buildSubscriptionWriteData,
+  countDeletedMessages,
   resolveSubscriptionView,
 } from '../services/prisma-views.js';
 import { normalizePhoneNumber, normalizeText, nowIso } from '../validation/common.js';
+import { buildCurrentMonthWindow } from '../services/subscriptions/cycle.js';
 
 const TEAM_DRIVER_SELECT = {
   id: true,
@@ -749,19 +751,22 @@ export async function handleMeRoutes(request, response, { pathName }) {
     const context = await getAuthContext(request, response);
     if (!context) return true;
 
-    const [user, orderCount] = await Promise.all([
+    const currentMonthWindow = buildCurrentMonthWindow();
+    const [user, orderCount, deletedMessagesThisMonth] = await Promise.all([
       buildSanitizedUser(prisma, context.user),
       prisma.order.count({
         where: {
           userId: context.user.id,
         },
       }),
+      countDeletedMessages(prisma, context.user.id, currentMonthWindow),
     ]);
 
     sendJson(response, 200, {
       usage: {
         ...user.usage,
         orderCount,
+        deletedMessagesThisMonth,
       },
     });
     return true;

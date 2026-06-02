@@ -78,7 +78,9 @@ export function StatsUsagePanel({ usage, orders }) {
   const { t } = useI18n();
   const percent = usage.percent || 0;
   const cycleLabel = getCycleLabel(usage);
-  const planLimitLabel = usage.limit ? `${usage.used} / ${usage.limit} docs` : t('stats.noDataLabel');
+  const planLimitLabel = usage.limit
+    ? `${usage.used} / ${usage.limit} ${t('stats.ordersUnit')}`
+    : t('stats.noDataLabel');
   const remainingLabel = String(usage.remaining || 0);
   const totalOrders = String(usage.orderCount ?? orders.length ?? 0);
   const deletedMessagesLabel = String(usage.deletedMessages || 0);

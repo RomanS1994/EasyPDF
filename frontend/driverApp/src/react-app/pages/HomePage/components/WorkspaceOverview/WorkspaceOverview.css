@@ -325,15 +325,6 @@
   opacity: 0.58;
 }
 
-.workspaceOverview-promoBanners {
-  display: grid;
-  gap: 10px;
-}
-
-.workspaceOverview-promoBanners[hidden] {
-  display: none;
-}
-
 .workspaceOverview .homeOverviewGrid {
   gap: 11px;
 }

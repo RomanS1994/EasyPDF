@@ -542,7 +542,10 @@ export async function handleOrderRoutes(request, response, { pathName, url }) {
   if (request.method === 'GET' && pathName === '/api/orders') {
     const context = await getAuthContext(request, response);
     if (!context) return true;
-    const { skip, limit } = normalizePaginationParams(url.searchParams);
+    const { skip, limit } = normalizePaginationParams(url.searchParams, {
+      defaultLimit: 50,
+      maxLimit: 1000,
+    });
 
     const orders = await prisma.order.findMany({
       where: {

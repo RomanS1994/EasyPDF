@@ -23,6 +23,7 @@ function getSafeUsage(usage) {
     remaining: usage?.remaining || 0,
     percent: usage?.percent || 0,
     deletedMessages: usage?.deletedMessages || 0,
+    deletedMessagesThisMonth: usage?.deletedMessagesThisMonth || 0,
     orderCount: usage?.orderCount || 0,
   };
 }
@@ -40,7 +41,7 @@ export function StatsPage() {
     },
   );
   const { data: ordersData, isLoading: isOrdersLoading, isError: isOrdersError } =
-    useGetOrdersQuery(undefined, {
+    useGetOrdersQuery({ limit: 1000 }, {
       skip: !shouldLoadOrders,
       refetchOnFocus: true,
       refetchOnReconnect: true,

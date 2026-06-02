@@ -9,7 +9,9 @@ import {
   getSubscriptionEndDate,
   getWeeklySalaryTotal,
 } from '../../../shared/subscriptionUtils.js';
+import { AdvertisingCarousel } from '../AdvertisingCarousel/AdvertisingCarousel.jsx';
 import { FlightTrackingNotice } from '../FlightTrackingNotice/FlightTrackingNotice.jsx';
+import { GuestTeamPromo } from '../GuestTeamPromo/GuestTeamPromo.jsx';
 
 import heroRobotImage from '../../../../assets/main_robot.png';
 import './WorkspaceOverview.css';
@@ -169,9 +171,15 @@ export function WorkspaceOverview({ user, orders, isOrdersLoading = false }) {
         </button>
       </div>
 
-      <div id={promoBannersId} className="workspaceOverview-promoBanners" hidden={!arePromoBannersVisible}>
+      <AdvertisingCarousel
+        id={promoBannersId}
+        hidden={!arePromoBannersVisible}
+        paginationLabel={t('home.promoBannersPagination')}
+        getSlideLabel={index => t('home.promoBannersGoTo', { number: index + 1 })}
+      >
         <FlightTrackingNotice />
-      </div>
+        <GuestTeamPromo />
+      </AdvertisingCarousel>
     </div>
   );
 }

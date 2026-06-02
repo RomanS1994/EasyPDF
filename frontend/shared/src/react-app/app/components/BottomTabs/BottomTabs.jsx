@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import { useI18n } from '../../i18n/useI18n.js';
@@ -15,11 +15,17 @@ function getTabClassName({ isActive }, extraClassName = '') {
 
 export function BottomTabs() {
   const { t } = useI18n();
+  const location = useLocation();
   const navigate = useNavigate();
   const user = useSelector(selectUser);
   const [isGuardOpen, setIsGuardOpen] = useState(false);
 
   const driver = user?.profile?.driver || user?.driver || {};
+  const isSchedulePath =
+    location.pathname === '/available-orders' ||
+    location.pathname === '/calendar' ||
+    location.pathname === '/history' ||
+    location.pathname.startsWith('/history/');
   const isDriverProfileComplete = ['name', 'address', 'spz', 'ico'].every(field => {
     const value = driver[field];
     return String(value ?? '').trim().length > 0;
@@ -71,7 +77,13 @@ export function BottomTabs() {
         <span className="bottomTab-label">{t('app.orders')}</span>
       </NavLink>
 
-      <NavLink className={linkProps => getTabClassName(linkProps)} to="/history">
+      <NavLink
+        className={linkProps => getTabClassName({
+          ...linkProps,
+          isActive: linkProps.isActive || isSchedulePath,
+        })}
+        to="/history"
+      >
         <span className="bottomTab-icon" aria-hidden="true">
           <SvgIcon name="history" />
         </span>

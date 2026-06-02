@@ -9,6 +9,7 @@ import { BusinessProfilePage } from './pages/BusinessProfilePage/BusinessProfile
 import { FlightTrackingPage } from './pages/FlightTrackingPage/FlightTrackingPage.jsx';
 import { HomePage } from './pages/HomePage/HomePage.jsx';
 import { AvailableOrdersPage } from './pages/AvailableOrdersPage/AvailableOrdersPage.jsx';
+import { CalendarPage } from './pages/CalendarPage/CalendarPage.jsx';
 import { HistoryDisplayPage } from './pages/HistoryDisplayPage/HistoryDisplayPage.jsx';
 import { HistoryPage } from './pages/HistoryPage/HistoryPage.jsx';
 import { LanguagePage } from './pages/LanguagePage/LanguagePage.jsx';
@@ -22,6 +23,7 @@ import { PlanUpgradePage } from './pages/PlanUpgradePage/PlanUpgradePage.jsx';
 import { SettingsPage } from './pages/SettingsPage/SettingsPage.jsx';
 import { SignInPage } from './pages/SignInPage/SignInPage.jsx';
 import { StatsPage } from './pages/StatsPage/StatsPage.jsx';
+import { TeamCollaborationPage } from './pages/TeamCollaborationPage/TeamCollaborationPage.jsx';
 import { TeamPage, TeamSearchPage } from './pages/TeamPage/TeamPage.jsx';
 
 export const router = createBrowserRouter([
@@ -78,6 +80,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: 'calendar',
+        element: (
+          <ProtectedRoute>
+            <CalendarPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: 'account',
         element: <AccountPage />,
       },
@@ -118,6 +128,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <FlightTrackingPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'team-collaboration',
+        element: (
+          <ProtectedRoute>
+            <TeamCollaborationPage />
           </ProtectedRoute>
         ),
       },

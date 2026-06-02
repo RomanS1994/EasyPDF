@@ -247,7 +247,14 @@ export function buildUsageView(subscription, used = 0) {
   };
 }
 
-export async function countDeletedMessages(client, userId) {
+export async function countDeletedMessages(client, userId, window = null) {
+  const createdAtFilter = window?.currentPeriodStart && window?.currentPeriodEnd
+    ? {
+        gte: new Date(window.currentPeriodStart),
+        lte: new Date(window.currentPeriodEnd),
+      }
+    : undefined;
+
   return client.auditLog.count({
     where: {
       targetUserId: userId,
@@ -255,6 +262,7 @@ export async function countDeletedMessages(client, userId) {
       action: {
         in: ['order.deleted', 'order.archived'],
       },
+      ...(createdAtFilter ? { createdAt: createdAtFilter } : {}),
     },
   });
 }

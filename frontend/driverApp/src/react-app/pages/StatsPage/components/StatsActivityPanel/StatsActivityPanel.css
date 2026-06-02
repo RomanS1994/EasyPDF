@@ -87,16 +87,20 @@
   border-bottom-right-radius: 999px;
 }
 
-.statusSegment-generated {
+.statusSegment-completed {
   background: linear-gradient(180deg, #4ade80, #15803d);
 }
 
-.statusSegment-pending {
+.statusSegment-planned {
   background: linear-gradient(180deg, #fde68a, #eab308);
 }
 
 .statusSegment-deleted {
   background: linear-gradient(180deg, #fb7185, #dc2626);
+}
+
+.statusSegment-empty {
+  background: linear-gradient(180deg, rgba(233, 236, 242, 0.98), rgba(244, 246, 250, 0.94));
 }
 
 .statusLegend {
@@ -127,11 +131,11 @@
   border-radius: 50%;
 }
 
-.statusLegendDot-generated {
+.statusLegendDot-completed {
   background: #1f7a45;
 }
 
-.statusLegendDot-pending {
+.statusLegendDot-planned {
   background: #d78b00;
 }
 
