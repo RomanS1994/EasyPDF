@@ -23,6 +23,8 @@ const PDF_MESSAGES = {
       vehiclePlate: 'SPZ vozidla:',
       ico: 'IČ:',
       emailPhone: 'E-mail, telefon:',
+      birthDate: 'Datum narození:',
+      residentialAddress: 'Adresa bydliště:',
       passengers: 'Počet klientů:',
       pickup: 'Místo nástupu:',
       dropoff: 'Místo ukončení:',

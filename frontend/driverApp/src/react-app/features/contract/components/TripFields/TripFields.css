@@ -31,10 +31,10 @@
 
 .contractOptionalField-trigger {
   width: 100%;
-  min-height: 58px;
-  padding: 10px 14px;
+  min-height: 46px;
+  padding: 7px 11px;
   border: 1px solid rgba(218, 226, 239, 0.92);
-  border-radius: 16px;
+  border-radius: 14px;
   background: rgba(255, 255, 255, 0.94);
   color: var(--text);
   box-shadow:
@@ -50,11 +50,11 @@
 .contractOptionalField-copy {
   min-width: 0;
   display: grid;
-  gap: 4px;
+  gap: 3px;
 }
 
 .contractOptionalField-title {
-  font-size: 0.92rem;
+  font-size: 0.84rem;
   font-weight: 700;
   line-height: 1.15;
   color: var(--text);
@@ -63,9 +63,9 @@
 .contractOptionalField-value {
   overflow: hidden;
   color: rgba(100, 116, 139, 0.92);
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   font-weight: 500;
-  line-height: 1.2;
+  line-height: 1.15;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

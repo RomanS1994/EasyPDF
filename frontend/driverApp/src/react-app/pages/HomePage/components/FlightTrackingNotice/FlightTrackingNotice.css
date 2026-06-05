@@ -164,16 +164,16 @@
   align-items: center;
   width: fit-content;
   border-radius: 999px;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1;
   text-transform: uppercase;
 }
 
 .flightTrackingNotice-status {
-  min-height: 14px;
+  min-height: 16px;
   color: #2563eb;
-  font-size: 8px;
-  letter-spacing: 0.04em;
+  font-size: 9px;
+  letter-spacing: 0.03em;
 }
 
 .flightTrackingNotice-plan {
@@ -182,10 +182,10 @@
   right: 16px;
   z-index: 3;
   gap: 5px;
-  min-height: 24px;
+  min-height: 26px;
   padding: 0 12px;
   color: #334155;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.02em;
   background: rgba(255, 255, 255, 0.86);
   border: 1px solid rgba(148, 163, 184, 0.22);
@@ -195,8 +195,8 @@
 }
 
 .flightTrackingNotice-plan svg {
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
   color: #2563eb;
 }
 
@@ -204,19 +204,21 @@
   max-width: 18.6rem;
   margin: 0;
   color: #0f172a;
-  font-size: 13px;
-  font-weight: 900;
+  font-size: 14px;
+  font-weight: 700;
   letter-spacing: 0;
   line-height: 1.08;
+  overflow-wrap: anywhere;
 }
 
 .flightTrackingNotice-subtitle {
   margin: 0;
   color: #42617f;
-  font-size: 10px;
-  font-weight: 800;
+  font-size: 11px;
+  font-weight: 600;
   letter-spacing: 0;
   line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .flightTrackingNotice-features {
@@ -232,11 +234,11 @@
 
 .flightTrackingNotice-features li {
   display: grid;
-  grid-template-columns: 24px minmax(0, 1fr);
+  grid-template-columns: 26px minmax(0, 1fr);
   align-items: center;
   gap: 6px;
-  min-height: 36px;
-  padding: 6px 7px;
+  min-height: 40px;
+  padding: 7px 8px;
   border: 1px solid rgba(96, 165, 250, 0.12);
   border-radius: 14px;
   color: #102033;
@@ -259,8 +261,8 @@
 .flightTrackingNotice-featureIcon {
   display: grid;
   place-items: center;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   color: #2563eb;
   background: rgba(219, 234, 254, 0.82);
@@ -286,29 +288,32 @@
 }
 
 .flightTrackingNotice-featureIcon svg {
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
   fill: none;
   stroke: currentColor;
 }
 
 .flightTrackingNotice-features strong {
+  display: block;
+  min-width: 0;
   color: #102033;
-  font-size: 8px;
-  font-weight: 900;
+  font-size: 9.5px;
+  font-weight: 700;
   letter-spacing: 0;
   line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .flightTrackingNotice-cta {
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: 32px minmax(0, 1fr) minmax(128px, 35%);
+  grid-template-columns: 34px minmax(0, 1fr) minmax(138px, 35%);
   gap: 8px;
   align-items: center;
-  min-height: 38px;
-  padding: 5px 7px;
+  min-height: 42px;
+  padding: 6px 8px;
   border: 1px solid rgba(96, 165, 250, 0.18);
   border-radius: 16px;
   background:
@@ -324,8 +329,8 @@
 .flightTrackingNotice-ctaIcon {
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 12px;
   color: #2563eb;
   background:
@@ -349,37 +354,56 @@
 
 .flightTrackingNotice-ctaCopy strong {
   color: #24364a;
-  font-size: 9px;
-  font-weight: 900;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0;
   line-height: 1.18;
+  overflow-wrap: anywhere;
 }
 
 .flightTrackingNotice-ctaAction {
   display: grid;
   align-items: center;
+  justify-items: end;
   min-width: 0;
 }
 
 .flightTrackingNotice-button {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
-  min-height: 28px;
-  padding: 0 9px;
+  width: 160px;
+  max-width: 100%;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 0;
   border-radius: 12px;
   color: #ffffff;
   text-decoration: none;
-  font-size: 9px;
-  font-weight: 900;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
   white-space: nowrap;
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    0 8px 18px rgba(37, 99, 235, 0.18);
+    0 14px 30px rgba(37, 99, 235, 0.22);
+  cursor: pointer;
   transition:
     transform 160ms ease,
     box-shadow 160ms ease;
+}
+
+.flightTrackingNotice-button:hover,
+.flightTrackingNotice-button:focus-visible {
+  outline: none;
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 18px 34px rgba(37, 99, 235, 0.24);
 }
 
 .flightTrackingNotice-button:active {
@@ -387,8 +411,8 @@
 }
 
 .flightTrackingNotice-button svg {
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
 }
 
 @media (max-width: 480px) {
@@ -433,15 +457,15 @@
   }
 
   .flightTrackingNotice-status {
-    font-size: 7px;
+    font-size: 8px;
   }
 
   .flightTrackingNotice-plan {
     top: 12px;
     right: 13px;
-    min-height: 22px;
+    min-height: 24px;
     padding: 0 9px;
-    font-size: 8px;
+    font-size: 9px;
   }
 
   .flightTrackingNotice-plan svg {
@@ -451,11 +475,11 @@
 
   .flightTrackingNotice-copy h2 {
     max-width: 15.5rem;
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .flightTrackingNotice-subtitle {
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .flightTrackingNotice-features {
@@ -464,15 +488,15 @@
   }
 
   .flightTrackingNotice-features li {
-    grid-template-columns: 22px minmax(0, 1fr);
+    grid-template-columns: 24px minmax(0, 1fr);
     gap: 6px;
-    min-height: 34px;
-    padding: 0 5px;
+    min-height: 38px;
+    padding: 3px 5px;
   }
 
   .flightTrackingNotice-featureIcon {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
   }
 
   .flightTrackingNotice-featureIcon svg {
@@ -481,20 +505,20 @@
   }
 
   .flightTrackingNotice-features strong {
-    font-size: 7px;
+    font-size: 8.5px;
   }
 
   .flightTrackingNotice-cta {
-    grid-template-columns: 28px minmax(0, 1fr) minmax(124px, 38%);
+    grid-template-columns: 30px minmax(0, 1fr) minmax(136px, 40%);
     gap: 6px;
-    min-height: 40px;
+    min-height: 44px;
     padding: 5px 7px;
     border-radius: 14px;
   }
 
   .flightTrackingNotice-ctaIcon {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: 10px;
   }
 
@@ -504,13 +528,14 @@
   }
 
   .flightTrackingNotice-ctaCopy strong {
-    font-size: 7.5px;
+    font-size: 8.5px;
   }
 
   .flightTrackingNotice-button {
-    min-height: 26px;
+    width: 136px;
+    min-height: 28px;
     border-radius: 10px;
-    font-size: 8px;
+    font-size: 9.5px;
   }
 
 }

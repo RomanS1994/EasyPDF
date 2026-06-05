@@ -3,6 +3,54 @@ import { existsSync } from "node:fs";
 import puppeteer from "puppeteer-core";
 
 let browserPromise = null;
+let activeBrowser = null;
+
+function isBrowserConnected(browser) {
+  if (!browser) return false;
+
+  if (typeof browser.connected === "boolean") {
+    return browser.connected;
+  }
+
+  if (typeof browser.isConnected === "function") {
+    return browser.isConnected();
+  }
+
+  return true;
+}
+
+function isRecoverableBrowserError(error) {
+  const name = String(error?.name || "");
+  const message = String(error?.message || error || "");
+
+  return (
+    name.includes("ConnectionClosed") ||
+    message.includes("Connection closed") ||
+    message.includes("Target closed") ||
+    message.includes("Browser closed") ||
+    message.includes("Session closed") ||
+    message.includes("Protocol error")
+  );
+}
+
+async function resetPdfBrowser() {
+  const currentBrowserPromise = browserPromise;
+  browserPromise = null;
+  activeBrowser = null;
+
+  if (!currentBrowserPromise) {
+    return;
+  }
+
+  try {
+    const browser = await currentBrowserPromise;
+    if (isBrowserConnected(browser)) {
+      await browser.close();
+    }
+  } catch {
+    // The browser is already gone or cannot be reached.
+  }
+}
 
 function resolveLocalBrowserPath() {
   const configuredPath = process.env.PUPPETEER_EXECUTABLE_PATH;
@@ -36,7 +84,7 @@ async function launchPdfBrowser() {
       throw new Error("Could not find a local Chrome executable");
     }
 
-    return await puppeteer.launch({
+    const browser = await puppeteer.launch({
       args: useServerChromium
         ? puppeteer.defaultArgs({ args: chromium.args, headless: "shell" })
         : puppeteer.defaultArgs({ headless: "new" }),
@@ -45,8 +93,19 @@ async function launchPdfBrowser() {
       headless: useServerChromium ? "shell" : "new",
       ignoreHTTPSErrors: true,
     });
+
+    activeBrowser = browser;
+    browser.once("disconnected", () => {
+      if (activeBrowser === browser) {
+        activeBrowser = null;
+        browserPromise = null;
+      }
+    });
+
+    return browser;
   } catch (error) {
     browserPromise = null;
+    activeBrowser = null;
     throw new Error(
       `Failed to launch PDF renderer: ${
         error instanceof Error ? error.message : String(error)
@@ -56,18 +115,28 @@ async function launchPdfBrowser() {
 }
 
 async function getPdfBrowser() {
-  if (!browserPromise) {
+  if (!browserPromise || (activeBrowser && !isBrowserConnected(activeBrowser))) {
     browserPromise = launchPdfBrowser();
   }
 
-  return browserPromise;
+  const browser = await browserPromise;
+
+  if (!isBrowserConnected(browser)) {
+    await resetPdfBrowser();
+    browserPromise = launchPdfBrowser();
+    return browserPromise;
+  }
+
+  return browser;
 }
 
-export async function renderPdfFromHtml(html) {
+async function renderPdfFromHtmlOnce(html) {
   const browser = await getPdfBrowser();
-  const page = await browser.newPage();
+  let page = null;
 
   try {
+    page = await browser.newPage();
+
     await page.setViewport({
       width: 1240,
       height: 1754,
@@ -99,6 +168,21 @@ export async function renderPdfFromHtml(html) {
       },
     });
   } finally {
-    await page.close();
+    if (page) {
+      await page.close().catch(() => {});
+    }
+  }
+}
+
+export async function renderPdfFromHtml(html) {
+  try {
+    return await renderPdfFromHtmlOnce(html);
+  } catch (error) {
+    if (!isRecoverableBrowserError(error)) {
+      throw error;
+    }
+
+    await resetPdfBrowser();
+    return renderPdfFromHtmlOnce(html);
   }
 }

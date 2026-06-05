@@ -8,6 +8,33 @@ function createEmptyBusinessParty() {
   };
 }
 
+function createEmptyCustomer() {
+  return {
+    name: '',
+    email: '',
+    birthDate: '',
+    address: '',
+  };
+}
+
+function mergeContractDefaults(contract) {
+  const defaults = createDefaultContractState();
+  const nextContract = contract && typeof contract === 'object' ? contract : {};
+  const nextCustomer =
+    nextContract.customer && typeof nextContract.customer === 'object'
+      ? nextContract.customer
+      : {};
+
+  return {
+    ...defaults,
+    ...nextContract,
+    customer: {
+      ...defaults.customer,
+      ...nextCustomer,
+    },
+  };
+}
+
 export function createDefaultContractState() {
   return {
     orderNumber: '',
@@ -19,10 +46,7 @@ export function createDefaultContractState() {
       spz: '',
     },
     provider: createEmptyBusinessParty(),
-    customer: {
-      name: '',
-      email: '',
-    },
+    customer: createEmptyCustomer(),
     passengers: '',
     trip: {
       from: { address: '' },
@@ -117,7 +141,7 @@ const contractSlice = createSlice({
       };
     },
     replaceContract(_state, action) {
-      return action.payload;
+      return mergeContractDefaults(action.payload);
     },
   },
 });

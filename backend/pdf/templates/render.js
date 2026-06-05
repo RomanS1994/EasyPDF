@@ -176,6 +176,14 @@ export function renderContractPdfHtml({
   const customerEmail = normalizeText(
     contractData?.customer?.email || contractData?.customer?.phone,
   );
+  const customerBirthDate = normalizeText(
+    contractData?.customer?.birthDate || contractData?.customer?.dateOfBirth,
+    "",
+  );
+  const customerAddress = normalizeText(
+    contractData?.customer?.address || contractData?.customer?.residentialAddress,
+    "",
+  );
   const passengers = normalizeText(
     contractData?.passengers ??
       contractData?.customers ??
@@ -221,7 +229,7 @@ export function renderContractPdfHtml({
             position: relative;
             font-family: Arial, sans-serif;
             color: #111;
-            padding: 40px 30px 30px 30px;
+            padding: 34px 28px 24px 28px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -240,7 +248,7 @@ export function renderContractPdfHtml({
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start;
           }
 
           .left-container {
@@ -250,19 +258,19 @@ export function renderContractPdfHtml({
           .title {
             font-weight: 900;
             font-family: Georgia, "Times New Roman", serif;
-            font-size: 36px;
+            font-size: 34px;
             line-height: 1.05;
             letter-spacing: -0.02em;
           }
 
           .muted {
             font-size: 12px;
-            margin: 5px 25px;
+            margin: 3px 22px;
             color: #444;
           }
 
           section {
-            margin-top: 30px;
+            margin-top: 32px;
           }
 
           .subtitle {
@@ -276,7 +284,7 @@ export function renderContractPdfHtml({
             display: grid;
             grid-template-columns: 130px auto;
             gap: 0 10px;
-            margin-top: 10px;
+            margin-top: 8px;
           }
 
           .grid-2 {
@@ -286,7 +294,7 @@ export function renderContractPdfHtml({
           .key,
           .value {
             height: auto;
-            margin: 5px 0;
+            margin: 3px 0;
             padding-left: 10px;
             display: flex;
             align-items: flex-end;
@@ -303,11 +311,11 @@ export function renderContractPdfHtml({
             color: #727272;
             font-weight: 500;
             border-bottom: 1px dashed;
-            min-height: 24px;
+            min-height: 22px;
           }
 
           .value--multiline {
-            line-height: 1.35;
+            line-height: 1.28;
             align-items: flex-start;
             padding-bottom: 2px;
           }
@@ -316,12 +324,16 @@ export function renderContractPdfHtml({
             margin-top: auto;
             font-size: 14px;
             color: #444;
-            margin-top: 12px;
+            margin-top: 8px;
+          }
+
+          .bottomArea {
+            margin-top: 18px;
           }
 
           .date {
             width: 30%;
-            margin: 50px 50px 0 auto;
+            margin: 92px 48px 0 auto;
           }
 
           .dateRow {
@@ -342,9 +354,10 @@ export function renderContractPdfHtml({
           .signatures {
             display: grid;
             justify-items: center;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: auto auto;
+            justify-content: space-between;
             gap: 0 50px;
-            margin-top: 20px;
+            margin-top: 14px;
           }
 
           .signature {
@@ -412,6 +425,18 @@ export function renderContractPdfHtml({
                 ${renderRows([
                   { label: t("labels.name"), value: customerName },
                   { label: t("labels.emailPhone"), value: customerEmail },
+                  ...(customerBirthDate
+                    ? [{ label: t("labels.birthDate"), value: customerBirthDate }]
+                    : []),
+                  ...(customerAddress
+                    ? [
+                        {
+                          label: t("labels.residentialAddress"),
+                          value: customerAddress,
+                          multiline: true,
+                        },
+                      ]
+                    : []),
                   { label: t("labels.passengers"), value: passengers },
                 ])}
               </div>
@@ -435,7 +460,7 @@ export function renderContractPdfHtml({
                 ])}
               </div>
 
-              <div class="grid-1 grid-2" style="margin-top: 20px;">
+              <div class="grid-1 grid-2" style="margin-top: 14px;">
                 ${renderRows([
                   { label: t("labels.price"), value: totalPrice },
                   { label: t("labels.payment"), value: paymentMethod },

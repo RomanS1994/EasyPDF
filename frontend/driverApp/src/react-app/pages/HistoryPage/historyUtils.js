@@ -1,6 +1,7 @@
 import { formatDateTime, getDateKey, getOrderDate, parseDateValue } from '../shared/dateUtils.js';
 
 const EUR_RATE = 25;
+const ORDER_COMPLETION_DELAY_MS = 60 * 60 * 1000;
 
 // Дістаємо суму й валюту з текстового поля.
 function parseMoneyValue(value) {
@@ -95,7 +96,7 @@ function isOrderCompletedByTime(order, referenceDate = new Date()) {
     return false;
   }
 
-  return tripDate.getTime() < currentDate.getTime();
+  return tripDate.getTime() + ORDER_COMPLETION_DELAY_MS <= currentDate.getTime();
 }
 
 function getCustomerName(order) {

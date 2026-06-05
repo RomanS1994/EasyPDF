@@ -62,6 +62,37 @@ export function buildOrderCreatorSnapshot(user) {
   };
 }
 
+function getCustomerPayload(body = {}, contractData = {}) {
+  const contractCustomer =
+    contractData.customer && typeof contractData.customer === 'object'
+      ? contractData.customer
+      : {};
+  const bodyCustomer =
+    body.customer && typeof body.customer === 'object' ? body.customer : {};
+
+  return {
+    name: contractCustomer.name || bodyCustomer.name || '',
+    email:
+      contractCustomer.email ||
+      bodyCustomer.email ||
+      contractCustomer.phone ||
+      '',
+    phone: contractCustomer.phone || bodyCustomer.phone || '',
+    birthDate:
+      contractCustomer.birthDate ||
+      contractCustomer.dateOfBirth ||
+      bodyCustomer.birthDate ||
+      bodyCustomer.dateOfBirth ||
+      '',
+    address:
+      contractCustomer.address ||
+      contractCustomer.residentialAddress ||
+      bodyCustomer.address ||
+      bodyCustomer.residentialAddress ||
+      '',
+  };
+}
+
 export function buildOrderRecord(body, user, options = {}) {
   const contractData = body.contractData || body.order || {};
   const createdAt = options.createdAt || nowIso();
@@ -81,15 +112,7 @@ export function buildOrderRecord(body, user, options = {}) {
     status: body.status || 'created',
     flightNumber,
     source: body.source || 'pdf-app',
-    customer: {
-      name: contractData.customer?.name || body.customer?.name || '',
-      email:
-        contractData.customer?.email ||
-        body.customer?.email ||
-        contractData.customer?.phone ||
-        '',
-      phone: contractData.customer?.phone || body.customer?.phone || '',
-    },
+    customer: getCustomerPayload(body, contractData),
     trip: {
       from: contractData.trip?.from?.address || body.trip?.from || '',
       to: contractData.trip?.to?.address || body.trip?.to || '',

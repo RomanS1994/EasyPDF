@@ -19,7 +19,6 @@ const DEFAULT_END_HOUR = 18;
 const HOUR_HEIGHT = 52;
 const EVENT_HEIGHT = 52;
 const EVENT_GAP = 6;
-const EVENT_VARIANTS = ['blue', 'green', 'orange', 'violet'];
 
 function getLocale(language) {
   if (language === 'uk') return 'uk-UA';
@@ -84,6 +83,48 @@ function getLocationLabel(value) {
   }
 
   return normalizeText(value.address || value.name || value.label);
+}
+
+function normalizeAddressForMatch(value) {
+  return normalizeText(value)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+}
+
+function isPrgAirportAddress(value) {
+  const address = normalizeAddressForMatch(value);
+
+  if (!address) {
+    return false;
+  }
+
+  return (
+    address.includes('letiste vaclava havla praha') ||
+    address.includes('vaclav havel airport prague') ||
+    (
+      address.includes('prg') &&
+      address.includes('aviaticka') &&
+      (address.includes('praha 6') || address.includes('prague 6'))
+    )
+  );
+}
+
+function getCalendarEventColor(order) {
+  const trip = order?.contractData?.trip || order?.trip || {};
+  const from = getLocationLabel(trip.from);
+  const to = getLocationLabel(trip.to);
+
+  if (isPrgAirportAddress(to)) {
+    return 'green';
+  }
+
+  if (isPrgAirportAddress(from)) {
+    return 'brick';
+  }
+
+  return 'blue';
 }
 
 function getOrderRoute(order, t) {
@@ -279,7 +320,7 @@ function formatDateTitle(value, language, t) {
   return capitalize(label);
 }
 
-function buildCalendarEvent(order, index, language, t) {
+function buildCalendarEvent(order, language, t) {
   const tripDate = parseDateValue(getOrderTripTime(order));
 
   if (!tripDate) {
@@ -294,7 +335,7 @@ function buildCalendarEvent(order, index, language, t) {
 
   return {
     id: order.id,
-    color: EVENT_VARIANTS[index % EVENT_VARIANTS.length],
+    color: getCalendarEventColor(order),
     customer: getCalendarCustomerName(order, t),
     date: tripDate,
     durationMinutes,
@@ -389,7 +430,7 @@ export function CalendarPage() {
 
   const events = useMemo(() => {
     return dayOrders
-      .map((order, index) => buildCalendarEvent(order, index, language, t))
+      .map(order => buildCalendarEvent(order, language, t))
       .filter(Boolean);
   }, [dayOrders, language, t]);
 

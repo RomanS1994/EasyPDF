@@ -185,6 +185,8 @@ export function OrderDetails({ orderId, onClose }) {
   const trip = order?.contractData?.trip || order?.trip || {};
   const customerContact = String(customer.phone || customer.email || customer.contact || "").trim();
   const customerEmail = String(customer.email || "").trim();
+  const customerBirthDate = String(customer.birthDate || customer.dateOfBirth || "").trim();
+  const customerAddress = String(customer.address || customer.residentialAddress || "").trim();
   const customerPhone = getPhoneContactValue(customer.phone, customer.email, customer.contact);
   const customerEmailContact = getEmailContactValue(customer.email, customer.contact, customer.phone);
   const customerPhoneHref = normalizePhoneHref(customerPhone);
@@ -754,39 +756,16 @@ export function OrderDetails({ orderId, onClose }) {
         {!isLoading && !isError ? (
           <>
             <section className="orderSheetCard">
-              <div className="orderSheetSectionHeader">
-                <OrderCardIcon name="file" tone="accent" />
-                <h4 className="orderSheetSectionTitle">{t('contract.orderInfo')}</h4>
-              </div>
-
               <div className="orderSheetRows">
-                <div className="orderSheetInfoRow">
+                <div className="orderSheetInfoRow orderSheetInfoRow--primaryId">
                   <div className="orderSheetInfoLead">
-                    <OrderCardIcon name="hash" />
+                    <OrderCardIcon name="file" tone="accent" />
                     <span className="orderSheetInfoLabel">{t('contract.orderId')}</span>
                   </div>
                   <span className="orderSheetInfoValue">{order.orderNumber || "-"}</span>
                 </div>
 
-                <div className="orderSheetInfoRow">
-                  <div className="orderSheetInfoLead">
-                    <OrderCardIcon name="takeoff" />
-                    <span className="orderSheetInfoLabel">{t('contract.flightNumber')}</span>
-                  </div>
-                  <div className="orderSheetPriceValue orderSheetPriceValue--flight">
-                    <span className="orderSheetInfoValue">{storedFlightNumber || "-"}</span>
-                    <button
-                      className="orderSheetEditButton"
-                      type="button"
-                      onClick={openFlightNumberEditor}
-                      aria-label={t('contract.editFlightNumber')}
-                    >
-                      <OrderGlyph name="edit" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="orderSheetInfoRow">
+                <div className="orderSheetInfoRow orderSheetInfoRow--customer">
                   <div className="orderSheetInfoLead">
                     <OrderCardIcon name="user" />
                     <span className="orderSheetInfoLabel">{t('contract.customer')}</span>
@@ -849,18 +828,54 @@ export function OrderDetails({ orderId, onClose }) {
                   </div>
                 </div>
 
+                {customerBirthDate ? (
+                  <div className="orderSheetInfoRow">
+                    <div className="orderSheetInfoLead">
+                      <OrderCardIcon name="user" />
+                      <span className="orderSheetInfoLabel">{t('contract.customerBirthDate')}</span>
+                    </div>
+                    <span className="orderSheetInfoValue">{customerBirthDate}</span>
+                  </div>
+                ) : null}
+
+                {customerAddress ? (
+                  <div className="orderSheetInfoRow orderSheetInfoRow--customerAddress">
+                    <div className="orderSheetInfoLead orderSheetInfoLead--alignStart">
+                      <OrderCardIcon name="location" />
+                      <span className="orderSheetInfoLabel">{t('contract.customerAddress')}</span>
+                    </div>
+                    <span className="orderSheetInfoValue orderSheetInfoValue--customerAddress">
+                      {customerAddress}
+                    </span>
+                  </div>
+                ) : null}
+
                 <div
                   className="orderSheetInfoRow orderSheetInfoRow--compactStats"
-                  aria-label={`${t('contract.passengers')}: ${passengersCount}. ${t('contract.luggageUnits')}: ${luggageUnits}.`}
+                  aria-label={`${t('contract.passengers')}: ${passengersCount}. ${t('contract.luggageUnits')}: ${luggageUnits}. ${t('contract.flightNumber')}: ${storedFlightNumber || "-"}.`}
                 >
-                  <span className="orderSheetCompactStat">
-                    <OrderCardIcon name="accounts" />
-                    <span className="orderSheetCompactStatValue">{passengersCount}</span>
-                  </span>
-                  <span className="orderSheetCompactStat">
-                    <OrderCardIcon name="luggage" />
-                    <span className="orderSheetCompactStatValue">{luggageUnits}</span>
-                  </span>
+                  <div className="orderSheetCompactGroup">
+                    <span className="orderSheetCompactStat">
+                      <OrderCardIcon name="accounts" />
+                      <span className="orderSheetCompactStatValue">{passengersCount}</span>
+                    </span>
+                    <span className="orderSheetCompactStat">
+                      <OrderCardIcon name="luggage" />
+                      <span className="orderSheetCompactStatValue">{luggageUnits}</span>
+                    </span>
+                  </div>
+                  <div className="orderSheetFlightStat">
+                    <OrderCardIcon name="takeoff" />
+                    <span className="orderSheetCompactStatValue">{storedFlightNumber || "-"}</span>
+                    <button
+                      className="orderSheetEditButton"
+                      type="button"
+                      onClick={openFlightNumberEditor}
+                      aria-label={t('contract.editFlightNumber')}
+                    >
+                      <OrderGlyph name="edit" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </section>
@@ -897,14 +912,6 @@ export function OrderDetails({ orderId, onClose }) {
                     <span className="orderSheetInfoLabel">{t('contract.tripTime')}</span>
                   </div>
                   <span className="orderSheetInfoValue">{tripTime}</span>
-                </div>
-
-                <div className="orderSheetInfoRow">
-                  <div className="orderSheetInfoLead">
-                    <OrderCardIcon name="wallet" />
-                    <span className="orderSheetInfoLabel">{t('contract.payment')}</span>
-                  </div>
-                  <span className="orderSheetInfoValue">{trip.paymentMethod || "-"}</span>
                 </div>
 
                 {driverComment ? (
@@ -962,6 +969,14 @@ export function OrderDetails({ orderId, onClose }) {
                       <OrderGlyph name="edit" />
                     </button>
                   </div>
+                </div>
+
+                <div className="orderSheetInfoRow">
+                  <div className="orderSheetInfoLead">
+                    <OrderCardIcon name="wallet" />
+                    <span className="orderSheetInfoLabel">{t('contract.payment')}</span>
+                  </div>
+                  <span className="orderSheetInfoValue">{trip.paymentMethod || "-"}</span>
                 </div>
               </div>
             </section>

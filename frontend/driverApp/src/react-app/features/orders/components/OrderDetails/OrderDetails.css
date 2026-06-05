@@ -194,6 +194,28 @@
   padding: 9px 0;
 }
 
+.orderSheetInfoRow--primaryId {
+  padding-top: 0;
+}
+
+.orderSheetInfoRow--primaryId .orderSheetInfoLabel {
+  color: rgba(17, 24, 39, 0.98);
+  font-size: 13px;
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+.orderSheetInfoRow--primaryId .orderSheetInfoValue {
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.orderSheetInfoRow--customer .orderSheetInfoValue {
+  font-size: 15px;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
 .orderSheetInfoRow--commission {
   align-items: center;
 }
@@ -203,16 +225,23 @@
 }
 
 .orderSheetInfoRow--compactStats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
   align-items: center;
   gap: 0;
+}
+
+.orderSheetCompactGroup {
+  flex: 0 0 50%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 18px;
+  min-width: 0;
 }
 
 .orderSheetCompactStat {
   display: inline-flex;
   align-items: center;
-  justify-content: flex-start;
   gap: 10px;
   min-width: 0;
   padding-left: 0;
@@ -223,18 +252,35 @@
   font-variant-numeric: tabular-nums;
 }
 
-.orderSheetCompactStat + .orderSheetCompactStat {
-  border-left: 1px solid rgba(226, 232, 240, 0.96);
-  padding-left: 20px;
-}
-
 .orderSheetCompactStat .orderSheetIcon {
   flex: 0 0 auto;
+}
+
+.orderSheetFlightStat {
+  flex: 1 1 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding-left: 18px;
+  border-left: 1px solid rgba(226, 232, 240, 0.96);
+  color: rgba(15, 23, 42, 0.98);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 .orderSheetCompactStatValue {
   min-width: 12px;
   text-align: left;
+}
+
+.orderSheetFlightStat .orderSheetCompactStatValue {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .orderSheetInfoLead {
@@ -265,7 +311,8 @@
   overflow-wrap: anywhere;
 }
 
-.orderSheetInfoValue--driverComment {
+.orderSheetInfoValue--driverComment,
+.orderSheetInfoValue--customerAddress {
   text-align: right;
   white-space: pre-wrap;
 }
@@ -447,11 +494,6 @@
   justify-content: flex-end;
   gap: 10px;
   min-width: 0;
-}
-
-.orderSheetPriceValue--flight .orderSheetInfoValue {
-  flex: 1;
-  text-align: right;
 }
 
 .orderSheetEditButton {
@@ -1100,6 +1142,25 @@
     grid-template-columns: minmax(0, 0.84fr) minmax(0, 1.16fr);
     gap: 8px;
     padding: 7px 0;
+  }
+
+  .orderSheetInfoRow--compactStats {
+    gap: 0;
+  }
+
+  .orderSheetCompactGroup {
+    gap: 12px;
+  }
+
+  .orderSheetCompactStat {
+    gap: 7px;
+    font-size: 11px;
+  }
+
+  .orderSheetFlightStat {
+    gap: 7px;
+    padding-left: 12px;
+    font-size: 11px;
   }
 
   .orderSheetInfoLead {

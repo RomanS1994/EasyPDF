@@ -12,10 +12,6 @@ const features = [
     icon: 'shield-star',
     titleKey: 'controlTitle',
   },
-  {
-    icon: 'clock',
-    titleKey: 'historyTitle',
-  },
 ];
 
 export function GuestTeamPromo() {

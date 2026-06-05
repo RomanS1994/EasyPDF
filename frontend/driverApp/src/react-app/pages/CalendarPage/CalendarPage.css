@@ -299,18 +299,11 @@
   --event-fill: linear-gradient(90deg, rgba(240, 253, 244, 0.96), rgba(255, 255, 255, 0.94));
 }
 
-.calendarEvent--orange {
-  --event-ink: #ea580c;
-  --event-border: rgba(249, 115, 22, 0.32);
+.calendarEvent--brick {
+  --event-ink: #c2410c;
+  --event-border: rgba(194, 65, 12, 0.32);
   --event-rail: rgba(254, 215, 170, 0.88);
   --event-fill: linear-gradient(90deg, rgba(255, 247, 237, 0.97), rgba(255, 255, 255, 0.94));
-}
-
-.calendarEvent--violet {
-  --event-ink: #7c3aed;
-  --event-border: rgba(124, 58, 237, 0.28);
-  --event-rail: rgba(221, 214, 254, 0.88);
-  --event-fill: linear-gradient(90deg, rgba(245, 243, 255, 0.97), rgba(255, 255, 255, 0.94));
 }
 
 .calendarEvent-time {

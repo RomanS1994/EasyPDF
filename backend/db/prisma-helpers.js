@@ -317,6 +317,8 @@ export function sanitizeOrderListRecord(order, options = {}) {
     customer: {
       name: pickTextValue(order.customer?.name),
       email: pickTextValue(order.customer?.email),
+      birthDate: pickTextValue(order.customer?.birthDate || order.customer?.dateOfBirth),
+      address: pickTextValue(order.customer?.address),
     },
     trip: {
       from: pickTextValue(order.trip?.from),

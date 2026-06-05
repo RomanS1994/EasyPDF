@@ -2,6 +2,8 @@ import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { getDateKey, getOrderDate, parseDateValue } from '../../../shared/dateUtils.js';
 import './StatsActivityPanel.css';
 
+const ORDER_COMPLETION_DELAY_MS = 60 * 60 * 1000;
+
 function getActivityDate(order) {
   return getOrderDate(order) || order?.createdAt || '';
 }
@@ -88,7 +90,9 @@ function getOrderStatusBucket(order, referenceDate = new Date()) {
 
   if (tripDate) {
     if (hasExplicitClockTime(tripTime)) {
-      return tripDate.getTime() < referenceDate.getTime() ? 'completed' : 'planned';
+      return tripDate.getTime() + ORDER_COMPLETION_DELAY_MS <= referenceDate.getTime()
+        ? 'completed'
+        : 'planned';
     }
 
     return getDateKey(tripDate) < getDateKey(referenceDate) ? 'completed' : 'planned';
