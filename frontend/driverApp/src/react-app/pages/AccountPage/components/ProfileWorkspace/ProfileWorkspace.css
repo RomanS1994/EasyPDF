@@ -43,6 +43,18 @@
   color: var(--muted);
 }
 
+/* Desktop profile stats:
+   keep the side column compact while preserving two quick summary cards. */
+@media (min-width: 1024px) {
+  .profileWorkspace-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profileWorkspace-card {
+    min-height: 96px;
+  }
+}
+
 @media (max-width: 560px) {
   .profileWorkspace-grid {
     grid-template-columns: 1fr;

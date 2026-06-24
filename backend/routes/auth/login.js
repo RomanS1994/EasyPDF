@@ -43,7 +43,7 @@ export async function handleLogin(request, response) {
       }),
   });
 
-  if (!user || !verifyPassword(password, user.passwordHash)) {
+  if (!user || user.deletedAt || !verifyPassword(password, user.passwordHash)) {
     recordRateLimitFailure('login', identifier);
     await logAuthFailure(
       request,

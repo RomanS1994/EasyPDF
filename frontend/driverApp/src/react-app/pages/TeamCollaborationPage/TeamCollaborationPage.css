@@ -548,6 +548,45 @@
   }
 }
 
+/* Desktop team info page:
+   keep the promo content wide enough for reading while cards align like a web page. */
+@media (min-width: 1024px) {
+  .teamCollaborationPage {
+    max-width: 1080px;
+    margin-inline: auto;
+    gap: 16px;
+  }
+
+  .teamCollaborationPage-hero,
+  .teamCollaborationPage-heroContent {
+    min-height: 360px;
+  }
+
+  .teamCollaborationPage-heroContent {
+    max-width: 31rem;
+    padding: 28px;
+  }
+
+  .teamCollaborationPage-hero h1 {
+    max-width: 28rem;
+    font-size: 36px;
+  }
+
+  .teamCollaborationPage-hero p {
+    max-width: 27rem;
+    font-size: 14px;
+  }
+
+  .teamCollaborationPage-section,
+  .teamCollaborationPage-benefits {
+    padding: 18px;
+  }
+
+  .teamCollaborationPage-finalCta {
+    padding: 18px;
+  }
+}
+
 @media (max-width: 480px) {
   .teamCollaborationPage {
     gap: 10px;

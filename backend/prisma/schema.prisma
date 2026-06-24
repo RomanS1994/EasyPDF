@@ -27,10 +27,13 @@ model User {
   name         String
   email        String   @unique
   phone        String?  @unique
+  businessIco  String?  @unique
+  businessDic  String?  @unique
   passwordHash String
   role         UserRole @default(user)
   activeTeamId String?
   profile      Json
+  deletedAt    DateTime?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -49,6 +52,7 @@ model User {
   orderOfferTargets OrderOfferTarget[] @relation("OrderOfferTargetDriver")
 
   @@index([activeTeamId])
+  @@index([deletedAt])
   @@map("users")
 }
 

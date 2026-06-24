@@ -59,6 +59,37 @@
   min-width: 0;
 }
 
+/* Desktop workspace:
+   authenticated screens get room for the left navigation while mobile keeps the phone layout. */
+@media (min-width: 1024px) {
+  .appLayout--workspace {
+    min-height: 100dvh;
+  }
+
+  .appLayout--withNav .appLayout-workspaceBody {
+    padding: 24px 32px 40px 292px;
+  }
+
+  .appLayout--withNav .pageContainer {
+    max-width: min(1120px, calc(100vw - 340px));
+    padding: 0;
+  }
+
+  .appLayout--home {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .appLayout--home .appLayout-workspaceBody,
+  .appLayout--home .pageContainer,
+  .appLayout--home .appLayout-main {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+}
+
 @media (max-width: 760px) {
   .appLayout-body {
     grid-template-columns: 1fr;
@@ -70,13 +101,13 @@
     padding: 0 12px 24px;
   }
 
-  .appLayout--workspace .pageContainer {
+  .appLayout--workspace:not(.appLayout--withNav) .pageContainer {
     max-width: 404px;
   }
 }
 
 @media (min-width: 1280px) {
-  .appLayout--workspace .pageContainer {
+  .appLayout--workspace:not(.appLayout--withNav) .pageContainer {
     max-width: 428px;
     padding: 0 14px 32px;
   }

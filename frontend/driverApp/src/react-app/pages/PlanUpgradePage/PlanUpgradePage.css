@@ -44,6 +44,24 @@
   line-height: 1.35;
 }
 
+/* Desktop plan upgrade:
+   pricing controls stay centered so comparison text and buttons remain easy to scan. */
+@media (min-width: 1024px) {
+  .planUpgradePage {
+    max-width: 860px;
+    margin-inline: auto;
+    gap: 16px;
+  }
+
+  .planUpgradePage-card {
+    padding: 16px;
+  }
+
+  .planUpgradePage .appTitleBlock p:last-child {
+    max-width: 32rem;
+  }
+}
+
 @media (max-width: 480px) {
   .planUpgradePage {
     gap: 8px;

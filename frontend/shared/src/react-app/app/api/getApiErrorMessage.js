@@ -3,6 +3,7 @@ import { readStoredLanguage } from '../i18n/languageStorage.js';
 
 const TRANSLATED_BACKEND_ERRORS = {
   'User with this email already exists': 'auth.emailAlreadyExists',
+  'Business identifiers are already used': 'auth.businessIdentifiersAlreadyUsed',
   'Invalid plan': 'auth.invalidPlan',
   'Name is required': 'auth.nameRequired',
   'Email is required': 'auth.emailRequired',

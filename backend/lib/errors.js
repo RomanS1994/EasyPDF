@@ -2,6 +2,7 @@ import { sendError } from './http.js';
 
 const STATUS_BY_MESSAGE = new Map([
   ['User with this email already exists', 409],
+  ['Business identifiers are already used', 409],
   ['Plan with this id already exists', 409],
   ['Order not found', 404],
   ['User not found', 404],

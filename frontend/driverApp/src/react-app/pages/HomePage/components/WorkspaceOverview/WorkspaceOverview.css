@@ -478,6 +478,93 @@
   line-height: 1.35;
 }
 
+/* Desktop home workspace:
+   use the wider content area as a dashboard instead of a single mobile column. */
+@media (min-width: 1024px) {
+  .workspaceOverview {
+    grid-template-columns: minmax(320px, 0.95fr) minmax(420px, 1.35fr);
+    align-items: start;
+    gap: 16px;
+  }
+
+  .workspaceOverview .appTop {
+    min-height: 260px;
+    padding: 24px;
+    border-radius: 24px;
+  }
+
+  .workspaceOverview .appTitleBlock {
+    max-width: calc(100% - 132px);
+  }
+
+  .workspaceOverview .appTitleBlock h1 {
+    font-size: clamp(34px, 3.2vw, 46px);
+  }
+
+  .workspaceOverview .appTitleBlock p:last-child {
+    max-width: 24rem;
+    font-size: 16px;
+  }
+
+  .workspaceOverview-mark {
+    top: 22px;
+    right: 22px;
+    --workspace-mark-size: 118px;
+    --workspace-robot-size: 106px;
+  }
+
+  .workspaceOverview .topMetrics {
+    padding-top: 64px;
+  }
+
+  .workspaceOverview-summaryStack {
+    min-width: 0;
+  }
+
+  .workspaceOverview .screenCard-home {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .workspaceOverview .homeOverviewGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .workspaceOverview .homeOverviewCard {
+    min-height: 128px;
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .workspaceOverview .homeOverviewCard-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+  }
+
+  .workspaceOverview .homeOverviewCard-icon svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .workspaceOverview .homeOverviewCard strong {
+    font-size: 22px;
+  }
+
+  .workspaceOverview .homeOverviewCard p {
+    font-size: 13px;
+  }
+
+  .workspaceOverview-promoToggle {
+    grid-column: 1 / -1;
+  }
+
+  .workspaceOverview [id="workspace-overview-promo-banners"] {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 480px) {
   .workspaceOverview {
     gap: 13px;

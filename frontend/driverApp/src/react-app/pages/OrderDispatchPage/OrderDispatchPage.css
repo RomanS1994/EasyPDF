@@ -501,6 +501,47 @@
   background: rgba(255, 255, 255, 0.82);
 }
 
+/* Desktop dispatch workspace:
+   order context remains on the left while sending targets and search controls sit on the right. */
+@media (min-width: 1024px) {
+  .orderDispatchPage {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+    align-items: start;
+    gap: 18px;
+    max-width: 1040px;
+    margin-inline: auto;
+  }
+
+  .orderDispatchPage-header,
+  .orderDispatchMessage,
+  .orderDispatchError,
+  .orderDispatchState {
+    grid-column: 1 / -1;
+  }
+
+  .orderDispatchSummary {
+    grid-column: 1;
+    min-height: 0;
+  }
+
+  .orderDispatchActions,
+  .orderDispatchList,
+  .orderDispatchSearch {
+    grid-column: 2;
+  }
+
+  .orderDispatchActions,
+  .orderDispatchList {
+    align-self: start;
+  }
+
+  .orderDispatchAction,
+  .orderDispatchListButton {
+    padding: 16px;
+  }
+}
+
 @media (max-width: 640px) {
   .orderDispatchPage-header {
     grid-template-columns: 1fr;

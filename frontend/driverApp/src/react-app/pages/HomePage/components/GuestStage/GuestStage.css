@@ -44,6 +44,73 @@
   line-height: 1.42;
 }
 
+.guestIntroTopbar {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  max-width: calc(100% - 104px);
+}
+
+.guestIntroTopbar .sectionEyebrow {
+  flex: 0 0 auto;
+}
+
+.guestLanguageSwitch {
+  position: relative;
+  z-index: 1;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  width: fit-content;
+  padding: 4px;
+
+  border: 1px solid rgba(15, 95, 215, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 8px 18px rgba(15, 23, 42, 0.06);
+}
+
+.guestLanguageButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 38px;
+  min-height: 30px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 10px;
+
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.guestLanguageButton.is-active {
+  background: linear-gradient(180deg, #2d7dff, #0f5fd7);
+  color: #fff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    0 6px 12px rgba(15, 95, 215, 0.18);
+}
+
+.guestLanguageButton:focus-visible {
+  outline: 2px solid rgba(15, 95, 215, 0.32);
+  outline-offset: 2px;
+}
+
 .guestIntroMark {
   position: absolute;
   right: 16px;
@@ -161,6 +228,25 @@
     font-size: 13px;
   }
 
+  .guestIntroTopbar {
+    gap: 8px;
+    max-width: calc(100% - 98px);
+  }
+
+  .guestLanguageSwitch {
+    gap: 3px;
+    padding: 3px;
+    border-radius: 13px;
+  }
+
+  .guestLanguageButton {
+    min-width: 34px;
+    min-height: 28px;
+    padding: 0 8px;
+    border-radius: 9px;
+    font-size: 11px;
+  }
+
   .guestIntroMark {
     width: 86px;
     height: 86px;
@@ -254,5 +340,52 @@
   .guestIntroMark-surface,
   .guestIntroMark-icon {
     animation: none;
+  }
+}
+
+/* Desktop guest stage:
+   keep the login/register entry screen centered and avoid full-width mobile blocks. */
+@media (min-width: 1024px) {
+  .guestStage {
+    max-width: 980px;
+    margin: 0 auto;
+    gap: 18px;
+  }
+
+  .guestIntro {
+    min-height: 260px;
+    padding: 34px 34px 30px;
+    border-radius: 28px;
+  }
+
+  .guestIntro h1 {
+    max-width: 14ch;
+    font-size: 44px;
+  }
+
+  .guestIntro p {
+    max-width: 28rem;
+    font-size: 18px;
+  }
+
+  .guestIntroTopbar {
+    max-width: calc(100% - 140px);
+  }
+
+  .guestIntroMark {
+    right: 34px;
+    top: 32px;
+    width: 112px;
+    height: 112px;
+  }
+
+  .guestIntroMark-icon {
+    width: 102px;
+    height: 102px;
+  }
+
+  .guestAuth {
+    padding: 20px;
+    border-radius: 26px;
   }
 }

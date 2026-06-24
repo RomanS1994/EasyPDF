@@ -167,10 +167,12 @@ export function renderContractPdfHtml({
   const driverAddress = normalizeText(contractData?.driver?.address);
   const driverSpz = normalizeText(contractData?.driver?.spz);
   const driverIco = normalizeText(contractData?.driver?.ico);
+  const driverDic = normalizeText(contractData?.driver?.dic || contractData?.driver?.dicVat);
 
   const providerName = normalizeText(contractData?.provider?.name);
   const providerAddress = normalizeText(contractData?.provider?.address);
   const providerIco = normalizeText(contractData?.provider?.ico);
+  const providerDic = normalizeText(contractData?.provider?.dic || contractData?.provider?.dicVat);
 
   const customerName = normalizeText(contractData?.customer?.name);
   const customerEmail = normalizeText(
@@ -404,6 +406,7 @@ export function renderContractPdfHtml({
                   { label: t("labels.address"), value: driverAddress },
                   { label: t("labels.vehiclePlate"), value: driverSpz },
                   { label: t("labels.ico"), value: driverIco },
+                  { label: t("labels.dic"), value: driverDic },
                 ])}
               </div>
             </section>
@@ -415,6 +418,7 @@ export function renderContractPdfHtml({
                   { label: t("labels.companyName"), value: providerName },
                   { label: t("labels.address"), value: providerAddress },
                   { label: t("labels.ico"), value: providerIco },
+                  { label: t("labels.dic"), value: providerDic },
                 ])}
               </div>
             </section>

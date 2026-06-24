@@ -143,6 +143,32 @@
   background: #d92d20;
 }
 
+/* Desktop activity panel:
+   chart and status mix sit side by side instead of stacking into a long column. */
+@media (min-width: 1024px) {
+  .statsActivityPanel {
+    grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+    align-items: start;
+    gap: 16px;
+  }
+
+  .statsVizCard {
+    padding: 16px;
+  }
+
+  .activityBars {
+    min-height: 210px;
+  }
+
+  .activityBarTrack {
+    height: 142px;
+  }
+
+  .statusLegend {
+    margin-top: 12px;
+  }
+}
+
 @media (max-width: 860px) {
   .activityBars {
     min-height: 132px;

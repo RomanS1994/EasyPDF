@@ -38,6 +38,7 @@ const DISPATCH_DRIVER_SELECT = {
   email: true,
   phone: true,
   role: true,
+  deletedAt: true,
   profile: true,
   updatedAt: true,
 };
@@ -82,21 +83,34 @@ export function buildOwnerContractBusinessPatch(user) {
       address: profile.driver.address || '',
       spz: profile.driver.spz || '',
       ico: profile.driver.ico || '',
+      dic: profile.driver.dic || '',
     },
     provider: {
-      name: profile.provider.name || user?.name || '',
+      id: profile.provider.id || profile.defaultProviderId || '',
+      name: profile.provider.name || '',
       address: profile.provider.address || '',
       ico: profile.provider.ico || '',
+      dic: profile.provider.dic || '',
     },
   };
 }
 
+function hasBusinessPartyData(value) {
+  return Boolean(
+    value &&
+      typeof value === 'object' &&
+      (value.name || value.address || value.ico || value.dic)
+  );
+}
+
 function buildAcceptedOrderContractData(contractData, owner) {
   const source = contractData && typeof contractData === 'object' ? contractData : {};
+  const ownerPatch = buildOwnerContractBusinessPatch(owner);
 
   return {
     ...source,
-    ...buildOwnerContractBusinessPatch(owner),
+    driver: ownerPatch.driver,
+    provider: hasBusinessPartyData(source.provider) ? source.provider : ownerPatch.provider,
   };
 }
 
@@ -141,6 +155,7 @@ function isEligibleDriver(user, excludeUserId = '') {
     user &&
       user.id &&
       user.id !== excludeUserId &&
+      !user.deletedAt &&
       user.role !== 'admin'
   );
 }
@@ -149,6 +164,7 @@ export async function searchDispatchDrivers(client, { search = '', excludeUserId
   const query = normalizeText(search).toLowerCase();
   const drivers = await client.user.findMany({
     where: {
+      deletedAt: null,
       role: {
         in: ['user', 'manager'],
       },
@@ -202,6 +218,7 @@ export async function searchDispatchDrivers(client, { search = '', excludeUserId
 async function resolveAllDriverTargets(client, excludeUserId) {
   const drivers = await client.user.findMany({
     where: {
+      deletedAt: null,
       role: {
         in: ['user', 'manager'],
       },

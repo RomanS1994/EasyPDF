@@ -313,3 +313,46 @@
     padding-left: 10px;
   }
 }
+
+/* Desktop additional trip data:
+   keep the drawer model, but make the form wide enough for two-column fields. */
+@media (min-width: 1024px) {
+  .tripAdditionalModal {
+    padding-left: 292px;
+  }
+
+  .tripAdditionalModal-sheet {
+    width: min(720px, calc(100vw - 340px));
+    padding: 18px;
+    border-radius: 24px 0 0 24px;
+  }
+
+  .tripAdditionalModal-fields {
+    gap: 12px;
+  }
+
+  .tripAdditionalModal-section {
+    gap: 10px;
+    padding-bottom: 14px;
+  }
+
+  .tripAdditionalModal-sectionHeader {
+    align-items: start;
+  }
+
+  .tripAdditionalModal-section h4 {
+    font-size: 1rem;
+  }
+
+  .tripAdditionalModal-field input {
+    min-height: 42px;
+  }
+
+  .tripAdditionalModal-seatList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tripAdditionalModal-done {
+    min-height: 44px;
+  }
+}

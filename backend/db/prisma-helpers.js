@@ -36,6 +36,24 @@ function pickTextValue(value) {
   return '';
 }
 
+function pickOrderPaymentMethod(order) {
+  return pickTextValue(
+    order.trip?.paymentMethod ||
+      order.trip?.paymentType ||
+      order.trip?.payment ||
+      order.contractData?.trip?.paymentMethod ||
+      order.contractData?.trip?.paymentType ||
+      order.contractData?.trip?.payment ||
+      order.contractData?.paymentMethod ||
+      order.contractData?.paymentType ||
+      order.contractData?.payment ||
+      order.metadata?.paymentMethod ||
+      order.metadata?.paymentType ||
+      order.metadata?.payment ||
+      ''
+  );
+}
+
 export const USER_WITH_SUBSCRIPTION_INCLUDE = {
   subscription: {
     include: {
@@ -307,6 +325,13 @@ export function sanitizeOrderListRecord(order, options = {}) {
     order.contractData?.luggageUnits ||
     order.trip?.luggageUnits ||
     '';
+  const paymentMethod = pickOrderPaymentMethod(order);
+  const distance =
+    order.trip?.distance ||
+    order.trip?.distanceKm ||
+    order.contractData?.trip?.distance ||
+    order.contractData?.trip?.distanceKm ||
+    '';
 
   return {
     id: order.id,
@@ -325,7 +350,10 @@ export function sanitizeOrderListRecord(order, options = {}) {
       to: pickTextValue(order.trip?.to),
       time: pickTextValue(order.trip?.time),
       luggageUnits: pickTextValue(luggageUnits),
+      paymentMethod,
+      distance: pickTextValue(distance),
     },
+    paymentMethod,
     passengers: pickTextValue(passengers),
     totalPrice: pickTextValue(order.totalPrice),
     metadata: normalizeOrderMetadata(order.metadata, options),

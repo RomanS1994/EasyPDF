@@ -1,12 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import { BackButton } from "@shared/app/components/BackButton/BackButton.jsx";
 import { RequestLoader, RequestLoadingState } from "@shared/app/components/RequestLoader/RequestLoader.jsx";
 import { useI18n } from "@shared/app/i18n/useI18n.js";
-import { selectUser } from "@shared/features/auth/authSlice.js";
+import { useUpdateProfileMutation } from "@shared/features/auth/authApi.js";
+import { selectToken, selectUser, setSession } from "@shared/features/auth/authSlice.js";
+import { saveSession } from "@shared/features/auth/authStorage.js";
 import { hasManagerAccess } from "@shared/features/auth/authAccess.js";
+import {
+  createEmptyProvider,
+  createProviderId,
+  getUserProviders,
+  hasProviderData,
+  hasSameProviderDetails,
+  normalizeProvider,
+  serializeProviders,
+} from "@shared/features/auth/providerProfile.js";
 import { useGenerateContractPdfMutation } from "../../../contract/contractApi.js";
 import { downloadFile } from "../../../contract/utils/downloadFile.js";
 import {
@@ -45,6 +56,17 @@ function getTransferLabel(user) {
   }
 
   return `${user.name || "-"} · ${user.email || "-"}`;
+}
+
+function getProviderMeta(provider, t) {
+  return [
+    provider?.address,
+    provider?.ico ? `${t('auth.ico')}: ${provider.ico}` : '',
+    provider?.dic ? `${t('auth.dic')}: ${provider.dic}` : '',
+  ]
+    .map(value => String(value || '').trim())
+    .filter(Boolean)
+    .join(' · ');
 }
 
 function getCommissionValue(order) {
@@ -139,8 +161,10 @@ function OrderCardIcon({ name, tone = "neutral", className = "" }) {
 }
 
 export function OrderDetails({ orderId, onClose }) {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const currentUser = useSelector(selectUser);
+  const token = useSelector(selectToken);
   const { t } = useI18n();
   const canTransfer = hasManagerAccess(currentUser?.role);
   const [isClosing, setIsClosing] = useState(false);
@@ -162,6 +186,7 @@ export function OrderDetails({ orderId, onClose }) {
   const [assignDriver, { isLoading: isTransferring }] =
     useAssignDriverMutation();
   const [updateOrder, { isLoading: isUpdatingOrder }] = useUpdateOrderMutation();
+  const [updateProfile, { isLoading: isSavingProvider }] = useUpdateProfileMutation();
   const [generateContractPdf, { isLoading: isGenerating }] =
     useGenerateContractPdfMutation();
   const { data, isLoading, isError } = useGetOrderQuery(orderId, {
@@ -181,6 +206,13 @@ export function OrderDetails({ orderId, onClose }) {
     );
 
   const order = data?.order || data || {};
+  const orderProvider = order?.contractData?.provider || {};
+  const savedProviders = useMemo(() => getUserProviders(currentUser), [currentUser]);
+  const isProviderAlreadySaved = savedProviders.some(provider =>
+    hasSameProviderDetails(provider, orderProvider),
+  );
+  const canSaveProvider = hasProviderData(orderProvider) && !isProviderAlreadySaved;
+  const providerMeta = getProviderMeta(orderProvider, t);
   const customer = order?.contractData?.customer || order?.customer || {};
   const trip = order?.contractData?.trip || order?.trip || {};
   const customerContact = String(customer.phone || customer.email || customer.contact || "").trim();
@@ -431,6 +463,53 @@ export function OrderDetails({ orderId, onClose }) {
       setSelectedUserId("");
     } catch (error) {
       setError(resolveErrorMessage(error, t('contract.failedToTransferOrder')));
+    }
+  }
+
+  async function handleSaveProviderToProfile() {
+    if (!hasProviderData(orderProvider)) {
+      return;
+    }
+
+    if (isProviderAlreadySaved) {
+      setMessage(t('contract.providerAlreadySaved'));
+      return;
+    }
+
+    const hasIdCollision = savedProviders.some(provider => provider.id && provider.id === orderProvider.id);
+    const nextProviderId = hasIdCollision || !orderProvider.id ? createProviderId() : orderProvider.id;
+    const nextProvider = normalizeProvider(
+      {
+        ...orderProvider,
+        id: nextProviderId,
+      },
+      nextProviderId,
+    );
+    const nextProviders = serializeProviders([...savedProviders, nextProvider]);
+    const requestedDefaultProviderId = currentUser?.profile?.defaultProviderId || nextProviders[0]?.id || '';
+    const nextDefaultProviderId = nextProviders.some(provider => provider.id === requestedDefaultProviderId)
+      ? requestedDefaultProviderId
+      : nextProviders[0]?.id || '';
+    const defaultProvider =
+      nextProviders.find(provider => provider.id === nextDefaultProviderId) ||
+      nextProviders[0] ||
+      createEmptyProvider();
+
+    setMessage("");
+    setError("");
+
+    try {
+      const updatedUser = await updateProfile({
+        providers: nextProviders,
+        defaultProviderId: nextDefaultProviderId,
+        provider: defaultProvider,
+      }).unwrap();
+
+      saveSession(token, updatedUser);
+      dispatch(setSession({ token, user: updatedUser }));
+      setMessage(t('contract.providerSavedToProfile'));
+    } catch (saveError) {
+      setError(resolveErrorMessage(saveError, t('contract.failedToSaveProvider')));
     }
   }
 
@@ -978,6 +1057,38 @@ export function OrderDetails({ orderId, onClose }) {
                   </div>
                   <span className="orderSheetInfoValue">{trip.paymentMethod || "-"}</span>
                 </div>
+
+                {hasProviderData(orderProvider) ? (
+                  <div className="orderSheetInfoRow orderSheetInfoRow--provider">
+                    <div className="orderSheetInfoLead orderSheetInfoLead--alignStart">
+                      <OrderCardIcon name="invoice" />
+                      <span className="orderSheetInfoLabel">{t('contract.provider')}</span>
+                    </div>
+                    <div className="orderSheetProviderValue">
+                      <span className="orderSheetInfoValue">{orderProvider.name || "-"}</span>
+                      {providerMeta ? (
+                        <span className="orderSheetProviderMeta">{providerMeta}</span>
+                      ) : null}
+                      {canSaveProvider ? (
+                        <button
+                          className="orderSheetProviderSaveButton"
+                          type="button"
+                          onClick={() => void handleSaveProviderToProfile()}
+                          disabled={isSavingProvider}
+                        >
+                          <SvgIcon name="plus" />
+                          <span>
+                            {isSavingProvider ? t('common.saving') : t('contract.saveProviderToProfile')}
+                          </span>
+                        </button>
+                      ) : (
+                        <span className="orderSheetProviderSaved">
+                          {t('contract.providerAlreadySaved')}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ) : null}
               </div>
             </section>
 

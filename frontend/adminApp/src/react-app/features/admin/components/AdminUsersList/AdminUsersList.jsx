@@ -22,64 +22,19 @@ function getInitials(user) {
   return `${parts[0][0] || ''}${parts[1][0] || ''}`.toUpperCase();
 }
 
-function hashString(value) {
-  let hash = 0;
-
-  for (let index = 0; index < value.length; index += 1) {
-    hash = (hash * 31 + value.charCodeAt(index)) | 0;
-  }
-
-  return Math.abs(hash);
-}
-
-function getAvatarImage(user) {
-  const avatarUrl = getAvatarUrl(user);
-  if (avatarUrl) {
-    return avatarUrl;
-  }
-
-  const initials = getInitials(user);
-  const seed = user?.name || user?.email || 'user';
-  const background = '#dcfce7';
-  const foreground = '#047857';
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="${seed}">
-      <defs>
-        <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="${background}" />
-          <stop offset="100%" stop-color="#f0fdf4" />
-        </linearGradient>
-      </defs>
-      <rect width="64" height="64" rx="12" fill="url(#bg)" />
-      <circle cx="32" cy="32" r="31" fill="rgba(255,255,255,0.18)" />
-      <text
-        x="32"
-        y="38"
-        text-anchor="middle"
-        font-family="Inter, Arial, sans-serif"
-        font-size="22"
-        font-weight="800"
-        fill="${foreground}"
-      >${initials}</text>
-    </svg>
-  `;
-
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-}
-
 function AdminUserAvatar({ user }) {
   const [hasError, setHasError] = useState(false);
   const initials = getInitials(user);
   const avatarUrl = getAvatarUrl(user);
 
-  if (hasError) {
+  if (hasError || !avatarUrl) {
     return <span className="adminUsersList-avatarFallback">{initials}</span>;
   }
 
   return (
     <img
       className="adminUsersList-avatarImage"
-      src={avatarUrl || getAvatarImage(user)}
+      src={avatarUrl}
       alt=""
       onError={() => setHasError(true)}
     />

@@ -406,6 +406,45 @@
   }
 }
 
+/* Desktop flight info page:
+   keep the rich hero wide and let supporting cards read as desktop content blocks. */
+@media (min-width: 1024px) {
+  .flightTrackingPage {
+    max-width: 1080px;
+    margin-inline: auto;
+    gap: 16px;
+  }
+
+  .flightTrackingPage-hero,
+  .flightTrackingPage-heroContent {
+    min-height: 360px;
+  }
+
+  .flightTrackingPage-heroContent {
+    max-width: 31rem;
+    padding: 28px;
+  }
+
+  .flightTrackingPage-hero h1 {
+    max-width: 28rem;
+    font-size: 36px;
+  }
+
+  .flightTrackingPage-hero p {
+    max-width: 27rem;
+    font-size: 14px;
+  }
+
+  .flightTrackingPage-section,
+  .flightTrackingPage-benefits {
+    padding: 18px;
+  }
+
+  .flightTrackingPage-finalCta {
+    padding: 18px;
+  }
+}
+
 @media (max-width: 480px) {
   .flightTrackingPage {
     gap: 10px;

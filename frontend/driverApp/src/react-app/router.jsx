@@ -20,9 +20,13 @@ import {
   OrderDispatchTeamPage,
 } from './pages/OrderDispatchPage/OrderDispatchPage.jsx';
 import { PlanUpgradePage } from './pages/PlanUpgradePage/PlanUpgradePage.jsx';
+import { ProvidersInfoPage } from './pages/ProvidersInfoPage/ProvidersInfoPage.jsx';
+import { ProvidersPage } from './pages/ProvidersPage/ProvidersPage.jsx';
 import { SettingsPage } from './pages/SettingsPage/SettingsPage.jsx';
 import { SignInPage } from './pages/SignInPage/SignInPage.jsx';
 import { StatsPage } from './pages/StatsPage/StatsPage.jsx';
+import { TaxInfoFilePage } from './pages/TaxInfoFilePage/TaxInfoFilePage.jsx';
+import { TaxInfoPage } from './pages/TaxInfoPage/TaxInfoPage.jsx';
 import { TeamCollaborationPage } from './pages/TeamCollaborationPage/TeamCollaborationPage.jsx';
 import { TeamPage, TeamSearchPage } from './pages/TeamPage/TeamPage.jsx';
 
@@ -108,6 +112,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: 'settings/providers',
+        element: (
+          <ProtectedRoute>
+            <ProvidersPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: 'settings/language',
         element: (
           <ProtectedRoute>
@@ -124,6 +136,38 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: 'settings/tax-info',
+        element: (
+          <ProtectedRoute>
+            <TaxInfoPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'settings/tax-info/pdf',
+        element: (
+          <ProtectedRoute>
+            <TaxInfoFilePage reportType="pdf" />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'settings/tax-info/excel',
+        element: (
+          <ProtectedRoute>
+            <TaxInfoFilePage reportType="excel" />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'settings/tax-info/accountant',
+        element: (
+          <ProtectedRoute>
+            <TaxInfoFilePage reportType="accountant" />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: 'flight-tracking',
         element: (
           <ProtectedRoute>
@@ -136,6 +180,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <TeamCollaborationPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'providers-info',
+        element: (
+          <ProtectedRoute>
+            <ProvidersInfoPage />
           </ProtectedRoute>
         ),
       },

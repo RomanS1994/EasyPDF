@@ -253,3 +253,19 @@
     gap: 0;
   }
 }
+
+/* Desktop history display screen:
+   give presentation controls more room without changing the centered name layout. */
+@media (min-width: 1024px) {
+  .historyDisplayScreen {
+    padding: 32px 40px;
+  }
+
+  .historyDisplayScreen-controls {
+    gap: 8px;
+  }
+
+  .historyDisplayScreen-selectShell {
+    min-width: 168px;
+  }
+}

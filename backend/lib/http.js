@@ -81,6 +81,7 @@ export function setCorsHeaders(response) {
     'Content-Type, Authorization, X-API-KEY'
   );
   response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
+  response.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
 
   if (origin !== '*') {
     response.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -110,9 +111,21 @@ export function sendJson(response, statusCode, payload) {
 }
 
 export function sendPdf(response, statusCode, buffer, fileName) {
+  sendBuffer(response, statusCode, buffer, {
+    contentType: 'application/pdf',
+    fileName,
+  });
+}
+
+export function sendBuffer(
+  response,
+  statusCode,
+  buffer,
+  { contentType = 'application/octet-stream', fileName = 'download' } = {}
+) {
   setCorsHeaders(response);
   response.writeHead(statusCode, {
-    'Content-Type': 'application/pdf',
+    'Content-Type': contentType,
     'Content-Disposition': `attachment; filename="${fileName}"`,
     'Content-Length': buffer.length,
   });

@@ -16,6 +16,7 @@ const MANAGER_USER_SELECT = {
   id: true,
   name: true,
   email: true,
+  deletedAt: true,
   role: true,
   createdAt: true,
   updatedAt: true,

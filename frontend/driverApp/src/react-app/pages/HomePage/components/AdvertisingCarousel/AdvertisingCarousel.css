@@ -1,5 +1,7 @@
 .advertisingCarousel {
+  --advertisingCarousel-cardHeight: 216px;
   display: flex;
+  align-items: flex-start;
   gap: 10px;
   min-width: 0;
   overflow-x: auto;
@@ -13,6 +15,12 @@
   -webkit-overflow-scrolling: touch;
 }
 
+@media (max-width: 480px) {
+  .advertisingCarousel {
+    --advertisingCarousel-cardHeight: 212px;
+  }
+}
+
 .advertisingCarousel::-webkit-scrollbar {
   display: none;
 }
@@ -24,6 +32,7 @@
 .advertisingCarousel-slide {
   display: grid;
   flex: 0 0 94%;
+  height: var(--advertisingCarousel-cardHeight);
   min-width: 0;
   scroll-snap-align: start;
   scroll-snap-stop: always;
@@ -81,4 +90,18 @@
   box-shadow: none;
   outline: none;
   transform: none;
+}
+
+/* Desktop promo carousel:
+   keep all promo cards equal height while giving each slide a desktop card width. */
+@media (min-width: 1024px) {
+  .advertisingCarousel {
+    --advertisingCarousel-cardHeight: 252px;
+    gap: 14px;
+    padding-right: 0;
+  }
+
+  .advertisingCarousel-slide {
+    flex-basis: min(760px, 78%);
+  }
 }

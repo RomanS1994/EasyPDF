@@ -10,6 +10,11 @@ import { buildSanitizedUser, createAuditLog, USER_WITH_SUBSCRIPTION_INCLUDE } fr
 import { findStoredPlan } from '../../db/plans-store.js';
 import { runStoreTransaction } from '../../db/store.js';
 import { readJsonBody, sendJson } from '../../lib/http.js';
+import {
+  assertBusinessIdentityAvailable,
+  buildBusinessIdentityData,
+  buildProfileWithBusinessIdentityLocks,
+} from '../../services/account-identity.js';
 import { buildSubscriptionWriteData } from '../../services/prisma-views.js';
 import { normalizeUserProfile } from '../../services/profiles.js';
 import { validateRegistrationInput } from '../../validation/auth.js';
@@ -67,6 +72,16 @@ export async function handleRegister(request, response) {
         const userId = randomUUID();
         const authSession = issueAuthSession(userId);
         const pendingPlanId = requestedPlan?.id || null;
+        const profile = buildProfileWithBusinessIdentityLocks(
+          normalizeUserProfile(body.profile, name),
+          null,
+          name
+        );
+        await assertBusinessIdentityAvailable(tx, {
+          profile,
+          name,
+        });
+        const businessIdentity = buildBusinessIdentityData(profile, name);
         const subscriptionData = buildSubscriptionWriteData({
           plan: freePlan,
           payload: {
@@ -89,9 +104,11 @@ export async function handleRegister(request, response) {
             id: userId,
             name,
             email,
+            businessIco: businessIdentity.businessIco,
+            businessDic: businessIdentity.businessDic,
             passwordHash: hashPassword(password),
             role: 'user',
-            profile: normalizeUserProfile(body.profile, name),
+            profile,
             sessions: {
               create: {
                 id: authSession.session.id,

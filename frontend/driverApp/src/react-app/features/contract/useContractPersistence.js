@@ -2,14 +2,16 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { selectUser } from '@shared/features/auth/authSlice.js';
+import { getDefaultProvider, hasProviderData } from '@shared/features/auth/providerProfile.js';
 import { replaceContract, selectContract, syncBusinessProfile } from './contractSlice.js';
 import { loadContractDraft, saveContractDraft } from './contractStorage.js';
 
 function getProfileContractPatch(user) {
   const profile = user?.profile || {};
   const driver = profile.driver || {};
-  const provider = profile.provider || {};
+  const provider = getDefaultProvider(user);
   const fallbackName = user?.name || '';
+  const hasSelectedProvider = hasProviderData(provider);
 
   return {
     driver: {
@@ -17,25 +19,30 @@ function getProfileContractPatch(user) {
       address: driver.address || '',
       spz: driver.spz || '',
       ico: driver.ico || '',
+      dic: driver.dic || '',
     },
     provider: {
-      name: provider.name || fallbackName,
-      address: provider.address || '',
-      ico: provider.ico || '',
+      id: hasSelectedProvider ? provider.id || profile.defaultProviderId || '' : '',
+      name: hasSelectedProvider ? provider.name || '' : '',
+      address: hasSelectedProvider ? provider.address || '' : '',
+      ico: hasSelectedProvider ? provider.ico || '' : '',
+      dic: hasSelectedProvider ? provider.dic || '' : '',
     },
   };
 }
 
-function hasSameBusinessProfile(contract, patch) {
+function hasSameDriverProfile(contract, patch) {
   return (
     contract?.driver?.name === patch.driver.name &&
     contract?.driver?.address === patch.driver.address &&
     contract?.driver?.spz === patch.driver.spz &&
     contract?.driver?.ico === patch.driver.ico &&
-    contract?.provider?.name === patch.provider.name &&
-    contract?.provider?.address === patch.provider.address &&
-    contract?.provider?.ico === patch.provider.ico
+    (contract?.driver?.dic || '') === patch.driver.dic
   );
+}
+
+function shouldSyncProvider(contract, patch) {
+  return hasProviderData(patch?.provider) && !hasProviderData(contract?.provider);
 }
 
 export function useContractPersistence() {
@@ -58,9 +65,14 @@ export function useContractPersistence() {
     if (!isReady || !user) return;
 
     const nextProfile = getProfileContractPatch(user);
+    const shouldUpdateDriver = !hasSameDriverProfile(contract, nextProfile);
+    const shouldUpdateProvider = shouldSyncProvider(contract, nextProfile);
 
-    if (!hasSameBusinessProfile(contract, nextProfile)) {
-      dispatch(syncBusinessProfile(nextProfile));
+    if (shouldUpdateDriver || shouldUpdateProvider) {
+      dispatch(syncBusinessProfile({
+        ...(shouldUpdateDriver ? { driver: nextProfile.driver } : {}),
+        ...(shouldUpdateProvider ? { provider: nextProfile.provider } : {}),
+      }));
     }
   }, [contract, dispatch, isReady, user]);
 

@@ -64,6 +64,16 @@ export async function getAuthContext(request, response) {
         return null;
       }
 
+      if (session.user.deletedAt) {
+        await client.session.deleteMany({
+          where: {
+            userId: session.user.id,
+          },
+        });
+        sendError(response, 401, 'Invalid or expired session');
+        return null;
+      }
+
       return {
         user: session.user,
         session,

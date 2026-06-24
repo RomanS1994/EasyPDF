@@ -276,6 +276,22 @@
   stroke-linejoin: round;
 }
 
+/* Desktop trip fields:
+   date and payment controls stay compact inside the two-column contract form. */
+@media (min-width: 1024px) {
+  .contractOptionalFields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .contractDateField {
+    width: 100%;
+  }
+
+  .paymentMethodButtons {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 480px) {
   .contractDateField {
     width: min(100%, 100%);

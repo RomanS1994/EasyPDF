@@ -3,11 +3,13 @@ import { handleManagerRoutes } from './manager/index.js';
 import { handleMeRoutes } from './me.js';
 import { handleOrderRoutes } from './orders.js';
 import { handlePublicRoutes } from './public.js';
+import { handleTaxReportRoutes } from './tax-reports.js';
 
 const routeHandlers = [
   handlePublicRoutes,
   handleAuthRoutes,
   handleMeRoutes,
+  handleTaxReportRoutes,
   handleOrderRoutes,
   handleManagerRoutes,
 ];

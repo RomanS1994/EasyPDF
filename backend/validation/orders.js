@@ -47,7 +47,18 @@ export function validateOrderCreateInput(body = {}) {
     resolveAddress(trip.from) || resolveAddress(body.trip?.from),
     resolveAddress(trip.to) || resolveAddress(body.trip?.to),
     trip.time,
-    trip.paymentMethod,
+    trip.paymentMethod ||
+      trip.paymentType ||
+      trip.payment ||
+      contractData.paymentMethod ||
+      contractData.paymentType ||
+      contractData.payment ||
+      body.trip?.paymentMethod ||
+      body.trip?.paymentType ||
+      body.trip?.payment ||
+      body.paymentMethod ||
+      body.paymentType ||
+      body.payment,
     contractData.totalPrice || body.totalPrice,
   ];
 

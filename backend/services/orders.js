@@ -93,6 +93,24 @@ function getCustomerPayload(body = {}, contractData = {}) {
   };
 }
 
+function getPaymentMethodPayload(body = {}, contractData = {}) {
+  return (
+    contractData.trip?.paymentMethod ||
+    contractData.trip?.paymentType ||
+    contractData.trip?.payment ||
+    contractData.paymentMethod ||
+    contractData.paymentType ||
+    contractData.payment ||
+    body.trip?.paymentMethod ||
+    body.trip?.paymentType ||
+    body.trip?.payment ||
+    body.paymentMethod ||
+    body.paymentType ||
+    body.payment ||
+    ''
+  );
+}
+
 export function buildOrderRecord(body, user, options = {}) {
   const contractData = body.contractData || body.order || {};
   const createdAt = options.createdAt || nowIso();
@@ -102,6 +120,11 @@ export function buildOrderRecord(body, user, options = {}) {
     contractData.flightNumber ||
     body.order?.flightNumber ||
     '';
+  const paymentMethod = getPaymentMethodPayload(body, contractData);
+  const contractTrip =
+    contractData.trip && typeof contractData.trip === 'object'
+      ? contractData.trip
+      : {};
 
   return {
     id: randomUUID(),
@@ -117,8 +140,7 @@ export function buildOrderRecord(body, user, options = {}) {
       from: contractData.trip?.from?.address || body.trip?.from || '',
       to: contractData.trip?.to?.address || body.trip?.to || '',
       time: contractData.trip?.time || body.trip?.time || '',
-      paymentMethod:
-        contractData.trip?.paymentMethod || body.trip?.paymentMethod || '',
+      paymentMethod,
     },
     totalPrice: contractData.totalPrice || body.totalPrice || '',
     pdf: {
@@ -128,6 +150,10 @@ export function buildOrderRecord(body, user, options = {}) {
     contractData: {
       ...contractData,
       flightNumber,
+      trip: {
+        ...contractTrip,
+        paymentMethod: contractTrip.paymentMethod || paymentMethod,
+      },
     },
     metadata: typeof body.metadata === 'object' && body.metadata ? body.metadata : {},
     createdAt,

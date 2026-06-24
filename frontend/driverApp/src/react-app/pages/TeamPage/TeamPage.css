@@ -665,6 +665,54 @@
   stroke: currentColor;
 }
 
+/* Desktop team workspace:
+   management cards and driver results use the wider page without stretching forms too far. */
+@media (min-width: 1024px) {
+  .teamPage {
+    max-width: 1040px;
+    margin-inline: auto;
+    gap: 20px;
+  }
+
+  .teamPage-header {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 16px;
+  }
+
+  .teamPage-section {
+    gap: 16px;
+  }
+
+  .teamPage-teamGrid,
+  .teamPage-driverList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .teamPage-teamCard {
+    padding: 18px;
+  }
+
+  .teamPage-createTile {
+    min-height: 132px;
+  }
+
+  .teamPage-searchSection {
+    max-width: 900px;
+    margin-inline: auto;
+    width: 100%;
+  }
+
+  .teamPage-searchRow {
+    grid-template-columns: minmax(0, 1fr) 58px;
+  }
+
+  .teamPage-tip {
+    margin-top: 0;
+  }
+}
+
 @media (max-width: 560px) {
   .teamPage {
     gap: 14px;

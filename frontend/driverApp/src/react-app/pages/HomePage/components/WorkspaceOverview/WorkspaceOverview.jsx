@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { RequestLoader } from '@shared/app/components/RequestLoader/RequestLoader.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { SvgIcon } from '@shared/app/components/SvgIcon/SvgIcon.jsx';
+import { saveStoredPromoBannersVisible } from '../../../../features/homeUi/homeUiStorage.js';
+import {
+  selectPromoBannersVisible,
+  setPromoBannersVisible,
+} from '../../../../features/homeUi/homeUiSlice.js';
 import {
   getPlanTypeLabel,
   getPlanVariant,
@@ -12,6 +18,7 @@ import {
 import { AdvertisingCarousel } from '../AdvertisingCarousel/AdvertisingCarousel.jsx';
 import { FlightTrackingNotice } from '../FlightTrackingNotice/FlightTrackingNotice.jsx';
 import { GuestTeamPromo } from '../GuestTeamPromo/GuestTeamPromo.jsx';
+import { ProvidersPromo } from '../ProvidersPromo/ProvidersPromo.jsx';
 
 import heroRobotImage from '../../../../assets/main_robot.png';
 import './WorkspaceOverview.css';
@@ -64,6 +71,7 @@ function OverviewCardIcon({ kind }) {
 }
 
 export function WorkspaceOverview({ user, orders, isOrdersLoading = false }) {
+  const dispatch = useDispatch();
   const { language, t } = useI18n();
   const userName = getUserName(user);
   const planType = getPlanTypeLabel(user);
@@ -72,7 +80,7 @@ export function WorkspaceOverview({ user, orders, isOrdersLoading = false }) {
   const weeklySalaryTotal = getWeeklySalaryTotal(orders);
   const orderCount = String(orders.length || 0);
   const [robotPose, setRobotPose] = useState(() => createRobotPose());
-  const [arePromoBannersVisible, setArePromoBannersVisible] = useState(true);
+  const arePromoBannersVisible = useSelector(selectPromoBannersVisible);
   const promoBannersId = 'workspace-overview-promo-banners';
 
   useEffect(() => {
@@ -93,6 +101,13 @@ export function WorkspaceOverview({ user, orders, isOrdersLoading = false }) {
       window.clearTimeout(timeoutId);
     };
   }, []);
+
+  function handleTogglePromoBanners() {
+    const nextVisible = !arePromoBannersVisible;
+
+    dispatch(setPromoBannersVisible(nextVisible));
+    saveStoredPromoBannersVisible(nextVisible);
+  }
 
   return (
     <div className={`workspaceOverview workspaceOverview--${planVariant} pageStack`}>
@@ -165,7 +180,7 @@ export function WorkspaceOverview({ user, orders, isOrdersLoading = false }) {
           aria-controls={promoBannersId}
           aria-expanded={arePromoBannersVisible}
           aria-label={arePromoBannersVisible ? t('home.promoBannersCollapse') : t('home.promoBannersExpand')}
-          onClick={() => setArePromoBannersVisible(current => !current)}
+          onClick={handleTogglePromoBanners}
         >
           <span className="workspaceOverview-promoToggleBar" aria-hidden="true" />
         </button>
@@ -177,6 +192,7 @@ export function WorkspaceOverview({ user, orders, isOrdersLoading = false }) {
         paginationLabel={t('home.promoBannersPagination')}
         getSlideLabel={index => t('home.promoBannersGoTo', { number: index + 1 })}
       >
+        <ProvidersPromo />
         <FlightTrackingNotice />
         <GuestTeamPromo />
       </AdvertisingCarousel>

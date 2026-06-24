@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { getApiErrorMessage } from '../../../../app/api/getApiErrorMessage.js';
 import { useI18n } from '../../../../app/i18n/useI18n.js';
 import { useUpdateProfileMutation } from '../../authApi.js';
 import { selectToken, selectUser, setSession } from '../../authSlice.js';
@@ -11,21 +12,17 @@ function getBusinessProfile(user) {
 
   return {
     driver: profile.driver || user?.driver || {},
-    provider: profile.provider || user?.provider || {},
   };
 }
 
 function buildInitialFormState(user) {
-  const { driver, provider } = getBusinessProfile(user);
+  const { driver } = getBusinessProfile(user);
 
   return {
     driverName: driver.name || '',
     driverAddress: driver.address || '',
     driverSpz: driver.spz || '',
     driverIco: driver.ico || '',
-    providerName: provider.name || '',
-    providerAddress: provider.address || '',
-    providerIco: provider.ico || '',
   };
 }
 
@@ -63,18 +60,13 @@ export function useBusinessProfileForm() {
           spz: form.driverSpz,
           ico: form.driverIco,
         },
-        provider: {
-          name: form.providerName,
-          address: form.providerAddress,
-          ico: form.providerIco,
-        },
       }).unwrap();
 
       saveSession(token, updatedUser);
       dispatch(setSession({ token, user: updatedUser }));
       setMessage(t('auth.profileSaved'));
-    } catch {
-      setError(t('auth.failedToSaveProfile'));
+    } catch (error) {
+      setError(getApiErrorMessage(error, 'auth.failedToSaveProfile'));
     }
   }
 

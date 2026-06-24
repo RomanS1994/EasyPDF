@@ -398,6 +398,44 @@
   white-space: nowrap;
 }
 
+/* Desktop calendar:
+   date controls and daily summary share the top row while the timeline keeps full width. */
+@media (min-width: 1024px) {
+  .calendarPage {
+    gap: 14px;
+  }
+
+  .calendarDatePanel {
+    grid-template-columns: minmax(340px, 0.8fr) minmax(420px, 1.2fr);
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .calendarDateNav,
+  .calendarWeekStrip,
+  .calendarSummary,
+  .calendarTimelineCard {
+    border-radius: 14px;
+  }
+
+  .calendarWeekStrip {
+    padding: 8px;
+  }
+
+  .calendarSummary {
+    padding: 12px 10px;
+  }
+
+  .calendarTimeline {
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+
+  .calendarEvent {
+    left: 10px;
+    right: 8px;
+  }
+}
+
 @media (max-width: 390px) {
   .calendarDateNav {
     grid-template-columns: 36px minmax(0, 1fr) 36px;

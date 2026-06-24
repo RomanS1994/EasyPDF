@@ -145,8 +145,8 @@
   color: rgba(17, 24, 39, 0.98);
   font-size: 15px;
   line-height: 1.1;
-  letter-spacing: -0.035em;
-  font-weight: 800;
+  letter-spacing: 0;
+  font-weight: 700;
 }
 
 .orderSheetIcon {
@@ -221,6 +221,10 @@
 }
 
 .orderSheetInfoRow--driverComment {
+  align-items: start;
+}
+
+.orderSheetInfoRow--provider {
   align-items: start;
 }
 
@@ -494,6 +498,55 @@
   justify-content: flex-end;
   gap: 10px;
   min-width: 0;
+}
+
+.orderSheetProviderValue {
+  display: grid;
+  justify-items: end;
+  gap: 5px;
+  min-width: 0;
+  text-align: right;
+}
+
+.orderSheetProviderMeta {
+  color: rgba(100, 116, 139, 0.96);
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.orderSheetProviderSaveButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid rgba(20, 184, 166, 0.18);
+  border-radius: 12px;
+  background: rgba(240, 253, 250, 0.96);
+  color: rgba(15, 118, 110, 0.98);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.orderSheetProviderSaveButton svg {
+  width: 15px;
+  height: 15px;
+}
+
+.orderSheetProviderSaveButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.orderSheetProviderSaved {
+  color: rgba(22, 163, 74, 0.94);
+  font-size: 11px;
+  line-height: 1.25;
+  font-weight: 700;
 }
 
 .orderSheetEditButton {
@@ -988,7 +1041,7 @@
   color: rgba(17, 24, 39, 0.98);
   font-size: 19px;
   line-height: 1.05;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
 }
 
 .orderPriceEditor-copy {
@@ -1097,6 +1150,27 @@
 .orderContactAction--message {
   background: linear-gradient(180deg, rgba(245, 243, 255, 0.98), rgba(237, 233, 254, 0.96));
   color: rgba(109, 40, 217, 0.98);
+}
+
+/* Desktop order details:
+   the drawer is wider on desktop so dense route, provider and payment rows do not feel cramped. */
+@media (min-width: 1024px) {
+  .orderDrawer-panel {
+    width: min(720px, calc(100vw - 340px));
+    padding: 12px 24px 18px;
+  }
+
+  .orderSheetCard {
+    padding: 16px;
+  }
+
+  .orderSheetInfoRow {
+    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+  }
+
+  .orderSheetRouteRow {
+    grid-template-columns: minmax(150px, 0.46fr) minmax(0, 1fr);
+  }
 }
 
 @media (max-width: 480px) {

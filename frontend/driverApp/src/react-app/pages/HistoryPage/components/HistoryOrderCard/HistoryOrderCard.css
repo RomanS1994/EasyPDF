@@ -1263,3 +1263,49 @@
     height: 10px;
   }
 }
+
+/* Desktop order history card:
+   reduce decorative height and use the wider list area for clearer route rows. */
+@media (min-width: 1024px) {
+  .ordersList {
+    gap: 12px;
+  }
+
+  .orderItem {
+    min-height: 132px;
+    border-radius: 16px;
+  }
+
+  .orderItemCard {
+    gap: 10px;
+    padding: 14px 16px 12px;
+  }
+
+  .orderItemHeader {
+    align-items: flex-start;
+  }
+
+  .orderItemCustomer {
+    font-size: 17px;
+    font-weight: 750;
+  }
+
+  .orderItemRouteCard {
+    grid-template-columns: 28px minmax(0, 1fr);
+    padding: 6px;
+    border-radius: 12px;
+  }
+
+  .orderItemRouteLineButton {
+    min-height: 38px;
+  }
+
+  .orderItemRouteLineValue {
+    font-size: 13px;
+  }
+
+  .orderItemMetaRow {
+    grid-template-columns: 30px minmax(0, max-content) 1px minmax(0, 1fr) auto;
+    gap: 10px;
+  }
+}

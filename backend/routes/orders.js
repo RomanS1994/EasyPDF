@@ -1,3 +1,5 @@
+import { Prisma } from '@prisma/client';
+
 import { getAuthContext, hasManagerAccess } from '../auth/context.js';
 import {
   buildSanitizedUser,
@@ -62,6 +64,115 @@ function getUtcDayBounds(isoValue) {
   const end = new Date(start);
   end.setUTCDate(end.getUTCDate() + 1);
   return { start, end };
+}
+
+function parseDateSearchParam(value) {
+  const text = normalizeText(value);
+
+  if (!text) {
+    return null;
+  }
+
+  const date = new Date(text);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return date;
+}
+
+function buildOrderDateFilter(searchParams) {
+  const from = parseDateSearchParam(searchParams.get('from') || searchParams.get('dateFrom'));
+  const to = parseDateSearchParam(searchParams.get('to') || searchParams.get('dateTo'));
+  const createdAt = {};
+
+  if (from) {
+    createdAt.gte = from;
+  }
+
+  if (to) {
+    createdAt.lt = to;
+  }
+
+  return Object.keys(createdAt).length ? { createdAt } : {};
+}
+
+function parseTripDateSearchParam(value) {
+  const text = normalizeText(value);
+  const match = text.match(/^(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}:\d{2}))?/);
+
+  if (!match) {
+    return '';
+  }
+
+  return `${match[1]}T${match[2] || '00:00'}`;
+}
+
+function getOrderDateField(searchParams) {
+  const value = normalizeText(searchParams.get('dateField')).toLowerCase();
+
+  return value === 'trip' ? 'trip' : 'createdAt';
+}
+
+async function findOrdersByTripDate(client, { from, limit, skip, to, userId }) {
+  const fromFilter = parseTripDateSearchParam(from);
+  const toFilter = parseTripDateSearchParam(to);
+
+  return client.$queryRaw`
+    WITH scoped_orders AS (
+      SELECT
+        "id",
+        "userId",
+        "createdByUserId",
+        "createdBySnapshot",
+        "orderNumber",
+        "status",
+        "flightNumber",
+        "customer",
+        "trip",
+        "totalPrice",
+        "contractData",
+        "metadata",
+        "createdAt",
+        "updatedAt",
+        CASE
+          WHEN COALESCE(NULLIF("trip"->>'time', ''), NULLIF("contractData"#>>'{trip,time}', '')) ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+            THEN COALESCE(NULLIF("trip"->>'time', ''), NULLIF("contractData"#>>'{trip,time}', '')) || 'T00:00'
+          ELSE replace(COALESCE(NULLIF("trip"->>'time', ''), NULLIF("contractData"#>>'{trip,time}', '')), ' ', 'T')
+        END AS "tripTimeForFilter"
+      FROM "orders"
+      WHERE "userId" = ${userId}
+        AND NOT EXISTS (
+          SELECT 1
+          FROM "order_offers"
+          WHERE "order_offers"."orderId" = "orders"."id"
+            AND "order_offers"."status" = 'open'
+        )
+    )
+    SELECT
+      "id",
+      "userId",
+      "createdByUserId",
+      "createdBySnapshot",
+      "orderNumber",
+      "status",
+      "flightNumber",
+      "customer",
+      "trip",
+      "totalPrice",
+      "contractData",
+      "metadata",
+      "createdAt",
+      "updatedAt"
+    FROM scoped_orders
+    WHERE "tripTimeForFilter" IS NOT NULL
+      ${fromFilter ? Prisma.sql`AND "tripTimeForFilter" >= ${fromFilter}` : Prisma.empty}
+      ${toFilter ? Prisma.sql`AND "tripTimeForFilter" < ${toFilter}` : Prisma.empty}
+    ORDER BY "tripTimeForFilter" DESC, "createdAt" DESC
+    LIMIT ${limit}
+    OFFSET ${skip}
+  `;
 }
 
 async function handleCreateOrder(request, response) {
@@ -388,10 +499,11 @@ async function handleAssignDriver(request, response, orderId) {
         select: {
           id: true,
           role: true,
+          deletedAt: true,
         },
       });
 
-      if (!targetUser) {
+      if (!targetUser || targetUser.deletedAt) {
         throw new Error('Selected driver not found');
       }
 
@@ -546,23 +658,32 @@ export async function handleOrderRoutes(request, response, { pathName, url }) {
       defaultLimit: 50,
       maxLimit: 1000,
     });
-
-    const orders = await prisma.order.findMany({
-      where: {
-        userId: context.user.id,
-        offers: {
-          none: {
-            status: 'open',
+    const orderDateField = getOrderDateField(url.searchParams);
+    const orders = orderDateField === 'trip'
+      ? await findOrdersByTripDate(prisma, {
+          from: url.searchParams.get('from') || url.searchParams.get('dateFrom'),
+          limit,
+          skip,
+          to: url.searchParams.get('to') || url.searchParams.get('dateTo'),
+          userId: context.user.id,
+        })
+      : await prisma.order.findMany({
+          where: {
+            userId: context.user.id,
+            ...buildOrderDateFilter(url.searchParams),
+            offers: {
+              none: {
+                status: 'open',
+              },
+            },
           },
-        },
-      },
-      select: ORDER_LIST_SELECT,
-      orderBy: {
-        createdAt: 'desc',
-      },
-      skip,
-      take: limit,
-    });
+          select: ORDER_LIST_SELECT,
+          orderBy: {
+            createdAt: 'desc',
+          },
+          skip,
+          take: limit,
+        });
     const refreshedOrders = await refreshFlightStatusesForOrders(prisma, orders, {
       enabled: hasFlightStatusAccess(context.user),
     });

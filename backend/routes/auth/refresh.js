@@ -53,11 +53,17 @@ export async function handleRefresh(request, response) {
         },
       });
 
-      if (!currentSession?.user) {
+      if (!currentSession?.user || currentSession.user.deletedAt) {
         if (currentSession) {
           await tx.session.deleteMany({
             where: {
-              id: currentSession.id,
+              ...(currentSession.user?.deletedAt
+                ? {
+                    userId: currentSession.user.id,
+                  }
+                : {
+                    id: currentSession.id,
+                  }),
             },
           });
         }

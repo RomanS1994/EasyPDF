@@ -8,6 +8,8 @@ import { SettingsAdminAccess } from "./components/SettingsAdminAccess/SettingsAd
 import { SettingsBusinessProfileLink } from "./components/SettingsBusinessProfileLink/SettingsBusinessProfileLink.jsx";
 import { SettingsLanguageLink } from "./components/SettingsLanguageLink/SettingsLanguageLink.jsx";
 import { SettingsPlanUpgradeLink } from "./components/SettingsPlanUpgradeLink/SettingsPlanUpgradeLink.jsx";
+import { SettingsProvidersLink } from "./components/SettingsProvidersLink/SettingsProvidersLink.jsx";
+import { SettingsTaxInfoLink } from "./components/SettingsTaxInfoLink/SettingsTaxInfoLink.jsx";
 import { SettingsTeamLink } from "./components/SettingsTeamLink/SettingsTeamLink.jsx";
 import { useI18n } from "@shared/app/i18n/useI18n.js";
 import "./SettingsPage.css";
@@ -23,10 +25,12 @@ export function SettingsPage() {
       <SettingsAccountSummary user={user} />
 
       {canAdmin ? <SettingsAdminAccess /> : null}
-      {canManageTeam ? <SettingsTeamLink /> : null}
 
       <SettingsLanguageLink />
+      {canManageTeam ? <SettingsTeamLink /> : null}
       <SettingsBusinessProfileLink />
+      <SettingsProvidersLink />
+      <SettingsTaxInfoLink />
       <SettingsPlanUpgradeLink />
 
       <section className="screenCard settingsPage-card">

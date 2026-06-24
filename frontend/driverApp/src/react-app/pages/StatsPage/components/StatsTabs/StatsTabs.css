@@ -30,3 +30,17 @@
     0 0 0 0.5px rgba(60, 60, 67, 0.14),
     0 6px 16px rgba(28, 32, 40, 0.04);
 }
+
+/* Desktop stats tabs:
+   keep the segmented control compact instead of stretching like a mobile bar. */
+@media (min-width: 1024px) {
+  .statsTabs {
+    width: fit-content;
+    min-width: 420px;
+  }
+
+  .statsTab {
+    min-height: 38px;
+    padding: 0 18px;
+  }
+}

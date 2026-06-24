@@ -2,9 +2,11 @@ import { createSlice } from '@reduxjs/toolkit';
 
 function createEmptyBusinessParty() {
   return {
+    id: '',
     name: '',
     address: '',
     ico: '',
+    dic: '',
   };
 }
 
@@ -24,10 +26,26 @@ function mergeContractDefaults(contract) {
     nextContract.customer && typeof nextContract.customer === 'object'
       ? nextContract.customer
       : {};
+  const nextProvider =
+    nextContract.provider && typeof nextContract.provider === 'object'
+      ? nextContract.provider
+      : {};
+  const nextDriver =
+    nextContract.driver && typeof nextContract.driver === 'object'
+      ? nextContract.driver
+      : {};
 
   return {
     ...defaults,
     ...nextContract,
+    driver: {
+      ...defaults.driver,
+      ...nextDriver,
+    },
+    provider: {
+      ...defaults.provider,
+      ...nextProvider,
+    },
     customer: {
       ...defaults.customer,
       ...nextCustomer,
@@ -89,6 +107,12 @@ const contractSlice = createSlice({
     updateProviderField(state, action) {
       const field = action.payload.key || action.payload.field;
       state.provider[field] = action.payload.value;
+    },
+    setProvider(state, action) {
+      state.provider = {
+        ...createEmptyBusinessParty(),
+        ...(action.payload || {}),
+      };
     },
     updateCustomerField(state, action) {
       const field = action.payload.key || action.payload.field;
@@ -153,6 +177,7 @@ export const {
   setFlightNumber,
   updateDriverField,
   updateProviderField,
+  setProvider,
   updateCustomerField,
   updateTripField,
   setPassengers,

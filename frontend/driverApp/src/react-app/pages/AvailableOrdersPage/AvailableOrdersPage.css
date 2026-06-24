@@ -182,6 +182,23 @@
   opacity: 0.68;
 }
 
+/* Desktop available orders:
+   incoming shared orders can be scanned in cards across the workspace width. */
+@media (min-width: 1024px) {
+  .availableOrdersPage {
+    gap: 16px;
+  }
+
+  .availableOrdersList {
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 16px;
+  }
+
+  .availableOrderCard {
+    align-content: start;
+  }
+}
+
 @media (max-width: 480px) {
   .availableOrdersPage-empty {
     padding: 14px;

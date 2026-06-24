@@ -394,3 +394,17 @@
     transform: none;
   }
 }
+
+/* Desktop plan card:
+   tighten card height for the four-column desktop plan grid. */
+@media (min-width: 1024px) {
+  .planCard {
+    min-height: 226px;
+    padding: 16px;
+    border-radius: 22px;
+  }
+
+  .planCard-heroValue {
+    font-size: 42px;
+  }
+}

@@ -264,6 +264,14 @@
   font-weight: 700;
 }
 
+/* Desktop contract actions:
+   confirmation dialogs have more comfortable width on wide screens. */
+@media (min-width: 1024px) {
+  .contractActionsModal-sheet {
+    width: min(100%, 420px);
+  }
+}
+
 @media (max-width: 480px) {
   .contractActions {
     gap: 8px;

@@ -198,6 +198,31 @@
   font-size: 12px;
 }
 
+/* Desktop salary panel:
+   split breakdown and trend cards into columns after the monthly headline. */
+@media (min-width: 1024px) {
+  .statsSalaryPanel {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.82fr);
+    align-items: start;
+    gap: 16px;
+  }
+
+  .salaryHeroCard {
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.48fr);
+    padding: 18px;
+  }
+
+  .salaryLedgerCard,
+  .salaryTrendCard {
+    padding: 16px;
+  }
+
+  .salaryHeroMain strong {
+    font-size: 42px;
+  }
+}
+
 @media (max-width: 560px) {
   .salaryHeroCard {
     grid-template-columns: 1fr;

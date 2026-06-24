@@ -193,3 +193,25 @@
     font-size: 10px;
   }
 }
+
+/* Desktop history toolbar:
+   align the controls as a single compact row above the wider order list. */
+@media (min-width: 1024px) {
+  .orderHistoryToolbar {
+    justify-content: flex-end;
+  }
+
+  .orderHistorySortButton {
+    width: 36px;
+    height: 36px;
+  }
+
+  .orderHistorySortButton--sort {
+    width: 72px;
+  }
+
+  .orderHistoryDateLabel {
+    min-width: 88px;
+    font-size: 12px;
+  }
+}

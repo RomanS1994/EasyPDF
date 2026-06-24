@@ -156,6 +156,20 @@
   width: 100%;
 }
 
+/* Desktop order page states:
+   empty or blocked states stay centered and readable inside the wider workspace. */
+@media (min-width: 1024px) {
+  .ordersPage-blocked {
+    max-width: 720px;
+    margin-inline: auto;
+    padding: 22px;
+  }
+
+  .ordersPage-errorSheet {
+    width: min(100%, 420px);
+  }
+}
+
 @media (max-width: 480px) {
   .ordersPage-blockedButton {
     width: 100%;

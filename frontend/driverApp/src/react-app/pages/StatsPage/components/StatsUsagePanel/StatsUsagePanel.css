@@ -158,6 +158,47 @@
   line-height: 1.25;
 }
 
+/* Desktop usage panel:
+   the progress ring becomes a side summary and counters fill the remaining width. */
+@media (min-width: 1024px) {
+  .statsPanel {
+    gap: 16px;
+  }
+
+  .statsHero {
+    grid-template-columns: 220px minmax(0, 1fr);
+    align-items: center;
+    justify-items: stretch;
+    gap: 18px;
+  }
+
+  .statsRing {
+    width: 210px;
+    height: 210px;
+  }
+
+  .statsRing-inner strong {
+    font-size: 38px;
+  }
+
+  .statsMiniGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .statsMiniCard {
+    min-height: 104px;
+    padding: 14px;
+  }
+
+  .usageCard {
+    padding: 16px;
+  }
+
+  .usageForecast {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 860px) {
   .statsRing {
     width: 168px;

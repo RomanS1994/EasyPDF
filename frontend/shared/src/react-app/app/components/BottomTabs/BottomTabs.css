@@ -187,9 +187,95 @@
 }
 
 @media (min-width: 1024px) {
+  /* Desktop navigation:
+     the same tab component becomes a left-side workspace menu for mouse/keyboard use. */
   .bottomTabs {
-    left: 12px;
-    right: 12px;
+    top: 24px;
+    bottom: auto;
+    left: 24px;
+    right: auto;
+    width: 236px;
+    min-height: auto;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 24px;
+    overflow: visible;
+  }
+
+  .bottomTabs::before {
+    border-radius: inherit;
+  }
+
+  .bottomTabs::after {
+    display: none;
+  }
+
+  .bottomTab,
+  .bottomTab-primary {
+    flex: 0 0 auto;
+    transform: none;
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    justify-items: start;
+    align-items: center;
+    align-content: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 8px 12px;
+    border-radius: 16px;
+  }
+
+  .bottomTab:hover {
+    background: rgba(255, 255, 255, 0.48);
+  }
+
+  .bottomTab-icon,
+  .bottomTab-primary .bottomTab-icon {
+    width: 34px;
+    height: 34px;
+    margin: 0;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.66);
+  }
+
+  .bottomTab-icon svg,
+  .bottomTab-primary .bottomTab-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .bottomTab-label,
+  .bottomTab-primary .bottomTab-label {
+    min-width: 0;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: rgba(60, 60, 67, 0.72);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bottomTab.is-active {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(239, 246, 255, 0.54));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.84),
+      0 10px 20px rgba(15, 23, 42, 0.08);
+  }
+
+  .bottomTab.is-active .bottomTab-icon,
+  .bottomTab-primary.is-active .bottomTab-icon {
+    color: var(--accent);
+    background: rgba(229, 240, 255, 0.76);
+  }
+
+  .bottomTab-primary.is-active .bottomTab-label {
+    color: var(--accent);
   }
 }
 

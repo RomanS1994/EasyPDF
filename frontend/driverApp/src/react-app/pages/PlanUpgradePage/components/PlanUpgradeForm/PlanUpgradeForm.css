@@ -414,6 +414,36 @@
   height: 15px;
 }
 
+/* Desktop plan form:
+   show plan cards as a balanced two-column catalog on wide screens. */
+@media (min-width: 1024px) {
+  .planUpgradeForm-plans {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .planUpgradeForm-plan {
+    grid-template-columns: 56px minmax(0, 1fr);
+    align-content: start;
+    min-height: 184px;
+  }
+
+  .planUpgradeForm-planAside {
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    justify-items: start;
+  }
+
+  .planUpgradeForm-planPrice {
+    justify-items: start;
+  }
+
+  .planUpgradeForm-button {
+    width: min(420px, 100%);
+    justify-self: center;
+  }
+}
+
 @media (max-width: 720px) {
   .planUpgradeForm-plan {
     grid-template-columns: 48px minmax(0, 1fr) 122px;

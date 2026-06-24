@@ -181,3 +181,15 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Desktop route modal:
+   center the route chooser inside the desktop workspace, away from left nav. */
+@media (min-width: 1024px) {
+  .historyRouteModal {
+    padding: 28px 28px 28px 320px;
+  }
+
+  .historyRouteModal-sheet {
+    width: min(460px, calc(100vw - 380px));
+  }
+}

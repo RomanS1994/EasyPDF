@@ -15,9 +15,12 @@ export function AppLayout({ children }) {
   const user = useSelector(selectUser);
   const showBottomTabs = Boolean(token && user);
   const isHomeScreen = location.pathname === '/' && showBottomTabs;
-  const layoutClassName = `appLayout appLayout--workspace ${
-    isHomeScreen ? 'appLayout--home' : ''
-  }`;
+  const layoutClassName = [
+    'appLayout',
+    'appLayout--workspace',
+    showBottomTabs ? 'appLayout--withNav' : '',
+    isHomeScreen ? 'appLayout--home' : '',
+  ].filter(Boolean).join(' ');
 
   return (
     <div className={layoutClassName}>

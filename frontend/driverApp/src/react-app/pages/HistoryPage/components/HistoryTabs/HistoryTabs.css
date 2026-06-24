@@ -127,3 +127,18 @@
     font-size: 8px;
   }
 }
+
+/* Desktop history tabs:
+   keep filters readable and compact in the desktop toolbar area. */
+@media (min-width: 1024px) {
+  .orderHistoryTabs {
+    width: fit-content;
+    min-width: 460px;
+  }
+
+  .orderHistoryTab {
+    min-height: 38px;
+    padding: 0 16px;
+    font-size: 12px;
+  }
+}

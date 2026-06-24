@@ -71,3 +71,26 @@
   font-size: 0.72rem;
   color: rgba(100, 116, 139, 0.96);
 }
+
+/* Desktop address autocomplete:
+   make search results easier to scan with slightly larger rows. */
+@media (min-width: 1024px) {
+  .addressAutocompleteMenu {
+    top: calc(100% - 2px);
+    gap: 2px;
+    padding: 4px;
+    border-radius: 12px;
+  }
+
+  .addressAutocompleteItem {
+    min-height: 34px;
+    padding: 6px 8px;
+    border-radius: 9px;
+    font-size: 0.86rem;
+  }
+
+  .addressAutocompleteStatus {
+    padding: 8px;
+    font-size: 0.8rem;
+  }
+}

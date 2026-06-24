@@ -118,6 +118,23 @@
   color: var(--danger);
 }
 
+/* Desktop profile hero:
+   avatar, copy and actions sit in one work row instead of stacking tightly. */
+@media (min-width: 1024px) {
+  .profileHero {
+    padding: 18px;
+  }
+
+  .profileHero-main {
+    align-items: center;
+    gap: 16px;
+  }
+
+  .profileHero-actions {
+    padding-top: 8px;
+  }
+}
+
 @media (max-width: 480px) {
   .profileHero {
     padding: 12px 12px 14px;

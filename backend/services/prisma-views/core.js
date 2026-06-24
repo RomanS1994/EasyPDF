@@ -349,6 +349,7 @@ export function sanitizeUserFromRecords({
       ...buildUsageView(resolvedSubscription, usedOrders),
       deletedMessages,
     },
+    deletedAt: toIsoString(user.deletedAt),
     createdAt: toIsoString(user.createdAt),
     updatedAt: toIsoString(user.updatedAt),
   };

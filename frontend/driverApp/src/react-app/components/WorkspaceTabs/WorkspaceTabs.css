@@ -213,3 +213,18 @@
     height: 14px;
   }
 }
+
+/* Desktop workspace tabs:
+   keep section tabs compact under the desktop sidebar navigation. */
+@media (min-width: 1024px) {
+  .workspaceTabs {
+    position: static;
+    width: fit-content;
+    min-width: 520px;
+  }
+
+  .workspaceTabs-tab {
+    height: 46px;
+    padding: 0 14px;
+  }
+}

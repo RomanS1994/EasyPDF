@@ -1,257 +1,928 @@
 # DocTra / pdfApp
 
-> Workspace для приватних водіїв і невеликих transfer-команд. Створюйте PDF-договори, зберігайте замовлення, стежте за лімітом плану та керуйте підписками в одному застосунку.
+DocTra, також `pdfApp`, це веб-застосунок для приватних transfer-водіїв і невеликих команд. Він об'єднує створення договорів, PDF-документів, замовлень, передачу замовлень іншим водіям, статистику, податкові звіти, профіль водія, постачальників, плани підписки і адмін-панель.
 
-## Що це
+Проект побудований як split-stack система:
 
-DocTra побудований як split-stack система:
-
-| Частина | Що робить |
+| Частина | Призначення |
 | --- | --- |
-| Frontend | Мультисторінкові Vite-застосунки у `frontend/driverApp/`, `frontend/adminApp/` і `frontend/dispatcherApp/` |
-| Backend | Node HTTP API з Prisma та PostgreSQL |
-| PDF | HTML-first шаблони, що рендеряться через Puppeteer/Chromium |
-| Auth | `Authorization: Bearer <token>` + rotating refresh cookie |
-| Ops | Audit logs, health checks, rate limits, secret scanning, deploy-ready scripts |
+| Driver app | Основний мобільний кабінет водія у `frontend/driverApp` |
+| Admin app | Back-office для менеджера/адміна у `frontend/adminApp` |
+| Dispatcher app | Зарезервований окремий frontend mount у `frontend/dispatcherApp` |
+| Shared frontend | Спільні компоненти, i18n, auth, API slice у `frontend/shared` |
+| Backend | Node HTTP API без Express, Prisma, PostgreSQL, auth, PDF, orders |
+| PDF engine | HTML-шаблони, які рендеряться у PDF через Puppeteer/Chromium |
+| Database | PostgreSQL через Prisma schema і migrations |
 
-## Головні можливості
+## Зміст
 
-- покроковий wizard для створення transfer-замовлень
-- збереження замовлень і повторний доступ до них у кабінеті
-- генерація двох типів PDF: `offer` і `confirmation`
-- облік місячного ліміту генерацій і статистики використання
-- редагування профілю, фото, бізнес-даних і мови інтерфейсу
-- ручний запит paid-апгрейду з підтвердженням менеджером
-- окремий admin workspace у `frontend/adminApp/`
-- PWA-обгортка зі splash screen, manifest та іконками
+- [Коротко про можливості](#коротко-про-можливості)
+- [Архітектура](#архітектура)
+- [Ролі та доступи](#ролі-та-доступи)
+- [Плани](#плани)
+- [Driver App](#driver-app)
+- [Admin App](#admin-app)
+- [Backend API](#backend-api)
+- [Модель даних](#модель-даних)
+- [Локальний запуск](#локальний-запуск)
+- [Змінні середовища](#змінні-середовища)
+- [Скрипти](#скрипти)
+- [Деплой](#деплой)
+- [Перевірки](#перевірки)
 
-## Ролі
+## Коротко про можливості
+
+Основні можливості системи:
+
+- реєстрація, логін, refresh-сесія, захищені routes;
+- створення transfer-замовлення через форму договору;
+- вибір постачальника для замовлення зі списку збережених постачальників;
+- збереження замовлень у базу;
+- генерація PDF договору з типом документа `offer` або `confirmation`;
+- 10-хвилинне вікно генерації після відкриття token-сесії;
+- історія замовлень з фільтрами, сортуванням і деталями;
+- редагування ціни, комісії, контактів, статусів і даних замовлення;
+- видалення та відновлення замовлень через архів;
+- передача замовлення всім водіям, конкретному водієві або команді;
+- прийняття або пропуск отриманого замовлення;
+- команди водіїв для Platinum-плану;
+- статистика використання, активності та доходів;
+- податкова інформація по місяцях;
+- календар доходів і список замовлень за конкретний день;
+- PDF-звіт за місяць, Excel-звіт замовлень і файл даних для бухгалтера;
+- бізнес-профіль водія;
+- окрема сторінка постачальників з кількома записами, IČO і DIČ;
+- flight tracking для Platinum-плану через aviationstack;
+- багатомовність: українська, англійська, чеська;
+- адмін-панель для акаунтів, планів, підписок, замовлень і audit log;
+- PWA-friendly frontend assets, SVG sprite icons, Netlify rewrites.
+
+## Архітектура
+
+### Frontend
+
+Frontend складається з трьох застосунків:
+
+| App | Path | Build output | Призначення |
+| --- | --- | --- | --- |
+| Driver | `frontend/driverApp` | `dist/` | Кабінет водія |
+| Admin | `frontend/adminApp` | `dist/admin/` | Адмін-панель |
+| Dispatcher | `frontend/dispatcherApp` | `dist/dispatcher/` | Зарезервований mount `/dispatcher/` |
+
+Driver і Admin використовують React, Redux Toolkit, RTK Query, React Router і спільний модуль `frontend/shared`.
+
+Важливі frontend директорії:
+
+```text
+frontend/
+  driverApp/
+    src/react-app/
+      components/      спільні компоненти driver app
+      features/        contract, orders, address autocomplete та інші feature-модулі
+      pages/           route pages driver app
+  adminApp/
+    src/react-app/
+      pages/           route pages admin app
+      features/admin/  admin UI компоненти
+  dispatcherApp/       окремий зарезервований frontend
+  shared/
+    src/react-app/
+      app/             API base, i18n, layout, common components
+      features/        auth/admin/shared helpers
+```
+
+### Backend
+
+Backend це Node HTTP server у `backend/server.js`.
+
+Він робить:
+
+- env validation при старті;
+- CORS;
+- optional `X-API-KEY` перевірку;
+- auth через access token і refresh cookie;
+- Prisma connection і синхронізацію планів;
+- маршрутизацію через `backend/routes/index.js`;
+- PDF generation через `backend/pdf`;
+- flight status refresh через `backend/services/flight-status-refresh.js`;
+- audit logging через helper-и Prisma.
+
+Основні backend директорії:
+
+```text
+backend/
+  auth/          токени, refresh cookie, rate limit, guards
+  config/        плани, runtime env validation
+  db/            Prisma helpers, store, plan/subscription sync
+  lib/           HTTP helpers, error handling
+  pdf/           contract PDF renderer і шаблони
+  prisma/        schema і migrations
+  routes/        API route handlers
+  services/      orders, teams, dispatch, tax reports, flight status
+  tools/         create-admin, seed, Prisma postinstall
+  validation/    input validation helpers
+```
+
+## Ролі та доступи
 
 | Роль | Доступ |
 | --- | --- |
-| `user` | Створення замовлень, власний профіль, статистика, історія, запит апгрейду |
-| `manager` | Керування користувачами, підписками, планами, замовленнями та audit log |
-| `admin` | Усе з `manager` + зміна ролей користувачів |
+| `user` | Driver app, власні замовлення, профіль, постачальники, статистика, податкова інформація, запит апгрейду |
+| `manager` | Усе як `user` + менеджерські можливості backend, робота з користувачами, планами, підписками, замовленнями |
+| `admin` | Усе як `manager` + зміна ролей користувачів |
 
-## Поточний набір планів
+Доступи в UI:
 
-| Plan | Ліміт на місяць | Поточна ціна | Стара ціна | Знижка |
-| --- | --- | --- | --- | --- |
-| `plan-free` | 100 | 0 CZK | 199 CZK | -100% |
-| `plan-25` | 300 | 229 CZK | 299 CZK | -23% |
-| `plan-50` | 500 | 379 CZK | 499 CZK | -24% |
-| `plan-100` | 1000 | 699 CZK | 899 CZK | -22% |
+- звичайні protected routes вимагають авторизації;
+- admin routes вимагають `admin`;
+- team routes вимагають Platinum-план;
+- flight tracking дані показуються тільки для Platinum-плану;
+- self-service зміна плану через `PATCH /api/me/plan` навмисно вимкнена.
 
-Усі плани підтримують обидва типи документів:
+## Плани
 
-- `offer`
-- `confirmation`
+Плани визначені у `backend/config/plans.js` і синхронізуються у базу при старті backend.
 
-## Структура репозиторію
+| ID | Назва | Ліміт на місяць | Ціна | Стара ціна | PDF документи |
+| --- | --- | ---: | ---: | ---: | --- |
+| `plan-free` | Free | 100 | 0 CZK | 199 CZK | `offer`, `confirmation` |
+| `plan-25` | Silver | 300 | 229 CZK | 299 CZK | `offer`, `confirmation` |
+| `plan-50` | Gold | 500 | 379 CZK | 499 CZK | `offer`, `confirmation` |
+| `plan-100` | Platinum | 1000 | 699 CZK | 899 CZK | `offer`, `confirmation` |
+
+Platinum додатково відкриває:
+
+- командні функції;
+- передачу замовлення на команду;
+- live flight status;
+- сторінки промо-функцій без редіректу на апгрейд.
+
+## Driver App
+
+Driver app це основний кабінет водія.
+
+### Routes
+
+| Route | Екран |
+| --- | --- |
+| `/` | Головна / створення замовлення |
+| `/sign-in` | Авторизація |
+| `/orders` | Робочий простір замовлень |
+| `/orders/:orderId/dispatch` | Передача замовлення |
+| `/orders/:orderId/dispatch/team` | Передача замовлення команді |
+| `/orders/:orderId/dispatch/driver` | Передача конкретному водієві |
+| `/available-orders` | Отримані замовлення, які можна прийняти або пропустити |
+| `/calendar` | Розклад |
+| `/history` | Історія замовлень |
+| `/history/display/:orderId` | Display screen для замовлення |
+| `/stats` | Статистика |
+| `/account` | Акаунт |
+| `/settings` | Налаштування |
+| `/settings/business-profile` | Бізнес-профіль водія |
+| `/settings/providers` | Постачальники |
+| `/settings/language` | Мова |
+| `/settings/plan-upgrade` | Запит підвищення плану |
+| `/settings/tax-info` | Податкова інформація |
+| `/settings/tax-info/pdf` | Екран місячного PDF-звіту |
+| `/settings/tax-info/excel` | Екран Excel-звіту |
+| `/settings/tax-info/accountant` | Екран даних для бухгалтера |
+| `/flight-tracking` | Опис flight tracking |
+| `/team-collaboration` | Опис командних можливостей |
+| `/settings/team` | Команда водія |
+| `/settings/team/search` | Пошук водіїв для команди |
+
+### Створення замовлення
+
+Форма договору знаходиться в `frontend/driverApp/src/react-app/features/contract`.
+
+Вона збирає:
+
+- постачальника для замовлення;
+- пасажира;
+- контакт пасажира;
+- кількість пасажирів;
+- pickup адресу;
+- dropoff адресу;
+- дату і час поїздки;
+- тип оплати: card, cash, invoice;
+- додаткові дані: номер рейсу, коментар водія, багаж, дитячі крісла;
+- загальну суму;
+- тип PDF документа.
+
+Валідація вимагає:
+
+- ім'я клієнта;
+- email або телефон клієнта;
+- кількість пасажирів;
+- адресу звідки;
+- адресу куди;
+- дату і час;
+- тип оплати;
+- ціну.
+
+### Token session для генерації
+
+Перед збереженням або PDF-генерацією використовується generation session:
+
+- тривалість: 10 хвилин;
+- session зберігає `orderId`, `orderNumber`, `documentType`, `expiresAt`;
+- якщо session протермінована, водій має відкрити форму замовлення заново;
+- при download PDF, якщо замовлення ще не існує, воно створюється зі статусом `pending_pdf`;
+- після успішної PDF-генерації статус оновлюється на `pdf_generated`;
+- при помилці PDF статус оновлюється на `pdf_failed`.
+
+### PDF договори
+
+Contract PDF генерується через:
 
 ```text
-backend/   API, Prisma schema, migrations, auth, orders, PDF renderer
-frontend/  client apps
-  driverApp/      current driver-facing app
-  adminApp/       back-office admin app
-  dispatcherApp/  future dispatcher app
-tools/     dev runner, build/postbuild helpers, hooks
-dist/      generated production build output (ignored in git)
+POST /api/contracts/get-pdf
 ```
 
-## Frontend structure
+Підтримані типи:
 
-- `frontend/driverApp/src/react-app` contains the isolated driver React app.
-- `frontend/driverApp/src/react-app/app` contains the shell, router, store, providers, and layout components.
-- `frontend/driverApp/src/react-app/features` contains driver feature slices, RTK Query APIs, hooks, utilities, and UI components.
-- `frontend/driverApp/src/react-app/pages` contains the driver route pages.
-- `frontend/driverApp/index.html` is the current driver SPA entry point.
-- `frontend/adminApp/src/react-app` contains the isolated back-office app.
-- `frontend/adminApp/src/react-app/pages` contains the admin route pages.
-- `frontend/adminApp/src/react-app/features/admin` contains the back-office admin UI components.
-- `frontend/shared/src/react-app/features/admin` contains the shared admin data API used by both apps.
-- `frontend/dispatcherApp` is reserved for the future dispatcher app and is built into `/dispatcher/` in the shared Netlify deploy.
+- `offer`;
+- `confirmation`.
 
-## Основні сторінки
+PDF створюється на backend з HTML-шаблону, а frontend отримує Blob і завантажує файл локально.
 
-| Зона | Шляхи |
+### Замовлення
+
+Замовлення зберігаються у таблиці `orders`.
+
+Важливі поля:
+
+- `orderNumber`;
+- `status`;
+- `customer`;
+- `trip`;
+- `totalPrice`;
+- `pdf`;
+- `contractData`;
+- `metadata`;
+- `flightNumber`;
+- `createdByUserId`;
+- `createdBySnapshot`.
+
+Замовлення можна:
+
+- створити;
+- переглянути;
+- оновити;
+- видалити;
+- передати іншому водієві;
+- передати команді;
+- відкрити в історії;
+- згенерувати PDF;
+- переглянути в admin app.
+
+### Історія
+
+Сторінка `/history`:
+
+- завантажує власні замовлення;
+- групує їх по вкладках: сьогодні, заплановані, завершені та інші;
+- підтримує фільтр по даті;
+- підтримує сортування;
+- відкриває деталі замовлення у drawer;
+- дає доступ до dispatch flow;
+- показує route, дату, пасажирів, багаж, ціну і статус.
+
+### Деталі замовлення
+
+Drawer деталей замовлення дозволяє:
+
+- переглядати клієнта, маршрут, дату, оплату, ціну;
+- копіювати контактні дані;
+- відкривати call/email/send actions;
+- змінювати ціну;
+- зберігати комісію;
+- переглядати постачальника із snapshot замовлення;
+- зберегти постачальника із замовлення у власний профіль, якщо такого ще немає;
+- передавати замовлення;
+- генерувати PDF.
+
+### Передача замовлень
+
+Order dispatch працює через `order_offers` і `order_offer_targets`.
+
+Водій може:
+
+- надіслати замовлення всім водіям;
+- надіслати конкретному водієві;
+- надіслати команді, якщо активний Platinum;
+- видалити замовлення.
+
+Отримувач бачить замовлення на `/available-orders` і може:
+
+- прийняти;
+- пропустити.
+
+Після прийняття:
+
+- замовлення переходить до нового власника;
+- contract data отримує driver data нового власника;
+- provider snapshot із замовлення зберігається, якщо він був у вихідному замовленні;
+- отримувач може окремо зберегти постачальника у свій профіль.
+
+### Команди
+
+Команди доступні для Platinum.
+
+Функції:
+
+- створення команди;
+- додавання водіїв;
+- вибір активної команди;
+- видалення учасників;
+- передача замовлення на команду;
+- обмеження доступу через `requirePlatinumTeam`.
+
+Backend моделі:
+
+- `Team`;
+- `TeamMember`.
+
+### Постачальники
+
+Постачальники винесені в окремий екран `/settings/providers`.
+
+Профіль користувача може містити:
+
+- `providers`: список постачальників;
+- `defaultProviderId`: основний постачальник;
+- `provider`: нормалізований основний постачальник для backward compatibility.
+
+Кожен постачальник має:
+
+- `id`;
+- `name`;
+- `address`;
+- `ico`;
+- `dic`.
+
+Логіка:
+
+- список за замовчуванням згорнутий;
+- новий постачальник зберігається окремою кнопкою;
+- існуючих постачальників можна редагувати;
+- можна зробити постачальника основним;
+- можна видалити всіх постачальників;
+- якщо `providers: []`, backend не відновлює старий legacy provider;
+- у формі замовлення вибирається тільки фактичний provider зі списку;
+- якщо stale provider видалений, форма переходить на перший доступний або очищає provider.
+
+### Бізнес-профіль
+
+Бізнес-профіль водія зберігає:
+
+- ім'я водія;
+- адресу;
+- SPZ;
+- IČO;
+- DIČ, якщо є.
+
+Постачальники більше не редагуються в бізнес-профілі, бо мають окремий екран.
+
+### Податкова інформація
+
+Екран `/settings/tax-info` показує дані по вибраному місяцю.
+
+Джерело даних:
+
+```text
+GET /api/orders?dateField=trip&from=YYYY-MM-DDT00:00&to=YYYY-MM-DDT00:00&limit=1000
+```
+
+Frontend додатково фільтрує замовлення по року і місяцю, щоб не підмішувати дані з інших місяців.
+
+На екрані є:
+
+- перемикач місяця;
+- загальний заробіток за місяць;
+- кількість замовлень;
+- календар доходів;
+- вибір дня;
+- список усіх замовлень за вибраний день;
+- кнопки переходу до трьох типів файлів.
+
+Payment buckets:
+
+- `cash`;
+- `card`;
+- `invoice`, у UI це фактура;
+- `unknown`.
+
+Податок як окрема метрика прибраний.
+
+### Податкові файли
+
+Є три екрани:
+
+| Route | Тип | Призначення |
+| --- | --- | --- |
+| `/settings/tax-info/pdf` | PDF | Місячний звіт для перегляду |
+| `/settings/tax-info/excel` | XLS | Таблиця замовлень для обробки |
+| `/settings/tax-info/accountant` | PDF | Дані для бухгалтера |
+
+Файли генеруються backend endpoint-ом:
+
+```text
+POST /api/tax-reports/download
+```
+
+Payload:
+
+```json
+{
+  "type": "pdf",
+  "month": "2026-06",
+  "language": "uk"
+}
+```
+
+`type` може бути:
+
+- `pdf`;
+- `excel`;
+- `accountant`.
+
+Особливості:
+
+- назва у звітах береться з імені водія, не з бренду;
+- Excel не має колонки `Platforma`;
+- тип оплати `Platforma` нормалізується у `Faktura`;
+- файли не кладуться в Redux state, а завантажуються direct fetch-ом;
+- PDF для бухгалтера містить дані підприємця, доходи, комісії і підсумки.
+
+### Статистика
+
+Сторінка `/stats` має вкладки:
+
+- usage;
+- salary;
+- activity.
+
+Дані:
+
+- usage приходить з `/api/me/usage`;
+- orders завантажуються з `/api/orders`;
+- рахується використання місячного ліміту;
+- показується кількість замовлень;
+- показуються видалені повідомлення за місяць;
+- salary/activity обчислюються з order data.
+
+### Розклад
+
+Сторінка `/calendar` будує календар/таймлайн по замовленнях.
+
+Вона використовує:
+
+- дату поїздки;
+- маршрут;
+- пасажирів;
+- статус;
+- коротку інформацію про замовлення.
+
+### Flight Tracking
+
+Flight tracking доступний для Platinum.
+
+Backend сервіс:
+
+- бере номер рейсу з `flightNumber` або `contractData.flightNumber`;
+- перевіряє тільки рейси сьогодні або завтра;
+- кешує статус у `metadata.flightStatus`;
+- не оновлює завершені по часу замовлення;
+- використовує `AVIATIONSTACK_API_KEY`;
+- нормалізує статуси: `landed`, `delayed`, `in_air`, `scheduled`, `cancelled`, `unknown`;
+- ховає flight status для користувачів без доступу.
+
+### Мова
+
+Підтримані мови:
+
+- українська;
+- English;
+- čeština.
+
+i18n знаходиться у:
+
+```text
+frontend/shared/src/react-app/app/i18n/messages.js
+```
+
+### Акаунт і налаштування
+
+Settings містить:
+
+- мову;
+- команду;
+- бізнес-профіль;
+- постачальників;
+- податкову інформацію;
+- підвищення плану;
+- admin access link для відповідних ролей;
+- сесію і видалення акаунта.
+
+## Admin App
+
+Admin app доступний на `/admin/`.
+
+### Routes
+
+| Route | Екран |
 | --- | --- |
-| Driver app | `/`, `/orders/`, `/history/`, `/stats/`, `/account/`, `/settings/` |
-| Admin app | `/admin/`, `/admin/accounts/`, `/admin/accounts/:userId`, `/admin/orders/`, `/admin/orders/users/:userId`, `/admin/orders/view/:orderId`, `/admin/settings/`, `/admin/settings/language/`, `/admin/settings/audit/` |
-| Dispatcher app | `/dispatcher/` |
+| `/admin` | Dashboard |
+| `/admin/accounts` | Список акаунтів |
+| `/admin/accounts/:userId` | Деталі акаунта |
+| `/admin/orders` | Всі замовлення |
+| `/admin/orders/users/:userId` | Замовлення конкретного користувача |
+| `/admin/orders/view/:orderId` | Деталі замовлення |
+| `/admin/orders/:orderId` | Деталі замовлення |
+| `/admin/settings` | Налаштування адміна |
+| `/admin/settings/language` | Мова адмінки |
+| `/admin/settings/audit` | Audit log |
+
+### Функціонал адмінки
+
+Admin app дозволяє:
+
+- переглядати користувачів;
+- фільтрувати і відкривати акаунти;
+- бачити профіль, роль, підписку і usage;
+- змінювати роль користувача;
+- змінювати план і статус підписки;
+- продовжувати підписку;
+- підтверджувати оплату pending upgrade;
+- скасовувати підписку;
+- керувати планами;
+- переглядати всі замовлення;
+- дивитися активні та archived/deleted замовлення;
+- відновлювати archived order;
+- дивитися audit log.
+
+## Backend API
+
+Усі protected endpoints використовують `Authorization: Bearer <accessToken>`.
+
+Якщо `API_KEY` заданий на backend, frontend має надсилати `X-API-KEY`, значення якого береться з `VITE_API_KEY`.
+
+### Public
+
+| Method | Endpoint | Призначення |
+| --- | --- | --- |
+| `GET` | `/api/health` | Health check backend і PostgreSQL |
+| `GET` | `/api/plans` | Активні плани |
+| `POST` | `/api/contracts/get-pdf` | Генерація contract PDF для існуючого order |
+
+### Auth
+
+| Method | Endpoint | Призначення |
+| --- | --- | --- |
+| `POST` | `/api/auth/register` | Реєстрація |
+| `POST` | `/api/auth/login` | Логін |
+| `POST` | `/api/auth/refresh` | Оновлення access token через refresh cookie |
+| `POST` | `/api/auth/logout` | Logout і revoke refresh session |
+
+### My account
+
+| Method | Endpoint | Призначення |
+| --- | --- | --- |
+| `GET` | `/api/me` | Поточний користувач |
+| `GET` | `/api/me/usage` | Usage поточного плану |
+| `PATCH` | `/api/me/profile` | Профіль, бізнес-дані, постачальники, avatar |
+| `GET` | `/api/me/team` | Команди користувача |
+| `PATCH` | `/api/me/team` | Створення/оновлення команд |
+| `POST` | `/api/me/subscription/upgrade-request` | Запит апгрейду плану |
+| `PATCH` | `/api/me/plan` | Вимкнено, повертає 403 |
+| `DELETE` | `/api/me` | Видалення акаунта |
+
+### Orders
+
+| Method | Endpoint | Призначення |
+| --- | --- | --- |
+| `POST` | `/api/orders` | Створити замовлення |
+| `GET` | `/api/orders` | Список власних замовлень |
+| `GET` | `/api/orders?dateField=trip&from=...&to=...` | Замовлення по даті поїздки |
+| `GET` | `/api/orders/:id` | Деталі замовлення |
+| `PATCH` | `/api/orders/:id` | Оновити замовлення |
+| `DELETE` | `/api/orders/:id` | Видалити/заархівувати замовлення |
+| `PATCH` | `/api/orders/:id/assign-driver` | Призначити водія |
+| `GET` | `/api/orders/drivers` | Пошук водіїв для dispatch |
+| `GET` | `/api/orders/available` | Доступні order offers |
+| `POST` | `/api/orders/:id/offers` | Створити offer передачі |
+| `POST` | `/api/orders/:id/offers/:offerId/accept` | Прийняти offer |
+| `POST` | `/api/orders/:id/offers/:offerId/skip` | Пропустити offer |
+
+### Tax reports
+
+| Method | Endpoint | Призначення |
+| --- | --- | --- |
+| `POST` | `/api/tax-reports/download` | PDF/XLS/accountant файл за місяць |
+
+### Manager / Admin
+
+| Method | Endpoint | Призначення |
+| --- | --- | --- |
+| `GET` | `/api/manager/users` | Список користувачів |
+| `GET` | `/api/manager/users/:id` | Деталі користувача |
+| `PATCH` | `/api/manager/users/:id/role` | Зміна ролі, admin only |
+| `PATCH` | `/api/manager/users/:id/subscription` | Зміна підписки |
+| `POST` | `/api/manager/users/:id/subscription/extend` | Продовження підписки |
+| `POST` | `/api/manager/users/:id/subscription/cancel` | Скасування підписки |
+| `POST` | `/api/manager/users/:id/subscription/confirm-payment` | Підтвердження оплати |
+| `GET` | `/api/manager/plans` | Список планів |
+| `POST` | `/api/manager/plans` | Створення плану |
+| `PATCH` | `/api/manager/plans/:id` | Оновлення плану |
+| `GET` | `/api/manager/orders` | Всі замовлення |
+| `GET` | `/api/manager/orders/:id` | Деталі active або archived order |
+| `POST` | `/api/manager/orders/:id/restore` | Відновлення archived order |
+| `GET` | `/api/manager/audit` | Audit log |
+
+## Модель даних
+
+Prisma schema знаходиться у `backend/prisma/schema.prisma`.
+
+| Model | Призначення |
+| --- | --- |
+| `User` | Акаунт, роль, телефон, активна команда, JSON profile |
+| `Session` | Refresh token sessions |
+| `Plan` | Каталог планів |
+| `Subscription` | Підписка користувача, ліміт, pending upgrade |
+| `Order` | Активне замовлення |
+| `ArchivedOrder` | Видалене/заархівоване замовлення |
+| `Team` | Команда власника |
+| `TeamMember` | Учасники команди |
+| `OrderOffer` | Offer передачі замовлення |
+| `OrderOfferTarget` | Target-и offer-а для конкретних водіїв |
+| `AuditLog` | Журнал дій auth/profile/subscription/plans/orders |
+
+### User profile JSON
+
+Профіль користувача нормалізується через `backend/services/profiles.js`.
+
+Типова структура:
+
+```json
+{
+  "avatarUrl": "",
+  "driver": {
+    "name": "",
+    "address": "",
+    "spz": "",
+    "ico": "",
+    "dic": ""
+  },
+  "provider": {
+    "id": "",
+    "name": "",
+    "address": "",
+    "ico": "",
+    "dic": ""
+  },
+  "providers": [],
+  "defaultProviderId": ""
+}
+```
 
 ## Локальний запуск
 
-Потрібні Node.js і PostgreSQL.
+Потрібно:
+
+- Node.js;
+- npm;
+- PostgreSQL;
+- Chromium dependency для PDF у середовищі, де запускається Puppeteer.
+
+### 1. Встановити залежності
+
+```bash
+npm install
+npm --prefix backend install
+```
+
+### 2. Створити env файли
 
 ```bash
 cp frontend/driverApp/.env.example frontend/driverApp/.env
 cp backend/.env.example backend/.env
-npm install
-npm --prefix backend install
+```
+
+Заповніть у `backend/.env`:
+
+- `AUTH_TOKEN_SECRET`;
+- `DATABASE_URL` або `DIRECT_DATABASE_URL`;
+- за потреби `API_KEY`;
+- за потреби `AVIATIONSTACK_API_KEY`.
+
+Заповніть у `frontend/driverApp/.env`:
+
+- `VITE_API_BASE_URL`;
+- якщо backend має `API_KEY`, також `VITE_API_KEY`;
+- за потреби `VITE_GOOGLE_MAPS_API_KEY`.
+
+### 3. Prisma
+
+```bash
 npm run db:generate
 npm run db:migrate
+```
+
+### 4. Запустити все разом
+
+```bash
 npm run dev
 ```
 
-Після старту:
+Порти:
 
-- frontend: `http://localhost:5173`
-- admin: `http://localhost:4174/admin/`
-- dispatcher: `http://localhost:4175/dispatcher/`
-- backend: `http://localhost:3001`
-- основний mount-point застосунку: `/`
+| Сервіс | URL |
+| --- | --- |
+| Driver app | `http://localhost:5173` |
+| Admin app | `http://localhost:4174/admin/` |
+| Dispatcher app | `http://localhost:4175/dispatcher/` |
+| Backend | `http://localhost:3001` |
 
-`npm install` на корені також підключає git hooks. Якщо потрібно запустити їх окремо, використовуйте `npm run hooks:install`.
+### 5. Створити admin
+
+```bash
+npm run admin:create -- --email=admin@example.com --name="Admin" --password="password123"
+```
+
+або підвищити існуючого користувача, якщо це підтримано параметрами скрипта:
+
+```bash
+npm run admin:create -- --email=user@example.com --promote-existing
+```
 
 ## Змінні середовища
 
-### Frontend (`.env`)
+### Frontend
 
-| Variable | Обов’язково | Призначення |
+Файл: `frontend/driverApp/.env`
+
+| Variable | Обов'язково | Призначення |
 | --- | --- | --- |
-| `VITE_API_BASE_URL` | так | Базовий URL API, наприклад `http://localhost:3001/api` |
-| `VITE_API_KEY` | ні | Публічний ключ заголовка `X-API-KEY`, якщо він увімкнений на backend |
-| `VITE_GOOGLE_MAPS_API_KEY` | ні | Публічний ключ Google Maps Places для автокомпліту адрес |
-| `VITE_SUPPORT_WHATSAPP_URL` | ні | Посилання для ручного підтвердження оплати |
-| `VITE_SUPPORT_TELEGRAM_URL` | ні | Додаткове посилання підтримки |
-| `VITE_ADMIN_APP_URL` | ні | Повний URL або path до admin app, якщо вона окремо від driver app |
-| `VITE_DRIVER_APP_URL` | ні | Повний URL або path до driver app, якщо вона відкривається з admin app |
+| `VITE_API_BASE_URL` | так | Base URL backend API, наприклад `http://localhost:3001/api` |
+| `VITE_API_KEY` | ні | Public key для `X-API-KEY`, якщо backend API key увімкнений |
+| `VITE_GOOGLE_MAPS_API_KEY` | ні | Google Maps Places для адрес |
+| `VITE_SUPPORT_WHATSAPP_URL` | ні | Support link для manual payment |
+| `VITE_SUPPORT_TELEGRAM_URL` | ні | Support link для manual payment |
+| `VITE_ADMIN_APP_URL` | ні | URL або path до admin app |
+| `VITE_DRIVER_APP_URL` | ні | URL або path до driver app з admin app |
 
-Фронтенд-env файли зберігаються в `frontend/driverApp/.env` та `frontend/driverApp/.env.example`.
-Для локальної admin app використовуйте `npm run dev:admin` і окремий `VITE_ADMIN_APP_URL`, наприклад `http://localhost:4174/admin/accounts`. У production на одному домені краще використовувати same-origin path на кшталт `/admin/accounts`.
+### Backend
 
-### Backend (`backend/.env`)
+Файл: `backend/.env`
 
-| Variable | Обов’язково | Призначення |
+| Variable | Обов'язково | Призначення |
 | --- | --- | --- |
-| `AUTH_TOKEN_SECRET` | так | Секрет для підпису access token |
-| `DATABASE_URL` | так | Runtime connection до PostgreSQL через Prisma |
-| `DIRECT_DATABASE_URL` | ні | Direct DB connection для Prisma CLI та runtime fallback |
-| `API_KEY` | ні | Перевірка `X-API-KEY` на backend |
-| `CLIENT_ORIGIN` | ні | CORS origin override, can be a comma-separated list for local apps |
-| `BACKEND_PORT` | ні | Порт сервера, за замовчуванням `3001` |
+| `BACKEND_PORT` | ні | Порт backend, default `3001` |
+| `CLIENT_ORIGIN` | ні | CORS origins, comma-separated |
+| `API_KEY` | ні | Optional backend API key |
+| `AUTH_TOKEN_SECRET` | так | Секрет access token, мінімум 32 символи |
+| `ACCESS_TOKEN_TTL_MINUTES` | ні | TTL access token |
+| `REFRESH_TOKEN_TTL_HOURS` | ні | TTL refresh cookie |
+| `REFRESH_COOKIE_NAME` | ні | Назва refresh cookie |
+| `REFRESH_COOKIE_SAME_SITE` | ні | SameSite для refresh cookie |
+| `REFRESH_COOKIE_SECURE` | ні | Secure flag для refresh cookie |
+| `AUTH_LOGIN_WINDOW_MINUTES` | ні | Rate-limit window login |
+| `AUTH_LOGIN_LOCK_MINUTES` | ні | Lock duration login |
+| `AUTH_LOGIN_LOCK_AFTER_ATTEMPTS` | ні | Attempts до lock login |
+| `AUTH_REGISTER_WINDOW_MINUTES` | ні | Rate-limit window register |
+| `AUTH_REGISTER_LOCK_MINUTES` | ні | Lock duration register |
+| `AUTH_REGISTER_LOCK_AFTER_ATTEMPTS` | ні | Attempts до lock register |
+| `AVIATIONSTACK_API_KEY` | ні | Backend-only ключ flight status |
+| `AVIATIONSTACK_BASE_URL` | ні | Base URL aviationstack |
+| `AVIATIONSTACK_CACHE_TTL_MINUTES` | ні | TTL кешу flight status |
+| `AVIATIONSTACK_MAX_REFRESH_PER_REQUEST` | ні | Max refresh за request |
+| `AVIATIONSTACK_TIMEOUT_MS` | ні | Timeout запиту до aviationstack |
+| `DATABASE_URL` | так* | Prisma/PostgreSQL URL |
+| `DIRECT_DATABASE_URL` | так* | Direct DB URL або fallback для Prisma |
 
-Додаткові параметри cookie, auth windows і rate limits описані у `backend/.env.example`.
+`DATABASE_URL` або `DIRECT_DATABASE_URL` має бути заданий. Backend не стартує з placeholder-значеннями.
+
+`DB_MODE=file` і `DATA_FILE` залишені тільки як local/testing коментарі в `.env.example`; production працює через PostgreSQL.
 
 ## Скрипти
 
+Root scripts:
+
 | Команда | Що робить |
 | --- | --- |
-| `npm run dev` | Запускає driver app, admin app, dispatcher app і backend одночасно |
-| `npm run dev:client` | Запускає лише Vite frontend |
-| `npm run dev:admin` | Запускає лише Vite admin frontend на окремому порті |
-| `npm run dev:dispatcher` | Запускає лише Vite dispatcher frontend на окремому порті |
-| `npm run dev:server` | Запускає лише backend |
-| `npm run build` | Збирає production build driver, admin і dispatcher у `dist/` |
-| `npm run build:driver` | Збирає production build driver app у `dist/` |
-| `npm run build:admin` | Збирає production build admin app у `dist/admin/` |
-| `npm run build:dispatcher` | Збирає production build dispatcher app у `dist/dispatcher/` |
-| `npm run preview` | Локальний preview зібраного frontend |
-| `npm run db:generate` | `prisma generate` у `backend/` |
-| `npm run db:migrate` | Локальна Prisma migration |
-| `npm run db:migrate:deploy` | Deployment migration для production |
-| `npm run admin:create -- --email=...` | Створює або підвищує admin-акаунт |
-| `npm run secrets:check` | Сканує tracked files на випадкові секрети |
+| `npm run dev` | Запускає driver, admin, dispatcher і backend |
+| `npm run dev:client` | Запускає driver app |
+| `npm run dev:admin` | Запускає admin app |
+| `npm run dev:dispatcher` | Запускає dispatcher app |
+| `npm run dev:server` | Запускає backend dev |
+| `npm run build` | Збирає driver, admin і dispatcher |
+| `npm run build:driver` | Збирає driver app у `dist/` |
+| `npm run build:admin` | Збирає admin app у `dist/admin/` |
+| `npm run build:dispatcher` | Збирає dispatcher app у `dist/dispatcher/` |
+| `npm run preview` | Preview production frontend |
+| `npm run start:server` | Старт backend через backend package |
+| `npm run db:generate` | Prisma generate |
+| `npm run db:migrate` | Prisma migrate dev |
+| `npm run db:migrate:deploy` | Prisma migrate deploy |
+| `npm run admin:create -- ...` | Створити або підвищити admin |
+| `npm run secrets:check` | Перевірка tracked files на секрети |
+| `npm run hooks:install` | Встановити git hooks |
 
-## API
+Backend scripts:
 
-### Public
-
-- `GET /api/health`
-- `GET /api/plans`
-- `POST /api/contracts/get-pdf`
-
-### Auth
-
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/auth/refresh`
-- `POST /api/auth/logout`
-
-### My account
-
-- `GET /api/me`
-- `GET /api/me/usage`
-- `PATCH /api/me/profile`
-- `POST /api/me/subscription/upgrade-request`
-- `DELETE /api/me`
-
-### Orders
-
-- `POST /api/orders`
-- `GET /api/orders`
-- `GET /api/orders/:id`
-- `PATCH /api/orders/:id`
-
-### Manager / Admin
-
-- `GET /api/manager/users`
-- `GET /api/manager/users/:id`
-- `PATCH /api/manager/users/:id/subscription`
-- `POST /api/manager/users/:id/subscription/extend`
-- `POST /api/manager/users/:id/subscription/cancel`
-- `POST /api/manager/users/:id/subscription/confirm-payment`
-- `PATCH /api/manager/users/:id/role` - `admin` only
-- `GET /api/manager/plans`
-- `POST /api/manager/plans`
-- `PATCH /api/manager/plans/:id`
-- `GET /api/manager/orders`
-- `GET /api/manager/audit`
-
-## Операційні правила
-
-- public signup завжди створює `user`
-- public signup завжди стартує на `plan-free`
-- paid-плани залишаються pending, доки менеджер не підтвердить оплату
-- self-service зміна плану вимкнена навмисно
-- backend у production працює лише через Prisma + PostgreSQL
-- `GET /api/health` повертає `503`, якщо PostgreSQL недоступний
-- login і register мають brute-force lockouts та audit logging
-- backend не стартує без реального `AUTH_TOKEN_SECRET`
+| Команда | Що робить |
+| --- | --- |
+| `npm --prefix backend run dev` | Запустити backend |
+| `npm --prefix backend run start` | Production start backend |
+| `npm --prefix backend run db:generate` | Prisma generate |
+| `npm --prefix backend run db:migrate` | Prisma migrate dev |
+| `npm --prefix backend run db:migrate:deploy` | Prisma migrate deploy |
+| `npm --prefix backend run db:seed` | Prisma seed |
+| `npm --prefix backend run admin:create -- ...` | Admin create tool |
 
 ## Деплой
 
 ### Frontend на Netlify
 
-Один Netlify site:
+`netlify.toml`:
 
-- `/` -> driver app
-- `/admin/` -> admin app
-- `/dispatcher/` -> dispatcher app
+- build command: `npm run build`;
+- publish: `dist`;
+- `/admin/*` -> `/admin/index.html`;
+- `/dispatcher/*` -> `/dispatcher/index.html`;
+- `/api/*` proxy -> backend API URL, у поточному `netlify.toml` це Render backend;
+- `/*` -> `/index.html`.
 
-- install command: `npm install`
-- build command: `npm run build`
-- publish directory: `dist`
-- required env: `VITE_API_BASE_URL`
-- optional env: `VITE_API_KEY`, `VITE_GOOGLE_MAPS_API_KEY`, `VITE_SUPPORT_WHATSAPP_URL`, `VITE_SUPPORT_TELEGRAM_URL`, `VITE_ADMIN_APP_URL`, `VITE_DRIVER_APP_URL`
+Production layout:
 
-Netlify rewrites:
-
-- `/admin/*` -> `/admin/index.html`
-- `/dispatcher/*` -> `/dispatcher/index.html`
-- `/*` -> `/index.html`
-
-### Backend на Render або іншому Node-host
-
-- root directory: `backend`
-- install command: `npm install`
-- release command: `npm run db:migrate:deploy`
-- start command: `npm run start`
-- required env: `AUTH_TOKEN_SECRET`, `DATABASE_URL`
-- optional env: `API_KEY`, `DIRECT_DATABASE_URL`
-- health check: `/api/health`
-
-## Модель даних
-
-| Model | Призначення |
+| Path | App |
 | --- | --- |
-| `users` | Акаунти, ролі, профіль |
-| `sessions` | Refresh-сесії |
-| `plans` | Каталог планів |
-| `subscriptions` | Статус підписки, цикл, квота, pending upgrade |
-| `orders` | Збережені замовлення та payload для PDF |
-| `audit_logs` | Події auth, профілю, підписок, планів і замовлень |
+| `/` | Driver app |
+| `/admin/` | Admin app |
+| `/dispatcher/` | Dispatcher app |
+
+Потрібні frontend env:
+
+- `VITE_API_BASE_URL`, якщо не використовується Netlify `/api/*` proxy;
+- `VITE_API_KEY`, якщо backend API key увімкнений;
+- optional Google/support URLs.
+
+### Backend на Render або іншому Node host
+
+Типові налаштування:
+
+- root directory: `backend`;
+- install command: `npm install`;
+- release command: `npm run db:migrate:deploy`;
+- start command: `npm run start`;
+- health check: `/api/health`;
+- env: `AUTH_TOKEN_SECRET`, `DATABASE_URL` або `DIRECT_DATABASE_URL`.
+
+## Операційні правила
+
+- public signup створює роль `user`;
+- новий користувач стартує на `plan-free`;
+- paid upgrade створює pending request;
+- оплату підтверджує manager/admin;
+- self-service plan change вимкнений;
+- backend валідовує env перед стартом;
+- backend повертає `503` на `/api/health`, якщо база недоступна;
+- login/register мають brute-force lockouts;
+- refresh token зберігається у cookie;
+- access token передається через `Authorization: Bearer`;
+- Blob/PDF downloads не мають зберігатися у Redux state;
+- SVG-іконки мають бути у `frontend/shared/src/react-app/app/components/SvgIcon/sprite.svg`, а не inline SVG у компонентах.
+
+## Перевірки
+
+У проекті немає окремого root `test` script. Базові перевірки перед релізом:
+
+```bash
+git diff --check
+npm run build:driver
+npm run build:admin
+npm run build:dispatcher
+```
+
+Для backend syntax check можна запускати:
+
+```bash
+node --check backend/routes/tax-reports.js
+node --check backend/services/tax-reports.js
+```
+
+Для production DB:
+
+```bash
+npm run db:migrate:deploy
+```
+
+Для секретів:
+
+```bash
+npm run secrets:check
+```
 
 ## Ліцензія
 

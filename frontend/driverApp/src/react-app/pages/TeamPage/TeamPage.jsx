@@ -65,48 +65,18 @@ function getInitials(driver) {
   return `${parts[0][0] || ''}${parts[1][0] || ''}`.toUpperCase();
 }
 
-function getAvatarImage(driver) {
-  const avatarUrl = getAvatarUrl(driver);
-  if (avatarUrl) {
-    return avatarUrl;
-  }
-
-  const initials = getInitials(driver);
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="driver">
-      <defs>
-        <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#ccfbf1" />
-          <stop offset="100%" stop-color="#ecfeff" />
-        </linearGradient>
-      </defs>
-      <rect width="64" height="64" rx="16" fill="url(#bg)" />
-      <text
-        x="32"
-        y="39"
-        text-anchor="middle"
-        font-family="Inter, Arial, sans-serif"
-        font-size="22"
-        font-weight="850"
-        fill="#0f766e"
-      >${initials}</text>
-    </svg>
-  `;
-
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-}
-
 function TeamDriverAvatar({ driver }) {
   const [hasError, setHasError] = useState(false);
+  const avatarUrl = getAvatarUrl(driver);
 
-  if (hasError) {
+  if (hasError || !avatarUrl) {
     return <span className="teamPage-avatarFallback">{getInitials(driver)}</span>;
   }
 
   return (
     <img
       className="teamPage-avatarImage"
-      src={getAvatarImage(driver)}
+      src={avatarUrl}
       alt=""
       onError={() => setHasError(true)}
     />

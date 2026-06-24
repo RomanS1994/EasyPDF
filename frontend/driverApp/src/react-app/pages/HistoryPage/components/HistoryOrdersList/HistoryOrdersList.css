@@ -93,6 +93,24 @@
   gap: 12px;
 }
 
+/* Desktop history list:
+   order cards become a two-column working list while completed groups stay full width. */
+@media (min-width: 1024px) {
+  .orderHistoryList,
+  .orderHistoryCompletedList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .orderHistoryCompletedBlock {
+    grid-column: 1 / -1;
+  }
+
+  .orderHistoryCompletedToggle {
+    min-height: 52px;
+  }
+}
+
 @media (max-width: 480px) {
   .orderHistoryCompletedToggle {
     grid-template-columns: 28px minmax(0, 1fr) auto;

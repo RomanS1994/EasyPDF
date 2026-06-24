@@ -5,6 +5,7 @@ import i18nReducer from '@shared/app/i18n/i18nSlice.js';
 import authReducer from '@shared/features/auth/authSlice.js';
 import contractReducer from './features/contract/contractSlice.js';
 import generationSessionReducer from './features/contract/generationSessionSlice.js';
+import homeUiReducer from './features/homeUi/homeUiSlice.js';
 
 const rootReducer = combineReducers({
   [baseApi.reducerPath]: baseApi.reducer,
@@ -12,6 +13,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   contract: contractReducer,
   generationSession: generationSessionReducer,
+  homeUi: homeUiReducer,
 });
 
 export const store = configureStore({

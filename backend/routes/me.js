@@ -15,6 +15,11 @@ import {
   sendError,
   sendJson,
 } from '../lib/http.js';
+import {
+  assertBusinessIdentityAvailable,
+  buildBusinessIdentityData,
+  buildProfileWithBusinessIdentityLocks,
+} from '../services/account-identity.js';
 import { normalizeTeamDriverIds, normalizeUserProfile } from '../services/profiles.js';
 import { requireTeamFeatureAccess } from '../services/team-access.js';
 import {
@@ -137,6 +142,7 @@ function getActiveTeam(teams, activeTeamId) {
 async function loadAvailableTeamDrivers(client) {
   const users = await client.user.findMany({
     where: {
+      deletedAt: null,
       role: {
         in: ['user', 'manager'],
       },
@@ -401,17 +407,45 @@ async function handleDeleteMe(request, response) {
 
   await runStoreTransaction({
     prisma: async tx => {
+      const target = await tx.user.findUnique({
+        where: {
+          id: context.user.id,
+        },
+        include: USER_WITH_SUBSCRIPTION_INCLUDE,
+      });
+
+      if (!target) {
+        throw new Error('User not found');
+      }
+
+      const deletedAt = new Date(nowIso());
       await createAuditLog(tx, {
         action: 'user.deleted_self',
         actorUserId: context.user.id,
         targetUserId: context.user.id,
         entityType: 'user',
         entityId: context.user.id,
+        before: {
+          deletedAt: target.deletedAt,
+        },
+        after: {
+          deletedAt: deletedAt.toISOString(),
+        },
       });
 
-      await tx.user.delete({
+      await tx.session.deleteMany({
+        where: {
+          userId: context.user.id,
+        },
+      });
+
+      await tx.user.update({
         where: {
           id: context.user.id,
+        },
+        data: {
+          deletedAt,
+          updatedAt: deletedAt,
         },
       });
     },
@@ -445,6 +479,7 @@ async function handleUpdateMyProfile(request, response) {
       }
 
       const currentProfile = normalizeUserProfile(target.profile, target.name);
+      const hasProvidersInput = Array.isArray(incomingProfile.providers);
       const requestedName = normalizeText(body.name ?? incomingProfile.name ?? target.name) || target.name;
       const nextPhone = hasPhoneInput
         ? normalizePhoneNumber(body.phone ?? incomingProfile.phone)
@@ -485,14 +520,30 @@ async function handleUpdateMyProfile(request, response) {
             ...currentProfile.driver,
             ...(incomingProfile.driver || {}),
           },
-          provider: {
-            ...currentProfile.provider,
-            ...(incomingProfile.provider || {}),
-          },
+          provider: hasProvidersInput
+            ? incomingProfile.provider || {}
+            : {
+                ...currentProfile.provider,
+                ...(incomingProfile.provider || {}),
+              },
+          providers: hasProvidersInput ? incomingProfile.providers : currentProfile.providers,
+          defaultProviderId:
+            incomingProfile.defaultProviderId ?? currentProfile.defaultProviderId,
           avatarUrl: nextAvatarUrl,
         },
         requestedName
       );
+      await assertBusinessIdentityAvailable(tx, {
+        profile: nextProfile,
+        name: requestedName,
+        excludeUserId: target.id,
+      });
+      const storedProfile = buildProfileWithBusinessIdentityLocks(
+        nextProfile,
+        target.profile,
+        requestedName
+      );
+      const businessIdentity = buildBusinessIdentityData(storedProfile, requestedName);
       const before = {
         name: target.name,
         phone: target.phone || '',
@@ -511,7 +562,9 @@ async function handleUpdateMyProfile(request, response) {
         data: {
           name: requestedName,
           ...(hasPhoneInput ? { phone: nextPhone || null } : {}),
-          profile: nextProfile,
+          businessIco: businessIdentity.businessIco,
+          businessDic: businessIdentity.businessDic,
+          profile: storedProfile,
           updatedAt: new Date(nowIso()),
         },
         include: USER_WITH_SUBSCRIPTION_INCLUDE,

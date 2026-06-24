@@ -1,5 +1,6 @@
 .flightTrackingNotice {
   position: relative;
+  box-sizing: border-box;
   display: grid;
   gap: 9px;
   min-height: 188px;
@@ -538,4 +539,48 @@
     font-size: 9.5px;
   }
 
+}
+
+/* Desktop flight promo:
+   scale content to the shared carousel height and keep the CTA close to the bottom. */
+@media (min-width: 1024px) {
+  .flightTrackingNotice {
+    min-height: var(--advertisingCarousel-cardHeight, 252px);
+    align-content: space-between;
+    gap: 12px;
+    padding: 20px 22px 18px;
+  }
+
+  .flightTrackingNotice-copy h2 {
+    max-width: 26rem;
+    font-size: 20px;
+  }
+
+  .flightTrackingNotice-subtitle {
+    max-width: 24rem;
+    font-size: 14px;
+  }
+
+  .flightTrackingNotice-features {
+    max-width: 620px;
+    gap: 10px;
+  }
+
+  .flightTrackingNotice-features li {
+    min-height: 44px;
+  }
+
+  .flightTrackingNotice-features strong {
+    font-size: 11px;
+  }
+
+  .flightTrackingNotice-cta {
+    max-width: 660px;
+    min-height: 56px;
+  }
+
+  .flightTrackingNotice-button {
+    min-height: 38px;
+    font-size: 13px;
+  }
 }

@@ -9,3 +9,10 @@
   overflow: hidden;
 }
 
+/* Desktop history display:
+   keep the full-screen display independent from the app sidebar layout. */
+@media (min-width: 1024px) {
+  .historyDisplayPage {
+    inset: 0;
+  }
+}

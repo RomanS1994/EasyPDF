@@ -1,6 +1,7 @@
 import { useI18n } from '@shared/app/i18n/useI18n.js';
 import { useContractPersistence } from '../../useContractPersistence.js';
 import { CustomerFields } from '../CustomerFields/CustomerFields.jsx';
+import { ProviderSelector } from '../ProviderSelector/ProviderSelector.jsx';
 import { TripFields } from '../TripFields/TripFields.jsx';
 import { ContractActions } from '../ContractActions/ContractActions.jsx';
 import { PriceField } from '../PriceField/PriceField.jsx';
@@ -17,6 +18,8 @@ export function ContractForm() {
       </div>
 
       <div className="contractForm-grid">
+        <ProviderSelector />
+
         <section className="contractSection">
           <h3 className="contractSection-title">{t('contract.passenger')}</h3>
           <CustomerFields />

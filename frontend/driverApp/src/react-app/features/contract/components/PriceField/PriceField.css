@@ -126,3 +126,16 @@
     height: 28px;
   }
 }
+
+/* Desktop price field:
+   keep currency choices compact while the input gets the useful width. */
+@media (min-width: 1024px) {
+  .priceField-row {
+    grid-template-columns: minmax(220px, 1fr) 96px 96px;
+  }
+
+  .priceField-input,
+  .priceField-currencyButton {
+    min-height: 46px;
+  }
+}

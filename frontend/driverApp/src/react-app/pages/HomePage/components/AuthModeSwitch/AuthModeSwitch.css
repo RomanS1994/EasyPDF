@@ -30,3 +30,16 @@
     0 1px 0 rgba(255, 255, 255, 0.96) inset,
     0 10px 20px rgba(36, 41, 48, 0.1);
 }
+
+/* Desktop auth switch:
+   preserve the segmented control width inside the wider guest auth card. */
+@media (min-width: 1024px) {
+  .authModeSwitch {
+    max-width: 520px;
+  }
+
+  .authModeSwitch-btn {
+    min-height: 46px;
+    font-size: 13px;
+  }
+}
