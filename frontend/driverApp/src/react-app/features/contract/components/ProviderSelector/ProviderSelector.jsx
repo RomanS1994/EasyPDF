@@ -4,12 +4,13 @@ import { Link } from 'react-router-dom';
 
 import { SvgIcon } from '@shared/app/components/SvgIcon/SvgIcon.jsx';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
-import { selectUser } from '@shared/features/auth/authSlice.js';
+import { useLazyGetMeQuery } from '@shared/features/auth/authApi.js';
+import { selectToken, selectUser, setSession } from '@shared/features/auth/authSlice.js';
+import { saveSession } from '@shared/features/auth/authStorage.js';
 import {
   getUserProviders,
   hasSameProviderDetails,
   hasProviderData,
-  normalizeProvider,
 } from '@shared/features/auth/providerProfile.js';
 import { selectProvider, setProvider } from '../../contractSlice.js';
 import './ProviderSelector.css';
@@ -17,23 +18,48 @@ import './ProviderSelector.css';
 export function ProviderSelector() {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
+  const token = useSelector(selectToken);
   const provider = useSelector(selectProvider);
   const { t } = useI18n();
+  const [getMe] = useLazyGetMeQuery();
   const [isOpen, setIsOpen] = useState(false);
   const providers = useMemo(() => getUserProviders(user), [user]);
   const hasSelectedProviderData = hasProviderData(provider);
   const matchedProvider =
     providers.find(item => item.id && item.id === provider?.id) ||
     providers.find(item => hasSameProviderDetails(item, provider));
-  const selectedProvider =
-    matchedProvider ||
-    (hasSelectedProviderData ? normalizeProvider(provider, provider?.id || 'selected-provider') : null) ||
-    providers[0] ||
-    null;
+  const selectedProvider = matchedProvider || providers[0] || null;
   const selectedProviderId = selectedProvider?.id || '';
-  const hasProviderInList = Boolean(matchedProvider);
-  const shouldRenderDetachedProviderOption =
-    Boolean(selectedProvider && hasSelectedProviderData && !hasProviderInList);
+
+  useEffect(() => {
+    let isActive = true;
+
+    if (!token) {
+      return () => {
+        isActive = false;
+      };
+    }
+
+    getMe()
+      .unwrap()
+      .then(response => {
+        const updatedUser = response?.user || response;
+
+        if (!isActive || !updatedUser) {
+          return;
+        }
+
+        saveSession(token, updatedUser);
+        dispatch(setSession({ token, user: updatedUser }));
+      })
+      .catch(() => {
+        // Keep the current session if this scoped server sync fails.
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [dispatch, getMe, token]);
 
   useEffect(() => {
     if (!providers.length) {
@@ -44,12 +70,18 @@ export function ProviderSelector() {
       return;
     }
 
-    if (hasProviderInList || hasSelectedProviderData) {
+    if (!matchedProvider) {
+      dispatch(setProvider(providers[0]));
       return;
     }
 
-    dispatch(setProvider(providers[0]));
-  }, [dispatch, hasProviderInList, hasSelectedProviderData, providers]);
+    if (
+      provider?.id !== matchedProvider.id ||
+      !hasSameProviderDetails(provider, matchedProvider)
+    ) {
+      dispatch(setProvider(matchedProvider));
+    }
+  }, [dispatch, hasSelectedProviderData, matchedProvider, provider, providers]);
 
   function handleSelect(nextProvider) {
     if (!nextProvider) {
@@ -93,11 +125,6 @@ export function ProviderSelector() {
                       setIsOpen(true);
                     }}
                   >
-                    {shouldRenderDetachedProviderOption ? (
-                      <option value={selectedProviderId}>
-                        {selectedProvider.name || t('common.noName')}
-                      </option>
-                    ) : null}
                     {providers.map(item => (
                       <option key={item.id} value={item.id}>
                         {item.name || t('common.noName')}

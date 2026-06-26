@@ -6,7 +6,7 @@ import { RequestLoader } from '@shared/app/components/RequestLoader/RequestLoade
 import { SvgIcon } from '@shared/app/components/SvgIcon/SvgIcon.jsx';
 import { getApiErrorMessage } from '@shared/app/api/getApiErrorMessage.js';
 import { useI18n } from '@shared/app/i18n/useI18n.js';
-import { useUpdateProfileMutation } from '@shared/features/auth/authApi.js';
+import { useLazyGetMeQuery, useUpdateProfileMutation } from '@shared/features/auth/authApi.js';
 import { selectToken, selectUser, setSession } from '@shared/features/auth/authSlice.js';
 import { saveSession } from '@shared/features/auth/authStorage.js';
 import {
@@ -49,6 +49,7 @@ export function ProvidersPage() {
   const token = useSelector(selectToken);
   const { t } = useI18n();
   const [updateProfile, { isLoading }] = useUpdateProfileMutation();
+  const [getMe] = useLazyGetMeQuery();
   const [providers, setProviders] = useState(() => buildProviderDraft(user).providers);
   const [defaultProviderId, setDefaultProviderId] = useState(
     () => buildProviderDraft(user).defaultProviderId,
@@ -58,6 +59,15 @@ export function ProvidersPage() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
+  function applyUserSession(updatedUser) {
+    if (!updatedUser || !token) {
+      return;
+    }
+
+    saveSession(token, updatedUser);
+    dispatch(setSession({ token, user: updatedUser }));
+  }
+
   useEffect(() => {
     const draft = buildProviderDraft(user);
     setProviders(draft.providers);
@@ -65,6 +75,33 @@ export function ProvidersPage() {
     setNewProvider(null);
     setExpandedProviderIds(new Set());
   }, [user]);
+
+  useEffect(() => {
+    let isActive = true;
+
+    if (!token) {
+      return () => {
+        isActive = false;
+      };
+    }
+
+    getMe()
+      .unwrap()
+      .then(response => {
+        if (!isActive) {
+          return;
+        }
+
+        applyUserSession(response?.user || response);
+      })
+      .catch(() => {
+        // Keep the current session if this scoped server sync fails.
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [getMe, token]);
 
   function addProvider() {
     setMessage('');
@@ -112,39 +149,74 @@ export function ProvidersPage() {
     );
   }
 
-  function deleteProvider(providerId) {
-    setExpandedProviderIds(current => {
-      const next = new Set(current);
-      next.delete(providerId);
-      return next;
-    });
-    setProviders(current => {
-      const nextProviders = current.filter(provider => provider.id !== providerId);
-      setDefaultProviderId(currentDefaultId => getDefaultProviderId(nextProviders, currentDefaultId));
-      return nextProviders;
-    });
+  async function deleteProvider(providerId) {
+    const nextProviders = providers.filter(provider => provider.id !== providerId);
+    const nextDefaultProviderId = getDefaultProviderId(nextProviders, defaultProviderId);
+    const saved = await saveProviders(
+      nextProviders,
+      nextDefaultProviderId,
+      t('settings.providers.saved'),
+    );
+
+    if (saved) {
+      setExpandedProviderIds(current => {
+        const next = new Set(current);
+        next.delete(providerId);
+        return next;
+      });
+    }
+  }
+
+  async function makeDefaultProvider(providerId) {
+    await saveProviders(
+      providers,
+      providerId,
+      t('settings.providers.saved'),
+    );
+  }
+
+  async function commitProviderUpdate(providerId, field, value) {
+    const nextProviders = providers.map(provider =>
+      provider.id === providerId
+        ? {
+            ...provider,
+            [field]: value,
+          }
+        : provider,
+    );
+    const nextDefaultProviderId = getDefaultProviderId(nextProviders, defaultProviderId);
+
+    await saveProviders(
+      nextProviders,
+      nextDefaultProviderId,
+      t('settings.providers.saved'),
+    );
   }
 
   async function saveProviders(nextProviders, nextDefaultProviderId, successMessage) {
     setMessage('');
     setError('');
 
+    const serializedProviders = serializeProviders(nextProviders);
+    const resolvedDefaultProviderId = getDefaultProviderId(
+      serializedProviders,
+      nextDefaultProviderId,
+    );
     const defaultProvider =
-      nextProviders.find(provider => provider.id === nextDefaultProviderId) ||
-      nextProviders[0] ||
+      serializedProviders.find(provider => provider.id === resolvedDefaultProviderId) ||
+      serializedProviders[0] ||
       createEmptyProvider();
 
     try {
       const updatedUser = await updateProfile({
-        providers: nextProviders,
-        defaultProviderId: nextDefaultProviderId,
+        providers: serializedProviders,
+        defaultProviderId: resolvedDefaultProviderId,
         provider: defaultProvider,
       }).unwrap();
 
-      saveSession(token, updatedUser);
-      dispatch(setSession({ token, user: updatedUser }));
-      setProviders(nextProviders);
-      setDefaultProviderId(nextDefaultProviderId);
+      applyUserSession(updatedUser);
+      setProviders(serializedProviders);
+      setDefaultProviderId(resolvedDefaultProviderId);
       setMessage(successMessage);
       return true;
     } catch (error) {
@@ -335,6 +407,9 @@ export function ProvidersPage() {
                             value={provider.name}
                             placeholder={t('settings.providers.namePlaceholder')}
                             onChange={event => updateProvider(provider.id, 'name', event.target.value)}
+                            onBlur={event =>
+                              commitProviderUpdate(provider.id, 'name', event.target.value)
+                            }
                           />
                         </label>
 
@@ -347,6 +422,9 @@ export function ProvidersPage() {
                             onChange={event =>
                               updateProvider(provider.id, 'address', event.target.value)
                             }
+                            onBlur={event =>
+                              commitProviderUpdate(provider.id, 'address', event.target.value)
+                            }
                           />
                         </label>
 
@@ -358,6 +436,9 @@ export function ProvidersPage() {
                               value={provider.ico}
                               placeholder={t('settings.providers.icoPlaceholder')}
                               onChange={event => updateProvider(provider.id, 'ico', event.target.value)}
+                              onBlur={event =>
+                                commitProviderUpdate(provider.id, 'ico', event.target.value)
+                              }
                             />
                           </label>
 
@@ -368,6 +449,9 @@ export function ProvidersPage() {
                               value={provider.dic}
                               placeholder={t('settings.providers.dicPlaceholder')}
                               onChange={event => updateProvider(provider.id, 'dic', event.target.value)}
+                              onBlur={event =>
+                                commitProviderUpdate(provider.id, 'dic', event.target.value)
+                              }
                             />
                           </label>
                         </div>
@@ -377,8 +461,8 @@ export function ProvidersPage() {
                         <button
                           className="providersPage-secondaryButton"
                           type="button"
-                          onClick={() => setDefaultProviderId(provider.id)}
-                          disabled={isDefault}
+                          onClick={() => makeDefaultProvider(provider.id)}
+                          disabled={isDefault || isLoading}
                         >
                           <SvgIcon name="check-circle" />
                           <span>{t('settings.providers.makeDefault')}</span>
@@ -388,6 +472,7 @@ export function ProvidersPage() {
                           className="providersPage-deleteButton"
                           type="button"
                           onClick={() => deleteProvider(provider.id)}
+                          disabled={isLoading}
                         >
                           <SvgIcon name="trash" />
                           <span>{t('settings.providers.delete')}</span>
