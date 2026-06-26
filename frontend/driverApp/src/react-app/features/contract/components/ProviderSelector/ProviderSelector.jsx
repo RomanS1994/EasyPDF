@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
@@ -25,10 +25,23 @@ export function ProviderSelector() {
   const [isOpen, setIsOpen] = useState(false);
   const providers = useMemo(() => getUserProviders(user), [user]);
   const hasSelectedProviderData = hasProviderData(provider);
+  const defaultProviderId = user?.profile?.defaultProviderId || providers[0]?.id || '';
+  const defaultProvider =
+    providers.find(item => item.id && item.id === defaultProviderId) ||
+    providers[0] ||
+    null;
+  const profileSignature = useMemo(
+    () => `${defaultProviderId}:${providers.map(item => item.id).join('|')}`,
+    [defaultProviderId, providers],
+  );
+  const previousProfileRef = useRef({
+    defaultProviderId: '',
+    signature: '',
+  });
   const matchedProvider =
     providers.find(item => item.id && item.id === provider?.id) ||
     providers.find(item => hasSameProviderDetails(item, provider));
-  const selectedProvider = matchedProvider || providers[0] || null;
+  const selectedProvider = matchedProvider || defaultProvider;
   const selectedProviderId = selectedProvider?.id || '';
 
   useEffect(() => {
@@ -62,6 +75,18 @@ export function ProviderSelector() {
   }, [dispatch, getMe, token]);
 
   useEffect(() => {
+    const previousProfile = previousProfileRef.current;
+    const hasProfileChanged = Boolean(
+      previousProfile.signature && previousProfile.signature !== profileSignature,
+    );
+
+    if (previousProfile.signature !== profileSignature) {
+      previousProfileRef.current = {
+        defaultProviderId,
+        signature: profileSignature,
+      };
+    }
+
     if (!providers.length) {
       if (hasSelectedProviderData) {
         dispatch(setProvider({}));
@@ -70,8 +95,19 @@ export function ProviderSelector() {
       return;
     }
 
+    if (
+      hasProfileChanged &&
+      defaultProvider &&
+      previousProfile.defaultProviderId &&
+      provider?.id === previousProfile.defaultProviderId &&
+      previousProfile.defaultProviderId !== defaultProvider.id
+    ) {
+      dispatch(setProvider(defaultProvider));
+      return;
+    }
+
     if (!matchedProvider) {
-      dispatch(setProvider(providers[0]));
+      dispatch(setProvider(defaultProvider));
       return;
     }
 
@@ -81,7 +117,16 @@ export function ProviderSelector() {
     ) {
       dispatch(setProvider(matchedProvider));
     }
-  }, [dispatch, hasSelectedProviderData, matchedProvider, provider, providers]);
+  }, [
+    defaultProvider,
+    defaultProviderId,
+    dispatch,
+    hasSelectedProviderData,
+    matchedProvider,
+    profileSignature,
+    provider,
+    providers,
+  ]);
 
   function handleSelect(nextProvider) {
     if (!nextProvider) {

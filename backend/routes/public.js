@@ -32,6 +32,18 @@ async function listAvailablePlans() {
   });
 }
 
+function hasBusinessPartyData(value) {
+  return Boolean(
+    value &&
+      typeof value === 'object' &&
+      (value.name || value.address || value.ico || value.dic || value.dicVat)
+  );
+}
+
+function pickProviderForPdf(...candidates) {
+  return candidates.find(hasBusinessPartyData) || {};
+}
+
 export async function handlePublicRoutes(request, response, { pathName }) {
   if (request.method === 'GET' && pathName === '/api/health') {
     const health = await getDatabaseHealth();
@@ -82,11 +94,24 @@ export async function handlePublicRoutes(request, response, { pathName }) {
       throw new Error('Invalid PDF document type');
     }
 
+    const orderContractData =
+      order.contractData && typeof order.contractData === 'object' ? order.contractData : {};
+    const bodyOrderData = body.order && typeof body.order === 'object' ? body.order : {};
+    const bodyContractData =
+      body.contractData && typeof body.contractData === 'object' ? body.contractData : {};
+    const ownerBusinessPatch = buildOwnerContractBusinessPatch(order.user);
     const contractData = {
-      ...(order.contractData && typeof order.contractData === 'object' ? order.contractData : {}),
-      ...(body.order && typeof body.order === 'object' ? body.order : {}),
-      ...(body.contractData && typeof body.contractData === 'object' ? body.contractData : {}),
-      ...buildOwnerContractBusinessPatch(order.user),
+      ...ownerBusinessPatch,
+      ...orderContractData,
+      ...bodyOrderData,
+      ...bodyContractData,
+      driver: ownerBusinessPatch.driver,
+      provider: pickProviderForPdf(
+        bodyContractData.provider,
+        bodyOrderData.provider,
+        orderContractData.provider,
+        ownerBusinessPatch.provider
+      ),
       orderNumber: order.orderNumber || body.order?.orderNumber || body.contractData?.orderNumber || '',
       documentType: requestedDocumentType,
     };
