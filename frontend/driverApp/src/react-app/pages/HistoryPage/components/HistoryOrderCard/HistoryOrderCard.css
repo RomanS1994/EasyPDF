@@ -680,14 +680,15 @@
 }
 
 .orderFlightStatusBadge--delayed {
-  background: rgba(255, 245, 222, 0.98);
-  color: #c57c00;
+  background: rgba(255, 236, 236, 0.98);
+  color: #cf2f2f;
 }
 
+.orderFlightStatusBadge--landed,
 .orderFlightStatusBadge--in_air,
 .orderFlightStatusBadge--scheduled {
-  background: rgba(235, 242, 255, 0.98);
-  color: #1769e8;
+  background: rgba(235, 247, 239, 0.96);
+  color: #15783a;
 }
 
 .orderFlightStatusBadge--cancelled {
@@ -768,8 +769,39 @@
   font-weight: 800;
 }
 
+.orderFlightPanelTerminal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 20px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: rgba(47, 120, 255, 0.1);
+  color: #1769e8;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.orderFlightPanelTerminal--delayed {
+  background: rgba(207, 47, 47, 0.1);
+  color: #cf2f2f;
+}
+
+.orderFlightPanelTerminal--scheduled {
+  background: rgba(26, 143, 67, 0.1);
+  color: #1a8f43;
+}
+
 .orderFlightPanel--delayed .orderFlightPanelTiming {
-  color: #b87500;
+  color: #cf2f2f;
+}
+
+.orderFlightPanel--in_air .orderFlightPanelTiming,
+.orderFlightPanel--scheduled .orderFlightPanelTiming {
+  color: #1a8f43;
 }
 
 .orderFlightPanel--landed .orderFlightPanelTiming {
@@ -1069,6 +1101,12 @@
   .orderFlightPanelRoute,
   .orderFlightPanelTiming {
     font-size: 10px;
+  }
+
+  .orderFlightPanelTerminal {
+    min-height: 18px;
+    padding: 0 6px;
+    font-size: 9px;
   }
 
   .orderItemRouteTrackStart,

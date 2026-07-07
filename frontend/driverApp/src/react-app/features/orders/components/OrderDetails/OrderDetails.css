@@ -553,10 +553,12 @@
 }
 
 .orderSheetFlightBadge--delayed {
-  background: rgba(255, 245, 222, 0.98);
-  color: #b87500;
+  background: rgba(255, 236, 236, 0.98);
+  color: #cf2f2f;
 }
 
+.orderSheetFlightBadge--in_air,
+.orderSheetFlightBadge--scheduled,
 .orderSheetFlightBadge--landed {
   background: rgba(235, 247, 239, 0.96);
   color: #1a8f43;

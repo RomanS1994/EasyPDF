@@ -405,6 +405,21 @@ function getFlightCardTiming(flightStatus) {
   return '';
 }
 
+// Скорочує значення термінала до компактного формату T1, T2 або T3.
+function formatFlightTerminal(value) {
+  const terminal = String(value || '')
+    .trim()
+    .toUpperCase()
+    .replace(/^TERMINAL\s*/i, '')
+    .replace(/\s+/g, '');
+
+  if (!terminal) {
+    return '';
+  }
+
+  return terminal.startsWith('T') ? terminal : `T${terminal}`;
+}
+
 function FlightStatusBadge({ flightStatus }) {
   if (!flightStatus) {
     return null;
@@ -462,6 +477,7 @@ function FlightStatusPanel({ flightStatus, onCopyFlightNumber, copyNoticeVisible
   const destinationCode = getFlightRouteCode(flightStatus.route?.toCode || flightStatus.route?.to);
   const routeSummary = [route, destinationCode].filter(Boolean).join(' → ');
   const timing = getFlightCardTiming(flightStatus);
+  const terminal = formatFlightTerminal(flightStatus.terminal);
 
   return (
     <div
@@ -482,6 +498,11 @@ function FlightStatusPanel({ flightStatus, onCopyFlightNumber, copyNoticeVisible
       </span>
       {routeSummary ? <span className="orderFlightPanelRoute">{routeSummary}</span> : null}
       {timing ? <span className="orderFlightPanelTiming">{timing}</span> : null}
+      {terminal ? (
+        <span className={`orderFlightPanelTerminal orderFlightPanelTerminal--${flightStatus.status}`}>
+          {terminal}
+        </span>
+      ) : null}
     </div>
   );
 }
