@@ -4,6 +4,7 @@ const DEFAULT_BASE_URL = 'https://api.aviationstack.com/v1';
 const DEFAULT_TIMEOUT_MS = 6000;
 const FALLBACK_FLIGHTS_LIMIT = 10;
 
+// Нормалізує номер рейсу для запиту до Aviationstack.
 function normalizeFlightNumber(value) {
   return String(value || '')
     .trim()
@@ -11,6 +12,7 @@ function normalizeFlightNumber(value) {
     .toUpperCase();
 }
 
+// Додає пробіл між кодом авіакомпанії та номером рейсу.
 function formatFlightNumber(value) {
   const normalized = normalizeFlightNumber(value);
 
@@ -21,6 +23,7 @@ function formatFlightNumber(value) {
   return normalized.replace(/^([A-Z0-9]{2})(\d.*)$/, '$1 $2');
 }
 
+// Перетворює часовий рядок провайдера на ISO.
 function toIsoString(value) {
   if (!value) {
     return '';
@@ -30,11 +33,13 @@ function toIsoString(value) {
   return Number.isNaN(date.getTime()) ? '' : date.toISOString();
 }
 
+// Повертає лише додатне ціле число.
 function toPositiveInteger(value) {
   const parsed = Number.parseInt(String(value ?? '').trim(), 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 }
 
+// Додає хвилини до ISO-часу.
 function addMinutes(isoValue, minutes) {
   const date = new Date(isoValue);
 
@@ -46,19 +51,31 @@ function addMinutes(isoValue, minutes) {
   return date.toISOString();
 }
 
+// Читає секретний API key лише на backend.
 function getAviationstackApiKey() {
   return String(process.env.AVIATIONSTACK_API_KEY || '').trim();
 }
 
+// Повертає налаштований або стандартний URL провайдера.
 function getAviationstackBaseUrl() {
   return String(process.env.AVIATIONSTACK_BASE_URL || DEFAULT_BASE_URL).trim() || DEFAULT_BASE_URL;
 }
 
+// Повертає timeout зовнішнього HTTP-запиту.
 function getAviationstackTimeoutMs() {
   const configured = Number.parseInt(String(process.env.AVIATIONSTACK_TIMEOUT_MS || ''), 10);
   return Number.isFinite(configured) && configured > 0 ? configured : DEFAULT_TIMEOUT_MS;
 }
 
+// Визначає, чи можна передавати plan-specific параметр flight_date.
+function shouldUseFlightDateFilter() {
+  // За замовчуванням вимкнено, щоб не робити платний fallback-запит.
+  return String(process.env.AVIATIONSTACK_USE_FLIGHT_DATE_FILTER || '')
+    .trim()
+    .toLowerCase() === 'true';
+}
+
+// Нормалізує дату рейсу до YYYY-MM-DD.
 function normalizeFlightDate(value) {
   const text = String(value || '').trim();
   const match = text.match(/^(\d{4}-\d{2}-\d{2})/);
@@ -66,6 +83,7 @@ function normalizeFlightDate(value) {
   return match ? match[1] : '';
 }
 
+// Дістає дату з рядка або Date-сумісного значення.
 function getDatePart(value) {
   const text = String(value || '').trim();
   const directDate = text.match(/^(\d{4}-\d{2}-\d{2})/);
@@ -78,6 +96,7 @@ function getDatePart(value) {
   return Number.isNaN(date.getTime()) ? '' : date.toISOString().slice(0, 10);
 }
 
+// Будує URL одного запиту без автоматичних повторів.
 function buildFlightsUrl(flightNumber, { flightDate = '', includeFlightDate = true, limit = 1 } = {}) {
   const baseUrl = getAviationstackBaseUrl().replace(/\/+$/, '');
   const url = new URL(`${baseUrl}/flights`);
@@ -95,6 +114,7 @@ function buildFlightsUrl(flightNumber, { flightDate = '', includeFlightDate = tr
   return url;
 }
 
+// Перетворює API-помилку провайдера на стандартний Error.
 function createAviationstackError(payload) {
   const message = payload?.error?.info || payload?.error?.message || 'aviationstack API error';
   const error = new Error(message);
@@ -102,6 +122,7 @@ function createAviationstackError(payload) {
   return error;
 }
 
+// Перетворює статус Aviationstack на внутрішній статус застосунку.
 function normalizeFlightStatus(value, arrivalDelay) {
   const status = String(value || '').trim().toLowerCase();
 
@@ -114,6 +135,7 @@ function normalizeFlightStatus(value, arrivalDelay) {
   return 'unknown';
 }
 
+// Визначає дату конкретного запису рейсу.
 function getFlightRecordDate(record) {
   const arrival = record?.arrival && typeof record.arrival === 'object' ? record.arrival : {};
   const departure = record?.departure && typeof record.departure === 'object' ? record.departure : {};
@@ -126,6 +148,7 @@ function getFlightRecordDate(record) {
   );
 }
 
+// Обирає запис, який відповідає потрібній даті рейсу.
 function selectFlightRecord(records, { flightDate = '' } = {}) {
   if (!Array.isArray(records) || !records.length) {
     return null;
@@ -140,6 +163,7 @@ function selectFlightRecord(records, { flightDate = '' } = {}) {
   return records.find(record => getFlightRecordDate(record) === normalizedFlightDate) || null;
 }
 
+// Нормалізує відповідь провайдера для frontend і кешу.
 export function normalizeAviationstackFlight(record, fallbackFlightNumber) {
   if (!record || typeof record !== 'object') {
     return {
@@ -191,6 +215,7 @@ export function normalizeAviationstackFlight(record, fallbackFlightNumber) {
   };
 }
 
+// Виконує один HTTP-запит і повертає нормалізований статус.
 async function requestFlightStatus(flightNumber, options, signal) {
   const response = await fetch(buildFlightsUrl(flightNumber, options), {
     method: 'GET',
@@ -220,6 +245,7 @@ async function requestFlightStatus(flightNumber, options, signal) {
   return normalizeAviationstackFlight(flight, flightNumber);
 }
 
+// Завантажує статус рейсу з timeout без платного retry/fallback.
 export async function fetchAviationstackFlightStatus(flightNumber, { flightDate = '' } = {}) {
   const normalizedFlightNumber = normalizeFlightNumber(flightNumber);
 
@@ -230,29 +256,18 @@ export async function fetchAviationstackFlightStatus(flightNumber, { flightDate 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), getAviationstackTimeoutMs());
   const normalizedFlightDate = normalizeFlightDate(flightDate);
+  const includeFlightDate = shouldUseFlightDateFilter();
 
   try {
-    try {
-      return await requestFlightStatus(
-        normalizedFlightNumber,
-        { flightDate: normalizedFlightDate },
-        controller.signal
-      );
-    } catch (error) {
-      if (normalizedFlightDate && error?.code === 'function_access_restricted') {
-        return await requestFlightStatus(
-          normalizedFlightNumber,
-          {
-            flightDate: normalizedFlightDate,
-            includeFlightDate: false,
-            limit: FALLBACK_FLIGHTS_LIMIT,
-          },
-          controller.signal
-        );
-      }
-
-      throw error;
-    }
+    return await requestFlightStatus(
+      normalizedFlightNumber,
+      {
+        flightDate: normalizedFlightDate,
+        includeFlightDate,
+        limit: includeFlightDate ? 1 : FALLBACK_FLIGHTS_LIMIT,
+      },
+      controller.signal
+    );
   } finally {
     clearTimeout(timeout);
   }

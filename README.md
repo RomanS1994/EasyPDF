@@ -492,7 +492,10 @@ Backend сервіс:
 
 - бере номер рейсу з `flightNumber` або `contractData.flightNumber`;
 - перевіряє тільки рейси сьогодні або завтра;
-- кешує статус у `metadata.flightStatus`;
+- кешує статус глобально за парою `flightNumber + flightDate` і копіює його в `metadata.flightStatus`;
+- не виконує повторний зовнішній запит раніше ніж через 15 хвилин, включно після помилки API;
+- дедуплікує паралельні запити через атомарний DB lock;
+- припиняє оновлення після статусів `landed` або `cancelled`;
 - не оновлює завершені по часу замовлення;
 - використовує `AVIATIONSTACK_API_KEY`;
 - нормалізує статуси: `landed`, `delayed`, `in_air`, `scheduled`, `cancelled`, `unknown`;
@@ -780,6 +783,7 @@ npm run admin:create -- --email=user@example.com --promote-existing
 | --- | --- | --- |
 | `BACKEND_PORT` | ні | Порт backend, default `3001` |
 | `CLIENT_ORIGIN` | ні | CORS origins, comma-separated |
+| `TZ` | ні | Часовий пояс backend; рекомендовано `Europe/Prague` |
 | `API_KEY` | ні | Optional backend API key |
 | `AUTH_TOKEN_SECRET` | так | Секрет access token, мінімум 32 символи |
 | `ACCESS_TOKEN_TTL_MINUTES` | ні | TTL access token |
@@ -795,9 +799,11 @@ npm run admin:create -- --email=user@example.com --promote-existing
 | `AUTH_REGISTER_LOCK_AFTER_ATTEMPTS` | ні | Attempts до lock register |
 | `AVIATIONSTACK_API_KEY` | ні | Backend-only ключ flight status |
 | `AVIATIONSTACK_BASE_URL` | ні | Base URL aviationstack |
-| `AVIATIONSTACK_CACHE_TTL_MINUTES` | ні | TTL кешу flight status |
+| `AVIATIONSTACK_CACHE_TTL_MINUTES` | ні | TTL кешу flight status, мінімум 15 хв |
+| `AVIATIONSTACK_FUTURE_CACHE_TTL_MINUTES` | ні | TTL для рейсів на завтра, типово 60 хв |
 | `AVIATIONSTACK_MAX_REFRESH_PER_REQUEST` | ні | Max refresh за request |
 | `AVIATIONSTACK_TIMEOUT_MS` | ні | Timeout запиту до aviationstack |
+| `AVIATIONSTACK_USE_FLIGHT_DATE_FILTER` | ні | Передавати платний/plan-specific `flight_date`; типово `false` |
 | `DATABASE_URL` | так* | Prisma/PostgreSQL URL |
 | `DIRECT_DATABASE_URL` | так* | Direct DB URL або fallback для Prisma |
 
@@ -878,6 +884,17 @@ Production layout:
 - start command: `npm run start`;
 - health check: `/api/health`;
 - env: `AUTH_TOKEN_SECRET`, `DATABASE_URL` або `DIRECT_DATABASE_URL`.
+
+Для flight tracking на Render:
+
+- обов’язково: `AVIATIONSTACK_API_KEY`;
+- рекомендовано явно: `AVIATIONSTACK_CACHE_TTL_MINUTES=15`;
+- рекомендовано явно: `AVIATIONSTACK_FUTURE_CACHE_TTL_MINUTES=60`;
+- рекомендовано явно: `AVIATIONSTACK_USE_FLIGHT_DATE_FILTER=false`;
+- рекомендовано: `TZ=Europe/Prague`, оскільки refresh-window використовує локальну дату поїздки;
+- `AVIATIONSTACK_MAX_REFRESH_PER_REQUEST` обмежує кількість різних рейсів, які один HTTP request може спробувати оновити.
+
+Новий глобальний кеш потребує таблицю `flight_status_cache`, тому pre-deploy/release command із `db:migrate:deploy` має бути увімкнений до запуску нової версії backend.
 
 ## Операційні правила
 

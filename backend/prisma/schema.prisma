@@ -271,3 +271,21 @@ model AuditLog {
   @@index([createdAt])
   @@map("audit_logs")
 }
+
+model FlightStatusCache {
+  flightNumber  String
+  flightDate    String
+  payload       Json?
+  lastAttemptAt DateTime?
+  refreshedAt   DateTime?
+  nextRefreshAt DateTime?
+  lockUntil     DateTime?
+  lastError     String   @default("")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@id([flightNumber, flightDate])
+  @@index([nextRefreshAt])
+  @@index([lockUntil])
+  @@map("flight_status_cache")
+}

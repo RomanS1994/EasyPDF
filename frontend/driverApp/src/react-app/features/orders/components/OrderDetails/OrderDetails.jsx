@@ -80,6 +80,96 @@ function normalizeFlightNumber(value) {
     .toUpperCase();
 }
 
+const FLIGHT_STATUS_VALUES = new Set([
+  "landed",
+  "delayed",
+  "in_air",
+  "scheduled",
+  "cancelled",
+  "unknown",
+]);
+
+function normalizeFlightStatus(value, fallbackFlightNumber) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return null;
+  }
+
+  const rawStatus = String(value.status || "").trim().toLowerCase();
+  const route = value.route && typeof value.route === "object" && !Array.isArray(value.route)
+    ? value.route
+    : {};
+
+  return {
+    status: FLIGHT_STATUS_VALUES.has(rawStatus) ? rawStatus : "unknown",
+    flightNumber: normalizeFlightNumber(value.flightNumber || fallbackFlightNumber),
+    route: {
+      from: String(route.from || "").trim(),
+      to: String(route.to || "").trim(),
+      fromCode: String(route.fromCode || "").trim().toUpperCase(),
+      toCode: String(route.toCode || "").trim().toUpperCase(),
+    },
+    scheduledArrival: value.scheduledArrival || "",
+    estimatedArrival: value.estimatedArrival || "",
+    actualArrival: value.actualArrival || "",
+    delayMinutes: Math.max(0, Number.parseInt(String(value.delayMinutes || "0"), 10) || 0),
+    terminal: String(value.terminal || "").trim(),
+    baggageClaim: String(value.baggageClaim || "").trim(),
+    updatedAt: value.updatedAt || "",
+  };
+}
+
+function formatFlightPoint(name, code) {
+  const normalizedName = String(name || "").trim();
+  const normalizedCode = String(code || "").trim().toUpperCase();
+
+  if (normalizedName && normalizedCode && !normalizedName.toUpperCase().includes(normalizedCode)) {
+    return `${normalizedName} (${normalizedCode})`;
+  }
+
+  return normalizedName || normalizedCode;
+}
+
+function formatFlightRoute(route) {
+  return [
+    formatFlightPoint(route?.from, route?.fromCode),
+    formatFlightPoint(route?.to, route?.toCode),
+  ].filter(Boolean).join(" → ");
+}
+
+function formatFlightDateTime(value) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "-";
+  }
+
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const year = date.getUTCFullYear();
+  const hours = String(date.getUTCHours()).padStart(2, "0");
+  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+
+  return `${day}.${month}.${year}, ${hours}:${minutes}`;
+}
+
+function getFlightStatusLabel(flightStatus, t) {
+  const labels = {
+    landed: "contract.flightStatusLanded",
+    delayed: "contract.flightStatusDelayed",
+    in_air: "contract.flightStatusInAir",
+    scheduled: "contract.flightStatusScheduled",
+    cancelled: "contract.flightStatusCancelled",
+    unknown: "contract.flightStatusUnknown",
+  };
+  const label = t(labels[flightStatus?.status] || labels.unknown);
+
+  if (flightStatus?.status === "delayed" && flightStatus.delayMinutes) {
+    return `${label} +${flightStatus.delayMinutes} ${t("contract.minutesShort")}`;
+  }
+
+  return label;
+}
+
 function normalizeCount(value) {
   const parsed = Number.parseInt(String(value ?? '').trim(), 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
@@ -243,6 +333,7 @@ export function OrderDetails({ orderId, onClose }) {
   const storedFlightNumber = String(
     order?.flightNumber || order?.contractData?.flightNumber || "",
   ).trim();
+  const flightStatus = normalizeFlightStatus(order?.metadata?.flightStatus, storedFlightNumber);
   const amountDue = storedPrice || "-";
   const commissionConverted = useMemo(() => {
     if (!commissionInput) {
@@ -1006,6 +1097,71 @@ export function OrderDetails({ orderId, onClose }) {
                 ) : null}
               </div>
             </section>
+
+            {flightStatus ? (
+              <section className="orderSheetCard orderSheetFlightCard">
+                <div className="orderSheetSectionHeader">
+                  <OrderCardIcon name="takeoff" tone="accent" />
+                  <h4 className="orderSheetSectionTitle">{t('contract.flightInfo')}</h4>
+                </div>
+
+                <div className="orderSheetFlightHero">
+                  <div className="orderSheetFlightIdentity">
+                    <strong>{flightStatus.flightNumber || storedFlightNumber || '-'}</strong>
+                    {formatFlightRoute(flightStatus.route) ? (
+                      <span>{formatFlightRoute(flightStatus.route)}</span>
+                    ) : null}
+                  </div>
+                  <span className={`orderSheetFlightBadge orderSheetFlightBadge--${flightStatus.status}`}>
+                    <span aria-hidden="true" />
+                    {getFlightStatusLabel(flightStatus, t)}
+                  </span>
+                </div>
+
+                <div className="orderSheetRows orderSheetFlightRows">
+                  {flightStatus.scheduledArrival ? (
+                    <div className="orderSheetInfoRow">
+                      <span className="orderSheetInfoLabel">{t('contract.scheduledArrival')}</span>
+                      <span className="orderSheetInfoValue">{formatFlightDateTime(flightStatus.scheduledArrival)}</span>
+                    </div>
+                  ) : null}
+                  {flightStatus.estimatedArrival ? (
+                    <div className="orderSheetInfoRow">
+                      <span className="orderSheetInfoLabel">{t('contract.estimatedArrival')}</span>
+                      <span className="orderSheetInfoValue orderSheetFlightValue--accent">
+                        {formatFlightDateTime(flightStatus.estimatedArrival)}
+                      </span>
+                    </div>
+                  ) : null}
+                  {flightStatus.actualArrival ? (
+                    <div className="orderSheetInfoRow">
+                      <span className="orderSheetInfoLabel">{t('contract.actualArrival')}</span>
+                      <span className="orderSheetInfoValue orderSheetFlightValue--success">
+                        {formatFlightDateTime(flightStatus.actualArrival)}
+                      </span>
+                    </div>
+                  ) : null}
+                  {flightStatus.terminal ? (
+                    <div className="orderSheetInfoRow">
+                      <span className="orderSheetInfoLabel">{t('contract.terminal')}</span>
+                      <span className="orderSheetInfoValue">{flightStatus.terminal}</span>
+                    </div>
+                  ) : null}
+                  {flightStatus.baggageClaim ? (
+                    <div className="orderSheetInfoRow">
+                      <span className="orderSheetInfoLabel">{t('contract.baggageClaim')}</span>
+                      <span className="orderSheetInfoValue">{flightStatus.baggageClaim}</span>
+                    </div>
+                  ) : null}
+                  {flightStatus.updatedAt ? (
+                    <div className="orderSheetInfoRow">
+                      <span className="orderSheetInfoLabel">{t('contract.flightUpdatedAt')}</span>
+                      <span className="orderSheetInfoValue">{formatDateTime(flightStatus.updatedAt)}</span>
+                    </div>
+                  ) : null}
+                </div>
+              </section>
+            ) : null}
 
             <section className="orderSheetCard">
               <div className="orderSheetSectionHeader">

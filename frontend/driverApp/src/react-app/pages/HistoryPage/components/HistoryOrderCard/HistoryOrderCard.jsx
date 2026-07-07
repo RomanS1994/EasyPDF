@@ -375,6 +375,36 @@ function getFlightStatusExtra(flightStatus) {
   return items;
 }
 
+function getFlightCardTiming(flightStatus) {
+  const scheduledTime = formatFlightTime(flightStatus.scheduledArrival);
+  const estimatedTime = formatFlightTime(flightStatus.estimatedArrival);
+  const actualTime = formatFlightTime(flightStatus.actualArrival);
+
+  if (flightStatus.status === 'landed') {
+    return actualTime ? `Landed ${actualTime}` : 'Landed';
+  }
+
+  if (flightStatus.status === 'delayed') {
+    const arrivalTime = estimatedTime || scheduledTime;
+    return arrivalTime ? `Arrival ${arrivalTime}` : 'Delayed';
+  }
+
+  if (flightStatus.status === 'in_air') {
+    const arrivalTime = estimatedTime || scheduledTime;
+    return arrivalTime ? `ETA ${arrivalTime}` : 'In air';
+  }
+
+  if (flightStatus.status === 'scheduled') {
+    return scheduledTime ? `Arrival ${scheduledTime}` : 'Scheduled';
+  }
+
+  if (flightStatus.status === 'cancelled') {
+    return 'Cancelled';
+  }
+
+  return '';
+}
+
 function FlightStatusBadge({ flightStatus }) {
   if (!flightStatus) {
     return null;
@@ -429,43 +459,29 @@ function FlightStatusPanel({ flightStatus, onCopyFlightNumber, copyNoticeVisible
   }
 
   const route = formatFlightRoute(flightStatus.route);
-  const statusText = getFlightStatusText(flightStatus);
-  const extraItems = getFlightStatusExtra(flightStatus);
-  const showProgress = flightStatus.status === 'in_air';
+  const destinationCode = getFlightRouteCode(flightStatus.route?.toCode || flightStatus.route?.to);
+  const routeSummary = [route, destinationCode].filter(Boolean).join(' → ');
+  const timing = getFlightCardTiming(flightStatus);
 
   return (
     <div
       className={`orderFlightPanel orderFlightPanel--${flightStatus.status}`}
-      aria-label={`Flight ${flightStatus.flightNumber}: ${statusText.primary}`}
+      aria-label={`Flight ${flightStatus.flightNumber}${timing ? `: ${timing}` : ''}`}
     >
-      <div className="orderFlightPanelIdentity">
-        <span className="orderFlightPanelNumberWrap">
-          <button
-            className="orderFlightPanelNumber"
-            type="button"
-            aria-label={`Copy flight number ${flightStatus.flightNumber}`}
-            title={flightStatus.flightNumber}
-            onClick={onCopyFlightNumber}
-          >
-            {flightStatus.flightNumber}
-          </button>
-          <FlightCopyToast visible={copyNoticeVisible} label={copyNoticeLabel} />
-        </span>
-        {route ? <span className="orderFlightPanelRoute">{route}</span> : null}
-      </div>
-      {showProgress ? <FlightProgress route={flightStatus.route} /> : null}
-      <div className="orderFlightPanelDetails">
-        <span className="orderFlightPanelStatus">{statusText.primary}</span>
-        {statusText.meta ? <span className="orderFlightPanelMeta">{statusText.meta}</span> : null}
-        {statusText.secondaryMeta ? <span className="orderFlightPanelMeta">{statusText.secondaryMeta}</span> : null}
-      </div>
-      {extraItems.length ? (
-        <div className="orderFlightPanelExtra">
-          {extraItems.map(item => (
-            <span key={item} className="orderFlightPanelMeta">{item}</span>
-          ))}
-        </div>
-      ) : null}
+      <span className="orderFlightPanelNumberWrap">
+        <button
+          className="orderFlightPanelNumber"
+          type="button"
+          aria-label={`Copy flight number ${flightStatus.flightNumber}`}
+          title={flightStatus.flightNumber}
+          onClick={onCopyFlightNumber}
+        >
+          {flightStatus.flightNumber}
+        </button>
+        <FlightCopyToast visible={copyNoticeVisible} label={copyNoticeLabel} />
+      </span>
+      {routeSummary ? <span className="orderFlightPanelRoute">{routeSummary}</span> : null}
+      {timing ? <span className="orderFlightPanelTiming">{timing}</span> : null}
     </div>
   );
 }
@@ -555,8 +571,6 @@ function HistoryOrderCard({ order, onOpen, referenceDate }) {
     order?.trip?.to ||
     '';
   const hasRoute = Boolean(routeFrom && routeTo);
-  const visibleRouteAddress = flightStatus ? routeFrom || routeTo : '';
-  const hasVisibleRoute = flightStatus ? Boolean(visibleRouteAddress) : hasRoute;
   const passengersCount = normalizeCount(order?.contractData?.passengers || order?.passengers);
   const luggageCount = normalizeCount(
     order?.contractData?.trip?.luggageUnits ||
@@ -703,49 +717,34 @@ function HistoryOrderCard({ order, onOpen, referenceDate }) {
             />
           ) : null}
 
-          <div className={`orderItemRoute ${hasVisibleRoute ? '' : 'is-placeholder'} ${flightStatus ? 'orderItemRoute--flight' : ''}`}>
-            {hasVisibleRoute ? (
-              flightStatus ? (
+          <div className={`orderItemRoute ${hasRoute ? '' : 'is-placeholder'} ${flightStatus ? 'orderItemRoute--flight' : ''}`}>
+            {hasRoute ? (
+              <>
                 <button
-                  className="orderItemRouteLineButton orderItemRouteLineButton--single"
+                  className="orderItemRouteLineButton"
                   type="button"
-                  onClick={(event) => handleOpenRouteModal(event, visibleRouteAddress, t('history.routeFrom'))}
+                  onClick={(event) => handleOpenRouteModal(event, routeFrom, t('history.routeFrom'))}
                 >
                   <span className="orderItemRouteLineText">
-                    <span className="orderItemRouteLineValue">{visibleRouteAddress}</span>
+                    <span className="orderItemRouteLineValue">{routeFrom}</span>
                   </span>
                   <span className="orderItemRouteLineArrow" aria-hidden="true">
                     <RouteOpenIcon />
                   </span>
                 </button>
-              ) : (
-                <>
-                  <button
-                    className="orderItemRouteLineButton"
-                    type="button"
-                    onClick={(event) => handleOpenRouteModal(event, routeFrom, t('history.routeFrom'))}
-                  >
-                    <span className="orderItemRouteLineText">
-                      <span className="orderItemRouteLineValue">{routeFrom}</span>
-                    </span>
-                    <span className="orderItemRouteLineArrow" aria-hidden="true">
-                      <RouteOpenIcon />
-                    </span>
-                  </button>
-                  <button
-                    className="orderItemRouteLineButton"
-                    type="button"
-                    onClick={(event) => handleOpenRouteModal(event, routeTo, t('history.routeTo'))}
-                  >
-                    <span className="orderItemRouteLineText">
-                      <span className="orderItemRouteLineValue">{routeTo}</span>
-                    </span>
-                    <span className="orderItemRouteLineArrow" aria-hidden="true">
-                      <RouteOpenIcon />
-                    </span>
-                  </button>
-                </>
-              )
+                <button
+                  className="orderItemRouteLineButton"
+                  type="button"
+                  onClick={(event) => handleOpenRouteModal(event, routeTo, t('history.routeTo'))}
+                >
+                  <span className="orderItemRouteLineText">
+                    <span className="orderItemRouteLineValue">{routeTo}</span>
+                  </span>
+                  <span className="orderItemRouteLineArrow" aria-hidden="true">
+                    <RouteOpenIcon />
+                  </span>
+                </button>
+              </>
             ) : (
               t('history.routeNotAdded')
             )}
